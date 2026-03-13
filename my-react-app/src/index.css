@@ -12,5 +12,11 @@
 }
 
 ::-webkit-scrollbar{
-  @apply hidden;
+  display: none;
+}
+
+@media (max-width:740px){
+  .active p{
+   @apply text-white bg-primary;
+  }
 }

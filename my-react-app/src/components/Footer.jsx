@@ -5,15 +5,13 @@ const Footer = () => {
   return (
     <div className='md:mx-10'>
         <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm'>
-            <div>
+            {/* <div>
 
                     < img className='mb-5 w-40' src={assets.logo} alt="" />
-                    <p className='w-full  text-gray-600 leading-7'>
-                        Lorem ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum has been the industry's  standard dummmy text ever since the 1500s,when on unkown printer took a galley of type and scrambied it to make a type specimen book.
-                    </p>
-            </div>
+                   
+            </div> */}
                     
-            <div>
+            {/* <div>
                 <p className='text-xl  font-medium mb-5'>COMPANY</p>
                     <ul className='flex flex-col gap-2 text-gray-600'>
                         <li>Home</li>
@@ -21,20 +19,20 @@ const Footer = () => {
                         <li>Contact us</li>
                         <li>Privacy policy</li>
                     </ul>
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
                     <p className='text-xl  font-medium mb-5'>GET IN TOUCH</p>
                     <ul className='flex flex-col gap-2 text-gray-600'>
                         <li>+1-212-456-7890</li>
                         <li>greatstackdev@gamil.com</li>
                     </ul>
-            </div>
+            </div> */}
         </div>
-        <div>
+        {/* <div>
             <hr />
             <p className='py-5 text-sm text-center'>Copyright 2024@ Prescripto - All Right Reserved.</p>
-        </div>
+        </div> */}
     </div>
   )
 }
