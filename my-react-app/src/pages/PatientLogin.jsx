@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { auth, db } from '../firebase/'
 import { useNavigate } from 'react-router-dom'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -86,11 +86,33 @@ const Login = () => {
       }
 
       else {
-        await signInWithEmailAndPassword(auth, email, password)
+
+
+
+
+        const userRef = doc(db, "patients", email)
+        const userSnap = await getDoc(userRef)
+
+        if (!userSnap.exists()) {
+          alert("No patient record found ")
+          return
+        }
+
+        const userData = userSnap.data()
+
+        if (userData.isDisabled) {
+          alert("Your account is disabled")
+          return
+        }
+
+        if (userData.accountInfo.password !== password) {
+          alert("Wrong password")
+          return
+        }
+
         alert("Login Success")
+        localStorage.setItem("patientEmail", email)
         navigate('/my-profile')
-        setEmail('');
-        setPassword('');
       }
 
     } catch (error) {

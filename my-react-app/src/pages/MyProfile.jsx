@@ -13,179 +13,174 @@ const MyProfile = () => {
 
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
 
-        console.log("Doc Exists:", docSnap.exists());
-        console.log("Data:", docSnap.data());
+    const email = localStorage.getItem("patientEmail")
 
-        if (docSnap.exists()) {
-          setUserData({
-            ...docSnap.data(),
-            image: docSnap.data()?.image || assets.profile_pic
-          });
-        } else {
+    if (!email) {
+      console.log("No email found ")
+      return
+    }
 
-          setUserData({
-            name: user.displayName || "No Name",
-            email: user.email,
-            address: "",
-            phone: "",
-            gender: "",
-            birthday: "",
-            image: assets.profile_pic
-          });
-        }
+    const fetchData = async () => {
+
+      const docRef = doc(db, "patients", email)
+      const docSnap = await getDoc(docRef)
+
+      if (docSnap.exists()) {
+
+        setUserData(docSnap.data())
+
+      } else {
+
+        console.log("No patient data found ")
+
       }
-    });
 
+    }
 
-    return () => unsubscribe();
-  }, []);
+    fetchData()
+
+  }, [])
 
 
   if (!userData) return <div>Patient Profile...</div>;
 
   return (
-    <div className='max-w-lg flex flex-col gap-2 text-sm'>
-      <label htmlFor="image">
-        <img
-          className="w-36 h-36 rounded-full object-cover cursor-pointer"
-          src={userData?.image || assets.profile_pic}
-          alt=""
-        />
-      </label>
-
-      <input type="file" id="image" hidden
-        onChange={async (e) => {
-
-          const file = e.target.files[0]
-
-          if (file) {
-
-            const reader = new FileReader()
-
-            reader.onloadend = async () => {
-
-              const imageUrl = reader.result
-
-              setUserData(prev => ({
-                ...prev,
-                image: imageUrl
-              }))
-
-              const user = auth.currentUser
-
-              if (user) {
-
-                const docRef = doc(db, "users", user.uid)
-
-                await updateDoc(docRef, {
-                  image: imageUrl
-                })
-
-              }
-
-            }
-
-            reader.readAsDataURL(file)
-
-          }
-
-        }}
-      />
-
-      {
-        isEdit
-          ? <input className='bg-gray-50 text-3xl font-medium max-w-60 mt-4' type="text" value={userData.name} onChange={e => setUserData(prev => ({ ...prev, name: e.target.value }))} />
-          : <p className='font-medium text-3xl text-neutral-800 mt-4'>{userData.name}</p>
-      }
-
-      <hr className='bg-zinc-400 h-[1px] border-none' />
-      <div>
-        <p className='text-neutral-500 underline mt-3'>CONTACT INFORMATION</p>
-        <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
-          <p className='font-medium'>Email id:</p>
-          <p className='text-blue-500'>{userData.email}</p>
-          <p className='font-medium'>Phone:</p>
-          {
-            isEdit
-              ? <input className='bg-gray-100 max-w-52' type="text" value={userData.phone} onChange={e => setUserData(prev => ({ ...prev, phone: e.target.value }))} />
-              : <p className='text-blue-400'>{userData.phone}</p>
-          }
+    <div className="flex min-h-screen">
 
 
-          <p className='font-medium'>Address:</p>
-          {
-            isEdit
-              ? <p>
-                <input
-                  className='bg-gray-50' type="text" value={userData.address} onChange={(e) => setUserData(prev => ({ ...prev, address: e.target.value }))}
-                />
-              </p>
-              : <p className='text-gray-500'>
-                {userData.address}
-              </p>
-          }
+      <div className="w-64 bg-blue-600 text-white p-6 space-y-6">
+        {/* <p className="text-xl font-bold">Prescripto</p>
+        <p>Home</p>
+        <p>Subscription</p>
+        <p>Account Creation</p>
+        <p>Doctors</p> */}
+      </div>
+
+
+      <div className="flex-1 p-10">
+
+        <div className="max-w-5xl mx-auto">
+
+
+          <div className="flex items-center gap-6 mb-10">
+
+            <img src={userData.image || assets.profile_pic} className="w-32 h-32 rounded-full object-cover" />
+
+            <h1 className="text-3xl font-bold">
+              {userData.basicInfo?.name}
+            </h1>
+
+          </div>
+
+
+          <div className="grid grid-cols-2 gap-x-16 gap-y-6">
+
+
+            <div className="space-y-4">
+
+              {[
+                { label: "Name", key: "name", section: "basicInfo" },
+                { label: "Gender", key: "gender", section: "basicInfo" },
+                { label: "Address", key: "address", section: "basicInfo" },
+                { label: "EMR Contact", key: "emrContact", section: "basicInfo" },
+                { label: "Occupation", key: "occupation", section: "basicInfo" },
+                { label: "Policy Number", key: "policy", section: "insuranceInfo" },
+                { label: "Agent Number", key: "agentNumber", section: "insuranceInfo" },
+                { label: "Current Condition", key: "condition", section: "reasonInfo" },
+                { label: "Primary Reason", key: "primaryReason", section: "reasonInfo" },
+              ].map((item) => (
+                <div key={item.label} className="grid grid-cols-[180px_1fr] items-center">
+                  <span className="font-semibold">{item.label} :</span>
+
+                  <input
+                    disabled={!isEdit}
+                    value={userData[item.section]?.[item.key] || ""}
+                    className="border px-3 py-2 rounded w-full"
+                    onChange={(e) =>
+                      setUserData({
+                        ...userData,
+                        [item.section]: {
+                          ...userData[item.section],
+                          [item.key]: e.target.value
+                        }
+                      })
+                    }
+                  />
+                </div>
+              ))}
+
+            </div>
+
+
+            <div className="space-y-4">
+
+              {[
+                { label: "Age", key: "age", section: "basicInfo" },
+                { label: "DOB", key: "dob", section: "basicInfo" },
+                { label: "Contact", key: "contact", section: "basicInfo" },
+                { label: "Email", key: "email", section: "basicInfo" },
+                { label: "Insurance Provider", key: "provider", section: "insuranceInfo" },
+                { label: "Agent Name", key: "agentName", section: "insuranceInfo" },
+                { label: "Blood Group", key: "bloodGroup", section: "medicalHistory" },
+                { label: "Reason For Visit", key: "visitReason", section: "reasonInfo" },
+                { label: "Duration", key: "duration", section: "reasonInfo" },
+              ].map((item) => (
+                <div key={item.label} className="grid grid-cols-[180px_1fr] items-center">
+                  <span className="font-semibold">{item.label} :</span>
+
+                  <input
+                    disabled={!isEdit}
+                    value={userData[item.section]?.[item.key] || ""}
+                    className="border px-3 py-2 rounded w-full"
+                    onChange={(e) =>
+                      setUserData({
+                        ...userData,
+                        [item.section]: {
+                          ...userData[item.section],
+                          [item.key]: e.target.value
+                        }
+                      })
+                    }
+                  />
+                </div>
+              ))}
+
+            </div>
+
+          </div>
+
+
+
+          <div className="flex justify-end gap-6 mt-6">
+
+            {!isEdit ? (
+              <button onClick={() => setIsEdit(true)} className="border border-blue-500 px-8 py-2 rounded-full">
+                Edit
+              </button>
+            ) : (
+              <button onClick={async () => {
+
+                const email = localStorage.getItem("patientEmail")
+                const ref = doc(db, "patients", email)
+
+                await updateDoc(ref, userData)
+
+                alert("Saved")
+                setIsEdit(false)
+
+              }} className="bg-blue-500 text-white px-8 py-2 rounded-full">
+                Save
+              </button>
+            )}
+
+          </div>
         </div>
       </div>
-      <div>
-        <p className='text-neutral-500 underline mt-3'>BASIC  INFORMATION</p>
-        <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
-          <p className='font-medium'>Gender:</p>
-          {
-            isEdit
-              ? <select className='max-w-20 bg-gray-100' onChange={(e) => setUserData(prev => ({ ...prev, gender: e.target.value }))} value={userData.gender}>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-              : <p className='text-gray-400'>{userData.gender}</p>
 
-          }
-          <p className='font-medium'>Birthday:</p>
-          {
-            isEdit
-              ? <input className='max-w-28 bg-gray-100' type="date" onChange={(e) => setUserData(prev => ({ ...prev, birthday: e.target.value }))} value={userData.birthday} />
-              : <p className='text-gray-400'>{userData.birthday}</p>
-          }
-        </div>
-      </div>
-      <div className='mt-10'>
-        {
-          isEdit
-            ? <button className='border border-blue-500 px-8 py-2 rounded-full hover:bg-blue-500 hover:text-white transition-all'
-              onClick={async () => {
-
-                const user = auth.currentUser
-
-                if (!user) return
-
-                const docRef = doc(db, "users", user.uid)
-
-                try {
-
-                  await updateDoc(docRef, {
-                    name: userData.name,
-                    phone: userData.phone,
-                    address: userData.address,
-                    gender: userData.gender,
-                    birthday: userData.birthday,
-                    image: userData.image
-                  })
-
-                  setIsEdit(false)
-
-                } catch (error) {
-                  console.log(error)
-                }
-
-              }}>Save Information</button>
-            : <button className='border border-blue-500 px-8 py-2 rounded-full hover:bg-blue-500 hover:text-white transition-all' onClick={() => setIsEdit(true)}>Edit</button>
-        }
-      </div>
     </div>
+
+
   )
 }
 

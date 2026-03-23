@@ -1,6 +1,9 @@
 import React from "react";
-import { Routes, Route,useLocation} from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+
+import Loding from "./pages/Loding";
 import Home from "./pages/Home";
+import MasterLogin from "./pages/MasterLogin";
 import Doctor from "./pages/Doctor";
 import Login from "./pages/PatientLogin";
 import About from "./pages/About";
@@ -10,38 +13,59 @@ import MyAppointment from "./pages/MyAppointment";
 import Appointment from "./pages/Appointment";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import MasterLogin from "./pages/MasterLogin";
 import DoctorLogin from "./pages/DoctorLogin";
 import PatientLogin from "./pages/PatientLogin";
-import Account from "./pages/Account.jsx"
+import AdminLogin from "./pages/AdminLogin.jsx";
+import Account from "./pages/Account.jsx";
 import StaffLogin from "./pages/StaffLogin";
+import DoctorProfile from "./pages/DoctorProfile";
+import StaffProfile from "./pages/StaffProfile";
+import RoleWelcome from "./pages/RoleWelcome";
 
 const App = () => {
 
   const location = useLocation();
-  return (
+  const hideLayout = [
+    "/",
+    "/master-login",
+    "/doctor-login",
+    "/patient-login",
+    "/staff-login",
+    "/role-welcome",
+    "/admin-login"  
+  ].includes(location.pathname);
 
-    
-    <div className="mx-4 sm:mx-[10%]">
-      <Navbar />
+  return (
+    <div className="w-full">
+
+
+      {!hideLayout && <Navbar />}
+
       <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/doctor' element={<Doctor />} />
-        <Route path='/doctor/:speciality' element={<Doctor />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/my-profile' element={<MyProfile />} />
-        <Route path='/my-appointment' element={<MyAppointment />} />
-        <Route path='/appointment/:docId' element={<Appointment />} />
-        <Route path='/master-login' element={<MasterLogin />} />
-        <Route path='/doctor-login' element={<DoctorLogin />} />
-        <Route path='/patient-login' element={<PatientLogin />} />
+        <Route path="/" element={<Loding />} />
+        <Route path="/master-login" element={<MasterLogin />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/doctor" element={<Doctor />} />
+        <Route path="/doctor/:speciality" element={<Doctor />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/my-profile" element={<MyProfile />} />
+        <Route path="/my-appointment" element={<MyAppointment />} />
+        <Route path="/appointment/:docId" element={<Appointment />} />
+        <Route path="/doctor-login" element={<DoctorLogin />} />
+        <Route path="/patient-login" element={<PatientLogin />} />
         <Route path="/staff-login" element={<StaffLogin />} />
-        <Route path='/account' element={<Account />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/doctor-profile" element={<DoctorProfile />} />
+        <Route path="/staff-profile" element={<StaffProfile />} />
+        <Route path="/role-welcome" element={<RoleWelcome />} />
       </Routes>
 
-     {location.pathname !== "/account" && <Footer />}
+
+      {!hideLayout && location.pathname !== "/account" && <Footer />}
+
     </div>
   );
 };

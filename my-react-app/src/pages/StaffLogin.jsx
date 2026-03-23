@@ -23,14 +23,15 @@ const StaffLogin = () => {
 
         const data = docSnap.data()
 
-        if (data.password !== password) {
+       
+        if (data.staffAccount?.password !== password) {
             alert("Wrong Password")
             return
         }
 
-        localStorage.setItem("staffLogin", "true")
+        localStorage.setItem("staffId", staffId)
 
-        navigate("/staff-dashboard")
+        navigate("/staff-profile")
 
     }
 
@@ -45,13 +46,13 @@ const StaffLogin = () => {
                 </h2>
 
                 <input type="text" placeholder="Staff ID" className="border p-2 rounded w-full mb-4"
-                    value={staffId} onChange={(e) => setStaffId(e.target.value)}/>
+                    value={staffId} onChange={(e) => setStaffId(e.target.value)} />
 
                 <div className="relative">
 
                     <input type={showPassword ? "text" : "password"} placeholder="Password"
                         className="border p-2 rounded w-full pr-10" value={password}
-                        onChange={(e) => setPassword(e.target.value)}/>
+                        onChange={(e) => setPassword(e.target.value)} />
 
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
                         onClick={() => setShowPassword(!showPassword)}

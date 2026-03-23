@@ -8,190 +8,151 @@ import {
   signInWithPopup,
   updateProfile
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { doc, setDoc, collection, getDocs } from "firebase/firestore";
 
 const MasterLogin = () => {
 
-  const [state, setState] = useState("Login")
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false)
+  const [state, setState] = useState("Login");
+  const [name, setName] = useState("");
+  const [hospital, setHospital] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-
-    e.preventDefault()
+    e.preventDefault();
 
     try {
 
       if (state === "Register") {
 
         if (password !== confirmPassword) {
-          alert("Password and Confirm Password not match")
-          return
+          alert("Passwords do not match");
+          return;
         }
 
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
         await updateProfile(userCredential.user, {
           displayName: name
-        })
+        });
 
         await setDoc(doc(db, "master", userCredential.user.uid), {
           name: name,
           email: email,
+          hospital: hospital,
           role: "master"
-        })
+        });
 
-        alert("Master Registered Successfully")
-        setState("Login")
+        alert("Registered Successfully");
+        setState("Login");
+      }
 
+      
+      else {
 
-      } else {
+        await signInWithEmailAndPassword(auth, email, password);
 
-        await signInWithEmailAndPassword(auth, email, password)
+        const snapshot = await getDocs(collection(db, "master"));
+        const users = snapshot.docs.map(doc => doc.data());
 
-        localStorage.setItem("masterLogin", "true")
+        const match = users.find(u => u.email === email);
 
-        navigate("/account")
+        if (match) {
+          localStorage.setItem("hospitalName", match.hospital);
+        }
 
+        localStorage.setItem("masterLogin", "true");
+
+        navigate("/home");
       }
 
     } catch (error) {
-
-      alert(error.message)
-
+      alert(error.message);
     }
+  };
 
-  }
-
-
+  
   const handleGoogleLogin = async () => {
-
     try {
 
-      const provider = new GoogleAuthProvider()
-
-      const result = await signInWithPopup(auth, provider)
-
-      const user = result.user
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
       await setDoc(doc(db, "master", user.uid), {
         name: user.displayName,
         email: user.email,
-        role: "master"
-      }, { merge: true })
+        role: "master",
+        hospital: hospital || "Default"
+      }, { merge: true });
 
-      localStorage.setItem("masterLogin", "true")
+      localStorage.setItem("masterLogin", "true");
+      localStorage.setItem("hospitalName", hospital);
 
-      navigate("/account")
+      navigate("/home");
 
     } catch (error) {
-
-      alert(error.message)
-
+      alert(error.message);
     }
-
-  }
+  };
 
   return (
 
-    <div className="min-h-[80vh] flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
 
-      <form onSubmit={handleSubmit}
-        className="flex flex-col gap-4 border p-8 rounded-lg shadow-lg w-[350px]">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow w-[350px] flex flex-col gap-4">
 
-        <h2 className="text-2xl font-semibold text-center">
+        <h2 className="text-2xl text-center font-semibold">
           {state === "Login" ? "Master Login" : "Master Register"}
         </h2>
 
+        
         {state === "Register" && (
+          <>
+            <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)}
+              className="border p-3 rounded"/>
 
-          <input type="text" placeholder="Full Name" className="border p-2 rounded" value={name}
-            onChange={(e) => setName(e.target.value)} required />
+            <input type="text" placeholder="Hospital Name" value={hospital} onChange={(e) => setHospital(e.target.value)}
+              className="border p-3 rounded"/>
+          </>
         )}
 
-        <input type="email" placeholder="Email" className="border p-2 rounded" value={email}
-          onChange={(e) => setEmail(e.target.value)} required />
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
+          className="border p-3 rounded"/>
 
-        <div className="relative">
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
+          className="border p-3 rounded"/>
 
-          <input type={showPassword ? "text" : "password"} placeholder="Password"
-            className="border p-2 rounded w-full pr-10" value={password}
-            onChange={(e) => setPassword(e.target.value)} required />
-          <span
-            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
-
-        </div>
-
+        
         {state === "Register" && (
-
-          <div className="relative">
-
-            <input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm Password"
-              className="border p-2 rounded w-full pr-10" value={showConfirmPassword}
-              onChange={(e) => setShowConfirmPassword(e.target.value)} required
-            />
-
-            <span
-              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
-
-          </div>
-
+          <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+            className="border p-3 rounded"/>
         )}
 
-        <button className="bg-blue-500 text-white py-2 rounded">
+        <button className="bg-blue-500 text-white py-3 rounded">
           {state === "Login" ? "Login" : "Register"}
         </button>
 
-        <button type="button" onClick={handleGoogleLogin}
-          className="border border-gray-300 py-2 rounded flex items-center justify-center gap-2">
-
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5" />
-
+        
+        <button type="button" onClick={handleGoogleLogin} className="border py-3 rounded flex items-center justify-center gap-2">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5"/>
           Sign in with Google
-
         </button>
 
-        {state === "Login" ? (
-
-          <p className="text-sm">
-            No admin account?
-            <span className="text-blue-500 cursor-pointer ml-1" onClick={() => setState("Register")}>
-              Register here
-            </span>
-          </p>
-
-        ) : (
-
-          <p className="text-sm">
-            Already admin?
-            <span className="text-blue-500 cursor-pointer ml-1" onClick={() => setState("Login")}>
-              Login here
-            </span>
-          </p>
-
-        )}
+        <p className="text-center text-sm">
+          {state === "Login" ? "No account?" : "Already have account?"}
+          <span className="text-blue-500 ml-1 cursor-pointer" onClick={() => setState(state === "Login" ? "Register" : "Login")}>
+            {state === "Login" ? "Register" : "Login"}
+          </span>
+        </p>
 
       </form>
 
     </div>
+  );
+};
 
-  )
-
-}
-
-export default MasterLogin
+export default MasterLogin;

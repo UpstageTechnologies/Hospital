@@ -2,13 +2,10 @@ import React, { useState } from "react";
 import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
   GoogleAuthProvider,
   signInWithPopup
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const DoctorLogin = () => {
@@ -41,8 +38,8 @@ const DoctorLogin = () => {
       }, { merge: true })
 
       alert("Doctor Google Signup Success")
-
-      navigate("/Doctor")
+      console.log("Login success", email)
+      navigate("/doctor-profile")
 
     } catch (error) {
       alert(error.message)
@@ -59,35 +56,54 @@ const DoctorLogin = () => {
 
       if (state === "Register") {
 
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-
-        await updateProfile(userCredential.user, {
-          displayName: name
-        })
-
-        await setDoc(doc(db, "doctors", userCredential.user.uid), {
-          name: name,
-          email: email,
-          role: "doctor"
+        // ❌ Firebase Auth வேண்டாம்
+        await setDoc(doc(db, "doctors", email), {
+          doctorBasicInfo: {
+            name: name,
+            email: email
+          },
+          doctorAccount: {
+            password: password
+          },
+          isDisabled: false
         })
 
         alert("Doctor Registered Successfully")
         setState("Login")
 
-      }
+      } else {
 
-      else {
+        const doctorRef = doc(db, "doctors", email)
+        const doctorSnap = await getDoc(doctorRef)
 
-        await signInWithEmailAndPassword(auth, email, password)
+        if (!doctorSnap.exists()) {
+          alert("Doctor not found ❌")
+          return
+        }
 
+        const data = doctorSnap.data()
+
+        if (data.isDisabled) {
+          alert("Your account is disabled ❌")
+          return
+        }
+
+        if (data.doctorAccount?.password !== password) {
+          alert("Wrong password ❌")
+          return
+        }
+
+        // ✅ SUCCESS LOGIN
         alert("Doctor Login Success")
 
-        navigate("/Doctor")
+        localStorage.setItem("doctorEmail", email)
+
+       navigate("/doctor-profile")
 
       }
 
-    }
-    catch (error) {
+    } catch (error) {
+      console.log(error)
       alert(error.message)
     }
 

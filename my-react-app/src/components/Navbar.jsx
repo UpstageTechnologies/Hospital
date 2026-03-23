@@ -11,8 +11,7 @@ const Navbar = () => {
     const navigate = useNavigate()
     const location = useLocation();
 
-
-
+    const [hospitalLogo, setHospitalLogo] = useState(assets.logo);
     const [showProfileMenu, setShowProfileMenu] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
     const [isMaster, setIsMaster] = useState(false)
@@ -43,7 +42,7 @@ const Navbar = () => {
 
             if (currentUser) {
 
-                const docRef = doc(db, "users", currentUser.uid);
+                const docRef = doc(db, "master", currentUser.uid);
 
                 const docSnap = await getDoc(docRef);
 
@@ -62,6 +61,48 @@ const Navbar = () => {
         });
 
         return () => unsubscribe();
+
+    }, []);
+
+    useEffect(() => {
+
+        const fetchHospital = async () => {
+
+            const user = auth.currentUser;
+
+            if (!user) return;
+
+            
+            const docRef = doc(db, "master", user.uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+
+                const hospital = docSnap.data().hospital;
+
+                if (!hospital) return;
+
+                const name = hospital.toLowerCase();
+
+                if (name.includes("rajesh")) {
+                    setHospitalLogo("/logos/rajesh.png");
+                }
+                else if (name.includes("government") || name.includes("gh")) {
+                    setHospitalLogo("/logos/gh.png");
+                }
+                else if (name.includes("appolo")) {
+                    setHospitalLogo("/logos/appolo.png"); 
+                }
+                else if (name.includes("upstage")) {
+                    setHospitalLogo("/logos/upstage.png");
+                }
+                else {
+                    setHospitalLogo("/logos/default.png");
+                }
+            }
+        };
+
+        fetchHospital();
 
     }, []);
 
@@ -101,51 +142,51 @@ const Navbar = () => {
 
     return (
         <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 relative z-50 w-full px-4'>
-            <img className='w-44 cursor-pointer ml-2' src={assets.logo} alt="" />
+            <img className='w-16 h-16 object-contain cursor-pointer ml-2' src={hospitalLogo} alt="logo" />
             {!location.pathname.startsWith("/appointment") && (
                 <ul className="hidden md:flex items-center gap-6 font-medium">
 
-                {isMaster && location.pathname === "/account" ? (
+                    {isMaster && location.pathname === "/account" ? (
 
-                    <NavLink to="/account">
+                        <NavLink to="/account">
 
-                    </NavLink>
-
-                ) : (
-
-                    <>
-                        <NavLink to="/">
-                            <li className="py-1">Home</li>
                         </NavLink>
 
-                        <NavLink to="/doctor">
-                            <li className="py-1">All Doctors</li>
-                        </NavLink>
+                    ) : (
 
-                        <NavLink to="/about">
-                            <li className="py-1">About</li>
-                        </NavLink>
+                        <>
+                            <NavLink to="/">
+                                <li className="py-1">Home</li>
+                            </NavLink>
 
-                        <NavLink to="/contact">
-                            <li className="py-1">Contact</li>
-                        </NavLink>
-                    </>
+                            <NavLink to="/doctor">
+                                <li className="py-1">All Doctors</li>
+                            </NavLink>
 
-                )}
+                            <NavLink to="/about">
+                                <li className="py-1">About</li>
+                            </NavLink>
 
-            </ul>
-             )}
-          
+                            <NavLink to="/contact">
+                                <li className="py-1">Contact</li>
+                            </NavLink>
+                        </>
+
+                    )}
+
+                </ul>
+            )}
+
             <div className='flex items-center gap-4 relative'>
 
                 {
                     user ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
 
-                    <img className='w-8 h-8 rounded-full object-cover' src={userImage} alt="" />
-                    <img className='w-2.5 ' src={assets.dropdown_icon} alt="" />
+                        <img className='w-8 h-8 rounded-full object-cover' src={userImage} alt="" />
+                        <img className='w-2.5 ' src={assets.dropdown_icon} alt="" />
                         {showProfileMenu && (
                             <div className='absolute right-0 top-full mt-2 bg-white shadow-lg rounded-md p-4 text-base font-medium text-gray-600 z-50'>
-                             <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
+                                <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
                                     <p onClick={() => navigate('/my-profile')} className='hover:text-black cursor-pointer'>MyProfile</p>
                                     <label className="cursor-pointer">
                                         Profile
