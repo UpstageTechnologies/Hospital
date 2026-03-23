@@ -43,6 +43,7 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<Loding />} />
+        <Route path="/role-welcome" element={<RoleWelcome />} />
         <Route path="/master-login" element={<MasterLogin />} />
         <Route path="/home" element={<Home />} />
         <Route path="/doctor" element={<Doctor />} />
@@ -60,7 +61,7 @@ const App = () => {
         <Route path="/account" element={<Account />} />
         <Route path="/doctor-profile" element={<DoctorProfile />} />
         <Route path="/staff-profile" element={<StaffProfile />} />
-        <Route path="/role-welcome" element={<RoleWelcome />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
 

@@ -26,7 +26,7 @@ const Loding = () => {
                     .map(doc => doc.data().hospital)
                     .filter((h) => h && typeof h === "string");
 
-                
+
                 const localHistory = JSON.parse(localStorage.getItem("hospitalHistory")) || [];
                 const combined = [...new Set([...localHistory, ...hospitals])];
 
@@ -41,7 +41,7 @@ const Loding = () => {
     }, []);
 
 
-    
+
     const filteredHospitals = hospital
         ? hospitalList.filter((h) =>
             h && h.toLowerCase().includes(hospital.toLowerCase())
@@ -53,7 +53,7 @@ const Loding = () => {
     );
 
 
-   
+
     const saveHospitalToLocal = (name) => {
         let history = JSON.parse(localStorage.getItem("hospitalHistory")) || [];
 
@@ -84,7 +84,7 @@ const Loding = () => {
                 }, { merge: true });
             }
 
-           
+
             navigate("/role-welcome", { state: { role } });
 
         } catch (err) {
@@ -94,7 +94,7 @@ const Loding = () => {
 
     return (
         <div className="flex flex-col md:flex-row items-center justify-between min-h-screen px-6 md:px-20 py-10 bg-gradient-to-br from-gray-100 to-gray-200">
-             <div className="max-w-xl mt-10 md:mt-16">
+            <div className="max-w-xl mt-10 md:mt-16">
 
                 <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-4">
                     Your <br />
@@ -108,7 +108,7 @@ const Loding = () => {
 
                 <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 w-[380px] mt-6 mb-10">
 
-                     <div className="relative mb-4">
+                    <div className="relative mb-4">
 
                         <input type="text" placeholder="Enter Hospital Name" value={hospital} onFocus={() => setShowHospitalDropdown(true)}
                             onChange={(e) => {
@@ -118,7 +118,7 @@ const Loding = () => {
                             className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
 
-                       
+
                         {showHospitalDropdown && (
                             <div className="absolute w-full bg-white border border-gray-300 rounded-lg mt-2 shadow-lg z-50 max-h-40 overflow-y-auto">
 
@@ -128,10 +128,10 @@ const Loding = () => {
 
                                 {filteredHospitals.map((item, i) => (
                                     <div key={i} onClick={() => {
-                                            if (!item) return;
-                                            setHospital(item);
-                                            setShowHospitalDropdown(false);
-                                        }}
+                                        if (!item) return;
+                                        setHospital(item);
+                                        setShowHospitalDropdown(false);
+                                    }}
                                         className="px-4 py-2 cursor-pointer hover:bg-blue-500 hover:text-white"
                                     >
                                         {item}
@@ -164,10 +164,10 @@ const Loding = () => {
 
                                 {filteredRoles.map((item, i) => (
                                     <div key={i} onClick={() => {
-                                            setRole(item);
-                                            setOpen(false);
-                                            setSearch("");
-                                        }}
+                                        setRole(item);
+                                        setOpen(false);
+                                        setSearch("");
+                                    }}
                                         className="px-4 py-2 cursor-pointer hover:bg-blue-500 hover:text-white"
                                     >
                                         {item}
@@ -184,7 +184,7 @@ const Loding = () => {
                         Continue →
                     </button>
 
-                    <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg mb-3 transition">
+                    <button onClick={() => navigate("/master-login", { state: { register: true } })} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg mb-3 transition">
                         New User →
                     </button>
 
@@ -199,7 +199,7 @@ const Loding = () => {
 
             <div className="mt-10 md:mt-0 flex justify-center items-center">
                 <div className="bg-gray-200 p-6 rounded-full shadow-inner">
-                    <img src="/Doctors/doc1.png" alt="doctor" className="w-[260px] md:w-[320px] object-cover rounded-full"/>
+                    <img src="/Doctors/doc1.png" alt="doctor" className="w-[260px] md:w-[320px] object-cover rounded-full" />
                 </div>
             </div>
 
