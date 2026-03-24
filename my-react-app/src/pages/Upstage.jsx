@@ -6,7 +6,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 
-const Navbar = () => {
+const Upstage = () => {
 
     const navigate = useNavigate()
     const location = useLocation();
@@ -225,12 +225,13 @@ const Navbar = () => {
                                             className="cursor-pointer hover:text-black whitespace-nowrap">
                                             Master Login
                                         </p>
-                                        
+
                                         <p onClick={() => {
                                             navigate('/admin-login')
                                             setShowProfileMenu(false)
-                                        }} className="cursor-pointer hover:text-black whitespace-nowrap">
-                                             Admin Login
+                                        }}
+                                            className="cursor-pointer hover:text-black whitespace-nowrap">
+                                            Admin Login
                                         </p>
 
                                         <p onClick={() => {
@@ -317,4 +318,4 @@ const Navbar = () => {
     )
 }
 
-export default Navbar
+export default Upstage

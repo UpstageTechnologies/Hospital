@@ -15,7 +15,7 @@ const AdminLogin = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // 🔥 Email Login
+    
     const handleLogin = async () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
@@ -26,7 +26,7 @@ const AdminLogin = () => {
         }
     };
 
-    // 🔥 Register
+    
     const handleRegister = async () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
@@ -37,16 +37,16 @@ const AdminLogin = () => {
         }
     };
 
-    // 🔥 GOOGLE LOGIN (IMPORTANT)
+    
     const handleGoogle = async () => {
         try {
             const result = await signInWithPopup(auth, provider);
 
-            console.log(result.user); // debug
+            console.log(result.user); 
 
             alert("Google Login Success");
 
-            // 🔥 redirect
+            
             navigate("/account");
 
         } catch (err) {
@@ -64,55 +64,34 @@ const AdminLogin = () => {
                     {isRegister ? "Admin Register" : "Admin Login"}
                 </h2>
 
-                <input
-                    type="email"
-                    placeholder="Enter Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full mb-4 px-4 py-3 border rounded-lg bg-gray-100"
+                <input type="email" placeholder="Enter Email" value={email}
+                    onChange={(e) => setEmail(e.target.value)} className="w-full mb-4 px-4 py-3 border rounded-lg bg-gray-100"
                 />
 
-                <input
-                    type="password"
-                    placeholder="Enter Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full mb-5 px-4 py-3 border rounded-lg bg-gray-100"
+                <input type="password" placeholder="Enter Password" value={password}
+                    onChange={(e) => setPassword(e.target.value)} className="w-full mb-5 px-4 py-3 border rounded-lg bg-gray-100"
                 />
 
                 {!isRegister ? (
-                    <button
-                        onClick={handleLogin}
-                        className="w-full bg-blue-500 text-white py-3 rounded-lg mb-4"
-                    >
+                    <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-3 rounded-lg mb-4">
                         Login
                     </button>
                 ) : (
-                    <button
-                        onClick={handleRegister}
-                        className="w-full bg-blue-500 text-white py-3 rounded-lg mb-4"
-                    >
+                    <button onClick={handleRegister} className="w-full bg-blue-500 text-white py-3 rounded-lg mb-4">
                         Register
                     </button>
                 )}
 
-                {/* 🔥 GOOGLE BUTTON */}
+                
                 <button
                     onClick={handleGoogle}
                     className="w-full border border-gray-300 py-3 rounded-lg mb-4 flex items-center justify-center gap-3 bg-white hover:shadow-md transition"
                 >
-                    <img
-                        src="https://developers.google.com/identity/images/g-logo.png"
-                        alt="google"
-                        className="w-5 h-5"
-                    />
+                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="google" className="w-5 h-5"/>
                     <span>Sign in with Google</span>
                 </button>
 
-                <p
-                    onClick={() => setIsRegister(!isRegister)}
-                    className="text-center text-blue-500 cursor-pointer"
-                >
+                <p onClick={() => setIsRegister(!isRegister)} className="text-center text-blue-500 cursor-pointer">
                     {isRegister
                         ? "Already have account? Login"
                         : "No account? Register"}

@@ -56,7 +56,7 @@ const DoctorLogin = () => {
 
       if (state === "Register") {
 
-        // ❌ Firebase Auth வேண்டாம்
+        
         await setDoc(doc(db, "doctors", email), {
           doctorBasicInfo: {
             name: name,
@@ -77,19 +77,19 @@ const DoctorLogin = () => {
         const doctorSnap = await getDoc(doctorRef)
 
         if (!doctorSnap.exists()) {
-          alert("Doctor not found ❌")
+          alert("Doctor not found ")
           return
         }
 
         const data = doctorSnap.data()
 
         if (data.isDisabled) {
-          alert("Your account is disabled ❌")
+          alert("Your account is disabled ")
           return
         }
 
         if (data.doctorAccount?.password !== password) {
-          alert("Wrong password ❌")
+          alert("Wrong password ")
           return
         }
 

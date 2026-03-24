@@ -1,6 +1,8 @@
 import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
+import HospitalIntro from "./pages/HospitalIntro";
+import Upstage from "./pages/Upstage.jsx";
 import Loding from "./pages/Loding";
 import Home from "./pages/Home";
 import MasterLogin from "./pages/MasterLogin";
@@ -26,15 +28,16 @@ const App = () => {
 
   const location = useLocation();
   const hideLayout = [
-    "/",
+    "/", 
+    "/upstage",               
+    "/select-hospital",
+    "/role-welcome",
     "/master-login",
+    "/admin-login",
     "/doctor-login",
     "/patient-login",
-    "/staff-login",
-    "/role-welcome",
-    "/admin-login"  
+    "/staff-login"
   ].includes(location.pathname);
-
   return (
     <div className="w-full">
 
@@ -42,7 +45,9 @@ const App = () => {
       {!hideLayout && <Navbar />}
 
       <Routes>
-        <Route path="/" element={<Loding />} />
+        <Route path="/" element={<HospitalIntro />} />
+        <Route path="/upstage" element={<Upstage />} />
+        <Route path="/select-hospital" element={<Loding />} />
         <Route path="/role-welcome" element={<RoleWelcome />} />
         <Route path="/master-login" element={<MasterLogin />} />
         <Route path="/home" element={<Home />} />

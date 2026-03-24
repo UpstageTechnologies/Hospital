@@ -9,19 +9,15 @@ import {
   updateProfile
 } from "firebase/auth";
 import { doc, setDoc, collection, getDocs } from "firebase/firestore";
-import { useLocation } from "react-router-dom";
 
 const MasterLogin = () => {
 
-  const [state, setState] = useState(
-    location.state?.register ? "Register" : "Login"
-  );
+  const [state, setState] = useState("Login");
   const [name, setName] = useState("");
   const [hospital, setHospital] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const location = useLocation();
 
   const navigate = useNavigate();
 
@@ -54,7 +50,6 @@ const MasterLogin = () => {
         setState("Login");
       }
 
-
       else {
 
         await signInWithEmailAndPassword(auth, email, password);
@@ -77,7 +72,6 @@ const MasterLogin = () => {
       alert(error.message);
     }
   };
-
 
   const handleGoogleLogin = async () => {
     try {
@@ -113,42 +107,39 @@ const MasterLogin = () => {
           {state === "Login" ? "Master Login" : "Master Register"}
         </h2>
 
-
         {state === "Register" && (
           <>
-            <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)}
-              className="border p-3 rounded" />
+            <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} className="border p-3 rounded"/>
 
-            <input type="text" placeholder="Hospital Name" value={hospital} onChange={(e) => setHospital(e.target.value)}
-              className="border p-3 rounded" />
+            <input type="text" placeholder="Hospital Name" value={hospital} onChange={(e) => setHospital(e.target.value)} className="border p-3 rounded"/>
           </>
         )}
 
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
-          className="border p-3 rounded" />
+        <input type="email"  placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="border p-3 rounded"/>
 
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
-          className="border p-3 rounded" />
-
+        <input type="password"  placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="border p-3 rounded"/>
 
         {state === "Register" && (
           <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-            className="border p-3 rounded" />
+            className="border p-3 rounded"/>
         )}
 
         <button className="bg-blue-500 text-white py-3 rounded">
           {state === "Login" ? "Login" : "Register"}
         </button>
 
-
-        <button type="button" onClick={handleGoogleLogin} className="border py-3 rounded flex items-center justify-center gap-2">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5" />
+        <button type="button" onClick={handleGoogleLogin}
+          className="border py-3 rounded flex items-center justify-center gap-2">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5"/>
           Sign in with Google
         </button>
 
         <p className="text-center text-sm">
           {state === "Login" ? "No account?" : "Already have account?"}
-          <span className="text-blue-500 ml-1 cursor-pointer" onClick={() => setState(state === "Login" ? "Register" : "Login")}>
+          <span
+            className="text-blue-500 ml-1 cursor-pointer"
+            onClick={() => setState(state === "Login" ? "Register" : "Login")}
+          >
             {state === "Login" ? "Register" : "Login"}
           </span>
         </p>

@@ -586,11 +586,11 @@ const Account = () => {
         isDisabled: false
       })
 
-      alert("Admin saved ✅")
+      alert("Admin saved ")
 
       fetchAdmins()
 
-      
+      // 🔥 RESET ALL FORM DATA
       setAdminBasicInfo({
         name: "",
         age: "",
@@ -642,7 +642,7 @@ const Account = () => {
         isDisabled: false
       })
 
-      alert("Patient saved ✅")
+      alert("Patient saved ")
 
       fetchPatients()
 
@@ -801,9 +801,9 @@ const Account = () => {
 
         {subMenu === "admins" && (
 
-          <div className="w-full md:w-3/4 p-6 relative overflow-y-auto h-[500px]">
+          <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[450px]">
 
-            <div className="w-full md:w-1/4 p-4 space-y-3">
+            <div className="w-1/4 p-4 space-y-3">
               <h2 className="text-xl font-bold">Create Admin Account</h2>
 
               <button onClick={() => setAdminStep(1)}
@@ -830,7 +830,8 @@ const Account = () => {
 
 
 
-            <div className="w-full md:w-3/4 p-6 relative overflow-auto min-h-[500px]">
+            <div className="w-3/4 p-6 relative overflow-hidden h-[450px]">
+
 
 
               {adminStep === 1 && (
@@ -840,81 +841,65 @@ const Account = () => {
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
-                    <FloatingInput label="Name" required
-                      value={adminBasicInfo.name}
-                      disabled={isViewMode}
+
+                    <FloatingInput label="Name" required value={adminBasicInfo.name} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminBasicInfo({ ...adminBasicInfo, name: e.target.value })
                       }
                     />
 
-                    <FloatingInput label="Age" required type="number"
-                      value={adminBasicInfo.age}
-                      disabled={isViewMode}
+
+                    <FloatingInput label="Age" required type="number" value={adminBasicInfo.age} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminBasicInfo({ ...adminBasicInfo, age: e.target.value })
                       }
                     />
 
+
                     <div className="relative">
-                      <select
-                        value={adminBasicInfo.gender}
-                        disabled={isViewMode}
+                      <select value={adminBasicInfo.gender} disabled={isViewMode}
                         onChange={(e) =>
                           setAdminBasicInfo({ ...adminBasicInfo, gender: e.target.value })
                         }
-                        className="w-full border rounded-xl px-4 py-3"
+                        className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
                       >
                         <option value="">Select Gender</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                        <option>Others</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Others">Others</option>
                       </select>
-                    </div>
 
-                    <div className="flex flex-col w-full">
-
-                      <label className="text-sm text-gray-600 mb-1">
-                        DOB <span className="text-red-500">*</span>
+                      <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
+                        Gender <span className="text-red-500">*</span>
                       </label>
-                        
-                      <input
-                        type="date"
-                        value={adminBasicInfo.dob}
-                        onChange={(e) =>
-                          setAdminBasicInfo({ ...adminBasicInfo, dob: e.target.value })
-                        }
-                        className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none bg-white"
-                      />
-
                     </div>
 
-                    <FloatingInput
-                      label="Address"
-                      className="col-span-2"
-                      inputClassName="h-[100px] pt-6"
-                      value={adminBasicInfo.address}
-                      disabled={isViewMode}
+
+                    <FloatingInput label="DOB" type="date" value={adminBasicInfo.dob} disabled={isViewMode}
+                      onChange={(e) =>
+                        setAdminBasicInfo({ ...adminBasicInfo, dob: e.target.value })
+                      }
+                    />
+
+
+                    <FloatingInput label="Address" className="col-span-2" inputClassName="h-[120px] pt-6" value={adminBasicInfo.address || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminBasicInfo({ ...adminBasicInfo, address: e.target.value })
                       }
                     />
 
+
                     <div className="col-span-2 flex flex-col gap-4">
 
-                      <FloatingInput label="Contact Number"
-                        value={adminBasicInfo.contact}
-                        disabled={isViewMode}
+                      <FloatingInput label="Contact Number" required value={adminBasicInfo.contact} disabled={isViewMode}
                         onChange={(e) =>
                           setAdminBasicInfo({ ...adminBasicInfo, contact: e.target.value })
                         }
                       />
 
-                      <FloatingInput label="EMR Contact"
-                        value={adminBasicInfo.emrContact}
-                        disabled={isViewMode}
+                      <FloatingInput label="EMR Contact" value={adminBasicInfo.emrContact || ""} disabled={isViewMode}
                         onChange={(e) =>
                           setAdminBasicInfo({ ...adminBasicInfo, emrContact: e.target.value })
                         }
@@ -922,17 +907,15 @@ const Account = () => {
 
                     </div>
 
-                    <FloatingInput label="Email" className="col-span-2"
-                      value={adminBasicInfo.email}
-                      disabled={isViewMode}
+
+                    <FloatingInput label="Email" className="col-span-2" value={adminBasicInfo.email} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminBasicInfo({ ...adminBasicInfo, email: e.target.value })
                       }
                     />
 
-                    <FloatingInput label="Occupation" className="col-span-2"
-                      value={adminBasicInfo.occupation}
-                      disabled={isViewMode}
+
+                    <FloatingInput label="Occupation" className="col-span-2" value={adminBasicInfo.occupation || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminBasicInfo({ ...adminBasicInfo, occupation: e.target.value })
                       }
@@ -940,9 +923,8 @@ const Account = () => {
 
                   </div>
 
-                  <div className="mt-6 flex justify-end">
-                    <button onClick={() => setAdminStep(2)}
-                      className="bg-blue-500 text-white px-10 py-2 rounded">
+                  <div className="absolute bottom-4 right-6 flex gap-4">
+                    <button onClick={() => setAdminStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
                   </div>
@@ -957,9 +939,7 @@ const Account = () => {
                   <h3 className="text-lg font-bold mb-6">Designation</h3>
 
                   <div className="grid grid-cols-2 gap-6 max-w-4xl">
-                    <FloatingInput label="Designation"
-                      value={adminDesignation.designation}
-                      disabled={isViewMode}
+                    <FloatingInput label="Designation" value={adminDesignation.designation} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminDesignation({
                           ...adminDesignation,
@@ -968,9 +948,7 @@ const Account = () => {
                       }
                     />
 
-                    <FloatingInput label="Qualification"
-                      value={adminDesignation.qualification}
-                      disabled={isViewMode}
+                    <FloatingInput label="Qualification" value={adminDesignation.qualification} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminDesignation({
                           ...adminDesignation,
@@ -996,9 +974,7 @@ const Account = () => {
 
                   <div className="flex flex-col gap-6 max-w-md">
 
-                    <FloatingInput label="Admin ID"
-                      value={adminOfficial.adminId}
-                      disabled={isViewMode}
+                    <FloatingInput label="Admin ID" value={adminOfficial.adminId} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminOfficial({
                           ...adminOfficial,
@@ -1007,9 +983,7 @@ const Account = () => {
                       }
                     />
 
-                    <FloatingInput label="Joining Date" type="date"
-                      value={adminOfficial.joiningDate}
-                      disabled={isViewMode}
+                    <FloatingInput label="Joining Date" type="date" value={adminOfficial.joiningDate} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminOfficial({
                           ...adminOfficial,
@@ -1018,9 +992,7 @@ const Account = () => {
                       }
                     />
 
-                    <FloatingInput label="Relieving Date" type="date"
-                      value={adminOfficial.relievingDate}
-                      disabled={isViewMode}
+                    <FloatingInput label="Relieving Date" type="date" value={adminOfficial.relievingDate} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminOfficial({
                           ...adminOfficial,
@@ -1047,9 +1019,7 @@ const Account = () => {
 
                   <div className="flex flex-col gap-6 max-w-md">
 
-                    <FloatingInput label="Admin ID"
-                      value={adminAccount.adminId}
-                      disabled={isViewMode}
+                    <FloatingInput label="Admin ID" value={adminAccount.adminId} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminAccount({
                           ...adminAccount,
@@ -1058,9 +1028,7 @@ const Account = () => {
                       }
                     />
 
-                    <FloatingInput label="Password" type="password"
-                      value={adminAccount.password}
-                      disabled={isViewMode}
+                    <FloatingInput label="Password" type="password" value={adminAccount.password} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminAccount({
                           ...adminAccount,
@@ -1069,9 +1037,7 @@ const Account = () => {
                       }
                     />
 
-                    <FloatingInput label="Confirm Password" type="password"
-                      value={adminAccount.confirmPassword}
-                      disabled={isViewMode}
+                    <FloatingInput label="Confirm Password" type="password" value={adminAccount.confirmPassword} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminAccount({
                           ...adminAccount,
@@ -1173,8 +1139,7 @@ const Account = () => {
                         Edit
                       </button>
 
-                      <button
-                        onClick={async () => {
+                      <button onClick={async () => {
                           await deleteDoc(doc(db, "admins", adm.id))
                           fetchAdmins()
                         }}
@@ -1183,8 +1148,7 @@ const Account = () => {
                         Delete
                       </button>
 
-                      <button
-                        onClick={async () => {
+                      <button onClick={async () => {
                           await updateDoc(doc(db, "admins", adm.id), {
                             isDisabled: !adm.isDisabled
                           })
@@ -1211,12 +1175,12 @@ const Account = () => {
 
         {subMenu === "doctors" && (
 
-          <div className="flex w-full max-w-7xl border rounded-lg overflow-y-auto h-[450px]">
+          <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[450px]">
 
 
-            <div className="w-1/4 p-4 space-y-3 border-r">
+            <div className="w-1/4 p-4 space-y-3">
 
-              <h2 className="text-xl font-bold">Create Doctor Account</h2>
+              <h2 className="text-xl font-bold mb-4">Create Doctor Account</h2>
 
               <button onClick={() => setDoctorStep(1)}
                 className={`w-full p-2 rounded text-white ${doctorStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
@@ -1240,8 +1204,8 @@ const Account = () => {
 
             </div>
 
-            {/* RIGHT SIDE */}
-            <div className="w-full md:w-3/4 p-6 relative overflow-y-auto h-[500px]">
+
+            <div className="w-3/4 p-6 relative overflow-hidden h-[450px]">
 
 
               {doctorStep === 1 && (
@@ -1295,9 +1259,7 @@ const Account = () => {
                     />
 
 
-                    <FloatingInput label="Address"
-                      className="col-span-2"
-                      inputClassName="h-[100px] pt-6"
+                    <FloatingInput label="Address" className="col-span-2" inputClassName="h-[120px] pt-6"
                       value={doctorBasicInfo.address || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setDoctorBasicInfo({ ...doctorBasicInfo, address: e.target.value })
@@ -1337,7 +1299,7 @@ const Account = () => {
 
                   </div>
 
-                  <div className="mt-6 flex justify-end">
+                  <div className="absolute bottom-4 right-6 flex gap-4">
                     <button onClick={() => setDoctorStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
@@ -1356,10 +1318,7 @@ const Account = () => {
 
                   <div className="grid grid-cols-2 gap-6 max-w-4xl">
 
-                    <FloatingInput
-                      label="Designation"
-                      value={doctorDesignation.designation}
-                      disabled={isViewMode}
+                    <FloatingInput label="Designation" value={doctorDesignation.designation} disabled={isViewMode}
                       onChange={(e) =>
                         setDoctorDesignation({
                           ...doctorDesignation,
@@ -1625,7 +1584,7 @@ const Account = () => {
 
             <div className="w-1/4 p-4 space-y-3">
 
-              <h2 className="text-xl font-bold">Create Staff Account</h2>
+              <h2 className="text-xl font-bold mb-4">Create Staff Account</h2>
 
               <button onClick={() => setStaffStep(1)} className={`w-full p-2 rounded text-white ${staffStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Basic Info
@@ -1700,7 +1659,7 @@ const Account = () => {
                     />
 
 
-                    <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[100px] pt-6"
+                    <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[120px] pt-6"
                       value={staffBasicInfo.address || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setStaffBasicInfo({ ...staffBasicInfo, address: e.target.value })
@@ -1740,7 +1699,7 @@ const Account = () => {
 
                   </div>
 
-                  <div className="mt-6 flex justify-end">
+                  <div className="absolute bottom-4 right-6 flex gap-4">
                     <button onClick={() => setStaffStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
@@ -1758,6 +1717,15 @@ const Account = () => {
                   </h3>
 
                   <div className="grid grid-cols-2 gap-6 max-w-4xl">
+
+                    <FloatingInput label="Designation" value={staffDesignation.designation} disabled={isViewMode}
+                      onChange={(e) =>
+                        setStaffDesignation({
+                          ...staffDesignation,
+                          designation: e.target.value
+                        })
+                      }
+                    />
 
                     <FloatingInput label="Qualification" value={staffDesignation.qualification} disabled={isViewMode}
                       onChange={(e) =>
@@ -2053,28 +2021,17 @@ const Account = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
 
-                    <FloatingInput
-                      label="Name"
-                      required
-                      value={basicInfo.name}
-                      disabled={isViewMode}
+                    <FloatingInput label="Name" required value={basicInfo.name} disabled={isViewMode}
                       onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
                     />
 
-                    <FloatingInput
-                      label="Age"
-                      required
-                      type="number"
-                      value={basicInfo.age}
-                      disabled={isViewMode}
+                    <FloatingInput label="Age" required type="number" value={basicInfo.age} disabled={isViewMode}
                       onChange={(e) => setBasicInfo({ ...basicInfo, age: e.target.value })}
                     />
 
 
                     <div className="relative">
-                      <select
-                        value={basicInfo.gender}
-                        disabled={isViewMode}
+                      <select value={basicInfo.gender} disabled={isViewMode}
                         onChange={(e) => setBasicInfo({ ...basicInfo, gender: e.target.value })}
                         className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
                       >
@@ -2090,66 +2047,39 @@ const Account = () => {
                     </div>
 
 
-                    <FloatingInput
-                      label="DOB"
-                      type="date"
-                      className="w-full"
-                      inputClassName="h-[52px]"
-                      value={basicInfo.dob}
-                      disabled={isViewMode}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, dob: e.target.value })}
+                    <FloatingInput label="DOB" type="date" className="w-full" inputClassName="h-[52px]" value={basicInfo.dob}
+                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, dob: e.target.value })}
                     />
 
 
-                    <FloatingInput
-                      label="Address"
-                      required
-                      className="col-span-2"
-                      inputClassName="h-[100px] pt-6"
-                      value={basicInfo.address}
-                      disabled={isViewMode}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, address: e.target.value })}
+                    <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[120px] pt-6" value={basicInfo.address}
+                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, address: e.target.value })}
                     />
 
                     <div className="col-span-2 flex flex-col gap-4">
 
-                      <FloatingInput
-                        label="Contact Number"
-                        required
-                        value={basicInfo.contact}
-                        disabled={isViewMode}
-                        onChange={(e) => setBasicInfo({ ...basicInfo, contact: e.target.value })}
+                      <FloatingInput label="Contact Number" required value={basicInfo.contact}
+                        disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, contact: e.target.value })}
                       />
 
-                      <FloatingInput
-                        label="EMR Contact"
-                        value={basicInfo.emrContact}
-                        disabled={isViewMode}
+                      <FloatingInput label="EMR Contact" value={basicInfo.emrContact} disabled={isViewMode}
                         onChange={(e) => setBasicInfo({ ...basicInfo, emrContact: e.target.value })}
                       />
 
                     </div>
 
 
-                    <FloatingInput
-                      label="Email"
-                      className="col-span-2"
-                      value={basicInfo.email}
-                      disabled={isViewMode}
+                    <FloatingInput label="Email" className="col-span-2" value={basicInfo.email} disabled={isViewMode}
                       onChange={(e) => setBasicInfo({ ...basicInfo, email: e.target.value })}
                     />
 
-                    <FloatingInput
-                      label="Occupation"
-                      className="col-span-2"
-                      value={basicInfo.occupation}
-                      disabled={isViewMode}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, occupation: e.target.value })}
+                    <FloatingInput label="Occupation" className="col-span-2" value={basicInfo.occupation}
+                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, occupation: e.target.value })}
                     />
 
                   </div>
 
-                  <div className="mt-6 flex justify-end">
+                  <div className="absolute bottom-4 right-6 flex gap-4">
                     <button onClick={() => setStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
@@ -2333,27 +2263,16 @@ const Account = () => {
 
                   <div className="flex flex-col gap-6 max-w-md">
 
-                    <FloatingInput
-                      label="Username"
-                      value={accountInfo.username}
-                      disabled={isViewMode}
-                      onChange={(e) => setAccountInfo({ ...accountInfo, username: e.target.value })}
+                    <FloatingInput label="Username" value={accountInfo.username}
+                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, username: e.target.value })}
                     />
 
-                    <FloatingInput
-                      label="Password"
-                      type="password"
-                      value={accountInfo.password}
-                      disabled={isViewMode}
-                      onChange={(e) => setAccountInfo({ ...accountInfo, password: e.target.value })}
+                    <FloatingInput label="Password" type="password" value={accountInfo.password}
+                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, password: e.target.value })}
                     />
 
-                    <FloatingInput
-                      label="Confirm Password"
-                      type="password"
-                      value={accountInfo.confirmPassword}
-                      disabled={isViewMode}
-                      onChange={(e) => setAccountInfo({ ...accountInfo, confirmPassword: e.target.value })}
+                    <FloatingInput label="Confirm Password" type="password" value={accountInfo.confirmPassword}
+                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, confirmPassword: e.target.value })}
                     />
                   </div>
 
