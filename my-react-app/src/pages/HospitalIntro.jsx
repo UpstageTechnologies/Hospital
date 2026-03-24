@@ -63,7 +63,7 @@ const HospitalIntro = () => {
 
                 <div className="flex gap-4">
 
-                    <button onClick={() => navigate("/select-hospital")} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-600 transition">
+                    <button onClick={() => navigate("/upstage")} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-600 transition">
                         Get Started →
                     </button>
 

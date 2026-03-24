@@ -93,7 +93,7 @@ const Loding = () => {
     };
 
     return (
-        <div className="flex flex-col md:flex-row items-center justify-between min-h-screen px-6 md:px-20 py-10 bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-6 md:px-28 lg:px-40 py-10 bg-gradient-to-br from-gray-100 to-gray-200 gap-10">
             <div className="max-w-xl mt-10 md:mt-16">
 
                 <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-4">
@@ -188,14 +188,14 @@ const Loding = () => {
                         New User →
                     </button>
 
-                    
+
 
                 </div>
 
             </div>
 
 
-            <div className="mt-10 md:mt-0 flex justify-center items-center">
+            <div className="mt-10 md:mt-0 flex justify-center items-center md:ml-10">
                 <div className="bg-gray-200 p-6 rounded-full shadow-inner">
                     <img src="/Doctors/doc1.png" alt="doctor" className="w-[260px] md:w-[320px] object-cover rounded-full" />
                 </div>

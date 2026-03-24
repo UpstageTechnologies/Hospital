@@ -1,321 +1,240 @@
-import React, { useState, useEffect } from 'react'
-import { assets } from '../assets/assets'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { auth, db } from '../firebase'
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { useLocation } from "react-router-dom";
-import { onAuthStateChanged } from "firebase/auth";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { assets } from "../assets/assets";
 
 const Upstage = () => {
 
-    const navigate = useNavigate()
-    const location = useLocation();
+    const navigate = useNavigate();
 
-    const [hospitalLogo, setHospitalLogo] = useState(assets.logo);
-    const [showProfileMenu, setShowProfileMenu] = useState(false)
-    const [showMenu, setShowMenu] = useState(false)
-    const [isMaster, setIsMaster] = useState(false)
-    const [userImage, setUserImage] = useState(assets.profile_pic)
-    const [user, setUser] = useState(null);
-    const [showLogoutPopup, setShowLogoutPopup] = useState(false)
+    const specialityData = [
+        { name: "General physician", image: "/speciality/General_physician.svg" },
+        { name: "Gynecologist", image: "/speciality/Gynecologist.svg" },
+        { name: "Dermatologist", image: "/speciality/Dermatologist.svg" },
+        { name: "Pediatricians", image: "/speciality/Pediatricians.svg" },
+        { name: "Neurologist", image: "/speciality/Neurologist.svg" },
+        { name: "Gastroenterologist", image: "/speciality/Gastroenterologist.svg" },
+    ];
 
-    useEffect(() => {
-
-        const checkMaster = () => {
-            const master = localStorage.getItem("masterLogin")
-            setIsMaster(master === "true")
-        }
-
-        checkMaster()
-
-        window.addEventListener("storage", checkMaster)
-
-        return () => window.removeEventListener("storage", checkMaster)
-
-    }, [])
-
-    useEffect(() => {
-
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-
-            setUser(currentUser)
-
-            if (currentUser) {
-
-                const docRef = doc(db, "master", currentUser.uid);
-
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-
-                    setUserImage(docSnap.data().image || assets.profile_pic);
-
-                }
-
-            } else {
-
-                setUserImage(assets.profile_pic)
-
-            }
-
-        });
-
-        return () => unsubscribe();
-
-    }, []);
-
-    useEffect(() => {
-
-        const fetchHospital = async () => {
-
-            const user = auth.currentUser;
-
-            if (!user) return;
-
-            
-            const docRef = doc(db, "master", user.uid);
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-
-                const hospital = docSnap.data().hospital;
-
-                if (!hospital) return;
-
-                const name = hospital.toLowerCase();
-
-                if (name.includes("rajesh")) {
-                    setHospitalLogo("/logos/rajesh.png");
-                }
-                else if (name.includes("government") || name.includes("gh")) {
-                    setHospitalLogo("/logos/gh.png");
-                }
-                else if (name.includes("appolo")) {
-                    setHospitalLogo("/logos/appolo.png"); 
-                }
-                else if (name.includes("upstage")) {
-                    setHospitalLogo("/logos/upstage.png");
-                }
-                 else if (name.includes("vk")) {
-                    setHospitalLogo("/logos/vk.png");
-                }
-                else {
-                    setHospitalLogo("/logos/default.png");
-                }
-            }
-        };
-
-        fetchHospital();
-
-    }, []);
-
-
-    const handleImageChange = async (e) => {
-        const file = e.target.files[0]
-
-        if (file) {
-
-            const reader = new FileReader()
-
-            reader.onloadend = async () => {
-
-                const imageUrl = reader.result
-
-                setUserImage(imageUrl)
-
-                const user = auth.currentUser
-
-                if (user) {
-
-                    await setDoc(doc(db, "users", user.uid), {
-                        image: imageUrl
-                    }, { merge: true })
-
-                }
-
-            }
-
-            reader.readAsDataURL(file)
-
-        }
-    }
-
-
-
+    const doctors = [
+        {
+            name: "Dr. S. Rajesh Kumar",
+            speciality: "General Physician",
+            hospital: "Apollo Hospital, Chennai",
+            image: "/category/doct1.png",
+            map: "https://www.google.com/maps?q=Apollo+Hospital+Chennai",
+        },
+        {
+            name: "Dr. Priya Lakshmi",
+            speciality: "Gynecologist",
+            hospital: "Government Hospital, Madurai",
+            image: "/category/doct2.png",
+            map: "https://www.google.com/maps?q=Government+Hospital+Madurai",
+        },
+        {
+            name: "Dr. Aravind Subramanian",
+            speciality: "Dermatologist",
+            hospital: "CMC Hospital, Vellore",
+            image: "/category/doct3.png",
+            map: "https://www.google.com/maps?q=CMC+Hospital+Vellore",
+        },
+        {
+            name: "Dr. Karthik Narayanan",
+            speciality: "Pediatrician",
+            hospital: "SRM Hospital, Chennai",
+            image: "/category/doct4.png",
+            map: "https://www.google.com/maps?q=SRM+Hospital+Chennai",
+        },
+        {
+            name: "Dr. Meena Ramesh",
+            speciality: "Neurologist",
+            hospital: "MIOT Hospital, Chennai",
+            image: "/category/doct5.png",
+            map: "https://www.google.com/maps?q=MIOT+Hospital+Chennai",
+        },
+        {
+            name: "Dr. Vijay Anand",
+            speciality: "Gastroenterologist",
+            hospital: "Kauvery Hospital, Trichy",
+            image: "/category/doct6.png",
+            map: "https://www.google.com/maps?q=Kauvery+Hospital+Trichy",
+        },
+        {
+            name: "Dr. Lakshmi Devi",
+            speciality: "Gynecologist",
+            hospital: "Government Hospital, Theni",
+            image: "/category/doct7.png",
+            map: "https://www.google.com/maps?q=Government+Hospital+Theni",
+        },
+        {
+            name: "Dr. Abinaya",
+            speciality: "General Physician",
+            hospital: "Government Hospital, Sattur",
+            image: "/category/doct8.png",
+            map: "https://www.google.com/maps?q=Government+Hospital+Sattur",
+        },
+        {
+            name: "Dr. Aruna",
+            speciality: "Pediatrician",
+            hospital: "Manipal Hospitals, Salem",
+            image: "/category/doct9.png",
+            map: "https://www.google.com/maps?q=Manipal+Hospital+Salem",
+        },
+        {
+            name: "Dr. Selva Srija",
+            speciality: "Neurologist",
+            hospital: "Rajesh Hospitals, Virudhunagar",
+            image: "/category/doct10.png",
+            map: "https://www.google.com/maps?q=Rajesh+Hospital+Virudhunagar",
+        },
+        {
+            name: "Dr. Vijay Kumar",
+            speciality: "Dermatologist",
+            hospital: "Government Hospitals, Kanniyakumari",
+            image: "/category/doct11.png",
+            map: "https://www.google.com/maps?q=Government+Hospital+Kanniyakumari",
+        },
+        {
+            name: "Dr. Geniya",
+            speciality: "General Physician",
+            hospital: "Annai Hospitals, Madurai",
+            image: "/category/doct12.png",
+            map: "https://www.google.com/maps?q=Annai+Hospital+Madurai",
+        },
+    ];
 
     return (
-        <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 relative z-50 w-full px-4'>
-            <img className='w-16 h-16 object-contain cursor-pointer ml-2' src={hospitalLogo} alt="logo" />
-            {!location.pathname.startsWith("/appointment") && (
-                <ul className="hidden md:flex items-center gap-6 font-medium">
+        <div className="w-full min-h-screen bg-white">
 
-                    {isMaster && location.pathname === "/account" ? (
 
-                        <NavLink to="/account">
+            <div className="flex justify-between items-center px-8 py-4 shadow">
+                <img src="/logos/upstage.png" alt="logo" className="w-28" />
 
-                        </NavLink>
-
-                    ) : (
-
-                        <>
-                            <NavLink to="/">
-                                <li className="py-1">Home</li>
-                            </NavLink>
-
-                            <NavLink to="/doctor">
-                                <li className="py-1">All Doctors</li>
-                            </NavLink>
-
-                            <NavLink to="/about">
-                                <li className="py-1">About</li>
-                            </NavLink>
-
-                            <NavLink to="/contact">
-                                <li className="py-1">Contact</li>
-                            </NavLink>
-                        </>
-
-                    )}
-
+                <ul className="flex gap-8 font-medium">
+                    <li>Home</li>
+                    <li>All Doctors</li>
+                    <li>About</li>
+                    <li>Contact</li>
                 </ul>
-            )}
 
-            <div className='flex items-center gap-4 relative'>
+                <button onClick={() => navigate("/select-hospital")} className="bg-blue-500 text-white px-5 py-2 rounded-full">
+                    Login
+                </button>
+            </div>
 
-                {
-                    user ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
 
-                        <img className='w-8 h-8 rounded-full object-cover' src={userImage} alt="" />
-                        <img className='w-2.5 ' src={assets.dropdown_icon} alt="" />
-                        {showProfileMenu && (
-                            <div className='absolute right-0 top-full mt-2 bg-white shadow-lg rounded-md p-4 text-base font-medium text-gray-600 z-50'>
-                                <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
-                                    <p onClick={() => navigate('/my-profile')} className='hover:text-black cursor-pointer'>MyProfile</p>
-                                    <label className="cursor-pointer">
-                                        Profile
-                                        <input type="file" hidden accept="image/*"
-                                            onChange={handleImageChange}
-                                        />
-                                    </label>
-                                    <p onClick={() => navigate('/my-appointment')} className='hover:text-black cursor-pointer'>MyAppointment</p>
-                                    <p
-                                        onClick={() => setShowLogoutPopup(true)}
-                                        className="hover:text-black cursor-pointer"
-                                    >
-                                        Logout
-                                    </p>
-                                </div>
-                            </div>
-                        )}
+            <div className='flex flex-col md:flex-row bg-blue-500 rounded-lg px-6 md:px-10 lg:px-20 mt-5 mx-6'>
+
+                <div className='md:w-1/2 flex flex-col justify-center gap-4 py-10'>
+
+                    <p className='text-3xl md:text-4xl text-white font-semibold'>
+                        Book Appointment <br /> With Trusted Doctors
+                    </p>
+
+                    <div className='flex items-center gap-3 text-white text-sm'>
+                        <img className='w-14' src={assets.group_profiles} alt="" />
+                        <p>
+                            Simply browse through our extensive list of trusted doctors and schedule your appointment hassle-free
+                        </p>
                     </div>
-                        : <div className="relative">
 
-                            <img onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-8 cursor-pointer"
-                                src={assets.login1_icon} alt=""
-                            />
+                    <button className="bg-white px-6 py-3 rounded-full text-gray-700 w-fit">
+                        Book Appointment →
+                    </button>
 
-                            {showProfileMenu && (
-                                <div className="absolute right-0 top-full mt-3 bg-white shadow-lg rounded-md p-4 text-gray-600 z-50">
-                                    <div className="flex flex-col gap-4 min-w-[150px]">
-
-                                        <p onClick={() => {
-                                            navigate('/master-login')
-                                            setShowProfileMenu(false)
-                                        }}
-                                            className="cursor-pointer hover:text-black whitespace-nowrap">
-                                            Master Login
-                                        </p>
-
-                                        <p onClick={() => {
-                                            navigate('/admin-login')
-                                            setShowProfileMenu(false)
-                                        }}
-                                            className="cursor-pointer hover:text-black whitespace-nowrap">
-                                            Admin Login
-                                        </p>
-
-                                        <p onClick={() => {
-                                            navigate('/doctor-login')
-                                            setShowProfileMenu(false)
-                                        }} className="cursor-pointer hover:text-black whitespace-nowrap">
-                                            Doctor Login
-                                        </p>
-
-                                        <p onClick={() => {
-                                            navigate('/patient-login')
-                                            setShowProfileMenu(false)
-                                        }}
-                                            className="cursor-pointer hover:text-black whitespace-nowrap">
-                                            Patient Login
-                                        </p>
-
-                                        <p onClick={() => {
-                                            navigate('/staff-login')
-                                            setShowProfileMenu(false)
-                                        }}
-                                            className="cursor-pointer hover:text-black whitespace-nowrap">
-                                            Staff Login
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-
-
-                        </div>
-                }
-
-                <img onClick={() => setShowMenu(true)} className='w-6 md:hidden' src={assets.menu_icon} alt="" />
-                <div className={` ${showMenu ? 'fixed w-full' : 'h-0 w-0'} md:hidden right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>
-                    <div className='flex items-center justify-between px-5 py-6'>
-                        <img className='w-36' src={assets.logo} alt="" />
-                        <img className='w-7' onClick={() => setShowMenu(false)} src={assets.cross_icon} alt="" />
-                    </div>
-                    <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium'>
-                        <NavLink onClick={() => setShowMenu(false)} to='/'><p className='px-4 py-2 rounded  inline-block'>Home</p></NavLink>
-                        <NavLink onClick={() => setShowMenu(false)} to='/doctor'><p className='px-4 py-2 rounded  inline-block'>All Doctors</p></NavLink>
-                        <NavLink onClick={() => setShowMenu(false)} to='/about'><p className='px-4 py-2 rounded  inline-block'>About</p></NavLink>
-                        <NavLink onClick={() => setShowMenu(false)} to='/contact'><p className='px-4 py-2 rounded  inline-block'>Contact</p></NavLink>
-                    </ul>
                 </div>
-                {showLogoutPopup && (
 
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-
-                        <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
-
-                            <h2 className="text-lg font-semibold mb-4">
-                                Are you sure you want to logout?
-                            </h2>
-
-                            <div className="flex justify-center gap-4">
-
-                                <button onClick={() => setShowLogoutPopup(false)} className="px-4 py-2 bg-gray-300 rounded" >
-                                    Cancel
-                                </button>
-
-                                <button onClick={() => {
-                                    auth.signOut()
-                                    localStorage.removeItem("masterLogin")
-                                    setShowLogoutPopup(false)
-                                    navigate("/")
-                                }}
-                                    className="px-4 py-2 bg-red-500 text-white rounded"
-                                >
-                                    Logout
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                )}
+                <div className='md:w-1/2'>
+                    <img className='w-full' src={assets.header_img} alt="" />
+                </div>
 
             </div>
+
+
+            <div className="flex flex-col items-center gap-4 py-16 text-gray-800">
+
+                <h1 className="text-3xl font-semibold">
+                    Find by speciality
+                </h1>
+
+                <p className="text-center text-sm">
+                    Simply browse through our extensive list of trusted doctors
+                </p>
+
+                <div className="flex justify-center gap-10 pt-10 flex-wrap">
+
+                    {specialityData.map((item, index) => (
+                        <div key={index} className="flex flex-col items-center">
+
+                            <div className="bg-gray-200 rounded-full w-32 h-32 flex items-center justify-center">
+                                <img src={item.image} className="w-16 h-16" />
+                            </div>
+
+                            <p className="mt-3 text-sm font-medium">
+                                {item.name}
+                            </p>
+
+                        </div>
+                    ))}
+
+                </div>
+
+            </div>
+
+
+            <div className="px-10 py-10">
+
+                <h1 className="text-3xl font-semibold mb-8 text-center">
+                    Top Doctors in Tamil Nadu
+                </h1>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+                    {doctors.map((doc, index) => (
+                        <div key={index} className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition">
+
+                            <img src={doc.image} className="w-full h-60 object-contain bg-[#e6edf5] p-4" />
+
+                            <div className="p-4">
+
+                                <p className="text-green-600 text-sm">● Available</p>
+
+                                <h2 className="font-semibold text-lg">
+                                    {doc.name}
+                                </h2>
+
+                                <p className="text-gray-600 text-sm">
+                                    {doc.speciality}
+                                </p>
+
+                                <a href={doc.map} target="_blank" rel="noreferrer" className="text-blue-500 text-xs underline">
+                                    📍 {doc.hospital}
+                                </a>
+
+                            </div>
+
+                        </div>
+                    ))}
+
+                </div>
+
+            </div>
+
+            <div className='flex bg-blue-500 rounded-lg px-6 sm:px-10 md:px-14 lg:px-12 my-20 md:mx-10'>
+                <div className='flex-1 py-8 sm:py-10 md:py-16 lg:py-24 lg:pl-5'>
+                    <div className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white'>
+                        <p>Book Appointment</p>
+                        <p className='mt-4'>With 100+ Trusted Doctors</p>
+                    </div>
+                    <button onClick={() => { navigate('/login'); scrollTo(0, 0) }} className='bg-white text-sm sm:text-base text-gray-600 px-8 py-3 rounded-full mt-6 hover:scale-105 transition-all'>Create Account</button>
+                </div>
+
+                <div className='hidden md:block md:w-1/2 lg:w-[370px] relative'>
+                    <img className='w-full absolute bottom-0 right-0 max-w-md' src={assets.appointment_img} alt="" />
+                </div>
+            </div>
+
         </div>
+    );
+};
 
-    )
-}
-
-export default Upstage
+export default Upstage;
