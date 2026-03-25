@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { auth, db } from "../firebase";
 import {
   createUserWithEmailAndPassword,
@@ -8,18 +8,25 @@ import {
   signInWithPopup,
   updateProfile
 } from "firebase/auth";
-import { doc, setDoc, collection, getDocs } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 const MasterLogin = () => {
 
-  const [state, setState] = useState("Login");
+  
   const [name, setName] = useState("");
   const [hospital, setHospital] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const fromRole = location.state?.fromRole === true;
+  const isRegister = location.state?.isRegister === true;
+
+  const [state, setState] = useState(isRegister ? "Register" : "Login");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,9 +47,9 @@ const MasterLogin = () => {
         });
 
         await setDoc(doc(db, "master", userCredential.user.uid), {
-          name: name,
-          email: email,
-          hospital: hospital,
+          name,
+          email,
+          hospital,
           role: "master"
         });
 
@@ -53,15 +60,6 @@ const MasterLogin = () => {
       else {
 
         await signInWithEmailAndPassword(auth, email, password);
-
-        const snapshot = await getDocs(collection(db, "master"));
-        const users = snapshot.docs.map(doc => doc.data());
-
-        const match = users.find(u => u.email === email);
-
-        if (match) {
-          localStorage.setItem("hospitalName", match.hospital);
-        }
 
         localStorage.setItem("masterLogin", "true");
 
@@ -88,7 +86,6 @@ const MasterLogin = () => {
       }, { merge: true });
 
       localStorage.setItem("masterLogin", "true");
-      localStorage.setItem("hospitalName", hospital);
 
       navigate("/home");
 
@@ -108,20 +105,34 @@ const MasterLogin = () => {
         </h2>
 
         {state === "Register" && (
-          <>
-            <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} className="border p-3 rounded"/>
+          <div>
+            <input type="text" placeholder="Full Name" value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="border p-3 rounded w-full mb-2" />
 
-            <input type="text" placeholder="Hospital Name" value={hospital} onChange={(e) => setHospital(e.target.value)} className="border p-3 rounded"/>
-          </>
+            <input type="text" placeholder="Hospital Name" value={hospital}
+              onChange={(e) => setHospital(e.target.value)}
+              className="border p-3 rounded w-full mb-2" />
+
+            <input type="tel" placeholder="Phone number" value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="border p-3 rounded w-full" />
+          </div>
         )}
 
-        <input type="email"  placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="border p-3 rounded"/>
+        <input type="email" placeholder="Email" value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border p-3 rounded" />
 
-        <input type="password"  placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="border p-3 rounded"/>
+        <input type="password" placeholder="Password" value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="border p-3 rounded" />
 
         {state === "Register" && (
-          <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-            className="border p-3 rounded"/>
+          <input type="password" placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="border p-3 rounded" />
         )}
 
         <button className="bg-blue-500 text-white py-3 rounded">
@@ -130,19 +141,21 @@ const MasterLogin = () => {
 
         <button type="button" onClick={handleGoogleLogin}
           className="border py-3 rounded flex items-center justify-center gap-2">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5"/>
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5" />
           Sign in with Google
         </button>
 
-        <p className="text-center text-sm">
-          {state === "Login" ? "No account?" : "Already have account?"}
-          <span
-            className="text-blue-500 ml-1 cursor-pointer"
-            onClick={() => setState(state === "Login" ? "Register" : "Login")}
-          >
-            {state === "Login" ? "Register" : "Login"}
-          </span>
-        </p>
+        {!fromRole && !isRegister && (
+          <p className="text-center text-sm">
+            No account?
+            <span
+              className="text-blue-500 ml-1 cursor-pointer"
+              onClick={() => setState("Register")}
+            >
+              Register
+            </span>
+          </p>
+        )}
 
       </form>
 

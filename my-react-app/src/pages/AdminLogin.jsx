@@ -6,6 +6,7 @@ import {
     signInWithPopup
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const AdminLogin = () => {
 
@@ -14,8 +15,10 @@ const AdminLogin = () => {
     const [isRegister, setIsRegister] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const location = useLocation();
+    const fromRole = location.state?.fromRole === true;
 
-    
+
     const handleLogin = async () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
@@ -26,7 +29,7 @@ const AdminLogin = () => {
         }
     };
 
-    
+
     const handleRegister = async () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
@@ -37,16 +40,16 @@ const AdminLogin = () => {
         }
     };
 
-    
+
     const handleGoogle = async () => {
         try {
             const result = await signInWithPopup(auth, provider);
 
-            console.log(result.user); 
+            console.log(result.user);
 
             alert("Google Login Success");
 
-            
+
             navigate("/account");
 
         } catch (err) {
@@ -82,20 +85,23 @@ const AdminLogin = () => {
                     </button>
                 )}
 
-                
+
                 <button
                     onClick={handleGoogle}
                     className="w-full border border-gray-300 py-3 rounded-lg mb-4 flex items-center justify-center gap-3 bg-white hover:shadow-md transition"
                 >
-                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="google" className="w-5 h-5"/>
+                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="google" className="w-5 h-5" />
                     <span>Sign in with Google</span>
                 </button>
 
-                <p onClick={() => setIsRegister(!isRegister)} className="text-center text-blue-500 cursor-pointer">
-                    {isRegister
-                        ? "Already have account? Login"
-                        : "No account? Register"}
-                </p>
+                {!fromRole && (
+                    <p className="text-center text-sm">
+                        No account?
+                        <span className="text-blue-500 ml-1 cursor-pointer">
+                            Register
+                        </span>
+                    </p>
+                )}
 
             </div>
         </div>

@@ -159,7 +159,7 @@ const Loding = () => {
                             <div className="absolute w-full bg-white border border-gray-300 rounded-lg mt-2 shadow-lg z-50 max-h-40 overflow-y-auto">
 
                                 {filteredRoles.length === 0 && (
-                                    <div className="p-3 text-gray-400">No results</div>
+                                    <div className="p-3 text-gray-400">Loding...</div>
                                 )}
 
                                 {filteredRoles.map((item, i) => (
@@ -184,7 +184,7 @@ const Loding = () => {
                         Continue →
                     </button>
 
-                    <button onClick={() => navigate("/master-login", { state: { register: true } })} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg mb-3 transition">
+                    <button onClick={() => navigate("/master-login", { state: { isRegister: true } })} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg mb-3 transition">
                         New User →
                     </button>
 

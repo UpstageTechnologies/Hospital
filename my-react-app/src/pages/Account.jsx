@@ -686,15 +686,54 @@ const Account = () => {
 
       const email = doctorBasicInfo.email
 
+      const doctorImages = [
+        "/Doctors/doc1.png",
+        "/Doctors/doc2.png",
+        "/Doctors/doc3.png",
+        "/Doctors/doc4.png",
+        "/Doctors/doc5.png",
+        "/Doctors/doc6.png"
+      ];
+
       await setDoc(doc(db, "doctors", email), {
+
+        // 🔥 FULL FORM SAVE
         doctorBasicInfo,
         doctorDesignation,
         doctorOfficial,
         doctorAccount,
+
+        // display fields (unchanged)
+        name: doctorBasicInfo.name,
+        speciality: doctorDesignation.designation,
+        hospital: doctorBasicInfo.address,
+        map: `https://www.google.com/maps?q=${doctorBasicInfo.address}`,
+        image: doctorImages[Math.floor(Math.random() * doctorImages.length)],
         isDisabled: false
+
       })
 
       alert("Doctor saved")
+      fetchDoctors()
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  const handleUpdateDoctor = async () => {
+    try {
+
+      const ref = doc(db, "doctors", doctorBasicInfo.email)
+
+      await updateDoc(ref, {
+        name: doctorBasicInfo.name,
+        speciality: doctorDesignation.designation,
+        hospital: doctorBasicInfo.address,
+      })
+
+      alert("Doctor updated")
+
+      setIsEditMode(false)
 
       fetchDoctors()
 
@@ -1140,20 +1179,20 @@ const Account = () => {
                       </button>
 
                       <button onClick={async () => {
-                          await deleteDoc(doc(db, "admins", adm.id))
-                          fetchAdmins()
-                        }}
+                        await deleteDoc(doc(db, "admins", adm.id))
+                        fetchAdmins()
+                      }}
                         className="bg-red-500 text-white px-2 py-1 rounded"
                       >
                         Delete
                       </button>
 
                       <button onClick={async () => {
-                          await updateDoc(doc(db, "admins", adm.id), {
-                            isDisabled: !adm.isDisabled
-                          })
-                          fetchAdmins()
-                        }}
+                        await updateDoc(doc(db, "admins", adm.id), {
+                          isDisabled: !adm.isDisabled
+                        })
+                        fetchAdmins()
+                      }}
                         className={`px-2 py-1 rounded text-white ${adm.isDisabled ? "bg-green-500" : "bg-gray-500"
                           }`}
                       >
@@ -1450,8 +1489,11 @@ const Account = () => {
                       Previous
                     </button>
 
-                    <button onClick={handleCreateDoctorFull} className="bg-green-500 text-white px-8 py-2 rounded">
-                      Create Doctor
+                    <button
+                      onClick={isEditMode ? handleUpdateDoctor : handleCreateDoctorFull}
+                      className="bg-green-500 text-white px-8 py-2 rounded"
+                    >
+                      {isEditMode ? "Update Doctor" : "Create Doctor"}
                     </button>
 
                   </div>
@@ -1475,9 +1517,9 @@ const Account = () => {
               <thead className="bg-gray-200">
                 <tr>
                   <th className="border p-2">Name</th>
-                  <th className="border p-2">age</th>
+                  <th className="border p-2">Speciality</th>
                   <th className="border p-2">address</th>
-                  <th className="border p-2">contact</th>
+
                   <th className="border p-2">Action</th>
                 </tr>
               </thead>
@@ -1489,32 +1531,34 @@ const Account = () => {
                   <tr key={index}>
 
                     <td className="border p-2">
-                      {docData.doctorBasicInfo?.name}
+                      {docData.name}
                     </td>
 
                     <td className="border p-2">
-                      {docData.doctorBasicInfo?.age}
+                      {docData.speciality}
                     </td>
 
                     <td className="border p-2">
-                      {docData.doctorBasicInfo?.address}
+                      {docData.hospital}
                     </td>
 
-                    <td className="border p-2">
-                      {docData.doctorBasicInfo?.contact}
-                    </td>
+                    {/* <td className="border p-2">
+                      {docData.contact}
+                    </td> */}
 
                     <td className="border p-2 flex gap-2">
 
 
                       <button
                         onClick={() => {
-                          setDoctorBasicInfo(docData.doctorBasicInfo)
-                          setDoctorDesignation(docData.doctorDesignation)
-                          setDoctorOfficial(docData.doctorOfficial)
-                          setDoctorAccount(docData.doctorAccount)
+
+                          setDoctorBasicInfo(docData.doctorBasicInfo || {})
+                          setDoctorDesignation(docData.doctorDesignation || {})
+                          setDoctorOfficial(docData.doctorOfficial || {})
+                          setDoctorAccount(docData.doctorAccount || {})
 
                           setIsViewMode(true)
+                          setIsEditMode(false)
                           setDoctorStep(1)
                         }}
                         className="bg-green-500 text-white px-2 py-1 rounded"
@@ -1525,18 +1569,25 @@ const Account = () => {
 
                       <button
                         onClick={() => {
-                          setDoctorBasicInfo(docData.doctorBasicInfo)
-                          setDoctorDesignation(docData.doctorDesignation)
-                          setDoctorOfficial(docData.doctorOfficial)
-                          setDoctorAccount(docData.doctorAccount)
+                          setDoctorBasicInfo({
+                            name: docData.name || "",
+                            address: docData.hospital || "",
+                            email: docData.email || ""
+                          })
+
+                          setDoctorDesignation({
+                            designation: docData.speciality || ""
+                          })
 
                           setIsViewMode(false)
+                          setIsEditMode(true)
                           setDoctorStep(1)
                         }}
                         className="bg-blue-500 text-white px-2 py-1 rounded"
                       >
                         Edit
                       </button>
+
 
 
                       <button

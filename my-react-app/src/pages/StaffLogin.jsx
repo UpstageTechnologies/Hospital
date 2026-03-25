@@ -3,6 +3,7 @@ import { db } from "../firebase"
 import { doc, getDoc } from "firebase/firestore"
 import { useNavigate } from "react-router-dom"
 import { FaEye, FaEyeSlash } from "react-icons/fa"
+import { useLocation } from "react-router-dom";
 
 const StaffLogin = () => {
 
@@ -10,6 +11,8 @@ const StaffLogin = () => {
     const [password, setPassword] = useState("")
     const navigate = useNavigate()
     const [showPassword, setShowPassword] = useState(false)
+    const location = useLocation();
+    const fromRole = location.state?.fromRole === true;
 
     const handleLogin = async () => {
 
@@ -23,7 +26,7 @@ const StaffLogin = () => {
 
         const data = docSnap.data()
 
-       
+
         if (data.staffAccount?.password !== password) {
             alert("Wrong Password")
             return

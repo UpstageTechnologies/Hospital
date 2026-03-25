@@ -9,46 +9,28 @@ const RoleWelcome = () => {
     const role = location.state?.role || "";
 
     const handleStart = () => {
-        if (role === "master") navigate("/master-login");
-        else if (role === "admin") navigate("/admin-login");
-        else if (role === "doctor") navigate("/doctor-login");
-        else if (role === "staff") navigate("/staff-login");
-        else if (role === "patient") navigate("/patient-login");
+        if (role === "master") navigate("/master-login", { state: { fromRole: true } });
+        else if (role === "admin") navigate("/admin-login", { state: { fromRole: true } });
+        else if (role === "doctor") navigate("/doctor-login", { state: { fromRole: true } });
+        else if (role === "staff") navigate("/staff-login", { state: { fromRole: true } });
+        else if (role === "patient") navigate("/patient-login", { state: { fromRole: true } });
     };
 
     const handleLogin = () => {
-        if (role === "master") navigate("/master-login");
-        else if (role === "admin") navigate("/admin-login");
-        else if (role === "doctor") navigate("/doctor-login");
-        else if (role === "staff") navigate("/staff-login");
-        else if (role === "patient") navigate("/patient-login");
+        if (role === "master") navigate("/master-login", { state: { fromRole: true } });
+        else if (role === "admin") navigate("/admin-login", { state: { fromRole: true } });
+        else if (role === "doctor") navigate("/doctor-login", { state: { fromRole: true } });
+        else if (role === "staff") navigate("/staff-login", { state: { fromRole: true } });
+        else if (role === "patient") navigate("/patient-login", { state: { fromRole: true } });
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-r from-blue-600 to-blue-600 text-white">
+        <div className="min-h-screen flex flex-col bg-gradient-to-r from-blue-400 to-blue-400 text-white">
 
-           
-            <div className="flex justify-between items-center px-10 py-4">
-               {/* <img src="/logos/upstage.png" alt="logo" className="h-10" /> */}
-
-                <div className="space-x-6">
-                    {/* <button className="hover:underline">Features</button>
-                    <button className="hover:underline">Apply Now</button>
-
-                    <button onClick={handleLogin} className="bg-blue-400 text-white px-4 py-2 rounded-lg font-semibold" >
-                        Login
-                    </button> */}
-                </div>
-            </div>
-
-            
             <div className="flex flex-col justify-center items-center flex-1">
 
                 <h1 className="text-5xl font-bold mb-4 text-center">
-                    Welcome to Hospital 
-                    {/* <span className="text-yellow-300 capitalize">
-                        {role || "User"}
-                    </span> */}
+                    Welcome to Hospital
                 </h1>
 
                 <p className="mb-8 text-lg">

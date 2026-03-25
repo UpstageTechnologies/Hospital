@@ -72,7 +72,7 @@ const Navbar = () => {
 
             if (!user) return;
 
-            
+
             const docRef = doc(db, "master", user.uid);
             const docSnap = await getDoc(docRef);
 
@@ -91,12 +91,12 @@ const Navbar = () => {
                     setHospitalLogo("/logos/gh.png");
                 }
                 else if (name.includes("appolo")) {
-                    setHospitalLogo("/logos/appolo.png"); 
+                    setHospitalLogo("/logos/appolo.png");
                 }
                 else if (name.includes("upstage")) {
                     setHospitalLogo("/logos/upstage.png");
                 }
-                 else if (name.includes("vk")) {
+                else if (name.includes("vk")) {
                     setHospitalLogo("/logos/vk.png");
                 }
                 else {
@@ -183,21 +183,29 @@ const Navbar = () => {
             <div className='flex items-center gap-4 relative'>
 
                 {
-                    user ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
+                    false ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
 
                         <img className='w-8 h-8 rounded-full object-cover' src={userImage} alt="" />
                         <img className='w-2.5 ' src={assets.dropdown_icon} alt="" />
                         {showProfileMenu && (
                             <div className='absolute right-0 top-full mt-2 bg-white shadow-lg rounded-md p-4 text-base font-medium text-gray-600 z-50'>
                                 <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
-                                    <p onClick={() => navigate('/my-profile')} className='hover:text-black cursor-pointer'>MyProfile</p>
+                                    <p onClick={() => navigate('/master-login')}>Master Login</p>
+                                    <p onClick={() => navigate('/admin-login')}>Admin Login</p>
+                                    <p onClick={() => navigate('/doctor-login')}>Doctor Login</p>
+                                    <p onClick={() => navigate('/staff-login')}>Staff Login</p>
+                                    <p onClick={() => navigate('/patient-login')}>Patient Login</p>
                                     <label className="cursor-pointer">
                                         Profile
                                         <input type="file" hidden accept="image/*"
                                             onChange={handleImageChange}
                                         />
                                     </label>
-                                    <p onClick={() => navigate('/my-appointment')} className='hover:text-black cursor-pointer'>MyAppointment</p>
+                                    <p onClick={() => navigate('/master-login')}>Master Login</p>
+                                    <p onClick={() => navigate('/admin-login')}>Admin Login</p>
+                                    <p onClick={() => navigate('/doctor-login')}>Doctor Login</p>
+                                    <p onClick={() => navigate('/staff-login')}>Staff Login</p>
+                                    <p onClick={() => navigate('/patient-login')}>Patient Login</p>
                                     <p
                                         onClick={() => setShowLogoutPopup(true)}
                                         className="hover:text-black cursor-pointer"
@@ -225,12 +233,12 @@ const Navbar = () => {
                                             className="cursor-pointer hover:text-black whitespace-nowrap">
                                             Master Login
                                         </p>
-                                        
+
                                         <p onClick={() => {
                                             navigate('/admin-login')
                                             setShowProfileMenu(false)
                                         }} className="cursor-pointer hover:text-black whitespace-nowrap">
-                                             Admin Login
+                                            Admin Login
                                         </p>
 
                                         <p onClick={() => {

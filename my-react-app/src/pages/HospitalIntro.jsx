@@ -12,25 +12,33 @@ const HospitalIntro = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen flex items-center justify-between px-10 md:px-20 bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-6 md:px-28 lg:px-40 py-10 bg-gradient-to-br from-gray-100 to-gray-200 gap-10">
 
 
-            <div className="max-w-xl">
+            <div className="max-w-xl text-center md:text-left">
 
                 <h1 className="text-5xl md:text-6xl font-extrabold leading-snug mb-6">
-                    <span className="text-black whitespace-nowrap">
-                        Hospital Solutions by
+
+                    <span className="block text-black">
+                        Hospital Solutions
                     </span>
-                    <br />
-                    <span className="text-blue-600">
-                        Upstage Technology
+
+                    <span className="block">
+                        <span className="text-black">by </span>
+                        <span className="text-blue-600">Upstage Technology</span>
                     </span>
+
                 </h1>
+
+                <div className="flex justify-center my-6 md:hidden">
+                    <div className="bg-gray-200 p-6 rounded-full">
+                        <img src="/Doctors/doc1.png" alt="doctor" className="w-[200px] object-cover rounded-full" />
+                    </div>
+                </div>
 
                 <p className="text-gray-600 text-lg mb-6">
                     Manage doctors, patients, staff — all in one smart platform.
                 </p>
-
 
                 <div className="space-y-3 text-gray-700 mb-6 text-sm">
 
@@ -60,8 +68,7 @@ const HospitalIntro = () => {
                     Built for modern hospitals — enhancing efficiency, accuracy, and patient experience.
                 </p>
 
-
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
 
                     <button onClick={() => navigate("/upstage")} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-600 transition">
                         Get Started →

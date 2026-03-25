@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfi
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
 
 
@@ -53,6 +54,8 @@ const Login = () => {
   const [gender, setGender] = useState('')
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const location = useLocation();
+  const fromRole = location.state?.fromRole === true;
 
   const onSubmitHandler = async (event) => {
     event.preventDefault()

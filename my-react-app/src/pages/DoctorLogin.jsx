@@ -7,6 +7,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
 const DoctorLogin = () => {
 
@@ -18,6 +19,8 @@ const DoctorLogin = () => {
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false)
+  const location = useLocation();
+  const fromRole = location.state?.fromRole === true;
 
 
   const handleGoogleSignup = async () => {
@@ -56,7 +59,7 @@ const DoctorLogin = () => {
 
       if (state === "Register") {
 
-        
+
         await setDoc(doc(db, "doctors", email), {
           doctorBasicInfo: {
             name: name,
@@ -93,12 +96,12 @@ const DoctorLogin = () => {
           return
         }
 
-        // ✅ SUCCESS LOGIN
+
         alert("Doctor Login Success")
 
         localStorage.setItem("doctorEmail", email)
 
-       navigate("/doctor-profile")
+        navigate("/doctor-profile")
 
       }
 
@@ -148,15 +151,15 @@ const DoctorLogin = () => {
 
           {state === "Register" && (
 
-            <div className="relative">
-
-              <input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm Password"
-                className="border p-2 rounded w-full pr-10" value={showConfirmPassword}
+            <div className="relative w-full">
+              <p>Confirm Password</p>
+              <input type={showConfirmPassword ? "text" : "password"}
+                className="border border-zinc-300 rounded w-full p-2 mt-1 pr-10" value={showConfirmPassword}
                 onChange={(e) => setShowConfirmPassword(e.target.value)} required
               />
 
               <span
-                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                className="absolute right-3 top-[65%] -translate-y-1/2 cursor-pointer text-gray-500"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
