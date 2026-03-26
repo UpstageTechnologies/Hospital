@@ -15,14 +15,21 @@ const Doctor = () => {
 
   const { doctors } = useContext(AppContext)
 
+  
+
   const applyFilter = () => {
+
+    let filtered = doctors.filter(doc =>
+      doc.hospital && doc.hospital.toLowerCase().includes("gh")
+    )
+
     if (speciality) {
-     setFilterDoc(doctors.filter(doc => 
-  doc.speciality.toLowerCase() === decodeURIComponent(speciality).toLowerCase()))
-    } else {
-      setFilterDoc(doctors)
+      filtered = filtered.filter(doc =>
+        doc.speciality.toLowerCase() === decodeURIComponent(speciality).toLowerCase()
+      )
     }
 
+    setFilterDoc(filtered)
   }
 
   useEffect(() => {

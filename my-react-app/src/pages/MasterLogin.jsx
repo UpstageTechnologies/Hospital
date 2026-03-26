@@ -63,7 +63,7 @@ const MasterLogin = () => {
 
         localStorage.setItem("masterLogin", "true");
 
-        navigate("/home");
+        navigate("/account");
       }
 
     } catch (error) {

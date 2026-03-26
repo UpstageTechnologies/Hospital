@@ -7,21 +7,22 @@ const RoleWelcome = () => {
     const location = useLocation();
 
     const role = location.state?.role || "";
+    const hospital = location.state?.hospital || "";
 
     const handleStart = () => {
-        if (role === "master") navigate("/master-login", { state: { fromRole: true } });
-        else if (role === "admin") navigate("/admin-login", { state: { fromRole: true } });
-        else if (role === "doctor") navigate("/doctor-login", { state: { fromRole: true } });
-        else if (role === "staff") navigate("/staff-login", { state: { fromRole: true } });
-        else if (role === "patient") navigate("/patient-login", { state: { fromRole: true } });
+        if (role === "master") navigate("/master-login", { state: { fromRole: true, hospital } });
+        else if (role === "admin") navigate("/admin-login", { state: { fromRole: true, hospital } });
+        else if (role === "doctor") navigate("/doctor-login", { state: { fromRole: true, hospital } });
+        else if (role === "staff") navigate("/staff-login", { state: { fromRole: true, hospital } });
+        else if (role === "patient") navigate("/patient-login", { state: { fromRole: true, hospital } });
     };
 
     const handleLogin = () => {
-        if (role === "master") navigate("/master-login", { state: { fromRole: true } });
-        else if (role === "admin") navigate("/admin-login", { state: { fromRole: true } });
-        else if (role === "doctor") navigate("/doctor-login", { state: { fromRole: true } });
-        else if (role === "staff") navigate("/staff-login", { state: { fromRole: true } });
-        else if (role === "patient") navigate("/patient-login", { state: { fromRole: true } });
+        if (role === "master") navigate("/master-login", { state: { fromRole: true, hospital } });
+        else if (role === "admin") navigate("/admin-login", { state: { fromRole: true, hospital } });
+        else if (role === "doctor") navigate("/doctor-login", { state: { fromRole: true, hospital } });
+        else if (role === "staff") navigate("/staff-login", { state: { fromRole: true, hospital } });
+        else if (role === "patient") navigate("/patient-login", { state: { fromRole: true, hospital } });
     };
 
     return (

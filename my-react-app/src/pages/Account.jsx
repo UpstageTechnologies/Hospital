@@ -7,6 +7,7 @@ import { useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 import FloatingInput from "../components/FloatingInput"
 import { createUserWithEmailAndPassword } from "firebase/auth"
+import { useLocation } from "react-router-dom";
 
 
 
@@ -14,7 +15,8 @@ const Account = () => {
 
   const [menu, setMenu] = useState("home")
   const [subMenu, setSubMenu] = useState("")
-
+  const location = useLocation();
+  const hospital = location.state?.hospital || "";
 
   const [doctorStep, setDoctorStep] = useState(1)
   const [doctorBasicInfo, setDoctorBasicInfo] = useState({
@@ -723,17 +725,22 @@ const Account = () => {
   const handleUpdateDoctor = async () => {
     try {
 
-      const ref = doc(db, "doctors", doctorBasicInfo.email)
+      const ref = doc(db, "doctors", editData.id)
 
       await updateDoc(ref, {
+        doctorBasicInfo,
+        doctorDesignation,
+        doctorOfficial,
+        doctorAccount,
         name: doctorBasicInfo.name,
         speciality: doctorDesignation.designation,
         hospital: doctorBasicInfo.address,
       })
 
-      alert("Doctor updated")
+      alert("Updated successfully")
 
       setIsEditMode(false)
+      setEditData(null)
 
       fetchDoctors()
 
@@ -791,7 +798,7 @@ const Account = () => {
 
     <div className="flex flex-col md:flex-row min-h-screen w-full">
 
-      <div className="w-64 bg-blue-600 text-white p-4 md:p-6 h-auto md:h-screen">
+      <div className="w-64 bg-blue-600 text-white p-4 md:p-6 min-h-screen">
 
         <ul className="space-y-4">
           <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu("home")} >
@@ -1526,99 +1533,105 @@ const Account = () => {
 
               <tbody>
 
-                {doctorAccounts.map((docData, index) => (
+                {doctorAccounts
+                  .filter(docData => !hospital || docData.hospital === hospital)
+                  .map((docData, index) => (
 
-                  <tr key={index}>
+                    <tr key={index}>
 
-                    <td className="border p-2">
-                      {docData.name}
-                    </td>
+                      <td className="border p-2">
+                        {docData.name}
+                      </td>
 
-                    <td className="border p-2">
-                      {docData.speciality}
-                    </td>
+                      <td className="border p-2">
+                        {docData.speciality}
+                      </td>
 
-                    <td className="border p-2">
-                      {docData.hospital}
-                    </td>
+                      <td className="border p-2">
+                        {docData.hospital}
+                      </td>
 
-                    {/* <td className="border p-2">
+                      {/* <td className="border p-2">
                       {docData.contact}
                     </td> */}
 
-                    <td className="border p-2 flex gap-2">
+                      <td className="border p-2 flex gap-2">
 
 
-                      <button
-                        onClick={() => {
+                        <button
+                          onClick={() => {
 
-                          setDoctorBasicInfo(docData.doctorBasicInfo || {})
-                          setDoctorDesignation(docData.doctorDesignation || {})
-                          setDoctorOfficial(docData.doctorOfficial || {})
-                          setDoctorAccount(docData.doctorAccount || {})
+                            setDoctorBasicInfo(docData.doctorBasicInfo || {})
+                            setDoctorDesignation(docData.doctorDesignation || {})
+                            setDoctorOfficial(docData.doctorOfficial || {})
+                            setDoctorAccount(docData.doctorAccount || {})
 
-                          setIsViewMode(true)
-                          setIsEditMode(false)
-                          setDoctorStep(1)
-                        }}
-                        className="bg-green-500 text-white px-2 py-1 rounded"
-                      >
-                        View
-                      </button>
-
-
-                      <button
-                        onClick={() => {
-                          setDoctorBasicInfo({
-                            name: docData.name || "",
-                            address: docData.hospital || "",
-                            email: docData.email || ""
-                          })
-
-                          setDoctorDesignation({
-                            designation: docData.speciality || ""
-                          })
-
-                          setIsViewMode(false)
-                          setIsEditMode(true)
-                          setDoctorStep(1)
-                        }}
-                        className="bg-blue-500 text-white px-2 py-1 rounded"
-                      >
-                        Edit
-                      </button>
+                            setIsViewMode(true)
+                            setIsEditMode(false)
+                            setDoctorStep(1)
+                          }}
+                          className="bg-green-500 text-white px-2 py-1 rounded"
+                        >
+                          View
+                        </button>
 
 
+                        <button
+                          onClick={() => {
 
-                      <button
-                        onClick={async () => {
-                          await deleteDoc(doc(db, "doctors", docData.id))
-                          fetchDoctors()
-                        }}
-                        className="bg-red-500 text-white px-2 py-1 rounded"
-                      >
-                        Delete
-                      </button>
+                            setEditData(null) 
+                            setViewData(null)
+
+                            // 🔥 full data load
+                            setDoctorBasicInfo(docData.doctorBasicInfo || {})
+                            setDoctorDesignation(docData.doctorDesignation || {})
+                            setDoctorOfficial(docData.doctorOfficial || {})
+                            setDoctorAccount(docData.doctorAccount || {})
+
+                            setEditData(docData)
+
+                            // 🔥 modes
+                            setIsViewMode(false)
+                            setIsEditMode(true)
+
+                            // 🔥 open form
+                            setDoctorStep(1)
+                          }}
+                          className="bg-blue-500 text-white px-2 py-1 rounded"
+                        >
+                          Edit
+                        </button>
 
 
-                      <button
-                        onClick={async () => {
-                          await updateDoc(doc(db, "doctors", docData.id), {
-                            isDisabled: !docData.isDisabled
-                          })
-                          fetchDoctors()
-                        }}
-                        className={`px-2 py-1 rounded text-white ${docData.isDisabled ? "bg-green-500" : "bg-gray-500"
-                          }`}
-                      >
-                        {docData.isDisabled ? "Enable" : "Disable"}
-                      </button>
+                        <button
+                          onClick={async () => {
+                            await deleteDoc(doc(db, "doctors", docData.id))
+                            fetchDoctors()
+                          }}
+                          className="bg-red-500 text-white px-2 py-1 rounded"
+                        >
+                          Delete
+                        </button>
 
-                    </td>
 
-                  </tr>
+                        <button
+                          onClick={async () => {
+                            await updateDoc(doc(db, "doctors", docData.id), {
+                              isDisabled: !docData.isDisabled
+                            })
+                            fetchDoctors()
+                          }}
+                          className={`px-2 py-1 rounded text-white ${docData.isDisabled ? "bg-green-500" : "bg-gray-500"
+                            }`}
+                        >
+                          {docData.isDisabled ? "Enable" : "Disable"}
+                        </button>
 
-                ))}
+                      </td>
+
+                    </tr>
+
+                  ))}
 
               </tbody>
 
@@ -2518,79 +2531,9 @@ const Account = () => {
 
         )}
 
-        {viewData && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
+       
 
-            <div className="bg-white p-6 rounded shadow w-80">
-
-              <h2 className="text-lg font-bold mb-3">Account Details</h2>
-
-              <p><b>Name:</b> {viewData.name}</p>
-
-              {viewData.email && (
-                <p><b>Email:</b> {viewData.email}</p>
-              )}
-
-              {viewData.staffId && (
-                <p><b>Staff ID:</b> {viewData.staffId}</p>
-              )}
-
-              {viewData.address && (
-                <p><b>Address:</b> {viewData.address}</p>
-              )}
-
-              {viewData.experience && (
-                <p><b>Experience:</b> {viewData.experience}</p>
-              )}
-
-              {viewData.password && (
-                <p><b>Password:</b> {viewData.password}</p>
-              )}
-
-              <button onClick={() => setViewData(null)} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-                Close
-              </button>
-
-            </div>
-
-          </div>
-        )}
-
-        {editData && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white p-6 rounded shadow w-80">
-
-              <h2 className="text-lg font-bold mb-3">Edit Account</h2>
-              <input className="border p-2 w-full mb-3" placeholder="Name" value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-
-              {editCollection !== "staffs" && (
-                <input className="border p-2 w-full mb-3" placeholder="Email" value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              )}
-
-              {editCollection === "staffs" && (
-                <>
-                  <input className="border p-2 w-full mb-3" placeholder="Staff ID" value={staffId}
-                    onChange={(e) => setStaffId(e.target.value)} />
-
-                  <input className="border p-2 w-full mb-3" placeholder="Address" value={address}
-                    onChange={(e) => setAddress(e.target.value)} />
-
-                  <input className="border p-2 w-full mb-3" placeholder="Experience" value={experience}
-                    onChange={(e) => setExperience(e.target.value)} />
-                </>
-              )}
-
-              <button onClick={handleUpdate} className="bg-blue-500 text-white px-4 py-2 rounded" >
-                Save
-              </button>
-
-            </div>
-          </div>
-        )}
+        
 
       </div>
 

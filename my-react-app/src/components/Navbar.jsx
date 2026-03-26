@@ -66,46 +66,45 @@ const Navbar = () => {
 
     useEffect(() => {
 
-        const fetchHospital = async () => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
 
-            const user = auth.currentUser;
+            let hospital = localStorage.getItem("selectedHospital");
 
-            if (!user) return;
+            if (!hospital && currentUser) {
+                const docRef = doc(db, "users", currentUser.uid);
+                const docSnap = await getDoc(docRef);
 
-
-            const docRef = doc(db, "master", user.uid);
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-
-                const hospital = docSnap.data().hospital;
-
-                if (!hospital) return;
-
-                const name = hospital.toLowerCase();
-
-                if (name.includes("rajesh")) {
-                    setHospitalLogo("/logos/rajesh.png");
-                }
-                else if (name.includes("government") || name.includes("gh")) {
-                    setHospitalLogo("/logos/gh.png");
-                }
-                else if (name.includes("appolo")) {
-                    setHospitalLogo("/logos/appolo.png");
-                }
-                else if (name.includes("upstage")) {
-                    setHospitalLogo("/logos/upstage.png");
-                }
-                else if (name.includes("vk")) {
-                    setHospitalLogo("/logos/vk.png");
-                }
-                else {
-                    setHospitalLogo("/logos/default.png");
+                if (docSnap.exists()) {
+                    hospital = docSnap.data().hospital;
                 }
             }
-        };
 
-        fetchHospital();
+            if (!hospital) return;
+
+            const name = hospital.toLowerCase();
+
+            if (name.includes("rajesh")) {
+                setHospitalLogo("/logos/rajesh.png");
+            }
+            else if (name === "gh" || name.includes("government hospital")) {
+                setHospitalLogo("/logos/gh.png");
+            }
+            else if (name.includes("apollo")) {
+                setHospitalLogo("/logos/appolo.png");
+            }
+            else if (name.includes("vk")) {
+                setHospitalLogo("/logos/vk.png");
+            }
+            else if (name.includes("upstage")) {
+                setHospitalLogo("/logos/upstage.png");
+            }
+            else {
+                setHospitalLogo("/logos/default.png");
+            }
+
+        });
+
+        return () => unsubscribe();
 
     }, []);
 

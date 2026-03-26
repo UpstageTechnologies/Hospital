@@ -22,16 +22,15 @@ import Account from "./pages/Account.jsx";
 import StaffLogin from "./pages/StaffLogin";
 import DoctorProfile from "./pages/DoctorProfile";
 import StaffProfile from "./pages/StaffProfile";
-import RoleWelcome from "./pages/RoleWelcome";
+
 
 const App = () => {
 
   const location = useLocation();
   const hideLayout = [
-    "/", 
-    "/upstage",               
+    "/",
+    "/upstage",
     "/select-hospital",
-    "/role-welcome",
     "/master-login",
     "/admin-login",
     "/doctor-login",
@@ -48,8 +47,6 @@ const App = () => {
         <Route path="/" element={<HospitalIntro />} />
         <Route path="/upstage" element={<Upstage />} />
         <Route path="/select-hospital" element={<Loding />} />
-        <Route path="/role-welcome" element={<RoleWelcome />} />
-        <Route path="/master-login" element={<MasterLogin />} />
         <Route path="/home" element={<Home />} />
         <Route path="/doctor" element={<Doctor />} />
         <Route path="/doctor/:speciality" element={<Doctor />} />
@@ -59,6 +56,7 @@ const App = () => {
         <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/my-appointment" element={<MyAppointment />} />
         <Route path="/appointment/:docId" element={<Appointment />} />
+        <Route path="/master-login" element={<MasterLogin />} />
         <Route path="/doctor-login" element={<DoctorLogin />} />
         <Route path="/patient-login" element={<PatientLogin />} />
         <Route path="/staff-login" element={<StaffLogin />} />

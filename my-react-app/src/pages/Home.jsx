@@ -5,11 +5,14 @@ import TopDoctor from "../components/TopDoctor";
 import Banner from "../components/Banner";
 
 const Home = () => {
+
+  const hospital = localStorage.getItem("selectedHospital") || "";
+
   return (
     <div>
         <Header />
         <SpecialityMenu />
-        <TopDoctor />
+        <TopDoctor hospital={hospital} />
         <Banner />
     </div>
   );

@@ -64,7 +64,14 @@ const Loding = () => {
         localStorage.setItem("hospitalHistory", JSON.stringify(history));
     };
 
+
+
     const handleContinue = async () => {
+
+        if (!hospital) {
+            alert("Select Hospital");
+            return;
+        }
 
         if (!role) {
             alert("Select Role");
@@ -74,24 +81,24 @@ const Loding = () => {
         try {
             const user = auth.currentUser;
 
-            if (hospital) {
-                saveHospitalToLocal(hospital);
-            }
+            
+            localStorage.setItem("selectedHospital", hospital.toLowerCase());
 
-            if (user && hospital) {
+           
+            if (user) {
                 await setDoc(doc(db, "users", user.uid), {
-                    hospital: hospital
+                    hospital: hospital,
+                    role: role
                 }, { merge: true });
             }
 
-
-            navigate("/role-welcome", { state: { role } });
+            
+            navigate("/home");
 
         } catch (err) {
-            alert(err.message);
+            console.log(err);
         }
     };
-
     return (
         <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-6 md:px-28 lg:px-40 py-10 bg-gradient-to-br from-gray-100 to-gray-200 gap-10">
             <div className="max-w-xl mt-10 md:mt-16">
