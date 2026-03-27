@@ -79,7 +79,11 @@ const Navbar = () => {
                 }
             }
 
-            if (!hospital) return;
+            if (location.pathname.startsWith("/upstage-doctors")) {
+                setHospitalLogo("/logos/upstage.png");
+                return;
+            }
+
 
             const name = hospital.toLowerCase();
 
@@ -182,35 +186,27 @@ const Navbar = () => {
             <div className='flex items-center gap-4 relative'>
 
                 {
-                    false ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
+                    user ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
 
                         <img className='w-8 h-8 rounded-full object-cover' src={userImage} alt="" />
                         <img className='w-2.5 ' src={assets.dropdown_icon} alt="" />
                         {showProfileMenu && (
                             <div className='absolute right-0 top-full mt-2 bg-white shadow-lg rounded-md p-4 text-base font-medium text-gray-600 z-50'>
                                 <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
-                                    <p onClick={() => navigate('/master-login')}>Master Login</p>
-                                    <p onClick={() => navigate('/admin-login')}>Admin Login</p>
-                                    <p onClick={() => navigate('/doctor-login')}>Doctor Login</p>
-                                    <p onClick={() => navigate('/staff-login')}>Staff Login</p>
-                                    <p onClick={() => navigate('/patient-login')}>Patient Login</p>
-                                    <label className="cursor-pointer">
-                                        Profile
-                                        <input type="file" hidden accept="image/*"
-                                            onChange={handleImageChange}
-                                        />
-                                    </label>
-                                    <p onClick={() => navigate('/master-login')}>Master Login</p>
-                                    <p onClick={() => navigate('/admin-login')}>Admin Login</p>
-                                    <p onClick={() => navigate('/doctor-login')}>Doctor Login</p>
-                                    <p onClick={() => navigate('/staff-login')}>Staff Login</p>
-                                    <p onClick={() => navigate('/patient-login')}>Patient Login</p>
-                                    <p
-                                        onClick={() => setShowLogoutPopup(true)}
-                                        className="hover:text-black cursor-pointer"
-                                    >
+
+                                    <p onClick={() => navigate('/my-profile')} className="cursor-pointer hover:text-black">
+                                        My Profile
+                                    </p>
+
+                                    <p onClick={() => navigate('/my-appointment')} className="cursor-pointer hover:text-black">
+                                        My Appointment
+                                    </p>
+
+                                    <p onClick={() => setShowLogoutPopup(true)} className="cursor-pointer hover:text-black">
                                         Logout
                                     </p>
+
+
                                 </div>
                             </div>
                         )}

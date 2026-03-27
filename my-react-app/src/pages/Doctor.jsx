@@ -14,27 +14,27 @@ const Doctor = () => {
   const navigate = useNavigate()
 
   const { doctors } = useContext(AppContext)
+  const selectedHospital = localStorage.getItem("selectedHospital");
 
-  
+
 
   const applyFilter = () => {
 
-    let filtered = doctors.filter(doc =>
-      doc.hospital && doc.hospital.toLowerCase().includes("gh")
-    )
+    let filtered = doctors;
 
-    if (speciality) {
+    // ✅ ONLY selected hospital doctors
+    if (selectedHospital) {
       filtered = filtered.filter(doc =>
-        doc.speciality.toLowerCase() === decodeURIComponent(speciality).toLowerCase()
-      )
+        doc.hospital?.toLowerCase().includes(selectedHospital)
+      );
     }
 
-    setFilterDoc(filtered)
+    setFilterDoc(filtered);
   }
 
   useEffect(() => {
     applyFilter()
-  }, [doctors, speciality])
+  }, [doctors])
   return (
     <div>
       <p className='text-gray-600'>Browse through the doctors specialist.</p>
@@ -51,15 +51,25 @@ const Doctor = () => {
         </div>
         <div className='w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6'>
           {
-            filterDoc && filterDoc.map((item) => (
-              <div key={item._id} onClick={() => navigate(`/appointment/${item._id}`)} className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'>
+            filterDoc && filterDoc.map((item, index) => (
+              <div
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();   // 🔥 IMPORTANT
+                  navigate(`/appointment/${index}`);
+                }}
+                className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'
+              >
                 <img className='bg-blue-50' src={item.image} alt="" />
+
                 <div className='p-4'>
-                  <div className='flex items-center gap-2 text-sm text-center text-green-500'>
-                    <p className='w-2 h-2 bg-green-500 rounded-full'></p><p>Available</p>
+                  <div className='flex items-center gap-2 text-sm text-green-500'>
+                    <p className='w-2 h-2 bg-green-500 rounded-full'></p>
+                    <p>Available</p>
                   </div>
-                  <p className='font-medium whitespace-nowrap'>{item.name}</p>
-                  <p>{item.speciality}</p>
+
+                  <p className='font-medium'>{item.name}</p>
+                  <p className='text-sm text-gray-600'>{item.speciality}</p>
                 </div>
               </div>
             ))

@@ -35,93 +35,6 @@ const Upstage = () => {
         fetchDoctors();
     }, []);
 
-    // const doctors = [
-    //     {
-    //         name: "Dr. S. Rajesh Kumar",
-    //         speciality: "General Physician",
-    //         hospital: "Apollo Hospital, Chennai",
-    //         image: "/category/doct1.png",
-    //         map: "https://www.google.com/maps?q=Apollo+Hospital+Chennai",
-    //     },
-    //     {
-    //         name: "Dr. Priya Lakshmi",
-    //         speciality: "Gynecologist",
-    //         hospital: "Government Hospital, Madurai",
-    //         image: "/category/doct2.png",
-    //         map: "https://www.google.com/maps?q=Government+Hospital+Madurai",
-    //     },
-    //     {
-    //         name: "Dr. Aravind Subramanian",
-    //         speciality: "Dermatologist",
-    //         hospital: "CMC Hospital, Vellore",
-    //         image: "/category/doct3.png",
-    //         map: "https://www.google.com/maps?q=CMC+Hospital+Vellore",
-    //     },
-    //     {
-    //         name: "Dr. Karthik Narayanan",
-    //         speciality: "Pediatrician",
-    //         hospital: "SRM Hospital, Chennai",
-    //         image: "/category/doct4.png",
-    //         map: "https://www.google.com/maps?q=SRM+Hospital+Chennai",
-    //     },
-    //     {
-    //         name: "Dr. Meena Ramesh",
-    //         speciality: "Neurologist",
-    //         hospital: "MIOT Hospital, Chennai",
-    //         image: "/category/doct5.png",
-    //         map: "https://www.google.com/maps?q=MIOT+Hospital+Chennai",
-    //     },
-    //     {
-    //         name: "Dr. Vijay Anand",
-    //         speciality: "Gastroenterologist",
-    //         hospital: "Kauvery Hospital, Trichy",
-    //         image: "/category/doct6.png",
-    //         map: "https://www.google.com/maps?q=Kauvery+Hospital+Trichy",
-    //     },
-    //     {
-    //         name: "Dr. Lakshmi Devi",
-    //         speciality: "Gynecologist",
-    //         hospital: "Government Hospital, Theni",
-    //         image: "/category/doct7.png",
-    //         map: "https://www.google.com/maps?q=Government+Hospital+Theni",
-    //     },
-    //     {
-    //         name: "Dr. Abinaya",
-    //         speciality: "General Physician",
-    //         hospital: "Government Hospital, Sattur",
-    //         image: "/category/doct8.png",
-    //         map: "https://www.google.com/maps?q=Government+Hospital+Sattur",
-    //     },
-    //     {
-    //         name: "Dr. Aruna",
-    //         speciality: "Pediatrician",
-    //         hospital: "Manipal Hospitals, Salem",
-    //         image: "/category/doct9.png",
-    //         map: "https://www.google.com/maps?q=Manipal+Hospital+Salem",
-    //     },
-    //     {
-    //         name: "Dr. Selva Srija",
-    //         speciality: "Neurologist",
-    //         hospital: "Sriramakrishna Hospitals, Virudhunagar",
-    //         image: "/category/doct10.png",
-    //         map: "https://www.google.com/maps?q=Sriramakrishna+Hospital+Virudhunagar",
-    //     },
-    //     {
-    //         name: "Dr. Vijay Kumar",
-    //         speciality: "Dermatologist",
-    //         hospital: "Government Hospitals, Kanniyakumari",
-    //         image: "/category/doct11.png",
-    //         map: "https://www.google.com/maps?q=Government+Hospital+Kanniyakumari",
-    //     },
-    //     {
-    //         name: "Dr. Geniya",
-    //         speciality: "General Physician",
-    //         hospital: "Annai Hospitals, Madurai",
-    //         image: "/category/doct12.png",
-    //         map: "https://www.google.com/maps?q=Annai+Hospital+Madurai",
-    //     },
-    // ];
-
     return (
         <div className="w-full min-h-screen bg-white">
 
@@ -157,7 +70,13 @@ const Upstage = () => {
                         </p>
                     </div>
 
-                    <button className="bg-white px-6 py-3 rounded-full text-gray-700 w-fit">
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem("selectedHospital");
+                            navigate("/upstage-doctors");
+                        }}
+                        className="bg-white px-6 py-3 rounded-full text-gray-700 w-fit"
+                    >
                         Book Appointment →
                     </button>
 

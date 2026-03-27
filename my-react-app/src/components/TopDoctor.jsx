@@ -30,8 +30,9 @@ const TopDoctor = ({ hospital }) => {
                         <div
                             key={index}
                             onClick={() => {
-                                navigate(`/appointment/${doc._id}`)
-                                scrollTo(0, 0)
+                                // 🔥 USE INDEX ONLY (NO ID PROBLEM)
+                                navigate(`/appointment/${index}`);
+                                window.scrollTo(0, 0);
                             }}
                             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'>
 
