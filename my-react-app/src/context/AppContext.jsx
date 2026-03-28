@@ -17,6 +17,7 @@ const AppContextProvider = (props) => {
       snapshot.forEach((doc) => {
         list.push({
           id: doc.id,
+          email: doc.id,
           ...doc.data()
         });
       });

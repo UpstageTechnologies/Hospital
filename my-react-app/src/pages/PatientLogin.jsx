@@ -90,10 +90,12 @@ const Login = () => {
 
       else {
 
+        // 🔥 ADD THIS (VERY IMPORTANT)
+        const userCredential = await signInWithEmailAndPassword(auth, email, password)
 
+        const uid = userCredential.user.uid
 
-
-        const userRef = doc(db, "patients", email)
+        const userRef = doc(db, "users", uid)
         const userSnap = await getDoc(userRef)
 
         if (!userSnap.exists()) {
@@ -108,14 +110,9 @@ const Login = () => {
           return
         }
 
-        if (userData.accountInfo.password !== password) {
-          alert("Wrong password")
-          return
-        }
-
         alert("Login Success")
         localStorage.setItem("patientEmail", email)
-        navigate('/my-profile')
+        navigate('/home')
       }
 
     } catch (error) {

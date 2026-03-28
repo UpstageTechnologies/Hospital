@@ -3,6 +3,9 @@ import { useParams, useLocation } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
+import { auth, db } from '../firebase'
+import { doc, getDoc, setDoc } from "firebase/firestore"
+import { collection, getDocs } from "firebase/firestore"
 
 
 const Appointment = () => {
@@ -18,6 +21,36 @@ const Appointment = () => {
   const [docSlots, setDocSlots] = useState([])
   const [slotIndex, setSlotIndex] = useState(0)
   const [slotTime, setSlotTime] = useState('')
+
+  const [showPopup, setShowPopup] = useState(false)
+  const [patientData, setPatientData] = useState(null)
+  const [appointmentNo, setAppointmentNo] = useState("")
+  const [address, setAddress] = useState("")
+  const [reason, setReason] = useState("")
+  const [mobile, setMobile] = useState("")
+  const [bookedSlots, setBookedSlots] = useState([])
+
+
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      const user = auth.currentUser
+      if (!user) return
+
+      const snap = await getDoc(doc(db, "users", user.uid))
+      if (snap.exists()) {
+        const data = snap.data()
+
+        setPatientData(data)
+
+        // 🔥 AUTO FILL
+        setMobile(data.mobile || data.phone || "")
+        setAddress(data.address || "")
+      }
+    }
+
+    fetchPatient()
+  }, [])
 
   // ✅ FINAL FIXED MATCH LOGIC
   useEffect(() => {
@@ -43,6 +76,7 @@ const Appointment = () => {
 
     setDocInfo({
       ...doctor,
+      email: doctor.email,
       degree: doctor.degree || "MBBS",
       experience: doctor.experience || "4 Years",
       about: doctor.about || "Experienced doctor with strong commitment to patient care.",
@@ -51,60 +85,57 @@ const Appointment = () => {
 
   }, [docId, doctors, selectedHospital]);
 
-  const getAvailableSlots = () => {
-    setDocSlots([])
+  useEffect(() => {
 
-    let today = new Date()
+    const fetchDoctorSlots = async () => {
 
-    for (let i = 0; i < 7; i++) {
+      if (!docInfo) return
 
-      let currentDate = new Date(today)
-      currentDate.setDate(today.getDate() + i)
+      // 🔥 doctor email use பண்ணுறோம்
+      const snap = await getDoc(doc(db, "doctors", docInfo.email))
 
-      let endTime = new Date(currentDate)
-      endTime.setHours(21, 0, 0, 0)
+      if (snap.exists()) {
+        const data = snap.data()
 
-      // ✅ TODAY மட்டும் special logic
-      if (i === 0) {
+        const slotArray = (data.slots || []).map(time => ({
+          time
+        }))
 
-        // current hour + 1
-        let hour = today.getHours() + 1
-
-        // minimum 10 AM
-        if (hour < 10) hour = 10
-
-        currentDate.setHours(hour)
-        currentDate.setMinutes(today.getMinutes() > 30 ? 30 : 0)
-
-      } else {
-        // ✅ other days full slots
-        currentDate.setHours(10)
-        currentDate.setMinutes(0)
+        setDocSlots([{
+          date: new Date(),
+          slots: slotArray
+        }])// single day slots
       }
 
-      let timeSlots = []
-
-      while (currentDate < endTime) {
-
-        let formattedTime = currentDate.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-
-        timeSlots.push({
-          datetime: new Date(currentDate),
-          time: formattedTime
-        })
-
-        currentDate.setMinutes(currentDate.getMinutes() + 30)
-      }
-
-      setDocSlots(prev => [...prev, timeSlots])
     }
-  }
+
+    fetchDoctorSlots()
+
+  }, [docInfo])
+
+
 
   useEffect(() => {
-    if (docInfo) getAvailableSlots()
+
+    const fetchBookedSlots = async () => {
+
+      const snap = await getDocs(collection(db, "appointments"))
+
+      let booked = []
+
+      snap.forEach(doc => {
+        const data = doc.data()
+
+        if (data.doctorEmail === docInfo?.email) {
+          booked.push(data.time)
+        }
+      })
+
+      setBookedSlots(booked)
+    }
+
+    if (docInfo) fetchBookedSlots()
+
   }, [docInfo])
 
   // ✅ LOADING FIX
@@ -144,22 +175,21 @@ const Appointment = () => {
         </p>
 
         {/* 📅 DAYS */}
-        <div className='flex flex-wrap justify-center gap-3 pb-2'>
+        {/* 📅 DATE */}
+        <div className='flex gap-3 pb-2'>
           {docSlots.map((item, index) => (
             <div
               key={index}
               onClick={() => setSlotIndex(index)}
-              className={`min-w-[60px] text-center p-3 rounded-lg cursor-pointer border transition-all
-        ${slotIndex === index
+              className={`text-center py-4 px-6 rounded-lg cursor-pointer
+      ${slotIndex === index
                   ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-700 border-gray-300 hover:bg-blue-100"
+                  : "border border-gray-300"
                 }`}
             >
-              <p className='text-sm'>
-                {item[0] && ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][item[0].datetime.getDay()]}
-              </p>
-              <p className='font-medium'>
-                {item[0]?.datetime.getDate()}
+              <p>{item.date.toDateString().slice(0, 3)}</p>
+              <p className='font-semibold'>
+                {item.date.getDate()}
               </p>
             </div>
           ))}
@@ -167,30 +197,149 @@ const Appointment = () => {
 
         {/* ⏰ TIME */}
         <div className='flex flex-wrap justify-center gap-3 mt-5'>
-          {docSlots[slotIndex]?.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => setSlotTime(item.time)}
-              className={`px-4 py-2 rounded-full border text-sm transition-all
-        ${slotTime === item.time
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-700 border-gray-300 hover:bg-blue-100"
-                }`}
-            >
-              {item.time}
-            </button>
-          ))}
+          {docSlots[slotIndex]?.slots.map((item, index) => {
+
+            const isBooked = bookedSlots.includes(item.time)
+
+            return (
+              <button
+                key={index}
+                disabled={isBooked}
+                onClick={() => setSlotTime(item.time)}
+                className={`px-4 py-2 rounded-full
+        ${isBooked
+                    ? "bg-gray-300 text-gray-500"
+                    : "border"
+                  }`}
+              >
+                {isBooked ? "Booked" : item.time}
+              </button>
+            )
+          })}
         </div>
 
         {/* 🔥 BUTTON */}
         <div className='flex justify-center'>
-          <button className='mt-6 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg shadow-md transition-all hover:scale-105'>
+          <button
+            onClick={async () => {
+
+              if (!slotTime) {
+                alert("Select time")
+                return
+              }
+
+              // 🔥 get all appointments count
+              const snap = await getDocs(collection(db, "appointments"))
+
+              const count = snap.size + 1
+
+              // 🔥 format AP001
+              const formatted = "AP" + String(count).padStart(3, "0")
+
+              setAppointmentNo(formatted)
+              setShowPopup(true)
+            }}
+            className='mt-6 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg'
+          >
             Book Appointment
           </button>
         </div>
       </div>
 
       <RelatedDoctors docId={docId} speciality={docInfo.speciality} />
+
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+
+          <div className="bg-white p-6 rounded-xl w-[350px] shadow-lg">
+
+            <h2 className="text-xl font-bold text-blue-600 mb-4">
+              Confirm Appointment
+            </h2>
+
+            {/* ✅ NAME + IMAGE */}
+            <div className="flex items-center gap-3 mb-3">
+              <img
+                src={patientData?.image || assets.profile_pic}
+                className="w-12 h-12 rounded-full"
+              />
+              <p className="font-semibold text-lg">
+                {patientData?.name || "Patient"}
+              </p>
+            </div>
+
+            {/* ✅ SMALL APPOINTMENT NO */}
+            <p className="mb-2 text-sm">
+              Appointment No: <b>{appointmentNo}</b>
+            </p>
+
+            {/* ❗ ADDRESS INPUT (FIXED) */}
+            <input
+              placeholder="Address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="border w-full p-2 mb-2 rounded"
+            />
+
+            {/* ✅ MOBILE */}
+            <input
+              placeholder="Mobile Number"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              className="border w-full p-2 mb-2 rounded"
+            />
+
+            {/* ✅ REASON */}
+            <input
+              placeholder="Reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="border w-full p-2 mb-4 rounded"
+            />
+
+            <div className="flex justify-between">
+
+              <button
+                onClick={() => setShowPopup(false)}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={async () => {
+
+                  const user = auth.currentUser
+
+                  await setDoc(doc(db, "appointments", appointmentNo), {
+                    appointmentNo,
+                    patientName: patientData?.name,
+                    patientImage: patientData?.image || "",
+                    address,
+                    mobile,
+                    reason,
+                    doctorEmail: docInfo.email,
+                    doctorName: docInfo.name,
+                    time: slotTime,
+                    userId: user.uid,
+                    createdAt: new Date()
+                  })
+
+                  alert("Appointment Booked ✅")
+                  setShowPopup(false)
+
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
