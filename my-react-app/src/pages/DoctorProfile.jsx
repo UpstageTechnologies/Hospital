@@ -59,8 +59,7 @@ const DoctorProfile = () => {
 
         <div className="flex min-h-screen">
 
-
-            <div className="w-64 bg-blue-600 text-white p-6">
+          <div className="w-64 bg-blue-600 text-white p-6">
                 <h2 className="text-xl font-bold mb-6">Doctor Panel</h2>
                 <p className="mb-3">Appointment Time</p>
                 <p className="mb-3">Appointments</p>
@@ -71,7 +70,7 @@ const DoctorProfile = () => {
 
             <div className="p-8 w-full flex flex-col items-center">
 
-                {/* HEADER */}
+               
                 <h1 className="text-4xl font-bold text-center">
                     Doctor Dashboard
                 </h1>
@@ -80,28 +79,19 @@ const DoctorProfile = () => {
                     Welcome Doctor 👨‍⚕️
                 </p>
 
-                <img
-                    src={doctorImage}
-                    alt="doctor"
-                    className="w-20 h-20 rounded-full object-cover mt-4"
-                />
+                <img src={doctorImage} alt="doctor" className="w-20 h-20 rounded-full object-cover mt-4"/>
 
-                {/* 🔵 SLOT BOX */}
+               
                 <div className="w-full max-w-md bg-white p-6 rounded-lg shadow text-center">
 
                     <h3 className="text-lg font-semibold mb-4">
                         Set Available Slots
                     </h3>
 
-                    <input
-                        value={newSlot}
-                        onChange={(e) => setNewSlot(e.target.value)}
-                        placeholder="ex: 10:00 am"
-                        className="border px-3 py-2 rounded w-full mb-3"
-                    />
+                    <input value={newSlot} onChange={(e) => setNewSlot(e.target.value)} placeholder="ex: 10:00 am"
+                        className="border px-3 py-2 rounded w-full mb-3"/>
 
-                    <button
-                        onClick={async () => {
+                    <button onClick={async () => {
 
                             if (!newSlot) return
 
@@ -117,14 +107,13 @@ const DoctorProfile = () => {
 
                             setNewSlot("")
                         }}
-                        className="bg-blue-600 text-white px-6 py-2 rounded"
-                    >
+                        className="bg-blue-600 text-white px-6 py-2 rounded">
                         Add Slot
                     </button>
 
                 </div>
 
-                {/* 🔥 SLOT LIST */}
+                
                 <div className="mt-8 w-full max-w-md text-center">
 
                     <h4 className="text-md font-semibold mb-3">

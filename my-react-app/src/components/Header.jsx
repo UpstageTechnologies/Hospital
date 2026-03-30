@@ -7,6 +7,7 @@ const Header = () => {
     const navigate = useNavigate();
 
     return (
+        <div className='px-6 sm:px-10'>
         <div className='flex flex-col md:flex-row flex-wrap bg-blue-500 rounded-lg px-6 md:px-10 lg:px-20'>
 
             <div className='md:w-1/2 flex flex-col items-start justify-center gap-4 py-10 m-auto md:py-[10vw] md:mb-[-30px]'>
@@ -26,6 +27,7 @@ const Header = () => {
             <div className='md:w-1/2 relative'>
                 <img className='w-full md:absolute bottom-0 h-auto rounded-lg' src={assets.header_img} alt="" />
             </div>
+        </div>
         </div>
     )
 }

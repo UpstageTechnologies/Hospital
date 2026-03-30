@@ -112,7 +112,7 @@ const Login = () => {
 
         alert("Login Success")
         localStorage.setItem("patientEmail", email)
-        navigate('/home')
+        navigate('/appointment-confirm')
       }
 
     } catch (error) {

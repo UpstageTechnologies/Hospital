@@ -30,7 +30,7 @@ const UpstageDoctors = () => {
     }, [doctors, speciality]);
 
     return (
-        <div>
+       <div className='px-6 sm:px-10'>
 
             <p className='text-gray-600'>Browse through the doctors specialist.</p>
 
