@@ -125,10 +125,9 @@ const AppointmentConfirm = () => {
 
             <div className='bg-white p-6 rounded-xl w-[400px]'>
 
-                {/* 👤 PATIENT */}
+                
                 <div className='flex items-center gap-3'>
-                    <img
-                        src={user.image && user.image !== ""
+                    <img src={user.image && user.image !== ""
                             ? user.image
                             : "https://ui-avatars.com/api/?name=" + user.name}
                         className="w-12 h-12 rounded-full object-cover"
@@ -139,37 +138,33 @@ const AppointmentConfirm = () => {
                     </h2>
                 </div>
 
-                {/* 📍 ADDRESS */}
+               
                 <p className='mt-3'>
                     Address: {user.address || "------"}
                 </p>
 
-                {/* 📞 PHONE */}
+                
                 <p>
                     Phone: {user.phone || "------"}
                 </p>
 
-                {/* 👨‍⚕️ DOCTOR NAME ONLY */}
+                
                 {doctor && (
                     <p className='mt-3 font-medium'>
                         Doctor: {doctor.name}
                     </p>
                 )}
 
-                {/* 🔢 APPOINTMENT NUMBER */}
+                
                 <p className='mt-3 font-medium'>
                     Appointment No: {appointmentNo}
                 </p>
 
-                {/* 📝 REASON */}
-                <textarea
-                    placeholder='Reason...'
-                    className='w-full border p-2 mt-3 rounded'
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                />
+                
+                <textarea placeholder='Reason...' className='w-full border p-2 mt-3 rounded' value={reason}
+                    onChange={(e) => setReason(e.target.value)}/>
 
-                {/* 🔘 BUTTONS */}
+               
                 <div className='flex justify-between mt-4'>
 
                     <button className='border px-4 py-2 rounded'>
@@ -180,7 +175,7 @@ const AppointmentConfirm = () => {
                         onClick={handleBook}
                         className='bg-blue-600 text-white px-4 py-2 rounded'
                     >
-                        Booked
+                        Book
                     </button>
 
                 </div>

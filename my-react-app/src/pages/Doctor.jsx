@@ -22,7 +22,7 @@ const Doctor = () => {
 
     let filtered = doctors;
 
-
+   
     if (selectedHospital) {
       filtered = filtered.filter(doc =>
         doc.hospital?.toLowerCase().includes(selectedHospital)
@@ -36,7 +36,7 @@ const Doctor = () => {
     applyFilter()
   }, [doctors])
   return (
-    <div className='px-6 sm:px-10'>
+   <div className='px-6 sm:px-10'>
       <p className='text-gray-600'>Browse through the doctors specialist.</p>
       <div className='flex flex-col sm:flex-row items-start gap-5 mt-5'>
 
@@ -55,16 +55,8 @@ const Doctor = () => {
               <div
                 key={index}
                 onClick={(e) => {
-                  e.stopPropagation();
-
-                  navigate(`/appointment/${encodeURIComponent(item.email)}`, {
-                    state: {
-                      doctor: {
-                        id: item.id,
-                        name: item.name
-                      }
-                    }
-                  });
+                  e.stopPropagation();  
+            navigate(`/appointment/${encodeURIComponent(item.email)}`);
                 }}
                 className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'
               >
