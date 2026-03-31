@@ -18,7 +18,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import DoctorLogin from "./pages/DoctorLogin";
 import PatientLogin from "./pages/PatientLogin";
-import AppointmentConfirm from "./pages/AppointmentConfirm.jsx";
+import PatientDashboard from "./pages/PatientDashboard";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import Account from "./pages/Account.jsx";
 import StaffLogin from "./pages/StaffLogin";
@@ -62,7 +62,7 @@ const App = () => {
         <Route path="/master-login" element={<MasterLogin />} />
         <Route path="/doctor-login" element={<DoctorLogin />} />
         <Route path="/patient-login" element={<PatientLogin />} />
-        <Route path="/appointment-confirm" element={<AppointmentConfirm />} />
+        <Route path="/patient-dashboard" element={<PatientDashboard />} />
         <Route path="/staff-login" element={<StaffLogin />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/account" element={<Account />} />

@@ -36,30 +36,25 @@ const UpstageDoctors = () => {
 
             <div className='flex flex-col sm:flex-row items-start gap-5 mt-5'>
 
-                {/* FILTER BUTTON (mobile) */}
-                <button
-                    className={`py-1 px-3 border rounded text-sm sm:hidden ${showFilter ? 'bg-blue-500 text-white' : ''}`}
-                    onClick={() => setShowFilter(prev => !prev)}
-                >
+                <button className={`py-1 px-3 border rounded text-sm sm:hidden ${showFilter ? 'bg-blue-500 text-white' : ''}`}
+                    onClick={() => setShowFilter(prev => !prev)}>
                     Filters
                 </button>
 
-                {/* LEFT SIDE FILTER */}
+                
                 <div className={`flex-col gap-4 text-sm text-gray-600 ${showFilter ? 'flex' : 'hidden sm:flex'}`}>
 
                     {["General physician", "Gynecologist", "Dermatologist", "Pediatricians", "Neurologist", "Gastroenterologist"]
                         .map((item, i) => (
 
-                            <p
-                                key={i}
+                            <p key={i}
                                 onClick={() =>
                                     speciality === item
                                         ? navigate("/upstage-doctors")
                                         : navigate(`/upstage-doctors/${item}`)
                                 }
                                 className={`pl-3 py-1.5 pr-16 border rounded cursor-pointer 
-                  ${speciality === item ? "bg-indigo-100 text-black" : ""}`}
-                            >
+                  ${speciality === item ? "bg-indigo-100 text-black" : ""}`} >
                                 {item}
                             </p>
 
@@ -67,16 +62,13 @@ const UpstageDoctors = () => {
 
                 </div>
 
-                {/* DOCTORS GRID */}
+                
                 <div className='w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
 
                     {filterDoc.map((item, index) => (
 
-                        <div
-                            key={index}
-                            onClick={() => navigate(`/appointment/${index}`)}
-                            className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'
-                        >
+                        <div key={index}  onClick={() => navigate(`/appointment/${item.email}`)}
+                            className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
                             <img src={item.image} className='bg-blue-50' />
 

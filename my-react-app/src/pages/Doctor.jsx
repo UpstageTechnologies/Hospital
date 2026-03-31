@@ -56,7 +56,7 @@ const Doctor = () => {
                 key={index}
                 onClick={(e) => {
                   e.stopPropagation();  
-            navigate(`/appointment/${encodeURIComponent(item.email)}`);
+                  navigate(`/appointment/${encodeURIComponent(item.email)}`);
                 }}
                 className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'
               >

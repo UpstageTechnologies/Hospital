@@ -33,7 +33,7 @@ const Login = () => {
 
       alert("Google Signup Success")
 
-      navigate("/login")
+      navigate("/patient-dashboard")
 
     } catch (error) {
 
@@ -90,7 +90,7 @@ const Login = () => {
 
       else {
 
-        // 🔥 ADD THIS (VERY IMPORTANT)
+
         const userCredential = await signInWithEmailAndPassword(auth, email, password)
 
         const uid = userCredential.user.uid
@@ -111,8 +111,8 @@ const Login = () => {
         }
 
         alert("Login Success")
-        localStorage.setItem("patientEmail", email)
-        navigate('/appointment-confirm')
+        localStorage.setItem("userEmail", email)
+        navigate('/patient-dashboard')
       }
 
     } catch (error) {
@@ -206,16 +206,9 @@ const Login = () => {
           </div>
         }
         <button type="submit" className='bg-blue-500 text-white w-full py-2 rounded-md text-base'>{state === 'Sign Up' ? "Create account" : "Login"}</button>
-        <button
-          type="button"
-          onClick={handleGoogleSignup}
-          className="border border-gray-300 w-full py-2 rounded-md flex items-center justify-center gap-3 mt-2"
-        >
+        <button type="button" onClick={handleGoogleSignup} className="border border-gray-300 w-full py-2 rounded-md flex items-center justify-center gap-3 mt-2">
 
-          <img
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-            className="w-5"
-          />
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5" />
 
           Sign up with Google
 
