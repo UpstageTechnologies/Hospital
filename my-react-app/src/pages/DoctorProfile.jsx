@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { doc, getDoc, updateDoc } from "firebase/firestore"
 import { db } from "../firebase"
-import { collection, query, where } from "firebase/firestore"
+import { collection, getDocs } from "firebase/firestore"
 
 const DoctorProfile = () => {
 
@@ -11,11 +11,12 @@ const DoctorProfile = () => {
     const [newSlot, setNewSlot] = useState("")
     const [doctorImage, setDoctorImage] = useState("")
     const [appointments, setAppointments] = useState([])
+    const [page, setPage] = useState("home")
+    const [selected, setSelected] = useState(null)
 
     useEffect(() => {
 
         const email = localStorage.getItem("doctorEmail")
-
         if (!email) return
 
         const fetchData = async () => {
@@ -24,9 +25,9 @@ const DoctorProfile = () => {
 
             if (snap.exists()) {
                 const data = snap.data()
-
                 setDoctorData(data)
-                setDoctorImage(data.image) // 🔥 IMPORTANT
+                setDoctorImage(data.image)
+                setSlots(data.slots || [])
             }
         }
 
@@ -35,139 +36,182 @@ const DoctorProfile = () => {
     }, [])
 
     useEffect(() => {
-
         const fetchAppointments = async () => {
 
             const email = localStorage.getItem("doctorEmail")
+            const snap = await getDocs(collection(db, "appointments"))
 
-            if (!email) return
+            let list = []
 
-            const q = query(
-                collection(db, "appointments"),
-                where("doctorId", "==", email)
-            )
+            snap.forEach(doc => {
+                const data = doc.data()
 
-            const snap = await getDocs(q)
+                if (
+                    data.doctorEmail === email ||
+                    data.doctorId === email
+                ) {
+                    list.push(data)
+                }
+            })
 
-            const data = snap.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-
-            setAppointments(data)
+            setAppointments(list)
         }
 
         fetchAppointments()
-
     }, [])
 
     if (!doctorData) return <p className="p-10">Loading...</p>
-
-    const handleChange = (section, field, value) => {
-        setDoctorData(prev => ({
-            ...prev,
-            [section]: {
-                ...prev[section],
-                [field]: value
-            }
-        }))
-    }
-
-    const handleSave = async () => {
-
-        const email = localStorage.getItem("doctorEmail")
-        const ref = doc(db, "doctors", email)
-
-        await updateDoc(ref, doctorData)
-
-        alert("Saved Successfully ")
-        setIsEdit(false)
-    }
 
     return (
 
         <div className="flex min-h-screen">
 
+            {/* LEFT PANEL */}
             <div className="w-64 bg-blue-600 text-white p-6">
                 <h2 className="text-xl font-bold mb-6">Doctor Panel</h2>
                 <p className="mb-3">Appointment Time</p>
-                <p className="mb-3">Appointments</p>
+
+                <p onClick={() => setPage("appointments")} className="mb-3 cursor-pointer">
+                    Appointments
+                </p>
+
                 <p className="mb-3">Patients</p>
                 <p className="mb-3">Profile</p>
             </div>
 
+            {/* ================= APPOINTMENTS PAGE ================= */}
+            {page === "appointments" && (
+                <div className="p-8 w-full">
 
-            <div className="p-8 w-full flex flex-col items-center">
+                    <h1 className="text-2xl font-bold mb-6">
+                        Appointments
+                    </h1>
 
+                    {(() => {
 
-                <h1 className="text-4xl font-bold text-center">
-                    Doctor Dashboard
-                </h1>
+                        const now = new Date()
 
-                <p className="mt-2 text-gray-600 text-lg mb-8 text-center">
-                    Welcome Doctor 👨‍⚕️
-                </p>
+                        const current = []
+                        const old = []
 
-                <img src={doctorImage} alt="doctor" className="w-20 h-20 rounded-full object-cover mt-4" />
+                        appointments.forEach(item => {
+                            const dateTime = new Date(`${item.date} ${item.time.split("-")[0]}`)
 
-
-                <div className="w-full max-w-md bg-white p-6 rounded-lg shadow text-center">
-
-                    <h3 className="text-lg font-semibold mb-4">
-                        Set Available Slots
-                    </h3>
-
-                    <input value={newSlot} onChange={(e) => setNewSlot(e.target.value)} placeholder="ex: 10:00 am"
-                        className="border px-3 py-2 rounded w-full mb-3" />
-
-                    <button onClick={async () => {
-
-                        if (!newSlot) return
-
-                        const email = localStorage.getItem("doctorEmail")
-
-                        const updatedSlots = [...slots, newSlot]
-
-                        setSlots(updatedSlots)
-
-                        await updateDoc(doc(db, "doctors", email), {
-                            slots: updatedSlots
+                            if (dateTime >= now) {
+                                current.push(item)
+                            } else {
+                                old.push(item)
+                            }
                         })
 
-                        setNewSlot("")
-                    }}
-                        className="bg-blue-600 text-white px-6 py-2 rounded">
-                        Add Slot
-                    </button>
+                        return (
+                            <>
+                                {/* 🔥 CURRENT (OUTSIDE) */}
+                                <h2 className="text-lg font-semibold mb-3">Current Appointments</h2>
+
+                                <div className="grid grid-cols-2 gap-4 mb-8">
+                                    {current.map((item, i) => (
+                                        <div
+                                            key={i}
+                                            className="bg-white shadow p-4 rounded border border-green-300"
+                                        >
+                                            <p className="font-semibold">{item.patientName}</p>
+                                            <p className="text-sm text-gray-500">{item.time}</p>
+                                            <p className="text-xs text-gray-400">{item.appointmentNo}</p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* 🔥 OLD (CLICK → POPUP SAME) */}
+                                <h2 className="text-lg font-semibold mb-3">Old Appointments</h2>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    {old.map((item, i) => (
+                                        <div
+                                            key={i}
+                                            onClick={() => setSelected(item)}
+                                            className="bg-white shadow p-4 rounded cursor-pointer hover:scale-105 transition"
+                                        >
+                                            <p className="font-semibold">{item.patientName}</p>
+                                            <p className="text-sm text-gray-500">{item.time}</p>
+                                            <p className="text-xs text-gray-400">{item.appointmentNo}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )
+                    })()}
 
                 </div>
+            )}
 
+            {/* ================= HOME PAGE ================= */}
+            {page === "home" && (
+                <div className="p-8 w-full flex flex-col items-center">
 
-                <div className="mt-8 w-full max-w-md text-center">
+                    <h1 className="text-4xl font-bold text-center">
+                        Doctor Dashboard
+                    </h1>
 
-                    <h4 className="text-md font-semibold mb-3">
-                        Your Slots
-                    </h4>
+                    <p className="mt-2 text-gray-600 text-lg mb-8 text-center">
+                        Welcome Doctor 👨‍⚕️
+                    </p>
 
-                    {slots.length === 0 ? (
-                        <p className="text-gray-500 text-sm">No slots added</p>
-                    ) : (
+                    <img src={doctorImage} className="w-20 h-20 rounded-full mt-4" />
+
+                    <div className="w-full max-w-md bg-white p-6 rounded-lg shadow text-center">
+
+                        <h3 className="text-lg font-semibold mb-4">
+                            Set Available Slots
+                        </h3>
+
+                        <input
+                            value={newSlot}
+                            onChange={(e) => setNewSlot(e.target.value)}
+                            placeholder="ex: 10:00 am"
+                            className="border px-3 py-2 rounded w-full mb-3"
+                        />
+
+                        <button
+                            onClick={async () => {
+
+                                if (!newSlot) return
+
+                                const email = localStorage.getItem("doctorEmail")
+                                const updatedSlots = [...slots, newSlot]
+
+                                setSlots(updatedSlots)
+
+                                await updateDoc(doc(db, "doctors", email), {
+                                    slots: updatedSlots
+                                })
+
+                                setNewSlot("")
+                            }}
+                            className="bg-blue-600 text-white px-6 py-2 rounded"
+                        >
+                            Add Slot
+                        </button>
+
+                    </div>
+
+                    <div className="mt-8 w-full max-w-md text-center">
+
+                        <h4 className="font-semibold mb-3">Your Slots</h4>
+
                         <div className="flex flex-wrap justify-center gap-2">
 
                             {slots.map((slot, index) => (
-                                <div
-                                    key={index}
-                                    className="flex items-center gap-2 bg-blue-100 px-3 py-1 rounded-full"
-                                >
+                                <div key={index} className="bg-blue-100 px-3 py-1 rounded-full flex gap-2">
 
-                                    <span className="text-sm">{slot}</span>
+                                    <span>{slot}</span>
 
                                     <button
                                         onClick={() => {
                                             setNewSlot(slot)
                                             setSlots(slots.filter((_, i) => i !== index))
                                         }}
-                                        className="text-xs text-blue-600"
+                                        className="text-blue-600 text-xs"
                                     >
                                         Edit
                                     </button>
@@ -176,7 +220,6 @@ const DoctorProfile = () => {
                                         onClick={async () => {
 
                                             const updated = slots.filter((_, i) => i !== index)
-
                                             setSlots(updated)
 
                                             const email = localStorage.getItem("doctorEmail")
@@ -186,7 +229,7 @@ const DoctorProfile = () => {
                                             })
 
                                         }}
-                                        className="text-xs text-red-500"
+                                        className="text-red-500 text-xs"
                                     >
                                         X
                                     </button>
@@ -195,62 +238,43 @@ const DoctorProfile = () => {
                             ))}
 
                         </div>
-                    )}
+
+                    </div>
 
                 </div>
+            )}
 
-                <div className="mt-10 w-full max-w-xl">
+            {/* ================= POPUP ================= */}
+            {selected && (
+                <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
 
-                    <h2 className="text-xl font-bold mb-4">Appointments</h2>
+                    <div className="bg-white w-[500px] rounded p-6 relative">
 
-                    {appointments.length === 0 ? (
-                        <p>No appointments</p>
-                    ) : (
-                        appointments.map((item, i) => (
+                        <button
+                            onClick={() => setSelected(null)}
+                            className="absolute top-2 right-3 text-xl"
+                        >
+                            ✖
+                        </button>
 
-                            <div key={i} className="border p-4 rounded mb-3">
+                        <h2 className="text-xl font-bold text-center mb-4">
+                            Appointment Details
+                        </h2>
 
-                                <p><b>Patient:</b> {item.patientName}</p>
-                                <p><b>Phone:</b> {item.phone}</p>
-                                <p><b>Address:</b> {item.address}</p>
-                                <p><b>Date:</b> {item.date}</p>
-                                <p><b>Time:</b> {item.time}</p>
-                                <p><b>Reason:</b> {item.reason}</p>
-                                <p><b>Appointment No:</b> {item.appointmentNo}</p>
+                        <p><b>Patient:</b> {selected.patientName}</p>
+                        <p><b>Phone:</b> {selected.phone}</p>
+                        <p><b>Address:</b> {selected.address}</p>
+                        <p><b>Date:</b> {selected.date}</p>
+                        <p><b>Time:</b> {selected.time}</p>
+                        <p><b>Reason:</b> {selected.reason}</p>
+                        <p><b>Appointment No:</b> {selected.appointmentNo}</p>
 
-                            </div>
-
-                        ))
-                    )}
-
+                    </div>
                 </div>
-
-            </div>
+            )}
 
         </div>
     )
 }
 
 export default DoctorProfile
-
-
-
-const Input = ({ label, value, isEdit, onChange }) => {
-
-    return (
-        <div className="grid grid-cols-[150px_1fr] items-center">
-            <span className="font-semibold">{label} :</span>
-
-            {isEdit ? (
-                <input
-                    value={value || ""}
-                    onChange={(e) => onChange && onChange(e.target.value)}
-                    className="border px-3 py-2 rounded w-full"
-                />
-            ) : (
-                <p>{value || "-"}</p>
-            )}
-
-        </div>
-    )
-}

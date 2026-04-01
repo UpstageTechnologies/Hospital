@@ -59,50 +59,69 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen flex items-center justify-center 
+  bg-gradient-to-br from-blue-100 via-purple-100 to-blue-200">
 
-            <div className="bg-white p-8 rounded-2xl shadow-xl w-[380px]">
+            <div className="backdrop-blur-lg bg-white/60 shadow-2xl 
+    rounded-2xl p-8 w-[380px]">
 
                 <h2 className="text-3xl font-bold mb-6 text-center">
                     {isRegister ? "Admin Register" : "Admin Login"}
                 </h2>
 
-                <input type="email" placeholder="Enter Email" value={email}
-                    onChange={(e) => setEmail(e.target.value)} className="w-full mb-4 px-4 py-3 border rounded-lg bg-gray-100"
+                {/* EMAIL */}
+                <input
+                    type="email"
+                    placeholder="Enter Email"
+                    autoComplete="off"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="input-style"
                 />
 
-                <input type="password" placeholder="Enter Password" value={password}
-                    onChange={(e) => setPassword(e.target.value)} className="w-full mb-5 px-4 py-3 border rounded-lg bg-gray-100"
+                {/* PASSWORD */}
+                <input
+                    type="password"
+                    placeholder="Enter Password"
+                     autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input-style"
                 />
 
+                {/* BUTTON */}
                 {!isRegister ? (
-                    <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-3 rounded-lg mb-4">
+                    <button onClick={handleLogin} className="btn-style">
                         Login
                     </button>
                 ) : (
-                    <button onClick={handleRegister} className="w-full bg-blue-500 text-white py-3 rounded-lg mb-4">
+                    <button onClick={handleRegister} className="btn-style">
                         Register
                     </button>
                 )}
 
-
-                <button
-                    onClick={handleGoogle}
-                    className="w-full border border-gray-300 py-3 rounded-lg mb-4 flex items-center justify-center gap-3 bg-white hover:shadow-md transition"
-                >
-                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="google" className="w-5 h-5" />
-                    <span>Sign in with Google</span>
+                {/* GOOGLE */}
+                <button onClick={handleGoogle} className="google-btn">
+                    <img
+                        src="https://developers.google.com/identity/images/g-logo.png"
+                        className="w-5"
+                    />
+                    Sign in with Google
                 </button>
 
+                {/* SWITCH LOGIN ↔ REGISTER */}
                 {!fromRole && (
-                    <p className="text-center text-sm">
-                        No account?
-                        <span className="text-blue-500 ml-1 cursor-pointer">
-                            Register
+                    <p className="text-center text-sm mt-3">
+                        {isRegister ? "Already have account?" : "No account?"}
+
+                        <span
+                            className="text-blue-600 ml-1 cursor-pointer"
+                            onClick={() => setIsRegister(!isRegister)}
+                        >
+                            {isRegister ? "Login" : "Register"}
                         </span>
                     </p>
                 )}
-
             </div>
         </div>
     );

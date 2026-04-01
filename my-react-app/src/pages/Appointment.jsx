@@ -99,7 +99,7 @@ const Appointment = () => {
          
 
           // 🔥 ADD THIS FIX
-          setShowRegister(true)
+          setShowRegister(false)
         }
       }
     })
@@ -155,8 +155,8 @@ const Appointment = () => {
                         <h2 className="text-xl font-bold mb-4">Create Account</h2>
 
                         <input id="name" placeholder="Full Name" className="border p-2 w-full mb-3" />
-                        <input id="email" placeholder="Email" className="border p-2 w-full mb-3" />
-                        <input id="password" placeholder="Password" type="password" className="border p-2 w-full mb-3" />
+                        <input id="email" autoComplete="off" placeholder="Email" className="border p-2 w-full mb-3" />
+                        <input id="password" autoComplete="new-password" placeholder="Password" type="password" className="border p-2 w-full mb-3" />
                         <input id="address" placeholder="Address" className="border p-2 w-full mb-3" />
                         <input id="phone" placeholder="Phone" className="border p-2 w-full mb-3" />
                         <div className="mb-3">
@@ -224,8 +224,8 @@ const Appointment = () => {
                       <>
                         <h2 className="text-xl font-bold mb-4">Login</h2>
 
-                        <input id="loginEmail" type="email" placeholder="Email" className="border p-2 w-full mb-3" />
-                        <input id="loginPassword" type="password" placeholder="Password" className="border p-2 w-full mb-3" />
+                        <input id="loginEmail" type="email" autoComplete="off" placeholder="Email" className="border p-2 w-full mb-3" />
+                        <input id="loginPassword" type="password" autoComplete="new-password" placeholder="Password" className="border p-2 w-full mb-3" />
 
                         <button
                           onClick={async () => {
@@ -304,9 +304,10 @@ const Appointment = () => {
                             try {
 
                               const appointmentData = {
-                                doctorId: docInfo?.id || "",
+                              doctorId: decodedId || "",
                                 doctorName: docInfo?.name || "",
                                 doctorImage: docInfo?.image || "",
+                               doctorEmail: decodedId,
                                 patientName: patientName,
                                 phone: phone,
                                 address: address,

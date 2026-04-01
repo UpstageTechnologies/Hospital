@@ -122,103 +122,155 @@ const Login = () => {
   }
 
   return (
-    <form autoComplete='off' onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center' >
-      <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg'>
-        <p className='text-2xl font-semibold'>{state === 'Sign Up' ? "Create account" : "Login"}</p>
-        <p>Please {state === 'Sign Up' ? "sign up" : "log in"} to book appointment</p>
-        {
-          state === "Sign Up" && <div className='w-full'>
-            <p>Full Name</p>
-            <input className='border border-zinc-300 rounded w-full p-2 mt-1' type="text" onChange={(e) => setName(e.target.value)} value={name} required />
-          </div>
-        }
+    <div className="min-h-screen flex items-center justify-center 
+  bg-gradient-to-br from-blue-100 via-purple-100 to-blue-200">
 
-        <div className='w-full'>
-          <p>Email</p>
-          <input autoComplete='off' className='border border-zinc-300 rounded w-full p-2 mt-1' type="email" onChange={(e) => setEmail(e.target.value)} value={email} required />
+      {/* CARD */}
+      <form
+        autoComplete="off"
+        onSubmit={onSubmitHandler}
+        className="backdrop-blur-lg bg-white/60 shadow-2xl border border-white/30 
+      rounded-2xl p-8 w-[350px] sm:w-[420px]"
+      >
+
+        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">
+          {state === 'Sign Up' ? "Create Account" : "Login"}
+        </h1>
+
+        <p className="text-center text-gray-500 mb-6">
+          Please {state === 'Sign Up' ? "sign up" : "log in"} to continue
+        </p>
+
+        {/* NAME */}
+        {state === "Sign Up" && (
+          <div className="mb-3">
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+          </div>
+        )}
+
+        {/* EMAIL */}
+        <div className="mb-3">
+          <input
+            type="email"
+            placeholder="Email"
+            autoComplete="off"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
         </div>
 
-        <div className="relative w-full">
-          <p>Password</p>
-          <input autoComplete="new-password" className="border border-zinc-300 rounded w-full p-2 mt-1 pr-10"
-            type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)}
-            value={password} required />
+        {/* PASSWORD */}
+        <div className="mb-3 relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 rounded-lg border pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
           <span
-            className="absolute right-3 top-[65%] -translate-y-1/2 cursor-pointer text-gray-500"
+            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </span>
         </div>
 
+        {/* CONFIRM PASSWORD */}
         {state === "Sign Up" && (
-
-          <div className="relative  w-full">
-            <p>Confirm Password</p>
-
-            <input type={showConfirmPassword ? "text" : "password"}
-              className="border p-2 rounded w-full pr-10" value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)} required
+          <div className="mb-3">
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
-
-            <span
-              className="absolute right-3 top-[65%] -translate-y-1/2 cursor-pointer text-gray-500"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
-
           </div>
-
         )}
 
-        {
-          state === "Sign Up" && <div className='w-full'>
-            <p>Address</p>
-            <input autoComplete='off' className='border border-zinc-400 rounded w-full p-2 mt-1' type="text" onChange={(e) => setAddress(e.target.value)} value={address} required />
+        {/* ADDRESS */}
+        {state === "Sign Up" && (
+          <input
+            type="text"
+            placeholder="Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="w-full p-3 mb-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        )}
+
+        {/* PHONE */}
+        {state === "Sign Up" && (
+          <input
+            type="tel"
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full p-3 mb-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        )}
+
+        {/* GENDER */}
+        {state === "Sign Up" && (
+          <div className="flex gap-4 mb-4 text-sm">
+            <label><input type="radio" name="gender" value="Male" onChange={(e) => setGender(e.target.value)} /> Male</label>
+            <label><input type="radio" name="gender" value="Female" onChange={(e) => setGender(e.target.value)} /> Female</label>
+            <label><input type="radio" name="gender" value="Others" onChange={(e) => setGender(e.target.value)} /> Others</label>
           </div>
-        }
+        )}
 
-        {
-          state === "Sign Up" && <div className='w-full'>
-            <p>Phone:</p>
-            <input autoComplete='off' className='border border-zinc-400 rounded w-full p-2 mt-1' type="tel" onChange={(e) => setPhone(e.target.value)} value={phone} required />
-          </div>
-        }
-
-        {
-          state === "Sign Up" && <div className='w-full'>
-            <p>Gender</p>
-
-            <div className='flex gap-6 mt-2'>
-              <label className='flex items-center gap-2'>
-                <input type="radio" name="gender" value="Male" onChange={(e) => setGender(e.target.value)} />Male
-              </label>
-
-              <label className='flex items-center gap-2'>
-                <input type="radio" name="gender" value="Female" onChange={(e) => setGender(e.target.value)} />Female
-              </label>
-
-              <label className='flex items-center gap-2'>
-                <input type="radio" name="gender" value="Others" onChange={(e) => setGender(e.target.value)} />Others
-              </label>
-            </div>
-          </div>
-        }
-        <button type="submit" className='bg-blue-500 text-white w-full py-2 rounded-md text-base'>{state === 'Sign Up' ? "Create account" : "Login"}</button>
-        <button type="button" onClick={handleGoogleSignup} className="border border-gray-300 w-full py-2 rounded-md flex items-center justify-center gap-3 mt-2">
-
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5" />
-
-          Sign up with Google
-
+        {/* BUTTON */}
+        <button
+          type="submit"
+          className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold hover:scale-105 transition"
+        >
+          {state === 'Sign Up' ? "Create Account" : "Login"}
         </button>
-        {
-          state === "Sign Up" ? <p>Already an account? <span onClick={() => setState('Login')} className='text-blue-500 underline cursor-pointer'>Login here</span> </p>
-            : <p>Create an new account? <span onClick={() => setState('Sign Up')} className='text-blue-500 underline cursor-pointer'>Register here</span></p>
-        }
-      </div>
-    </form>
+
+        {/* GOOGLE */}
+        <button
+          type="button"
+          onClick={handleGoogleSignup}
+          className="mt-3 w-full py-2 border rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100"
+        >
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5" />
+          Sign in with Google
+        </button>
+
+        {/* SWITCH */}
+        <p className="text-center text-sm mt-4">
+          {state === "Sign Up" ? (
+            <>
+              Already have account?{" "}
+              <span onClick={() => setState('Login')} className="text-blue-600 cursor-pointer">
+                Login
+              </span>
+            </>
+          ) : (
+            <>
+              Create an account?{" "}
+              <span onClick={() => setState('Sign Up')} className="text-blue-600 cursor-pointer">
+                Register
+              </span>
+            </>
+          )}
+        </p>
+
+      </form>
+    </div>
   )
 }
 

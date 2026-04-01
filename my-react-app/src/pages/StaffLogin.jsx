@@ -39,41 +39,42 @@ const StaffLogin = () => {
     }
 
     return (
+        <div className="min-h-screen flex items-center justify-center 
+  bg-gradient-to-br from-blue-100 via-purple-100 to-blue-200">
 
-        <div className="flex justify-center items-center min-h-screen">
+            <div className="backdrop-blur-lg bg-white/60 shadow-2xl 
+    rounded-2xl p-8 w-[350px]">
 
-            <div className="border p-6 rounded shadow w-96">
-
-                <h2 className="text-xl font-bold mb-4 text-center">
+                <h2 className="text-2xl font-bold text-center mb-4">
                     Staff Login
                 </h2>
 
-                <input type="text" placeholder="Staff ID" className="border p-2 rounded w-full mb-4"
-                    value={staffId} onChange={(e) => setStaffId(e.target.value)} />
+                <input placeholder="Staff ID"
+                    value={staffId}
+                    autoComplete="off"
+                    onChange={(e) => setStaffId(e.target.value)}
+                    className="input-style" />
 
                 <div className="relative">
+                    <input type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                         autoComplete="new-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="input-style pr-10" />
 
-                    <input type={showPassword ? "text" : "password"} placeholder="Password"
-                        className="border p-2 rounded w-full pr-10" value={password}
-                        onChange={(e) => setPassword(e.target.value)} />
-
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
-                        onClick={() => setShowPassword(!showPassword)}
-                    >
+                    <span className="eye-icon"
+                        onClick={() => setShowPassword(!showPassword)}>
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </span>
-
                 </div>
-                <br />
 
-                <button onClick={handleLogin} className="bg-blue-500 text-white w-full py-2 rounded">
+                <button onClick={handleLogin} className="btn-style mt-3">
                     Login
                 </button>
 
             </div>
-
         </div>
-
     )
 
 }

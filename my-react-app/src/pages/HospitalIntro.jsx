@@ -12,8 +12,8 @@ const HospitalIntro = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-6 md:px-28 lg:px-40 py-10 bg-gradient-to-br from-gray-100 to-gray-200 gap-10">
-
+        <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-6 md:px-28 lg:px-40 py-10 gap-10 
+bg-[radial-gradient(circle_at_10%_20%,rgba(224,231,255,0.8),transparent_40%),radial-gradient(circle_at_90%_80%,rgba(199,210,254,0.8),transparent_40%),linear-gradient(135deg,#eef2ff,#e0e7ff,#c7d2fe)]">
 
             <div className="max-w-xl text-center md:text-left">
 
