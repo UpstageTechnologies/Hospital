@@ -8,6 +8,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 import { auth } from "../firebase"
 import { onAuthStateChanged } from "firebase/auth"
 import { setDoc } from "firebase/firestore";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 
 
 const Appointment = () => {
@@ -32,6 +33,7 @@ const Appointment = () => {
   const [slotIndex, setSlotIndex] = useState(null)
   const [showRegister, setShowRegister] = useState(false)
   const [isRegister, setIsRegister] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
 
 
@@ -96,10 +98,30 @@ const Appointment = () => {
           setUserData(data)
 
         } else {
-         
-
-          // 🔥 ADD THIS FIX
           setShowRegister(false)
+        }
+      }
+    })
+
+    return () => unsub()
+  }, [])
+
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+
+        setIsLoggedIn(true) // ✅ ADD THIS
+
+        const snap = await getDoc(doc(db, "users", user.uid))
+
+        if (snap.exists()) {
+          const data = snap.data()
+
+          setPatientName(data.name)
+          setPhone(data.phone)
+          setAddress(data.address)
+          setUserData(data)
         }
       }
     })
@@ -119,7 +141,12 @@ const Appointment = () => {
 
             {/* LEFT MENU */}
             <div className="w-1/3 bg-blue-600 text-white p-6 flex flex-col gap-4">
-              <button onClick={() => setStep(1)} className={`p-2 rounded ${step === 1 ? "bg-white text-blue-600" : ""}`}>Login</button>
+              <button
+                onClick={() => setStep(1)}
+                className={`p-2 rounded ${step === 1 ? "bg-white text-blue-600" : ""}`}
+              >
+                Login
+              </button>
               <button onClick={() => setStep(2)} className={`p-2 rounded ${step === 2 ? "bg-white text-blue-600" : ""}`}>Reason</button>
               <button onClick={() => setStep(3)} className={`p-2 rounded ${step === 3 ? "bg-white text-blue-600" : ""}`}>Details</button>
             </div>
@@ -127,13 +154,19 @@ const Appointment = () => {
             {/* RIGHT */}
             <div className="w-2/3 p-6">
 
+
+
               {isBooked ? (
                 <div className="text-center mt-10">
                   <h2 className="text-2xl font-bold text-green-600 mb-4">
                     Appointment Booked ✅
                   </h2>
-                  <p className="mb-4"><b>Appointment No:</b> {appointmentNo}</p>
 
+                  <p className="mb-4">
+                    <b>Appointment No:</b> {appointmentNo}
+                  </p>
+
+                  {/* OK BUTTON */}
                   <button
                     onClick={() => {
                       setShowPopup(false)
@@ -144,37 +177,42 @@ const Appointment = () => {
                   >
                     OK
                   </button>
+
+                  {/* 👇 GAP + LINK */}
+                  <p
+                    onClick={() => navigate("/patient-dashboard")}
+                    className="mt-4 text-blue-600 cursor-pointer underline"
+                  >
+                    Go to Dashboard
+                  </p>
                 </div>
               ) : (
                 <>
-                  {/* STEP 1 */}
+
                   {step === 1 && (
 
                     showRegister ? (
+
                       <>
                         <h2 className="text-xl font-bold mb-4">Create Account</h2>
 
-                        <input id="name" placeholder="Full Name" className="border p-2 w-full mb-3" />
-                        <input id="email" autoComplete="off" placeholder="Email" className="border p-2 w-full mb-3" />
-                        <input id="password" autoComplete="new-password" placeholder="Password" type="password" className="border p-2 w-full mb-3" />
+                        <input id="name" placeholder="Full Name" autoComplete='off' className="border p-2 w-full mb-3" />
+                        <input id="email" placeholder="Email" autoComplete="new-password" className="border p-2 w-full mb-3" />
+                        <input id="password" type="password" placeholder="Password" className="border p-2 w-full mb-3" />
                         <input id="address" placeholder="Address" className="border p-2 w-full mb-3" />
                         <input id="phone" placeholder="Phone" className="border p-2 w-full mb-3" />
-                        <div className="mb-3">
-                          <label className="block mb-1">Gender</label>
-                          <div className="flex gap-4">
-                            <label><input type="radio" name="gender" value="Male" /> Male</label>
-                            <label><input type="radio" name="gender" value="Female" /> Female</label>
-                            <label><input type="radio" name="gender" value="Others" /> Others</label>
-                          </div>
-                        </div>
+                        <select id="gender" className="border p-2 w-full mb-3">
+                          <option value="">Select Gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
 
                         <button
                           onClick={async () => {
                             try {
                               const email = document.getElementById("email").value
                               const password = document.getElementById("password").value
-
-                              const gender = document.querySelector('input[name="gender"]:checked')?.value || ""
 
                               const userCred = await import("firebase/auth").then(m =>
                                 m.createUserWithEmailAndPassword(auth, email, password)
@@ -186,8 +224,7 @@ const Appointment = () => {
                                 name: document.getElementById("name").value,
                                 phone: document.getElementById("phone").value,
                                 address: document.getElementById("address").value,
-                                email: email,
-                                 gender: gender
+                                email: email
                               }
 
                               await setDoc(doc(db, "users", user.uid), {
@@ -202,7 +239,6 @@ const Appointment = () => {
 
                               alert("Account Created ✅")
                               setShowRegister(false)
-                              
 
                             } catch (err) {
                               alert(err.message)
@@ -220,64 +256,112 @@ const Appointment = () => {
                           </span>
                         </p>
                       </>
+
                     ) : (
+
                       <>
                         <h2 className="text-xl font-bold mb-4">Login</h2>
 
-                        <input id="loginEmail" type="email" autoComplete="off" placeholder="Email" className="border p-2 w-full mb-3" />
+                        <input id="loginEmail" type="email" autoComplete='off' placeholder="Email" className="border p-2 w-full mb-3" />
                         <input id="loginPassword" type="password" autoComplete="new-password" placeholder="Password" className="border p-2 w-full mb-3" />
 
                         <button
                           onClick={async () => {
-                            try {
-                              const email = document.getElementById("loginEmail").value
-                              const password = document.getElementById("loginPassword").value
+                            const email = document.getElementById("loginEmail").value
+                            const password = document.getElementById("loginPassword").value
 
-                              await import("firebase/auth").then(m =>
-                                m.signInWithEmailAndPassword(auth, email, password)
-                              )
+                            if (!email || !password) return alert("Fill all fields ❌")
 
-                              alert("Login Success ✅")
-                              setStep(2)
+                            await import("firebase/auth").then(m =>
+                              m.signInWithEmailAndPassword(auth, email, password)
+                            )
 
-                            } catch (err) {
-                              alert(err.message)
-                            }
+                            setIsLoggedIn(true)
+
                           }}
                           className="bg-blue-600 text-white px-6 py-2 rounded w-full mb-3"
                         >
                           Login
                         </button>
 
-                        <button className="border w-full py-2 rounded mb-3">
+                        <button
+                          onClick={async () => {
+                            const provider = new GoogleAuthProvider()
+                            const result = await signInWithPopup(auth, provider)
+                            const user = result.user
+
+                            const userData = {
+                              name: user.displayName,
+                              email: user.email,
+                              phone: "",
+                              address: ""
+                            }
+
+                            await setDoc(doc(db, "users", user.uid), {
+                              uid: user.uid,
+                              ...userData
+                            }, { merge: true })
+
+                            setUserData(userData)
+                            setPatientName(userData.name)
+                            setStep(2)
+                          }}
+                          className="border w-full py-2 rounded mb-3"
+                        >
                           Sign in with Google
                         </button>
 
-                        <p className="text-sm text-center">
+                        <p className="text-sm text-center mb-4">
                           Create an account?{" "}
                           <span onClick={() => setShowRegister(true)} className="text-blue-600 cursor-pointer">
                             Register here
                           </span>
                         </p>
+
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => setStep(2)}
+                            className="bg-blue-600 text-white px-6 py-2 rounded"
+                          >
+                            Next
+                          </button>
+                        </div>
                       </>
+
                     )
+
                   )}
 
                   {/* STEP 2 */}
                   {step === 2 && (
                     <>
-                      <h2 className="text-xl font-bold mb-4">Reason</h2>
+                      <h2 className="text-xl font-bold mb-3">Reason</h2>
 
                       <textarea
                         placeholder="Enter reason"
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
-                        className="border p-3 w-full h-32 mb-3"
+                        className="border p-3 w-full h-32 mb-4"
                       />
 
-                      <div className="flex justify-between">
-                        <button onClick={() => setStep(1)} className="px-4 py-2 border rounded">Back</button>
-                        <button onClick={() => setStep(3)} className="bg-blue-600 text-white px-6 py-2 rounded">Next</button>
+                      {/* ✅ FIXED BUTTON POSITION */}
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={() => setStep(1)}
+                          className="px-6 py-2 border rounded"
+                        >
+                          Previous
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            if (!reason) return alert("Enter reason ❌")
+                            setStep(3)
+                          }}
+                          className="bg-blue-600 text-white px-6 py-2 rounded"
+                        >
+                          Next
+                        </button>
                       </div>
                     </>
                   )}
@@ -296,45 +380,50 @@ const Appointment = () => {
                       <p><b>Reason:</b> {reason}</p>
                       <p><b>Appointment No:</b> {appointmentNo}</p>
 
-                      <div className="flex justify-between mt-4">
-                        <button onClick={() => setStep(2)} className="px-4 py-2 border rounded">Back</button>
+                      {/* ✅ FIXED BUTTON ALIGNMENT */}
+                      <div className="flex justify-end gap-3 mt-4">
+
+                        <button
+                          onClick={() => setStep(2)}
+                          className="px-6 py-2 border rounded"
+                        >
+                          Previous
+                        </button>
 
                         <button
                           onClick={async () => {
-                            try {
-
-                              const appointmentData = {
-                              doctorId: decodedId || "",
-                                doctorName: docInfo?.name || "",
-                                doctorImage: docInfo?.image || "",
-                               doctorEmail: decodedId,
-                                patientName: patientName,
-                                phone: phone,
-                                address: address,
-                                email: userData?.email || "",
-                                date: selectedDate,
-                                time: slotTime,
-                                reason: reason,
-                                appointmentNo: appointmentNo,
-                                createdAt: serverTimestamp()
-                              }
-
-                              await addDoc(collection(db, "appointments"), appointmentData)
-
-                              setIsBooked(true)
-
-                            } catch (error) {
-                              console.log(error)
-                              alert("Error booking appointment")
+                            if (!patientName || !phone || !address || !reason || !slotTime) {
+                              return alert("Fill all details ❌")
                             }
+
+                            const appointmentData = {
+                              doctorId: decodedId,
+                              doctorName: docInfo.name,
+                              patientName,
+                              phone,
+                              address,
+                              date: selectedDate,
+                              time: slotTime,
+                              reason,
+                              appointmentNo,
+                              createdAt: serverTimestamp()
+                            }
+
+                            await addDoc(collection(db, "appointments"), appointmentData)
+
+                            setIsBooked(true)
                           }}
                           className="bg-green-600 text-white px-6 py-2 rounded"
                         >
                           Book
                         </button>
+
                       </div>
                     </>
                   )}
+
+
+
                 </>
               )}
 
@@ -347,7 +436,7 @@ const Appointment = () => {
       <div className='flex gap-6 items-stretch w-full'>
         <img className='w-72 h-[300px] object-cover rounded-xl bg-blue-500' src={docInfo.image} alt="" />
 
-        <div className='flex-1 border rounded-xl p-6 shadow-sm flex flex-col justify-center'>
+       <div className='w-[500px] border rounded-xl p-6 shadow-sm flex flex-col justify-center'>
           <h1 className='text-3xl font-bold'>{docInfo.name}</h1>
           <p className='text-gray-600 mt-2'>{docInfo.speciality}</p>
           <p className='text-gray-600 mt-2'>{docInfo.experience || "5 Years Experience"}</p>

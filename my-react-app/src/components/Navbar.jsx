@@ -149,39 +149,42 @@ const Navbar = () => {
     return (
         <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 relative z-50 w-full px-4'>
             <img className='w-16 h-16 object-contain cursor-pointer ml-2' src={hospitalLogo} alt="logo" />
-            {!location.pathname.startsWith("/appointment") && (
-                <ul className="hidden md:flex items-center gap-6 font-medium">
+            {!(
+                location.pathname.startsWith("/doctor-profile") ||
+                location.pathname.startsWith("/patient-dashboard")
+            ) && (
+                    <ul className="hidden md:flex items-center gap-6 font-medium">
 
-                    {isMaster && location.pathname === "/account" ? (
+                        {isMaster && location.pathname === "/account" ? (
 
-                        <NavLink to="/account">
+                            <NavLink to="/account">
 
-                        </NavLink>
-
-                    ) : (
-
-                        <>
-                            <NavLink to="/">
-                                <li className="py-1">Home</li>
                             </NavLink>
 
-                            <NavLink to="/doctor">
-                                <li className="py-1">All Doctors</li>
-                            </NavLink>
+                        ) : (
 
-                            <NavLink to="/about">
-                                <li className="py-1">About</li>
-                            </NavLink>
+                            <>
+                                <NavLink to="/home">
+                                    <li className="py-1">Home</li>
+                                </NavLink>
 
-                            <NavLink to="/contact">
-                                <li className="py-1">Contact</li>
-                            </NavLink>
-                        </>
+                                <NavLink to="/doctor">
+                                    <li className="py-1">All Doctors</li>
+                                </NavLink>
 
-                    )}
+                                <NavLink to="/about">
+                                    <li className="py-1">About</li>
+                                </NavLink>
 
-                </ul>
-            )}
+                                <NavLink to="/contact">
+                                    <li className="py-1">Contact</li>
+                                </NavLink>
+                            </>
+
+                        )}
+
+                    </ul>
+                )}
 
             <div className='flex items-center gap-4 relative'>
 
@@ -299,7 +302,7 @@ const Navbar = () => {
                                     auth.signOut()
                                     localStorage.removeItem("masterLogin")
                                     setShowLogoutPopup(false)
-                                    navigate("/")
+                                    navigate("/home")
                                 }}
                                     className="px-4 py-2 bg-red-500 text-white rounded"
                                 >

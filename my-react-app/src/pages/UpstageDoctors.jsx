@@ -59,7 +59,7 @@ const UpstageDoctors = () => {
 
                 <div className={`flex-col gap-4 text-sm text-gray-600 ${showFilter ? 'flex' : 'hidden sm:flex'}`}>
 
-                    {["Theni", "Chennai", "Coimbatore", "Sattur", "Salem", "Sivakasi"]
+                    {["Theni", "Chennai", "Coimbatore", "Sattur", "Salem", "Sivakasi", "Virudhunagar","Vellore"]
                         .map((item, i) => (
 
                             <p key={i}

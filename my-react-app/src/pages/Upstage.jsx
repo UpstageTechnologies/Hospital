@@ -26,7 +26,10 @@ const Upstage = () => {
 
             const list = [];
             querySnapshot.forEach((doc) => {
-                list.push(doc.data());
+                list.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
             });
 
             setDoctors(list);
@@ -129,7 +132,11 @@ const Upstage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
                     {doctors.map((doc, index) => (
-                        <div key={index} className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition">
+                        <div
+                            key={index}
+                            onClick={() => navigate(`/appointment/${doc.id}`)}
+                            className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer"
+                        >
 
                             <img src={doc.image} className="w-full h-60 object-contain bg-[#e6edf5] p-4" />
 

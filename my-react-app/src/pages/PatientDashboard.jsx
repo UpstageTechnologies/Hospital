@@ -37,7 +37,6 @@ const PatientDashboard = () => {
             {/* LEFT MENU */}
             <div className="w-1/5 bg-blue-600 text-white p-6">
                 <h2 className="text-xl font-bold mb-6">Patient Panel</h2>
-
                 <p className="mb-4 cursor-pointer">Home</p>
                 <p className="mb-4 cursor-pointer font-bold">Appointments</p>
             </div>
@@ -50,8 +49,7 @@ const PatientDashboard = () => {
                 {/* LIST */}
                 <div className="grid grid-cols-2 gap-4">
                     {appointments.map((item, i) => (
-                        <div
-                            key={i}
+                        <div key={i}
                             onClick={() => setSelected(item)}
                             className="border p-4 rounded cursor-pointer hover:bg-gray-100"
                         >
@@ -71,19 +69,12 @@ const PatientDashboard = () => {
                     <div className="bg-white w-[500px] rounded p-6 relative">
 
                         {/* CLOSE */}
-                        <button
-                            onClick={() => setSelected(null)}
-                            className="absolute top-2 right-3 text-xl"
-                        >
+                        <button onClick={() => setSelected(null)} className="absolute top-2 right-3 text-xl">
                             ✖
                         </button>
 
                         {/* IMAGE */}
-                        <img
-                            src={selected.doctorImage}
-                            alt=""
-                            className="w-24 h-24 rounded-full mx-auto mb-4"
-                        />
+                        <img src={selected.doctorImage} alt="" className="w-24 h-24 rounded-full mx-auto mb-4"/>
 
                         <h2 className="text-xl font-bold text-center mb-4">
                             Appointment Details

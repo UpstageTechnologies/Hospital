@@ -4,6 +4,7 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import HospitalIntro from "./pages/HospitalIntro";
 import Upstage from "./pages/Upstage.jsx";
 import UpstageDoctors from "./pages/UpstageDoctors";
+import UpstageNavbar from "./components/UpstageNavbar";
 import Loding from "./pages/Loding";
 import Home from "./pages/Home";
 import MasterLogin from "./pages/MasterLogin";
@@ -43,11 +44,16 @@ const App = () => {
     <div className="w-full">
 
 
-      {!hideLayout && <Navbar />}
+      {!hideLayout && (
+        location.pathname.startsWith("/upstage")
+          ? <UpstageNavbar />
+          : <Navbar />
+      )}
 
       <Routes>
         <Route path="/" element={<HospitalIntro />} />
         <Route path="/upstage" element={<Upstage />} />
+
         <Route path="/upstage-doctors" element={<UpstageDoctors />} />
         <Route path="/upstage-doctors/:city" element={<UpstageDoctors />} />
         <Route path="/select-hospital" element={<Loding />} />
