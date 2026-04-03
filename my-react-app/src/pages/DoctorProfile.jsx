@@ -3,6 +3,107 @@ import { doc, getDoc, updateDoc } from "firebase/firestore"
 import { db } from "../firebase"
 import { collection, getDocs } from "firebase/firestore"
 
+
+const Calendar = ({ onSelect, selectedDate }) => {
+    const today = new Date()
+    const [currentMonth, setCurrentMonth] = useState(today)
+
+    const year = currentMonth.getFullYear()
+    const month = currentMonth.getMonth()
+
+    const firstDay = new Date(year, month, 1).getDay()
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+    const todayStr = new Date().toISOString().split("T")[0]
+    const holidays = {
+        "2026-04-05": "Festival",
+        "2026-04-10": "Holiday",
+        "2026-05-01": "Labour Day",
+        "2026-08-15": "Independence Day"
+    }
+
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+
+
+    const dates = []
+
+    // empty slots before 1st date
+    for (let i = 0; i < firstDay; i++) {
+        dates.push(null)
+    }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const fullDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`
+        dates.push(fullDate)
+    }
+
+    return (
+        <div className="bg-white rounded-2xl shadow p-6">
+
+            {/* HEADER */}
+            <div className="flex justify-between items-center mb-6">
+                <button onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
+                    className="bg-blue-500 text-white px-3 py-2 rounded-xl">◀</button>
+
+                <h2 className="text-xl font-bold">
+                    {currentMonth.toLocaleString("default", { month: "long" })} {year}
+                </h2>
+
+                <button onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}
+                    className="bg-blue-500 text-white px-3 py-2 rounded-xl">▶</button>
+            </div>
+
+            {/* WEEK DAYS */}
+            <div className="grid grid-cols-7 mb-3 text-center font-semibold text-gray-500">
+                {days.map((d, i) => (
+                    <div key={i}>{d}</div>
+                ))}
+            </div>
+
+            {/* DATES */}
+            <div className="grid grid-cols-7 gap-3">
+
+                {dates.map((date, i) => {
+                    if (!date) return <div key={i}></div>
+
+                    const day = parseInt(date.split("-")[2])
+                    const isToday = date === todayStr
+                    const isSelected = date === selectedDate
+                    const dayIndex = new Date(date).getDay()
+
+                    return (
+                        <button
+                            key={i}
+                            onDoubleClick={() => onSelect(date, "double")}
+                            className={`p-4 rounded-2xl text-center transition font-semibold
+
+  ${holidays[date]
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-gray-100"}
+
+  ${isToday ? "ring-2 ring-blue-400" : ""}
+
+  ${isSelected ? "bg-blue-700 text-white" : ""}
+
+`}
+                        >
+                            <p className="text-lg">{day}</p>
+                            {holidays[date] && (
+                                <p className="text-xs text-white mt-1">
+                                    {holidays[date]}
+                                </p>
+                            )}
+
+                        </button>
+                    )
+                })}
+
+            </div>
+        </div>
+    )
+}
+
 const DoctorProfile = () => {
 
     const [doctorData, setDoctorData] = useState(null)
@@ -12,6 +113,21 @@ const DoctorProfile = () => {
     const [appointments, setAppointments] = useState([])
     const [page, setPage] = useState("home")
     const [selected, setSelected] = useState(null)
+    const [selectedDate, setSelectedDate] = useState(null)
+    const [showPopup, setShowPopup] = useState(false)
+    const [popupDate, setPopupDate] = useState(null)
+    const [selectedTime, setSelectedTime] = useState("")
+    const [patientTab, setPatientTab] = useState("current")
+
+    const handleDateSelect = (date, type) => {
+        setSelectedDate(date)
+
+        if (type === "double") {
+            setPopupDate(date)
+            setShowPopup(true)
+        }
+    }
+
 
 
     const updateStatus = (appointmentNo, newStatus) => {
@@ -109,88 +225,152 @@ const DoctorProfile = () => {
                         Set Slot Timing
                     </h2>
 
-                    {/* 👇 DOCTOR IMAGE */}
-                    <img src={doctorImage} className="w-16 h-16 rounded-full mb-4" />
+                    <Calendar
+                        onSelect={handleDateSelect}
+                        selectedDate={selectedDate}
+                    />
 
-                    {/* 👇 SLOT BUTTONS */}
-                    <div className="flex gap-3 flex-wrap mb-6 justify-center">
 
-                        {[
-                            "10:00am - 11:00am",
-                            "11:00am - 12:00pm",
-                            "2:00pm - 3:00pm",
-                            "4:00pm - 5:00pm"
-                        ].map((time, i) => (
 
-                            <button
-                                key={i}
-                                onClick={async () => {
-                                    const email = localStorage.getItem("doctorEmail")
+                    {selectedDate && (
+                        <div className="mt-6 bg-white p-6 rounded-xl shadow">
 
-                                    const updatedSlots = [...slots, time]
+                            <h2 className="text-lg font-semibold mb-4">
+                                Schedule - {selectedDate}
+                            </h2>
 
-                                    setSlots(updatedSlots)
+                            <div className="space-y-4">
 
-                                    await updateDoc(doc(db, "doctors", email), {
-                                        slots: updatedSlots
+                                {[
+                                    9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+                                ].map((hour, i) => {
+
+                                    const timeLabel =
+                                        hour > 12
+                                            ? `${hour - 12}:00 PM`
+                                            : `${hour}:00 AM`
+
+                                    const booking = appointments.find(a => {
+                                        const d = new Date(a.date).toISOString().split("T")[0]
+                                        const bookingHour = parseInt(a.time)
+
+                                        return d === selectedDate && bookingHour === hour
                                     })
-                                }}
-                                className="px-4 py-2 border rounded-full hover:bg-blue-600 hover:text-white transition"
-                            >
-                                {time}
-                            </button>
 
-                        ))}
+                                    const currentHour = new Date().getHours()
+                                    const isCurrent = currentHour === hour
 
-                    </div>
+                                    return (
+                                        <div key={i} className="flex items-center gap-4">
+
+                                            {/* TIME */}
+                                            <p className="w-20 text-gray-500 font-medium">
+                                                {timeLabel}
+                                            </p>
+
+                                            {/* LINE */}
+                                            <div className="flex-1 border-b-2 border-gray-300 relative">
+
+                                                {/* ➤ CURRENT TIME */}
+                                                {isCurrent && (
+                                                    <div className="absolute left-0 -top-2 text-blue-600 text-xl">
+                                                        ➤
+                                                    </div>
+                                                )}
+
+                                                {/* BOOKING */}
+                                                {booking && (
+                                                    <div className={`absolute top-[-10px] px-3 py-1 rounded-full text-sm
+                  ${booking.status === "completed"
+                                                            ? "bg-green-500 text-white"
+                                                            : "bg-yellow-400 text-black"}
+                `}>
+                                                        {booking.patientName}
+                                                    </div>
+                                                )}
+
+                                            </div>
+
+                                        </div>
+                                    )
+                                })}
+
+                            </div>
+                        </div>
+                    )}
 
                     <h2 className="text-lg font-semibold mb-3">
                         Old Appointments
                     </h2>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white rounded-xl shadow overflow-x-auto">
 
-                        {appointments.filter(item => {
-                            const today = new Date(item.date)
-                            const now = new Date()
-                            return today < new Date(now.setHours(0, 0, 0, 0))
-                        }).map((item, i) => (
+                        <table className="w-full text-left border-collapse">
 
-                            <div key={i}
-                                onClick={() => setSelected(item)}
-                                className="bg-white shadow p-4 rounded cursor-pointer hover:scale-105 transition flex gap-4 items-center"
-                            >
+                            <thead className="bg-blue-600 text-white">
+                                <tr>
+                                    <th className="p-3">Patient Name</th>
+                                    <th className="p-3">Time</th>
+                                    <th className="p-3">Appointment No</th>
+                                    <th className="p-3">Status</th>
+                                    <th className="p-3">Action</th>
+                                </tr>
+                            </thead>
 
-                                <img src={doctorImage} className="w-12 h-12 rounded-full" />
+                            <tbody>
 
-                                <div>
-                                    <p className="font-semibold">{item.patientName}</p>
-                                    <p className="text-sm text-gray-500">{item.time}</p>
-                                    <p className="text-xs text-gray-400">{item.appointmentNo}</p>
+                                {appointments
+                                    .filter(item => {
+                                        const today = new Date(item.date)
+                                        const now = new Date()
+                                        return today < new Date(now.setHours(0, 0, 0, 0))
+                                    })
+                                    .map((item, i) => (
 
-                                    {/* ✅ STATUS */}
-                                    <p className={`text-xs mt-1 
-                                        ${item.status === "completed" && "text-green-600"}
-                                        ${item.status === "cancelled" && "text-red-500"}
-                                        ${!item.status && "text-yellow-500"}
-                                    `}>
-                                        {item.status ? item.status : "pending"}
-                                    </p>
+                                        <tr key={i} className="border-b hover:bg-gray-50">
 
-                                    {/* ✅ CANCEL */}
-                                    <button onClick={(e) => {
-                                        e.stopPropagation()
-                                        updateStatus(item.appointmentNo, "cancelled")
-                                    }}
-                                        className="mt-2 text-red-500 text-sm"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
+                                            <td className="p-3 font-semibold">
+                                                {item.patientName}
+                                            </td>
 
-                            </div>
+                                            <td className="p-3">
+                                                {item.time}
+                                            </td>
 
-                        ))}
+                                            <td className="p-3 text-gray-500">
+                                                {item.appointmentNo}
+                                            </td>
+
+                                            <td className="p-3">
+                                                <span className={`
+                px-2 py-1 rounded text-sm font-medium
+
+                ${item.status === "completed" && "bg-green-100 text-green-700"}
+                ${item.status === "cancelled" && "bg-red-100 text-red-600"}
+                ${!item.status && "bg-yellow-100 text-yellow-700"}
+              `}>
+                                                    {item.status ? item.status : "pending"}
+                                                </span>
+                                            </td>
+
+                                            <td className="p-3">
+
+                                                <button
+                                                    onClick={() => updateStatus(item.appointmentNo, "cancelled")}
+                                                    className="text-red-500 hover:underline"
+                                                >
+                                                    Cancel
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+
+                                    ))}
+
+                            </tbody>
+
+                        </table>
 
                     </div>
 
@@ -246,13 +426,105 @@ const DoctorProfile = () => {
             )}
 
             {page === "profile" && (
-                <div className="p-8 w-full flex flex-col items-center">
+                <div className="p-8 w-full">
 
-                    <img src={doctorImage} className="w-24 h-24 rounded-full mb-4" />
+                    <h1 className="text-2xl font-bold mb-6">
+                        Patient History
+                    </h1>
 
-                    <h2 className="text-2xl font-bold">{doctorData.name}</h2>
+                    {/* TABS */}
+                    <div className="flex gap-4 mb-6">
 
-                    <p className="text-gray-600">{doctorData.email}</p>
+                        <button
+                            onClick={() => setPatientTab("current")}
+                            className={`px-4 py-2 rounded-xl
+          ${patientTab === "current"
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-gray-100"}
+        `}
+                        >
+                            Current Condition
+                        </button>
+
+                        <button
+                            onClick={() => setPatientTab("previous")}
+                            className={`px-4 py-2 rounded-xl
+          ${patientTab === "previous"
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-gray-100"}
+        `}
+                        >
+                            Previous Condition
+                        </button>
+
+                        <button
+                            onClick={() => setPatientTab("details")}
+                            className={`px-4 py-2 rounded-xl
+          ${patientTab === "details"
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-gray-100"}
+        `}
+                        >
+                            Patient Details
+                        </button>
+
+                    </div>
+
+                    {/* CONTENT */}
+
+                    {patientTab === "current" && (
+                        <div className="bg-blue-50 p-6 rounded-xl">
+                            <h3 className="font-bold text-blue-700 mb-2">
+                                Current Condition
+                            </h3>
+                            <p>Patient currently has fever and mild cough.</p>
+                        </div>
+                    )}
+
+                    {patientTab === "previous" && (
+                        <div className="bg-yellow-50 p-6 rounded-xl">
+                            <h3 className="font-bold text-yellow-700 mb-2">
+                                Previous Condition
+                            </h3>
+                            <p>Patient had viral infection last month.</p>
+                        </div>
+                    )}
+
+                    {patientTab === "details" && (
+                        <div className="bg-gray-50 p-6 rounded-2xl space-y-4">
+
+                            {/* BASIC DETAILS */}
+                            <div className="bg-white p-5 rounded-xl shadow space-y-2">
+                                <p><b>Hospital Name:</b> City Hospital</p>
+                                <p><b>Doctor Name:</b> {doctorData?.name}</p>
+                                <p><b>Patient Name:</b> Sundar</p>
+                                <p><b>Age:</b> 35</p>
+                                <p><b>Mobile Number:</b> 5678909876</p>
+                                <p><b>Address:</b> Coimbatore</p>
+                            </div>
+
+                            {/* CURRENT CONDITION */}
+                            <div className="bg-blue-50 p-5 rounded-xl">
+                                <p className="font-semibold text-blue-700">
+                                    Current Condition
+                                </p>
+                                <p className="text-gray-700 mt-1">
+                                    Fever, mild cough, under treatment.
+                                </p>
+                            </div>
+
+                            {/* PREVIOUS CONDITION */}
+                            <div className="bg-yellow-50 p-5 rounded-xl">
+                                <p className="font-semibold text-yellow-700">
+                                    Previous Condition
+                                </p>
+                                <p className="text-gray-700 mt-1">
+                                    Viral infection, recovered last month.
+                                </p>
+                            </div>
+
+                        </div>
+                    )}
 
                 </div>
             )}
@@ -286,6 +558,7 @@ const DoctorProfile = () => {
                             Appointment Details
                         </h2>
 
+                        <p><b>Doctor Name:</b> {doctorData?.name}</p>
                         <p><b>Patient:</b> {selected.patientName}</p>
                         <p><b>Phone:</b> {selected.phone}</p>
                         <p><b>Address:</b> {selected.address}</p>
@@ -303,6 +576,98 @@ const DoctorProfile = () => {
                             <button onClick={() => updateStatus(selected.appointmentNo, "cancelled")} className="bg-red-500 text-white px-4 py-2 rounded w-full">
                                 Cancel
                             </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
+            {showPopup && (
+                <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+
+                    <div className="bg-gradient-to-br from-blue-500 to-blue-700 w-[420px] rounded-2xl p-6 text-white">
+
+                        <h2 className="text-xl font-bold mb-4 text-center">
+                            Select Time - {popupDate}
+                        </h2>
+
+                        <div className="flex flex-col gap-4">
+
+                            {[
+                                "10:00am - 11:00am",
+                                "11:00am - 12:00pm",
+                                "2:00pm - 3:00pm",
+                                "4:00pm - 5:00pm"
+                            ].map((time, i) => {
+
+                                const isBooked = appointments.some(
+                                    a => a.date === popupDate && a.time === time
+                                )
+
+                                return (
+                                    <button
+                                        key={i}
+                                        onClick={() => !isBooked && setSelectedTime(time)}
+                                        disabled={isBooked}
+                                        className={`p-4 rounded-2xl shadow-md transition-all duration-200 border
+
+        ${isBooked
+                                                ? "bg-red-100 text-red-500 cursor-not-allowed"
+                                                : selectedTime === time
+                                                    ? "bg-blue-600 text-white border-blue-600"
+                                                    : "bg-white text-black border-gray-200 hover:bg-blue-50"}
+      `}
+                                    >
+                                        {isBooked ? "Booked" : time}
+                                    </button>
+                                )
+                            })}
+
+                        </div>
+
+                        {/* BUTTONS */}
+                        <div className="flex gap-4 mt-6">
+
+                            {/* CANCEL */}
+                            <button
+                                onClick={() => {
+                                    setShowPopup(false)
+                                    setSelectedTime("")
+                                }}
+                                className="w-1/2 border border-gray-300 text-black py-3 rounded-xl bg-white"
+                            >
+                                Cancel
+                            </button>
+
+                            {/* SAVE */}
+                            <button
+                                onClick={() => {
+
+                                    if (!selectedTime) {
+                                        alert("Select time first")
+                                        return
+                                    }
+
+                                    const newBooking = {
+                                        date: popupDate,
+                                        time: selectedTime,
+                                        patientName: "Test Patient",
+                                        appointmentNo: "API" + Math.floor(Math.random() * 1000),
+                                        status: "pending"
+                                    }
+
+                                    setAppointments([...appointments, newBooking])
+
+                                    alert("✅ Appointment Booked Successfully")
+
+                                    setShowPopup(false)
+                                    setSelectedTime("")
+                                }}
+                                className="w-1/2 bg-blue-600 text-white py-3 rounded-xl"
+                            >
+                                Save
+                            </button>
+
                         </div>
 
                     </div>
