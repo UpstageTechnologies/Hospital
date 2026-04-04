@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import FloatingInput from "../components/FloatingInput"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { useLocation } from "react-router-dom";
+import Calendar from "../components/Calendar";
 
 
 
@@ -54,6 +55,7 @@ const Account = () => {
   const [staffId, setStaffId] = useState("")
 
   const [staffStep, setStaffStep] = useState(1)
+
 
   const [staffBasicInfo, setStaffBasicInfo] = useState({
     name: "",
@@ -838,6 +840,13 @@ const Account = () => {
             Doctors
           </li>
 
+          <li
+            className="cursor-pointer hover:text-gray-200"
+            onClick={() => setMenu("settings")}
+          >
+            Settings
+          </li>
+
         </ul>
 
       </div>
@@ -1579,7 +1588,7 @@ const Account = () => {
                         <button
                           onClick={() => {
 
-                            setEditData(null) 
+                            setEditData(null)
                             setViewData(null)
 
                             // 🔥 full data load
@@ -2531,9 +2540,21 @@ const Account = () => {
 
         )}
 
-       
+        {menu === "settings" && (
+          <div className="flex justify-center items-start mt-10">
+            <Calendar
+              onSave={async (date, title, type) => {
+                await setDoc(doc(db, "calendar", date), {
+                  title,
+                  type,
+                  date
+                })
+              }}
+            />
+          </div>
+        )}
 
-        
+
 
       </div>
 

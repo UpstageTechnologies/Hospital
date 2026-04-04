@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react"
 import { doc, getDoc, updateDoc } from "firebase/firestore"
 import { db } from "../firebase"
 import { collection, getDocs } from "firebase/firestore"
+import { onSnapshot } from "firebase/firestore"
+import AdminCalendar from "../components/Calendar"
 
 
-const Calendar = ({ onSelect, selectedDate }) => {
+const Calendar = ({ onSelect = () => {}, selectedDate = null, events = {} }) => {
     const today = new Date()
+
     const [currentMonth, setCurrentMonth] = useState(today)
 
     const year = currentMonth.getFullYear()
@@ -15,12 +18,7 @@ const Calendar = ({ onSelect, selectedDate }) => {
     const daysInMonth = new Date(year, month + 1, 0).getDate()
 
     const todayStr = new Date().toISOString().split("T")[0]
-    const holidays = {
-        "2026-04-05": "Festival",
-        "2026-04-10": "Holiday",
-        "2026-05-01": "Labour Day",
-        "2026-08-15": "Independence Day"
-    }
+
 
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
@@ -71,27 +69,34 @@ const Calendar = ({ onSelect, selectedDate }) => {
                     const isToday = date === todayStr
                     const isSelected = date === selectedDate
                     const dayIndex = new Date(date).getDay()
+                    const isSunday = dayIndex === 0
 
                     return (
                         <button
                             key={i}
-                            onDoubleClick={() => onSelect(date, "double")}
+                           onClick={() => onSelect && onSelect(date)}
                             className={`p-4 rounded-2xl text-center transition font-semibold
 
-  ${holidays[date]
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100"}
+${events?.[date]?.type?.toLowerCase() === "holiday"
+                                    ? "bg-green-500 text-white"
+                                   : events?.[date]?.type?.toLowerCase() === "gov" || isSunday
+                                        ? "bg-red-500 text-white"
+                                        : "bg-gray-100"}
 
   ${isToday ? "ring-2 ring-blue-400" : ""}
 
-  ${isSelected ? "bg-blue-700 text-white" : ""}
+ ${isSelected && !events[date] ? "bg-blue-700 text-white" : ""}
 
 `}
                         >
                             <p className="text-lg">{day}</p>
-                            {holidays[date] && (
-                                <p className="text-xs text-white mt-1">
-                                    {holidays[date]}
+                            {isSunday && !events[date] && (
+                                <p className="text-xs mt-1">Sunday</p>
+                            )}
+
+                            {events[date] && (
+                                <p className="text-xs mt-1">
+                                    {events[date].title}
                                 </p>
                             )}
 
@@ -114,18 +119,13 @@ const DoctorProfile = () => {
     const [page, setPage] = useState("home")
     const [selected, setSelected] = useState(null)
     const [selectedDate, setSelectedDate] = useState(null)
-    const [showPopup, setShowPopup] = useState(false)
-    const [popupDate, setPopupDate] = useState(null)
-    const [selectedTime, setSelectedTime] = useState("")
+
     const [patientTab, setPatientTab] = useState("current")
+    const [doctorEvents, setDoctorEvents] = useState({})
+    const [appointmentEvents, setAppointmentEvents] = useState({})
 
-    const handleDateSelect = (date, type) => {
+    const handleDateSelect = (date) => {
         setSelectedDate(date)
-
-        if (type === "double") {
-            setPopupDate(date)
-            setShowPopup(true)
-        }
     }
 
 
@@ -192,6 +192,40 @@ const DoctorProfile = () => {
         fetchAppointments()
     }, [])
 
+    useEffect(() => {
+
+        const ref = collection(db, "users", "demoAdmin", "calendar") // 🔥 IMPORTANT
+
+        const unsub = onSnapshot(ref, (snap) => {
+            let data = {}
+
+            snap.forEach(doc => {
+                data[doc.id] = doc.data()
+            })
+
+            // 🔴 govt holidays auto add
+            const govt = {
+                "2026-01-26": "Republic Day",
+                "2026-08-15": "Independence Day",
+                "2026-10-02": "Gandhi Jayanti"
+            }
+
+            Object.keys(govt).forEach(date => {
+                if (!data[date]) {
+                    data[date] = {
+                        title: govt[date],
+                        type: "gov"
+                    }
+                }
+            })
+
+            setDoctorEvents(data)   // only doctor ku
+        })
+
+        return () => unsub()
+
+    }, [])
+
     if (!doctorData) return <p className="p-10">Loading...</p>
 
     return (
@@ -208,6 +242,10 @@ const DoctorProfile = () => {
 
                 <p onClick={() => setPage("profile")} className="mb-3 cursor-pointer">
                     Profile
+                </p>
+
+                <p onClick={() => setPage("settings")} className="mb-3 cursor-pointer">
+                    Settings
                 </p>
             </div>
 
@@ -228,9 +266,8 @@ const DoctorProfile = () => {
                     <Calendar
                         onSelect={handleDateSelect}
                         selectedDate={selectedDate}
+                        events={appointmentEvents}
                     />
-
-
 
                     {selectedDate && (
                         <div className="mt-6 bg-white p-6 rounded-xl shadow">
@@ -528,151 +565,22 @@ const DoctorProfile = () => {
 
                 </div>
             )}
+            {page === "settings" && (
+                <div className="p-8 w-full flex justify-center">
 
-            {/* ================= POPUP ================= */}
-            {selected && (
-                <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
+                    <div className="w-full max-w-3xl">
 
-                    <div className="bg-white w-[500px] rounded p-6 relative">
+                        <h1 className="text-2xl font-bold mb-6">
+                            Calendar Settings
+                        </h1>
 
-                        <button onClick={() => setSelected(null)} className="absolute top-2 right-3 text-xl">
-                            ✖
-                        </button>
-
-                        <div className="flex items-center gap-3 mb-4">
-
-                            <img src={doctorImage} className="w-12 h-12 rounded-full" />
-
-                            <div>
-                                <p className="font-semibold text-lg">
-                                    {doctorData?.name}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                    Doctor
-                                </p>
-                            </div>
-
-                        </div>
-
-                        <h2 className="text-xl font-bold text-center mb-4">
-                            Appointment Details
-                        </h2>
-
-                        <p><b>Doctor Name:</b> {doctorData?.name}</p>
-                        <p><b>Patient:</b> {selected.patientName}</p>
-                        <p><b>Phone:</b> {selected.phone}</p>
-                        <p><b>Address:</b> {selected.address}</p>
-                        <p><b>Date:</b> {selected.date}</p>
-                        <p><b>Time:</b> {selected.time}</p>
-                        <p><b>Reason:</b> {selected.reason}</p>
-                        <p><b>Appointment No:</b> {selected.appointmentNo}</p>
-
-
-                        <div className="flex gap-2 mt-4">
-                            <button onClick={() => updateStatus(selected.appointmentNo, "completed")} className="bg-green-500 text-white px-4 py-2 rounded w-full">
-                                Complete
-                            </button>
-
-                            <button onClick={() => updateStatus(selected.appointmentNo, "cancelled")} className="bg-red-500 text-white px-4 py-2 rounded w-full">
-                                Cancel
-                            </button>
-                        </div>
-
+                    <AdminCalendar adminId="demoAdmin" enableSlots={true} />
                     </div>
+
                 </div>
             )}
 
-            {showPopup && (
-                <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
 
-                    <div className="bg-gradient-to-br from-blue-500 to-blue-700 w-[420px] rounded-2xl p-6 text-white">
-
-                        <h2 className="text-xl font-bold mb-4 text-center">
-                            Select Time - {popupDate}
-                        </h2>
-
-                        <div className="flex flex-col gap-4">
-
-                            {[
-                                "10:00am - 11:00am",
-                                "11:00am - 12:00pm",
-                                "2:00pm - 3:00pm",
-                                "4:00pm - 5:00pm"
-                            ].map((time, i) => {
-
-                                const isBooked = appointments.some(
-                                    a => a.date === popupDate && a.time === time
-                                )
-
-                                return (
-                                    <button
-                                        key={i}
-                                        onClick={() => !isBooked && setSelectedTime(time)}
-                                        disabled={isBooked}
-                                        className={`p-4 rounded-2xl shadow-md transition-all duration-200 border
-
-        ${isBooked
-                                                ? "bg-red-100 text-red-500 cursor-not-allowed"
-                                                : selectedTime === time
-                                                    ? "bg-blue-600 text-white border-blue-600"
-                                                    : "bg-white text-black border-gray-200 hover:bg-blue-50"}
-      `}
-                                    >
-                                        {isBooked ? "Booked" : time}
-                                    </button>
-                                )
-                            })}
-
-                        </div>
-
-                        {/* BUTTONS */}
-                        <div className="flex gap-4 mt-6">
-
-                            {/* CANCEL */}
-                            <button
-                                onClick={() => {
-                                    setShowPopup(false)
-                                    setSelectedTime("")
-                                }}
-                                className="w-1/2 border border-gray-300 text-black py-3 rounded-xl bg-white"
-                            >
-                                Cancel
-                            </button>
-
-                            {/* SAVE */}
-                            <button
-                                onClick={() => {
-
-                                    if (!selectedTime) {
-                                        alert("Select time first")
-                                        return
-                                    }
-
-                                    const newBooking = {
-                                        date: popupDate,
-                                        time: selectedTime,
-                                        patientName: "Test Patient",
-                                        appointmentNo: "API" + Math.floor(Math.random() * 1000),
-                                        status: "pending"
-                                    }
-
-                                    setAppointments([...appointments, newBooking])
-
-                                    alert("✅ Appointment Booked Successfully")
-
-                                    setShowPopup(false)
-                                    setSelectedTime("")
-                                }}
-                                className="w-1/2 bg-blue-600 text-white py-3 rounded-xl"
-                            >
-                                Save
-                            </button>
-
-                        </div>
-
-                    </div>
-                </div>
-            )}
 
         </div>
     )
