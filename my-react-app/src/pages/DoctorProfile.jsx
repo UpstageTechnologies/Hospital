@@ -4,9 +4,14 @@ import { db } from "../firebase"
 import { collection, getDocs } from "firebase/firestore"
 import { onSnapshot } from "firebase/firestore"
 import AdminCalendar from "../components/Calendar"
+import { setDoc } from "firebase/firestore"
 
 
-const Calendar = ({ onSelect = () => {}, selectedDate = null, events = {} }) => {
+const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type = "doctor" }) => {
+
+    const [popup, setPopup] = useState(false)
+    const [slots, setSlots] = useState([])
+    const [selectedSlotDate, setSelectedSlotDate] = useState("")
     const today = new Date()
 
     const [currentMonth, setCurrentMonth] = useState(today)
@@ -34,6 +39,22 @@ const Calendar = ({ onSelect = () => {}, selectedDate = null, events = {} }) => 
     for (let i = 1; i <= daysInMonth; i++) {
         const fullDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`
         dates.push(fullDate)
+    }
+
+    const formatTime = (time) => {
+        if (!time) return ""
+
+        let [h, m] = time.split(":")
+        h = parseInt(h)
+
+        if (h < 8 || h > 20) return ""   // ✅ restriction
+
+        let ampm = h >= 12 ? "PM" : "AM"
+
+        let displayHour = h % 12
+        if (displayHour === 0) displayHour = 12
+
+        return `${displayHour}:${m} ${ampm}`
     }
 
     return (
@@ -65,6 +86,12 @@ const Calendar = ({ onSelect = () => {}, selectedDate = null, events = {} }) => 
                 {dates.map((date, i) => {
                     if (!date) return <div key={i}></div>
 
+                    const dayOnly = date.split("-")[2]
+                    const eventData =
+                        events?.[date] ||
+                        events?.[`day-${dayOnly}`] ||
+                        null
+
                     const day = parseInt(date.split("-")[2])
                     const isToday = date === todayStr
                     const isSelected = date === selectedDate
@@ -74,19 +101,37 @@ const Calendar = ({ onSelect = () => {}, selectedDate = null, events = {} }) => 
                     return (
                         <button
                             key={i}
-                           onClick={() => onSelect && onSelect(date)}
+                            onClick={() => onSelect && onSelect(date)}
+                            onDoubleClick={() => {
+                                const dayOnly = date.split("-")[2]
+                                const eventData = events[date] || events[`day-${dayOnly}`]
+
+                                if (eventData) {
+
+                                    // ✅ REMOVE LEAVE SLOTS
+                                    const activeSlots = eventData.slots.filter(s => !s.leave)
+
+                                    setSlots(activeSlots)
+                                    setSelectedSlotDate(date)
+                                    setPopup(true)
+                                }
+                            }}
                             className={`p-4 rounded-2xl text-center transition font-semibold
 
-${events?.[date]?.type?.toLowerCase() === "holiday"
-                                    ? "bg-green-500 text-white"
-                                   : events?.[date]?.type?.toLowerCase() === "gov" || isSunday
-                                        ? "bg-red-500 text-white"
-                                        : "bg-gray-100"}
-
-  ${isToday ? "ring-2 ring-blue-400" : ""}
-
- ${isSelected && !events[date] ? "bg-blue-700 text-white" : ""}
-
+${type === "doctor"
+                                    ? (
+                                        events?.[date]?.type?.toLowerCase() === "holiday"
+                                            ? "bg-green-500 text-white"
+                                            : events?.[date]?.type?.toLowerCase() === "gov" || isSunday
+                                                ? "bg-red-500 text-white"
+                                                : "bg-gray-100"
+                                    )
+                                    : (
+                                        isSunday
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-gray-100"
+                                    )
+                                }
 `}
                         >
                             <p className="text-lg">{day}</p>
@@ -94,15 +139,121 @@ ${events?.[date]?.type?.toLowerCase() === "holiday"
                                 <p className="text-xs mt-1">Sunday</p>
                             )}
 
-                            {events[date] && (
-                                <p className="text-xs mt-1">
-                                    {events[date].title}
+                            {eventData && eventData.slots && (
+                                <p className="text-xs text-blue-400 mt-1">
+                                    {eventData.slots.filter(s => !s.leave).length} slots
                                 </p>
                             )}
 
                         </button>
+
+
                     )
                 })}
+                {popup && (
+                    <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
+
+                        <div className="bg-gradient-to-br from-blue-500 to-blue-700 p-5 rounded-xl w-[320px] text-white">
+
+                            <h2 className="font-bold mb-3">
+                                Slots - {selectedSlotDate}
+                            </h2>
+
+                            <div className="space-y-2">
+                                {slots.map((slot, i) => (
+                                    <div key={i} className="flex justify-between items-center bg-white text-black p-2 rounded">
+
+                                        {slot.isEditing ? (
+                                            <div className="flex gap-2 w-full">
+                                                <input
+                                                    type="time"
+                                                    value={slot.start}
+                                                    onChange={(e) => {
+                                                        const updated = [...slots]
+                                                        updated[i].start = e.target.value
+                                                        setSlots(updated)
+                                                    }}
+                                                    className="p-1 rounded text-black w-full"
+                                                />
+                                                <input
+                                                    type="time"
+                                                    value={slot.end}
+                                                    onChange={(e) => {
+                                                        const updated = [...slots]
+                                                        updated[i].end = e.target.value
+                                                        setSlots(updated)
+                                                    }}
+                                                    className="p-1 rounded text-black w-full"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <span>
+                                                {formatTime(slot.start)} - {formatTime(slot.end)}
+                                            </span>
+                                        )}
+
+                                        {/* LEAVE */}
+                                        <input
+                                            type="checkbox"
+                                            checked={slot.leave || false}
+                                            onChange={(e) => {
+                                                const updated = [...slots]
+                                                updated[i].leave = e.target.checked
+                                                setSlots(updated)
+                                            }}
+                                        />
+
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex gap-2 mt-4">
+
+                                <button
+                                    onClick={() => {
+                                        setSlots(slots.map(s => ({ ...s, isEditing: true })))
+                                    }}
+                                    className="bg-blue-500 text-white px-3 py-2 rounded w-full"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        const updated = slots.map(s => ({
+                                            ...s,
+                                            leave: !s.leave
+                                        }))
+                                        setSlots(updated)
+                                    }}
+                                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded w-full"
+                                >
+                                    Leave
+                                </button>
+
+                                <button
+                                    onClick={async () => {
+                                        await setDoc(doc(db, "appointments", selectedSlotDate), {
+                                            slots: slots
+                                                .filter(s => !s.leave) // 🔥 REMOVE leave slots permanently
+                                                .map(s => ({
+                                                    start: s.start,
+                                                    end: s.end
+                                                }))
+                                        }, { merge: true })
+
+                                        setPopup(false)
+                                    }}
+                                    className="bg-green-500 text-white px-3 py-2 rounded w-full"
+                                >
+                                    Save
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </div>
+                )}
 
             </div>
         </div>
@@ -226,6 +377,43 @@ const DoctorProfile = () => {
 
     }, [])
 
+    useEffect(() => {
+
+        const email = localStorage.getItem("doctorEmail")
+        if (!email) return
+
+        const ref = collection(db, "users", "demoAdmin", "calendar")
+
+        const unsub = onSnapshot(ref, (snap) => {
+
+            let data = {}
+
+            snap.forEach(doc => {
+                const d = doc.data()
+
+                if (d.slots) {
+                    // FULL DATE
+                    data[doc.id] = {
+                        slots: d.slots
+                    }
+
+                    // DAY ONLY (repeat every month)
+                    const dayOnly = doc.id.split("-")[2]
+
+                    data[`day-${dayOnly}`] = {
+                        slots: d.slots
+                    }
+                }
+            })
+
+            setAppointmentEvents(data)
+
+        })
+
+        return () => unsub()
+
+    }, [])
+
     if (!doctorData) return <p className="p-10">Loading...</p>
 
     return (
@@ -267,6 +455,7 @@ const DoctorProfile = () => {
                         onSelect={handleDateSelect}
                         selectedDate={selectedDate}
                         events={appointmentEvents}
+                        type="appointment"
                     />
 
                     {selectedDate && (
@@ -280,49 +469,61 @@ const DoctorProfile = () => {
 
                                 {[
                                     9, 10, 11, 12, 13, 14, 15, 16, 17, 18
-                                ].map((hour, i) => {
+                                ].map((hourLoop, i) => {
 
                                     const timeLabel =
-                                        hour > 12
-                                            ? `${hour - 12}:00 PM`
-                                            : `${hour}:00 AM`
-
+                                        hourLoop > 12
+                                            ? `${hourLoop - 12}:00 PM`
+                                            : `${hourLoop}:00 AM`
                                     const booking = appointments.find(a => {
-                                        const d = new Date(a.date).toISOString().split("T")[0]
-                                        const bookingHour = parseInt(a.time)
 
-                                        return d === selectedDate && bookingHour === hour
+                                        if (!a.date || !a.time) return false
+
+                                        const d = new Date(a.date).toLocaleDateString("en-CA")
+
+                                        // 🔥 extract hour properly
+                                        const timePart = a.time.split("-")[0]   // "5:19pm"
+                                        let hour = parseInt(timePart)
+
+                                        if (timePart.toLowerCase().includes("pm") && hour !== 12) {
+                                            hour += 12
+                                        }
+
+                                        if (timePart.toLowerCase().includes("am") && hour === 12) {
+                                            hour = 0
+                                        }
+
+                                        return d === selectedDate && hour === hourLoop
                                     })
 
                                     const currentHour = new Date().getHours()
-                                    const isCurrent = currentHour === hour
+                                    const isCurrent = currentHour === hourLoop
 
                                     return (
-                                        <div key={i} className="flex items-center gap-4">
+                                        <div key={i} className="flex items-start gap-4">
 
                                             {/* TIME */}
                                             <p className="w-20 text-gray-500 font-medium">
                                                 {timeLabel}
                                             </p>
 
-                                            {/* LINE */}
-                                            <div className="flex-1 border-b-2 border-gray-300 relative">
+                                            {/* TIMELINE */}
+                                            <div className="flex-1 relative border-l-2 border-gray-300 h-10">
 
-                                                {/* ➤ CURRENT TIME */}
+                                                {/* CURRENT TIME ARROW */}
                                                 {isCurrent && (
-                                                    <div className="absolute left-0 -top-2 text-blue-600 text-xl">
+                                                    <div className="absolute -left-3 top-1 text-blue-600 text-xl">
                                                         ➤
                                                     </div>
                                                 )}
 
-                                                {/* BOOKING */}
+                                                {/* BOOKED SLOT */}
                                                 {booking && (
-                                                    <div className={`absolute top-[-10px] px-3 py-1 rounded-full text-sm
-                  ${booking.status === "completed"
-                                                            ? "bg-green-500 text-white"
-                                                            : "bg-yellow-400 text-black"}
-                `}>
-                                                        {booking.patientName}
+                                                    <div className="absolute left-4 top-0 bg-yellow-400 text-black px-3 py-1 rounded-lg text-sm shadow">
+
+                                                        <div>👤 {booking.patientName}</div>
+                                                        <div className="text-xs">📝 {booking.reason}</div>
+
                                                     </div>
                                                 )}
 
@@ -574,7 +775,7 @@ const DoctorProfile = () => {
                             Calendar Settings
                         </h1>
 
-                    <AdminCalendar adminId="demoAdmin" enableSlots={true} />
+                        <AdminCalendar adminId="demoAdmin" enableSlots={true} />
                     </div>
 
                 </div>

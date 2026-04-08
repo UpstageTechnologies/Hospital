@@ -74,7 +74,7 @@ bg-[radial-gradient(circle_at_10%_20%,rgba(224,231,255,0.8),transparent_40%),rad
                         Get Started →
                     </button>
 
-                    <button className="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition">
+                    <button onClick={() => navigate("/demohome")} className="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition">
                         Demo
                     </button>
 

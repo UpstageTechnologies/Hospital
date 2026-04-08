@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { auth } from "../firebase"
 
 const PatientDashboard = () => {
 
@@ -8,7 +9,7 @@ const PatientDashboard = () => {
    
     const [selected, setSelected] = useState(null)
 
-    const userEmail = localStorage.getItem("userEmail") // login time save பண்ணணும்
+  const userEmail = auth.currentUser?.email// login time save பண்ணணும்
 
     useEffect(() => {
         const fetchAppointments = async () => {

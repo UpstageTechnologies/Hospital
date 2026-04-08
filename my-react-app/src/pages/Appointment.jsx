@@ -63,18 +63,14 @@ const Appointment = () => {
           ...data
         })
 
-        const formattedSlots = [
-          {
-            date: new Date().toISOString().split("T")[0],
-            times: data.slots || []
-          }
-        ]
-        setDocSlots(formattedSlots)
+
       }
     }
 
     if (!docInfo) fetchDoctor()
   }, [decodedId, docInfo])
+
+
 
   useEffect(() => {
     if (step === 3 && !appointmentNo) {
@@ -127,6 +123,43 @@ const Appointment = () => {
     })
 
     return () => unsub()
+  }, [])
+
+  useEffect(() => {
+    const fetchSlots = async () => {
+      const today = new Date().toISOString().split("T")[0]
+
+      const snap = await getDoc(doc(db, "appointments", today))
+
+      if (snap.exists()) {
+        const data = snap.data()
+
+        const formatted = [
+          {
+            date: today,
+            times: data.slots.map(s => {
+              const format = (t) => {
+                let [h, m] = t.split(":")
+                h = parseInt(h)
+
+                let ampm = h >= 12 ? "PM" : "AM"
+
+                let display = h % 12
+                if (display === 0) display = 12
+
+                return `${display}:${m}${ampm.toLowerCase()}`
+              }
+
+              return `${format(s.start)}-${format(s.end)}`
+            })
+          }
+        ]
+
+        setDocSlots(formatted)
+      }
+    }
+
+    fetchSlots()
   }, [])
 
   if (!docInfo) return <h1>Loading...</h1>
@@ -406,6 +439,7 @@ const Appointment = () => {
                               time: slotTime,
                               reason,
                               appointmentNo,
+                              email: userData?.email,
                               createdAt: serverTimestamp()
                             }
 
@@ -436,7 +470,7 @@ const Appointment = () => {
       <div className='flex gap-6 items-stretch w-full'>
         <img className='w-72 h-[300px] object-cover rounded-xl bg-blue-500' src={docInfo.image} alt="" />
 
-       <div className='w-[500px] border rounded-xl p-6 shadow-sm flex flex-col justify-center'>
+        <div className='w-[500px] border rounded-xl p-6 shadow-sm flex flex-col justify-center'>
           <h1 className='text-3xl font-bold'>{docInfo.name}</h1>
           <p className='text-gray-600 mt-2'>{docInfo.speciality}</p>
           <p className='text-gray-600 mt-2'>{docInfo.experience || "5 Years Experience"}</p>

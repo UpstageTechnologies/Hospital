@@ -105,7 +105,7 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
           const day = i + 1;
           const dateStr = format(day);
           const dayOnly = dateStr.split("-")[2];
-          const event = events[`day-${dayOnly}`] || events[dateStr];
+          const event = events[dateStr] || events[`day-${dayOnly}`];
           const dayIndex = new Date(dateStr).getDay();
           const isSunday = dayIndex === 0;
 
@@ -128,18 +128,27 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
 
                 // ✅ STEP 5 CORRECT PLACE
                 const dayOnly = dateStr.split("-")[2];
-                const eventData = events[`day-${dayOnly}`] || events[dateStr];
+                const eventData = events[dateStr] || events[`day-${dayOnly}`];
 
-                if (enableSlots && eventData?.slots && eventData.slots.length > 0) {
-                  setSlots(eventData.slots);
-                  setSlotCount(eventData.slots.length);
-                  setSlotInput(eventData.slots.length);
-                  setIsEdit(true);
-                } else {
-                  setSlots([{ start: "", end: "" }]);
-                  setSlotCount(1);
-                  setSlotInput(1);
-                  setIsEdit(false);
+                if (enableSlots) {
+                  const dateEvent = events[dateStr];
+                  const dayEvent = events[`day-${dayOnly}`];
+
+                  const finalData = dateEvent || dayEvent;
+
+                  if (finalData?.slots && finalData.slots.length > 0) {
+                    setSlots(finalData.slots);
+                    setSlotCount(finalData.slots.length);
+                    setSlotInput(finalData.slots.length);
+
+                    // 🔥 IMPORTANT
+                    setIsEdit(!!dateEvent); // only true if exact date exists
+                  } else {
+                    setSlots([{ start: "", end: "" }]);
+                    setSlotCount(1);
+                    setSlotInput(1);
+                    setIsEdit(false);
+                  }
                 }
               }}
 
@@ -274,13 +283,25 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
                     const value = parseInt(e.target.value) || 1;
                     setSlotInput(value);
 
-                    let newSlots = [];
-                    for (let i = 0; i < value; i++) {
-                      newSlots.push({ start: "", end: "" });
-                    }
-
                     setSlotCount(value);
-                    setSlots(newSlots);
+
+                    setSlots((prev) => {
+                      let updated = [...prev];
+
+                      // 🔥 ADD NEW SLOTS (only if increasing)
+                      if (value > updated.length) {
+                        for (let i = updated.length; i < value; i++) {
+                          updated.push({ start: "", end: "" });
+                        }
+                      }
+
+                      // 🔥 REMOVE EXTRA SLOTS (if decreasing)
+                      if (value < updated.length) {
+                        updated = updated.slice(0, value);
+                      }
+
+                      return updated;
+                    });
                   }}
                   className="w-full p-2 rounded bg-white text-black"
                   placeholder="Enter number of slots"
@@ -290,28 +311,34 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
               {/* SLOT TIME */}
               <div className="space-y-3 mb-4">
                 {slots.map((slot, index) => (
-                  <div key={index} className="flex gap-2">
-                    <input
-                      type="time"
-                      value={slot.start}
-                      onChange={(e) =>
-                        handleTimeChange(index, "start", e.target.value)
-                      }
-                      className="w-full p-2 rounded bg-white text-black"
-                    />
-                    <input
-                      type="time"
-                      value={slot.end}
-                      onChange={(e) =>
-                        handleTimeChange(index, "end", e.target.value)
-                      }
-                      className="w-full p-2 rounded bg-white text-black"
-                    />
+                  <div key={index} className="flex flex-col gap-1">
 
+                    {/* INPUT ROW */}
+                    <div className="flex gap-2">
+                      <input
+                        type="time"
+                        value={slot.start}
+                        onChange={(e) =>
+                          handleTimeChange(index, "start", e.target.value)
+                        }
+                        className="w-full p-2 rounded bg-white text-black"
+                      />
 
-                    <p className="text-xs text-white">
+                      <input
+                        type="time"
+                        value={slot.end}
+                        onChange={(e) =>
+                          handleTimeChange(index, "end", e.target.value)
+                        }
+                        className="w-full p-2 rounded bg-white text-black"
+                      />
+                    </div>
+
+                    {/* 🔥 TIME DISPLAY BELOW */}
+                    <p className="text-xs text-white text-center">
                       {formatTime(slot.start)} - {formatTime(slot.end)}
                     </p>
+
                   </div>
                 ))}
               </div>
@@ -323,7 +350,7 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
                   onClick={async () => {
 
                     if (isEdit) {
-                      // 🔥 UPDATE CURRENT DATE
+                      // 🔥 UPDATE (ONLY THIS DATE)
                       await setDoc(doc(db, "users", adminId, "calendar", selectedDate), {
                         slots
                       }, { merge: true });

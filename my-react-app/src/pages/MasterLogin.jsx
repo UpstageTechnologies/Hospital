@@ -145,7 +145,7 @@ const MasterLogin = () => {
         <button type="button" onClick={handleGoogleLogin}
           className="google-btn">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5" />
-          Google
+         Sign in with Google
         </button>
 
       </form>

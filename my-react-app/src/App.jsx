@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 import HospitalIntro from "./pages/HospitalIntro";
+import DemoHome from "./pages/DemoHome"   // 👈 import add pannu
 import Upstage from "./pages/Upstage.jsx";
 import UpstageDoctors from "./pages/UpstageDoctors";
 import UpstageNavbar from "./components/UpstageNavbar";
@@ -32,6 +33,7 @@ const App = () => {
   const location = useLocation();
   const hideLayout = [
     "/",
+    
     "/upstage",
     "/select-hospital",
     "/master-login",
@@ -45,13 +47,16 @@ const App = () => {
 
 
       {!hideLayout && (
-        location.pathname.startsWith("/upstage")
-          ? <UpstageNavbar />
-          : <Navbar />
-      )}
+  location.pathname.startsWith("/demo")
+    ? null   // 👈 demo pages la App navbar remove
+    : location.pathname.startsWith("/upstage")
+    ? <UpstageNavbar />
+    : <Navbar />
+)}
 
       <Routes>
         <Route path="/" element={<HospitalIntro />} />
+        <Route path="/demohome" element={<DemoHome />} />
         <Route path="/upstage" element={<Upstage />} />
 
         <Route path="/upstage-doctors" element={<UpstageDoctors />} />
