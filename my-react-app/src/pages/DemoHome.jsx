@@ -1,14 +1,35 @@
 import Navbar from "../components/Navbar"
 import { useNavigate } from "react-router-dom"
 import { assets } from "../assets/assets"
-import { specialityData } from "../assets/assets"
-import { doctors } from "../assets/assets"
+import { useState, useEffect } from "react"
+import { collection, getDocs } from "firebase/firestore"
+import { db } from "../firebase"   // 👈 correct path check panniko
 
 const DemoHome = () => {
 
     const navigate = useNavigate()
+    const specialityData = [
+       { name: "General physician", image: "/speciality/General_physician.svg" },
+        { name: "Gynecologist", image: "/speciality/Gynecologist.svg" },
+        { name: "Dermatologist", image: "/speciality/Dermatologist.svg" },
+        { name: "Pediatricians", image: "/speciality/Pediatricians.svg" },
+        { name: "Neurologist", image: "/speciality/Neurologist.svg" },
+        { name: "Gastroenterologist", image: "/speciality/Gastroenterologist.svg" },
+    ]
+    const [doctors, setDoctors] = useState([])
+    useEffect(() => {
+        const fetchDoctors = async () => {
+            const snapshot = await getDocs(collection(db, "doctors"))
+            const data = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            setDoctors(data)
+        }
 
-    
+        fetchDoctors()
+    }, [])
+
 
     return (
 
@@ -17,7 +38,7 @@ const DemoHome = () => {
 
 
             <div className="flex justify-between items-center px-8 py-4 shadow">
-               <p>Demo</p>
+                <p>Demo</p>
 
                 <ul className="flex gap-8 font-medium">
                     <li>Home</li>

@@ -1,8 +1,8 @@
 import Navbar from "../components/Navbar"
-import { useNavigate } from "react-router-dom"
+
 import { useState, useEffect, useContext } from "react"
-import { useNavigate, useParams } from "react-router-dom"
 import { AppContext } from "../context/AppContext"
+import { useNavigate, useParams } from "react-router-dom"
 
 const DemoDoctors = () => {
 
@@ -67,8 +67,8 @@ const DemoDoctors = () => {
                             <p key={i}
                                 onClick={() =>
                                     city === item
-                                        ? navigate("/upstage-doctors")
-                                        : navigate(`/upstage-doctors/${item}`)
+                                        ? navigate("/demodoctors")
+                                        : navigate(`/demodoctors/${item}`)
                                 }
                                 className={`pl-3 py-1.5 pr-16 border rounded cursor-pointer 
                  ${city === item ? "bg-indigo-100 text-black" : ""}`} >
@@ -88,7 +88,7 @@ const DemoDoctors = () => {
                             {filterDoc.map((item, index) => (
 
                                 <div key={index}
-                                    onClick={() => navigate(`/appointment/${item.email}`)}
+                                    onClick={() => navigate(`/demodoctor/${item.email}`)}
                                     className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
                                     <img src={item.image} className='bg-blue-50' />
@@ -121,7 +121,7 @@ const DemoDoctors = () => {
                                     {groupedDoctors[hospital].map((item, index) => (
 
                                         <div key={index}
-                                            onClick={() => navigate(`/appointment/${item.email}`)}
+                                            onClick={() => navigate(`/demodoctor/${item.email}`)}
                                             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
                                             <img src={item.image} className='bg-blue-50' />

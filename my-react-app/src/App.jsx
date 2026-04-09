@@ -2,7 +2,10 @@ import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 import HospitalIntro from "./pages/HospitalIntro";
-import DemoHome from "./pages/DemoHome"   // 👈 import add pannu
+import DemoHome from "./pages/DemoHome";
+import DemoDoctors from "./pages/DemoDoctors.jsx";  
+import DemoDoctorDetails from "./pages/DemoDoctorDetails";
+import Dashboard from "./pages/Dashboard"
 import Upstage from "./pages/Upstage.jsx";
 import UpstageDoctors from "./pages/UpstageDoctors";
 import UpstageNavbar from "./components/UpstageNavbar";
@@ -33,32 +36,35 @@ const App = () => {
   const location = useLocation();
   const hideLayout = [
     "/",
-    
+
     "/upstage",
     "/select-hospital",
     "/master-login",
     "/admin-login",
     "/doctor-login",
     "/patient-login",
-    "/staff-login"
+    "/staff-login",
+     "/dashboard"
   ].includes(location.pathname);
   return (
     <div className="w-full">
 
 
       {!hideLayout && (
-  location.pathname.startsWith("/demo")
-    ? null   // 👈 demo pages la App navbar remove
-    : location.pathname.startsWith("/upstage")
-    ? <UpstageNavbar />
-    : <Navbar />
-)}
+        location.pathname.startsWith("/demo")
+          ? null   // 👈 demo pages la App navbar remove
+          : location.pathname.startsWith("/upstage")
+            ? <UpstageNavbar />
+            : <Navbar />
+      )}
 
       <Routes>
         <Route path="/" element={<HospitalIntro />} />
         <Route path="/demohome" element={<DemoHome />} />
+        <Route path="/demodoctors" element={<DemoDoctors />} />
+        <Route path="/demodoctor/:id" element={<DemoDoctorDetails />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/upstage" element={<Upstage />} />
-
         <Route path="/upstage-doctors" element={<UpstageDoctors />} />
         <Route path="/upstage-doctors/:city" element={<UpstageDoctors />} />
         <Route path="/select-hospital" element={<Loding />} />

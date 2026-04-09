@@ -10,7 +10,7 @@ const DemoNavbar = () => {
 
     <div className="flex items-center py-4 px-6 border-b border-gray-300 bg-white">
 
-      {/* LOGO */}
+      LOGO
       <img
         src="/logos/upstage.png"
         className="w-28 cursor-pointer"
@@ -23,7 +23,7 @@ const DemoNavbar = () => {
           <li>Home</li>
         </NavLink>
 
-        <NavLink to="/upstage-doctors">
+        <NavLink to="/demodoctors">
           <li>All Doctors</li>
         </NavLink>
 
