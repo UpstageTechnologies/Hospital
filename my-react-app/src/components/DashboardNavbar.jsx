@@ -1,24 +1,28 @@
+import { useNavigate, useLocation } from "react-router-dom";
+
 const DashboardNavbar = () => {
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const active = (path) =>
+        location.pathname === path ? "text-blue-600 font-bold" : "";
+
     return (
-        <div className="flex items-center justify-between px-10 py-4 border-b">
+        <div className="w-full border-b p-4 flex justify-center gap-10 text-lg">
 
-            {/* LEFT */}
-            <h1 className="text-xl font-bold">Dashboard</h1>
+            <button className={active("/master-dashboard")} onClick={() => navigate("/master-dashboard")}>Master</button>
 
-            {/* CENTER */}
-            <div className="flex gap-8 mx-auto">
-                <button>Master</button>
-                <button>Admin</button>
-                <button>Doctor</button>
-                <button>Patient</button>
-                <button>Staff</button>
-            </div>
+            <button className={active("/admin-login")} onClick={() => navigate("/admin-login")}>Admin</button>
 
-            {/* RIGHT (empty for balance) */}
-            <div className="w-[100px]"></div>
+            <button className={active("/demo-patient-dashboard")} onClick={() => navigate("/demo-patient-dashboard")}>Patient</button>
+
+            <button className={active("/demo-doctor-dashboard")} onClick={() => navigate("/demo-doctor-dashboard")}>Doctor</button>
+
+            <button className={active("/staff-login")} onClick={() => navigate("/staff-login")}>Staff</button>
 
         </div>
-    )
-}
+    );
+};
 
-export default DashboardNavbar
+export default DashboardNavbar;

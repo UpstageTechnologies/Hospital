@@ -3,9 +3,13 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 import HospitalIntro from "./pages/HospitalIntro";
 import DemoHome from "./pages/DemoHome";
-import DemoDoctors from "./pages/DemoDoctors.jsx";  
+import DemoDoctors from "./pages/DemoDoctors";
 import DemoDoctorDetails from "./pages/DemoDoctorDetails";
 import Dashboard from "./pages/Dashboard"
+import DashboardNavbar from "./components/DashboardNavbar";
+import MasterDashboard from "./pages/MasterDashboard"
+import DemoPatientdashboard from "./pages/DemoPatientdashboard";
+import DemoDoctordashboard from "./pages/DemoDoctordashboard";
 import Upstage from "./pages/Upstage.jsx";
 import UpstageDoctors from "./pages/UpstageDoctors";
 import UpstageNavbar from "./components/UpstageNavbar";
@@ -36,7 +40,6 @@ const App = () => {
   const location = useLocation();
   const hideLayout = [
     "/",
-
     "/upstage",
     "/select-hospital",
     "/master-login",
@@ -44,19 +47,25 @@ const App = () => {
     "/doctor-login",
     "/patient-login",
     "/staff-login",
-     "/dashboard"
+    "/dashboard"
   ].includes(location.pathname);
   return (
     <div className="w-full">
 
 
-      {!hideLayout && (
-        location.pathname.startsWith("/demo")
-          ? null   // 👈 demo pages la App navbar remove
-          : location.pathname.startsWith("/upstage")
-            ? <UpstageNavbar />
-            : <Navbar />
-      )}
+    {!hideLayout && (
+  location.pathname.startsWith("/upstage")
+    ? <UpstageNavbar />
+    : (
+        location.pathname === "/master-dashboard" ||
+        location.pathname === "/demo-patient-dashboard" ||
+        location.pathname === "/demo-doctor-dashboard"
+      )
+      ? <DashboardNavbar />   // 🔥 FIRST PRIORITY
+      : location.pathname.startsWith("/demo")
+        ? null
+        : <Navbar />
+)}
 
       <Routes>
         <Route path="/" element={<HospitalIntro />} />
@@ -64,6 +73,9 @@ const App = () => {
         <Route path="/demodoctors" element={<DemoDoctors />} />
         <Route path="/demodoctor/:id" element={<DemoDoctorDetails />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/master-dashboard" element={<MasterDashboard />} />
+        <Route path="/demo-patient-dashboard" element={<DemoPatientdashboard />} />
+        <Route path="/demo-doctor-dashboard" element={<DemoDoctordashboard />} />
         <Route path="/upstage" element={<Upstage />} />
         <Route path="/upstage-doctors" element={<UpstageDoctors />} />
         <Route path="/upstage-doctors/:city" element={<UpstageDoctors />} />
