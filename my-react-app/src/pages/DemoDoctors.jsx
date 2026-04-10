@@ -16,16 +16,22 @@ const DemoDoctors = () => {
 
     const applyFilter = () => {
 
-        // ✅ ALWAYS show all doctors first
         if (!city) {
             setFilterDoc(doctors);
             return;
         }
 
-        // ✅ Filter only when city selected
-        const filtered = doctors.filter(doc =>
-            doc.doctorBasicInfo?.address?.toLowerCase().includes(city.toLowerCase())
-        );
+        const filtered = doctors.filter(doc => {
+            const address = doc.doctorBasicInfo?.address || "";
+
+            // split by comma
+            const parts = address.split(",");
+
+            // city usually first or last → check both
+            return parts
+                .map(p => p.trim().toLowerCase())
+                .includes(city.toLowerCase())
+        });
 
         setFilterDoc(filtered);
     };
@@ -34,18 +40,22 @@ const DemoDoctors = () => {
         applyFilter();
     }, [doctors, city]);
 
-    const groupedDoctors = {};
+    const groupedDoctors = {}
 
     filterDoc.forEach(doc => {
-        const address = doc.doctorBasicInfo?.address || "";
-        const [cityName, hospital] = address.split(",");
+
+        const address = doc.doctorBasicInfo?.address || ""
+        const parts = address.split(",")
+
+        const cityName = parts[0]?.trim()
+        const hospital = parts[1]?.trim() || "Unknown Hospital"
 
         if (!groupedDoctors[hospital]) {
-            groupedDoctors[hospital] = [];
+            groupedDoctors[hospital] = []
         }
 
-        groupedDoctors[hospital].push(doc);
-    });
+        groupedDoctors[hospital].push(doc)
+    })
 
     return (
         <div className='px-6 sm:px-10'>
@@ -106,7 +116,7 @@ const DemoDoctors = () => {
                         </div>
                     )}
 
-                    {/* ✅ city irundha → hospital group */}
+
                     {city && (
                         Object.keys(groupedDoctors).map((hospital, i) => (
 

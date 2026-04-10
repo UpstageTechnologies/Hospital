@@ -56,6 +56,25 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
     setSlots(updated);
   };
 
+  const fixTime = (time, index) => {
+    if (!time) return ""
+
+    let [h, m] = time.split(":")
+    h = parseInt(h)
+
+    // 👉 first slot மட்டும் AM
+    if (index !== 0 && h < 12) {
+      h += 12
+    }
+
+    let ampm = h >= 12 ? "PM" : "AM"
+
+    let displayHour = h % 12
+    if (displayHour === 0) displayHour = 12
+
+    return `${displayHour}:${m} ${ampm}`
+  }
+
   const formatTime = (time) => {
     if (!time) return "";
 
@@ -336,7 +355,7 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
 
                     {/* 🔥 TIME DISPLAY BELOW */}
                     <p className="text-xs text-white text-center">
-                      {formatTime(slot.start)} - {formatTime(slot.end)}
+                      {fixTime(slot.start, index)} - {fixTime(slot.end, index)}
                     </p>
 
                   </div>

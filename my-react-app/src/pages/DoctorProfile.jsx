@@ -47,14 +47,29 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
         let [h, m] = time.split(":")
         h = parseInt(h)
 
-        if (h < 8 || h > 20) return ""   // ✅ restriction
-
         let ampm = h >= 12 ? "PM" : "AM"
 
         let displayHour = h % 12
         if (displayHour === 0) displayHour = 12
 
         return `${displayHour}:${m} ${ampm}`
+    }
+
+    const convertTo24Hour = (time, index) => {
+        let [h, m] = time.split(":")
+        h = parseInt(h)
+
+
+        if (index === 0) {
+            return `${h.toString().padStart(2, "0")}:${m}`
+        }
+
+        // 👉 next slots PM assume
+        if (h < 12) {
+            h += 12
+        }
+
+        return `${h.toString().padStart(2, "0")}:${m}`
     }
 
     return (
@@ -236,9 +251,9 @@ ${type === "doctor"
                                         await setDoc(doc(db, "appointments", selectedSlotDate), {
                                             slots: slots
                                                 .filter(s => !s.leave) // 🔥 REMOVE leave slots permanently
-                                                .map(s => ({
-                                                    start: s.start,
-                                                    end: s.end
+                                                .map((s, i) => ({
+                                                    start: convertTo24Hour(s.start, i),
+                                                    end: convertTo24Hour(s.end, i)
                                                 }))
                                         }, { merge: true })
 
@@ -467,63 +482,58 @@ const DoctorProfile = () => {
 
                             <div className="space-y-4">
 
-                                {[
-                                    9, 10, 11, 12, 13, 14, 15, 16, 17, 18
-                                ].map((hourLoop, i) => {
+                                {Array.from({ length: 20 }, (_, i) => 9 * 60 + i * 30).map((minutes, i) => {
+
+                                    const hour = Math.floor(minutes / 60)
+                                    const min = minutes % 60
 
                                     const timeLabel =
-                                        hourLoop > 12
-                                            ? `${hourLoop - 12}:00 PM`
-                                            : `${hourLoop}:00 AM`
+                                        `${hour > 12 ? hour - 12 : hour}:${min === 0 ? "00" : min} ${hour >= 12 ? "PM" : "AM"}`
+
                                     const booking = appointments.find(a => {
 
                                         if (!a.date || !a.time) return false
 
                                         const d = new Date(a.date).toLocaleDateString("en-CA")
 
-                                        // 🔥 extract hour properly
-                                        const timePart = a.time.split("-")[0]   // "5:19pm"
-                                        let hour = parseInt(timePart)
+                                        const timePart = a.time.split("-")[0] // "9:30am"
 
-                                        if (timePart.toLowerCase().includes("pm") && hour !== 12) {
-                                            hour += 12
-                                        }
+                                        let [h, m] = timePart.replace(/am|pm/i, "").split(":")
+                                        h = parseInt(h)
+                                        m = parseInt(m || "0")
 
-                                        if (timePart.toLowerCase().includes("am") && hour === 12) {
-                                            hour = 0
-                                        }
+                                        if (timePart.toLowerCase().includes("pm") && h !== 12) h += 12
+                                        if (timePart.toLowerCase().includes("am") && h === 12) h = 0
 
-                                        return d === selectedDate && hour === hourLoop
+                                        const totalMinutes = h * 60 + m
+
+                                        return d === selectedDate && totalMinutes === minutes
                                     })
 
-                                    const currentHour = new Date().getHours()
-                                    const isCurrent = currentHour === hourLoop
+                                    const current = new Date()
+                                    const currentMinutes = current.getHours() * 60 + current.getMinutes()
+
+                                    const isCurrent = Math.floor(currentMinutes / 30) === Math.floor(minutes / 30)
 
                                     return (
                                         <div key={i} className="flex items-start gap-4">
 
-                                            {/* TIME */}
                                             <p className="w-20 text-gray-500 font-medium">
                                                 {timeLabel}
                                             </p>
 
-                                            {/* TIMELINE */}
                                             <div className="flex-1 relative border-l-2 border-gray-300 h-10">
 
-                                                {/* CURRENT TIME ARROW */}
                                                 {isCurrent && (
                                                     <div className="absolute -left-3 top-1 text-blue-600 text-xl">
                                                         ➤
                                                     </div>
                                                 )}
 
-                                                {/* BOOKED SLOT */}
                                                 {booking && (
                                                     <div className="absolute left-4 top-0 bg-yellow-400 text-black px-3 py-1 rounded-lg text-sm shadow">
-
                                                         <div>👤 {booking.patientName}</div>
                                                         <div className="text-xs">📝 {booking.reason}</div>
-
                                                     </div>
                                                 )}
 
@@ -536,7 +546,7 @@ const DoctorProfile = () => {
                             </div>
                         </div>
                     )}
-
+                    {/* 
                     <h2 className="text-lg font-semibold mb-3">
                         Old Appointments
                     </h2>
@@ -610,7 +620,7 @@ const DoctorProfile = () => {
 
                         </table>
 
-                    </div>
+                    </div> */}
 
                 </div>
             )}

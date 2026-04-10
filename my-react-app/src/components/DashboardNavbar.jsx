@@ -13,7 +13,7 @@ const DashboardNavbar = () => {
 
             <button className={active("/master-dashboard")} onClick={() => navigate("/master-dashboard")}>Master</button>
 
-            <button className={active("/admin-login")} onClick={() => navigate("/admin-login")}>Admin</button>
+            <button className={active("/admin-login")} onClick={() => navigate("/admin-dashboard")}>Admin</button>
 
             <button className={active("/demo-patient-dashboard")} onClick={() => navigate("/demo-patient-dashboard")}>Patient</button>
 

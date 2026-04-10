@@ -1,5 +1,9 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useEffect } from "react"
+import { db } from "../firebase"
+import { collection, addDoc, getDocs } from "firebase/firestore"
+
 
 const AppointmentPopup = ({ close, doctor, slotTime }) => {
 
@@ -27,56 +31,93 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
     const [currentUser, setCurrentUser] = useState(null)
 
     // 🔥 REGISTER
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (!name || !email || !password || !address || !phone || !gender) {
-            return alert("Fill all fields ❌")
+            return alert("Fill all fields")
         }
 
-        const newUser = {
-            name,
-            email,
-            password,
-            address,
-            phone,
-            gender
+        try {
+            // check duplicate email
+            const querySnapshot = await getDocs(collection(db, "users"))
+            const exists = querySnapshot.docs.find(
+                doc => doc.data().email === email
+            )
+
+            if (exists) {
+                return alert("User already exists")
+            }
+
+            await addDoc(collection(db, "users"), {
+                name,
+                email,
+                password,
+                address,
+                phone,
+                gender
+            })
+
+            alert("Account Created")
+            setShowRegister(false)
+
+        } catch (err) {
+            console.log(err)
+            alert("Error")
         }
-
-        setUsers([...users, newUser])
-
-        alert("Account Created ✅")
-        setShowRegister(false)
     }
 
     // 🔥 LOGIN
-    const handleLogin = () => {
-        const user = users.find(
-            (u) => u.email === loginEmail && u.password === loginPassword
-        )
+    const handleLogin = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "users"))
 
-        if (!user) {
-            return alert("Invalid Login ❌")
+            const users = querySnapshot.docs.map(doc => doc.data())
+
+            const user = users.find(
+                (u) => u.email === loginEmail && u.password === loginPassword
+            )
+
+            if (!user) {
+                return alert("Invalid Login ❌")
+            }
+
+            setIsLoggedIn(true)
+            setCurrentUser(user)
+
+            // optional: persist
+            localStorage.setItem("currentUser", JSON.stringify(user))
+
+            alert("Login Success")
+            setStep(2)
+
+        } catch (err) {
+            console.log(err)
+            alert("Error")
         }
-
-        setIsLoggedIn(true)
-        setCurrentUser(user)
-
-        alert("Login Success ✅")
-
-        setStep(2)
     }
 
     // 🔥 BOOK
     const handleBook = () => {
         if (!isLoggedIn) {
-            return alert("Login first ❌")
+            return alert("Login first ")
         }
 
         if (!reason) {
-            return alert("Enter reason ❌")
+            return alert("Enter reason ")
         }
 
-       setStep(4)
+        setStep(4)
     }
+
+
+    useEffect(() => {
+        const savedUser = JSON.parse(localStorage.getItem("currentUser"))
+
+        if (savedUser) {
+            setIsLoggedIn(true)
+            setCurrentUser(savedUser)
+            setStep(2)
+        }
+    }, [])
 
     return (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
