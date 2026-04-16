@@ -110,8 +110,6 @@ const App = () => {
         <Route path="/staff-profile" element={<StaffProfile />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-
-
       {!hideLayout && location.pathname !== "/account" && <Footer />}
 
     </div>
