@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type = "doctor" }) => {
 
-    const [popup, setPopup] = useState(false)
+    const [popup, setPopup] = useState(false)   
     const [slots, setSlots] = useState([])
     const [selectedSlotDate, setSelectedSlotDate] = useState("")
     const today = new Date()
@@ -74,14 +74,14 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
     }
 
     return (
-        <div className="bg-white rounded-2xl shadow p-3 sm:p-6 w-full max-w-[500px] mx-auto">
+        <div className="bg-white rounded-2xl shadow p-2 sm:p-4 md:p-6 w-full md:max-w-[650px] mx-auto">
 
             {/* HEADER */}
             <div className="flex justify-between items-center mb-6">
                 <button onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
                     className="bg-blue-500 text-white px-2 sm:px-3 py-2 rounded-lg sm:rounded-xl text-sm">◀</button>
 
-                <h2 className="text-base sm:text-xl font-bold text-center">
+<h2 className="text-base sm:text-xl font-bold text-center w-full">
                     {currentMonth.toLocaleString("default", { month: "long" })} {year}
                 </h2>
 
@@ -97,10 +97,12 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
             </div>
 
             {/* DATES */}
-            <div className="grid grid-cols-7 gap-2 sm:gap-3 md:gap-4 px-1 sm:px-0">
+            <div className="grid grid-cols-7 gap-2 sm:gap-3 md:gap-4">
 
                 {dates.map((date, i) => {
-                    if (!date) return <div key={i}></div>
+                    if (!date) return (
+                        <div key={i} className="aspect-square"></div>
+                      )
 
                     const dayOnly = date.split("-")[2]
                     const eventData =
@@ -132,12 +134,12 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
                                     setPopup(true)
                                 }
                             }}
-                            className={`min-h-[65px] sm:min-h-[75px] md:min-h-[85px]
-
-flex flex-col items-center justify-center
-rounded-xl sm:rounded-2xl
-text-center transition font-semibold
-text-sm sm:text-base
+                            className={`aspect-square
+                            flex flex-col items-center justify-center
+                            rounded-xl sm:rounded-2xl
+                            text-center transition font-semibold
+                            text-sm sm:text-base
+                            overflow-hidden
 
 ${type === "doctor"
                                     ? (
@@ -157,8 +159,10 @@ ${type === "doctor"
                         >
                             <p className="text-sm sm:text-lg font-semibold">{day}</p>
                             {isSunday && !events[date] && (
-                                <p className="text-xs mt-1">Sunday</p>
-                            )}
+    <p className="text-[10px] absolute bottom-1 opacity-0">
+        Sunday
+    </p>
+)}
 
                             {eventData && eventData.slots && (
                                 <p className="text-[9px] sm:text-xs text-blue-500 mt-1 leading-none">
@@ -441,10 +445,10 @@ const DoctorProfile = () => {
 
     return (
 
-        <div className="flex flex-col md:flex-row min-h-screen">
+        <div className="flex flex-col md:flex-row min-h-screen pb-16 md:pb-0">
 
             {/* LEFT PANEL */}
-            <div className="w-full md:w-64 bg-blue-600 text-white p-3 md:p-6 flex md:block justify-between md:justify-start overflow-x-auto gap-4 md:gap-0 text-sm sm:text-base">
+            <div className="hidden md:block w-full md:w-64 bg-blue-600 text-white p-3 md:p-6">
                 <p onClick={() => setPage("home")} className="mb-3 md:mb-3 cursor-pointer shrink-0">Home</p>
 
                 <p onClick={() => setPage("appointments")} className="mb-3 md:mb-3 cursor-pointer shrink-0">
@@ -464,7 +468,7 @@ const DoctorProfile = () => {
             {page === "appointments" && (
                 <div className="p-4 md:p-8 w-full">
 
-                    <h1 className="text-2xl font-bold mb-6">
+<h1 className="text-2xl font-bold mb-6 text-center md:text-left">
                         Appointments
                     </h1>
 
@@ -564,9 +568,11 @@ const DoctorProfile = () => {
             {page === "home" && (
                 <>
 
-                    <h1 className="text-2xl font-bold mb-6">Current Appointments</h1>
+<h1 className="text-2xl font-bold mb-6 text-center md:text-left">
+  Current Appointments
+</h1>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-20 md:pb-0 px-4 sm:px-6 md:px-0">
 
                         {appointments.map((item, index) => (
 
@@ -576,7 +582,7 @@ const DoctorProfile = () => {
                                     setSelectedAppointment(item)
                                     setStep(1)
                                 }}
-                                className="bg-white shadow-md rounded-xl p-5 flex items-center gap-4 cursor-pointer hover:shadow-lg transition"
+                                className="bg-white shadow-md rounded-xl p-5 flex items-center gap-4 cursor-pointer hover:shadow-lg transition w-full"
                             >
 
                                 {/* PATIENT IMAGE */}
@@ -778,6 +784,31 @@ const DoctorProfile = () => {
                 </>
             )}
 
+            {/* MOBILE BOTTOM NAV */}
+<div className="fixed bottom-0 left-0 w-full bg-white border-t shadow md:hidden flex justify-around items-center py-2 z-50">
+
+<button onClick={() => setPage("home")} className="flex flex-col items-center text-sm">
+    🏠
+    <span>Home</span>
+</button>
+
+<button onClick={() => setPage("appointments")} className="flex flex-col items-center text-sm">
+    📅
+    <span>Appointments</span>
+</button>
+
+<button onClick={() => setPage("profile")} className="flex flex-col items-center text-sm">
+    👤
+    <span>Profile</span>
+</button>
+
+<button onClick={() => setPage("settings")} className="flex flex-col items-center text-sm">
+    ⚙️
+    <span>Settings</span>
+</button>
+
+</div>
+
             {page === "profile" && (
                 <div className="p-8 w-full">
 
@@ -882,9 +913,9 @@ const DoctorProfile = () => {
                 </div>
             )}
             {page === "settings" && (
-                <div className="p-8 w-full flex justify-center">
+                <div className="w-full px-2 sm:px-4 md:p-8 flex justify-center md:justify-center">
 
-                    <div className="w-full max-w-3xl">
+<div className="w-full max-w-[100%] sm:max-w-[600px] md:max-w-[750px] lg:max-w-[900px] mx-auto px-2 sm:px-0">
 
                         <h1 className="text-2xl font-bold mb-6">
                             Calendar Settings

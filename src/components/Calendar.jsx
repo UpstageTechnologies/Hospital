@@ -95,14 +95,14 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
   }, [events]);
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow w-full max-w-2xl">
+    <div className="bg-white p-3 sm:p-6 rounded-2xl shadow w-full md:max-w-2xl mx-auto px-2 sm:px-0">
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <button onClick={() => setCurrent(new Date(year, month - 1, 1))}
           className="bg-purple-500 text-white px-3 py-2 rounded-xl">‹</button>
 
-        <h2 className="text-xl font-bold">
+<h2 className="text-lg sm:text-xl font-bold text-center w-full">
           {current.toLocaleString("default", { month: "long" })} {year}
         </h2>
 
@@ -116,7 +116,7 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
       </div>
 
       {/* GRID */}
-      <div className="grid grid-cols-7 gap-3">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 place-items-center">
 
         {[...Array(firstDay)].map((_, i) => <div key={i}></div>)}
 
@@ -172,14 +172,18 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
               }}
 
 
-              className={`p-4 rounded-2xl text-center cursor-pointer ${color}`}
-
+              className={`p-2 sm:p-3 md:p-4 
+aspect-square
+flex flex-col items-center justify-center
+rounded-2xl text-center cursor-pointer ${color}`}
 
             >
               <p className="font-bold">{day}</p>
               {isSunday && !event && (
-                <p className="text-xs">Sunday</p>
-              )}
+  <p className="text-[10px] opacity-0">
+    Sunday
+  </p>
+)}
 
               {event?.slots && (
                 <p className="text-xs text-blue-200">
