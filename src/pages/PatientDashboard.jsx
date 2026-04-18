@@ -46,21 +46,21 @@ const PatientDashboard = () => {
     }, [checkInTime, checkedOut])
 
     return (
-        <div className="flex h-screen">
+<div className="flex flex-col md:flex-row min-h-screen">
 
             {/* LEFT MENU */}
-            <div className="w-1/5 bg-blue-600 text-white p-6">
+            <div className="hidden md:block w-1/5 bg-blue-600 text-white p-6">
                 <h2 className="text-xl font-bold mb-6">Patient Panel</h2>
                 <p className="mb-4 cursor-pointer">Home</p>
                 <p className="mb-4 cursor-pointer font-bold">Appointments</p>
             </div>
 
             {/* RIGHT CONTENT */}
-            <div className="w-4/5 p-6">
+            <div className="w-full md:w-4/5 p-4 md:p-6 pb-20">
 
                 <h1 className="text-2xl font-bold mb-6">My Appointments</h1>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4 justify-items-center">
                     {appointments.map((item, i) => (
                         <div key={i}
                             onClick={() => {
@@ -70,7 +70,7 @@ const PatientDashboard = () => {
                                 setDuration(0)
                                 setCheckedOut(false)
                             }}
-                            className="border p-4 rounded cursor-pointer hover:bg-gray-100"
+                            className="border p-3 rounded-xl cursor-pointer hover:bg-gray-100 max-w-[260px] mx-auto"
                         >
                             <p><b>Doctor:</b> {item.doctorName}</p>
                             <p><b>Time:</b> {item.time}</p>
@@ -85,16 +85,15 @@ const PatientDashboard = () => {
             {selected && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40">
 
-                    <div className="bg-white w-[900px] rounded-lg flex overflow-hidden">
+<div className="bg-white w-[95%] md:w-[900px] rounded-lg flex flex-col md:flex-row overflow-hidden max-h-[90vh] overflow-y-auto md:overflow-hidden">
 
                         {/* LEFT SIDEBAR */}
-                        <div className="w-1/4 bg-gray-100 p-4 space-y-3">
-
+                        <div className="w-full md:w-1/4 bg-gray-100 p-3 md:p-4 flex flex-col gap-2">
                             <h2 className="font-bold text-lg">Appointment Panel</h2>
 
                             <button
                                 onClick={() => setStep(1)}
-                                className={`w-full p-2 rounded text-white ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}
+                                className={`w-full p-2 rounded text-white whitespace-nowrap ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}
                             >
                                 Patient Details
                             </button>
@@ -104,14 +103,14 @@ const PatientDashboard = () => {
                                     setStep(2)
                                     if (!checkInTime) setCheckInTime(Date.now())
                                 }}
-                                className={`w-full p-2 rounded text-white ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}
+                                className={`min-w-[120px] md:w-full px-4 py-2 rounded text-white whitespace-nowrap ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}
                             >
                                 Check-In
                             </button>
 
                             <button
                                 onClick={() => setStep(3)}
-                                className={`w-full p-2 rounded text-white ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}
+                                className={`min-w-[120px] md:w-full px-4 py-2 rounded text-white whitespace-nowrap ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}
                             >
                                 Pay
                             </button>
@@ -119,7 +118,7 @@ const PatientDashboard = () => {
                         </div>
 
                         {/* RIGHT CONTENT */}
-                        <div className="w-3/4 p-6 flex flex-col justify-between">
+                        <div className="w-full md:w-3/4 p-4 md:p-6 flex flex-col justify-between">
 
                             <button
                                 onClick={() => setSelected(null)}
@@ -145,7 +144,7 @@ const PatientDashboard = () => {
                                             Patient & Appointment Info
                                         </h3>
 
-                                        <div className="grid grid-cols-2 gap-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
 
                                             <div className="space-y-4">
                                                 <input value={selected.patientName} disabled className="w-full border p-3 rounded-xl" />
@@ -164,7 +163,7 @@ const PatientDashboard = () => {
                                     </div>
 
                                     {/* FIXED BUTTON */}
-                                    <div className="flex justify-end gap-4 mt-6">
+                                    <div className="flex flex-col md:flex-row justify-end gap-3 mt-6">
 
                                         <button
                                             onClick={() => navigate("/my-profile", { state: selected })}
@@ -269,6 +268,31 @@ const PatientDashboard = () => {
 
                 </div>
             )}
+
+            {/* MOBILE BOTTOM NAV */}
+<div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around items-center py-2 md:hidden z-50">
+
+<button onClick={() => navigate("/home")} className="flex flex-col items-center text-sm">
+    🏠
+    <span>Home</span>
+</button>
+
+<button onClick={() => navigate("/appointments")} className="flex flex-col items-center text-sm font-bold">
+    📅
+    <span>Appointments</span>
+</button>
+
+<button onClick={() => navigate("/my-profile")} className="flex flex-col items-center text-sm">
+    👤
+    <span>Profile</span>
+</button>
+
+<button className="flex flex-col items-center text-sm">
+    ⚙️
+    <span>Settings</span>
+</button>
+
+</div>
 
         </div>
     )

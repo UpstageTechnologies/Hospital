@@ -173,16 +173,33 @@ const Appointment = () => {
          <div className="bg-white w-[95%] md:w-[800px] max-h-[90vh] overflow-y-auto rounded-xl flex flex-col md:flex-row">
 
             {/* LEFT MENU */}
-            <div className="w-full md:w-1/3 bg-blue-600 flex md:flex-col flex-row justify-around">
-              <button
-                onClick={() => setStep(1)}
-                className={`p-2 rounded ${step === 1 ? "bg-white text-blue-600" : ""}`}
-              >
-                Login
-              </button>
-              <button onClick={() => setStep(2)} className={`p-2 rounded ${step === 2 ? "bg-white text-blue-600" : ""}`}>Reason</button>
-              <button onClick={() => setStep(3)} className={`p-2 rounded ${step === 3 ? "bg-white text-blue-600" : ""}`}>Details</button>
-            </div>
+            <div className="w-full md:w-1/3 bg-blue-600 text-white flex md:flex-col flex-row">
+
+<button
+    onClick={() => setStep(1)}
+    className={`flex-1 md:w-full text-center py-3 md:py-2 rounded-tl-xl md:rounded-none 
+    ${step === 1 ? "bg-white text-blue-600 font-semibold" : ""}`}
+>
+    Login
+</button>
+
+<button
+    onClick={() => setStep(2)}
+    className={`flex-1 md:w-full text-center py-3 md:py-2 
+    ${step === 2 ? "bg-white text-blue-600 font-semibold" : ""}`}
+>
+    Reason
+</button>
+
+<button
+    onClick={() => setStep(3)}
+    className={`flex-1 md:w-full text-center py-3 md:py-2 rounded-tr-xl md:rounded-none 
+    ${step === 3 ? "bg-white text-blue-600 font-semibold" : ""}`}
+>
+    Details
+</button>
+
+</div>
 
             {/* RIGHT */}
            <div className="w-full md:w-2/3 p-4 md:p-6">

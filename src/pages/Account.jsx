@@ -90,7 +90,7 @@ const Account = () => {
   const [accounts, setAccounts] = useState([])
   const [doctorAccounts, setDoctorAccounts] = useState([])
   const [adminsAccounts, setAdminsAccounts] = useState([])
-
+  const [showAccountPopup, setShowAccountPopup] = useState(false)
   const [adminStep, setAdminStep] = useState(1)
 
   const [adminBasicInfo, setAdminBasicInfo] = useState({
@@ -800,7 +800,7 @@ const Account = () => {
 
     <div className="flex flex-col md:flex-row min-h-screen w-full">
 
-      <div className="w-64 bg-blue-600 text-white p-4 md:p-6 min-h-screen">
+<div className="hidden md:block w-64 bg-blue-600 text-white p-4 md:p-6 min-h-screen">
 
         <ul className="space-y-4">
           <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu("home")} >
@@ -852,32 +852,32 @@ const Account = () => {
       </div>
 
 
-      <div className="flex-1 p-4 md:p-6 overflow-auto">
+      <div className="flex-1 p-4 md:p-6 pb-20 md:pb-6 overflow-auto">
 
         {subMenu === "admins" && (
 
-          <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[450px]">
+<div className="flex flex-col md:flex-row w-full max-w-7xl border rounded-lg overflow-hidden md:h-[450px] h-auto">
 
-            <div className="w-1/4 p-4 space-y-3">
-              <h2 className="text-xl font-bold">Create Admin Account</h2>
+<div className="w-full md:w-1/4 md:min-w-[200px] p-4 flex md:block overflow-x-auto md:overflow-visible gap-2 md:space-y-3">
+<h2 className="hidden md:block text-xl font-bold">Create Admin Account</h2>
 
               <button onClick={() => setAdminStep(1)}
-                className={`w-full p-2 rounded text-white ${adminStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
+                className={`min-w-[140px] md:w-full px-4 py-2 whitespace-nowrap rounded text-white ${adminStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Basic Info
               </button>
 
               <button onClick={() => setAdminStep(2)}
-                className={`w-full p-2 rounded text-white ${adminStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+                className={`min-w-[140px] md:w-full px-4 py-2 whitespace-nowrap rounded text-white ${adminStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Designation
               </button>
 
               <button onClick={() => setAdminStep(3)}
-                className={`w-full p-2 rounded text-white ${adminStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+                className={`min-w-[140px] md:w-full px-4 py-2 whitespace-nowrap rounded text-white ${adminStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Official Info
               </button>
 
               <button onClick={() => setAdminStep(4)}
-                className={`w-full p-2 rounded text-white ${adminStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
+                className={`min-w-[140px] md:w-full px-4 py-2 whitespace-nowrap rounded text-white ${adminStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Account
               </button>
 
@@ -885,7 +885,7 @@ const Account = () => {
 
 
 
-            <div className="w-3/4 p-6 relative overflow-hidden h-[450px]">
+            <div className="w-full md:w-3/4 p-4 md:p-6 relative overflow-visible md:overflow-hidden md:h-[450px] h-auto">
 
 
 
@@ -896,7 +896,7 @@ const Account = () => {
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
 
                     <FloatingInput label="Name" required value={adminBasicInfo.name} disabled={isViewMode}
@@ -939,14 +939,14 @@ const Account = () => {
                     />
 
 
-                    <FloatingInput label="Address" className="col-span-2" inputClassName="h-[120px] pt-6" value={adminBasicInfo.address || ""} disabled={isViewMode}
+                    <FloatingInput label="Address" className="col-span-1 md:col-span-2" inputClassName="h-[120px] pt-6" value={adminBasicInfo.address || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminBasicInfo({ ...adminBasicInfo, address: e.target.value })
                       }
                     />
 
 
-                    <div className="col-span-2 flex flex-col gap-4">
+<div className="col-span-1 md:col-span-2 flex flex-col gap-4">
 
                       <FloatingInput label="Contact Number" required value={adminBasicInfo.contact} disabled={isViewMode}
                         onChange={(e) =>
@@ -963,14 +963,14 @@ const Account = () => {
                     </div>
 
 
-                    <FloatingInput label="Email" className="col-span-2" value={adminBasicInfo.email} disabled={isViewMode}
+                    <FloatingInput label="Email" className="col-span-1 md:col-span-2" value={adminBasicInfo.email} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminBasicInfo({ ...adminBasicInfo, email: e.target.value })
                       }
                     />
 
 
-                    <FloatingInput label="Occupation" className="col-span-2" value={adminBasicInfo.occupation || ""} disabled={isViewMode}
+                    <FloatingInput label="Occupation" className="col-span-1 md:col-span-2" value={adminBasicInfo.occupation || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setAdminBasicInfo({ ...adminBasicInfo, occupation: e.target.value })
                       }
@@ -978,7 +978,7 @@ const Account = () => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="mt-6 md:absolute md:bottom-4 md:right-6 flex justify-end gap-4">
                     <button onClick={() => setAdminStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
@@ -1013,7 +1013,7 @@ const Account = () => {
                     />
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="mt-6 flex justify-center md:justify-end gap-4">
                     <button onClick={() => setAdminStep(1)} className="bg-gray-500 text-white px-6 py-2 rounded">Previous</button>
                     <button onClick={() => setAdminStep(3)} className="bg-blue-500 text-white px-6 py-2 rounded">Next</button>
                   </div>
@@ -1058,7 +1058,7 @@ const Account = () => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="mt-6 md:absolute md:bottom-4 md:right-6 flex justify-center md:justify-end gap-4">
                     <button onClick={() => setAdminStep(2)} className="bg-gray-500 text-white px-6 py-2 rounded">Previous</button>
                     <button onClick={() => setAdminStep(4)} className="bg-blue-500 text-white px-6 py-2 rounded">Next</button>
                   </div>
@@ -1103,7 +1103,7 @@ const Account = () => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="mt-6 flex justify-center md:justify-end gap-4">
 
                     <button
                       onClick={() => setAdminStep(3)}
@@ -2487,7 +2487,7 @@ const Account = () => {
 
         {menu === "home" && (
           <div>
-            <p className="text-2xl font-bold">Welcome Master Admin</p>
+            <p className="text-2xl font-bold">Welcome Admin Dashboard</p>
           </div>
         )}
 
@@ -2554,11 +2554,98 @@ const Account = () => {
           </div>
         )}
 
+ </div>
 
+ {showAccountPopup && (
+  <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white rounded-xl p-4 w-[200px] z-50 shadow-lg md:hidden">
 
-      </div>
+    <p className="font-bold mb-2">Account Creation</p>
+
+    <button 
+      onClick={() => {
+        setMenu("account")
+        setSubMenu("admins")
+        setShowAccountPopup(false)
+      }}
+      className="block w-full text-left py-2"
+    >
+      Admins
+    </button>
+
+    <button 
+      onClick={() => {
+        setMenu("account")
+        setSubMenu("doctors")
+        setShowAccountPopup(false)
+      }}
+      className="block w-full text-left py-2"
+    >
+      Doctors
+    </button>
+
+    <button 
+      onClick={() => {
+        setMenu("account")
+        setSubMenu("staff")
+        setShowAccountPopup(false)
+      }}
+      className="block w-full text-left py-2"
+    >
+      Other Staffs
+    </button>
+
+    <button 
+      onClick={() => {
+        setMenu("account")
+        setSubMenu("patients")
+        setShowAccountPopup(false)
+      }}
+      className="block w-full text-left py-2"
+    >
+      Patients
+    </button>
+
+  </div>
+)}
+
+      {/* MOBILE + TAB BOTTOM NAV */}
+<div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around items-center py-2 md:hidden z-50">
+
+<button onClick={() => setMenu("home")} className="flex flex-col items-center text-xs">
+  🏠
+  <span>Home</span>
+</button>
+
+<button onClick={() => setMenu("subscription")} className="flex flex-col items-center text-xs">
+  💳
+  <span>Subscription</span>
+</button>
+
+<button 
+  onClick={() => {
+    setShowAccountPopup(!showAccountPopup)
+  }}
+  className="flex flex-col items-center text-xs"
+>
+  👥
+  <span>Account</span>
+</button>
+
+<button onClick={() => setMenu("doctors")} className="flex flex-col items-center text-xs">
+  🩺
+  <span>Doctors</span>
+</button>
+
+<button onClick={() => setMenu("settings")} className="flex flex-col items-center text-xs">
+  ⚙️
+  <span>Settings</span>
+</button>
+
+</div>
 
     </div >
+
+    
 
   )
 

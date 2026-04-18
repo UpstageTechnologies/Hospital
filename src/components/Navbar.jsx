@@ -298,11 +298,29 @@ const Navbar = () => {
                                 </button>
 
                                 <button onClick={() => {
-                                    auth.signOut()
-                                    localStorage.removeItem("masterLogin")
-                                    setShowLogoutPopup(false)
-                                    navigate("/home")
-                                }}
+    auth.signOut()
+    localStorage.removeItem("masterLogin")
+    setShowLogoutPopup(false)
+
+    // 👇 இது தான் correct logic
+    const path = location.pathname
+
+    if (path.includes("account")) {
+        navigate("/account")
+    }
+    else if (path.includes("doctor")) {
+        navigate("/doctor-dashboard")
+    }
+    else if (path.includes("patient")) {
+        navigate("/patient-dashboard")
+    }
+    else if (path.includes("staff")) {
+        navigate("/staff-dashboard")
+    }
+    else {
+        navigate("/home")
+    }
+}}
                                     className="px-4 py-2 bg-red-500 text-white rounded"
                                 >
                                     Logout
