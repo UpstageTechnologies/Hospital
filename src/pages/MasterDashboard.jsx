@@ -1,9 +1,7 @@
-import Account from "./Account"
+import MasterAppointmentsDashboard from "./MasterAppointmentsDashboard"
 
 const MasterDashboard = () => {
-  return <Account />
+  return <MasterAppointmentsDashboard />
 }
 
 export default MasterDashboard
-
-

@@ -293,6 +293,7 @@ const DoctorProfile = () => {
     const [doctorImage, setDoctorImage] = useState("")
     const [appointments, setAppointments] = useState([])
     const [page, setPage] = useState("home")
+    const [callData, setCallData] = useState(null)
     const [selected, setSelected] = useState(null)
     const [selectedDate, setSelectedDate] = useState(null)
     const [selectedAppointment, setSelectedAppointment] = useState(null)
@@ -308,22 +309,38 @@ const DoctorProfile = () => {
 
 
 
-    const updateStatus = (appointmentNo, newStatus) => {
+    const updateStatus = async (appointmentNo, newStatus) => {
 
-        const updated = appointments.map(item => {
-
-            if (item.appointmentNo === appointmentNo) {
-                return {
-                    ...item,
-                    status: newStatus   // 🔥 force update
+        try {
+            const snap = await getDocs(collection(db, "appointments"))
+    
+            let updatedList = []
+    
+            for (let docItem of snap.docs) {
+    
+                const data = docItem.data()
+    
+                if (data.appointmentNo === appointmentNo) {
+    
+                    // 🔥 FIRESTORE UPDATE
+                    await updateDoc(doc(db, "appointments", docItem.id), {
+                        status: newStatus
+                    })
+    
+                    updatedList.push({ ...data, status: newStatus })
+                } else {
+                    updatedList.push(data)
                 }
             }
-
-            return item
-        })
-
-        setAppointments(updated)
-        setSelected(null)
+    
+            // 🔥 UI update
+            setAppointments(updatedList)
+    
+            alert(`Status updated to ${newStatus} ✅`)
+    
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     useEffect(() => {
@@ -462,6 +479,10 @@ const DoctorProfile = () => {
                 <p onClick={() => setPage("settings")} className="mb-3 md:mb-3 cursor-pointer shrink-0">
                     Settings
                 </p>
+
+                <p onClick={() => setPage("call")} className="mb-3 cursor-pointer">
+    Call / Confirm
+</p>
             </div>
 
             {/* ================= APPOINTMENTS PAGE ================= */}
@@ -563,6 +584,70 @@ const DoctorProfile = () => {
                 </div>
             )}
 
+{page === "call" && callData && (
+  <div className="p-6 w-full">
+
+    <h1 className="text-2xl font-bold mb-6">
+      📞 Patient Confirmation Panel
+    </h1>
+
+    <div className="bg-white shadow-xl rounded-2xl p-6 max-w-[700px]">
+
+      {/* IMAGE */}
+      <div className="flex justify-center mb-4">
+        <img
+          src={callData.patientImage || assets.profile_pic}
+          className="w-24 h-24 rounded-full"
+        />
+      </div>
+
+      {/* CALL BUTTON */}
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={() => window.open(`tel:${callData.phone}`)}
+          className="bg-green-500 text-white px-6 py-3 rounded-xl"
+        >
+          📞 Call Patient
+        </button>
+      </div>
+
+      {/* DETAILS */}
+      <div className="grid grid-cols-2 gap-4">
+
+        <input value={callData.patientName} disabled className="w-full border p-3 rounded-xl"/>
+        <input value={callData.phone || ""} disabled className="w-full border p-3 rounded-xl"/>
+
+        <input value={callData.address || ""} disabled className="w-full border p-3 rounded-xl"/>
+        <input value={callData.doctorName} disabled className="w-full border p-3 rounded-xl"/>
+
+        <input value={callData.date} disabled className="w-full border p-3 rounded-xl"/>
+        <input value={callData.time} disabled className="w-full border p-3 rounded-xl"/>
+
+      </div>
+
+      {/* CONFIRM BUTTONS */}
+      <div className="flex justify-center gap-4 mt-6">
+
+        <button
+          onClick={() => updateStatus(callData.appointmentNo, "arrived")}
+          className="bg-blue-500 text-white px-5 py-2 rounded"
+        >
+          ✅ Arrived
+        </button>
+
+        <button
+          onClick={() => updateStatus(callData.appointmentNo, "completed")}
+          className="bg-green-600 text-white px-5 py-2 rounded"
+        >
+          🩺 Completed
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
 
             {/* ================= HOME PAGE ================= */}
             {page === "home" && (
@@ -580,6 +665,7 @@ const DoctorProfile = () => {
                                 key={index}
                                 onClick={() => {
                                     setSelectedAppointment(item)
+                                    setCallData(item)   // ✅ முக்கியம்
                                     setStep(1)
                                 }}
                                 className="bg-white shadow-md rounded-xl p-5 flex items-center gap-4 cursor-pointer hover:shadow-lg transition w-full"

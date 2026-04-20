@@ -63,7 +63,7 @@ const MasterLogin = () => {
 
         localStorage.setItem("masterLogin", "true");
 
-        navigate("/account");
+        navigate("/master-dashboard");
       }
 
     } catch (error) {
@@ -72,27 +72,27 @@ const MasterLogin = () => {
   };
 
   const handleGoogleLogin = async () => {
-    try {
+  try {
 
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
 
-      await setDoc(doc(db, "master", user.uid), {
-        name: user.displayName,
-        email: user.email,
-        role: "master",
-        hospital: hospital || "Default"
-      }, { merge: true });
+    await setDoc(doc(db, "master", user.uid), {
+      name: user.displayName,
+      email: user.email,
+      role: "master",
+      hospital: hospital || "Default"
+    }, { merge: true });
 
-      localStorage.setItem("masterLogin", "true");
+    localStorage.setItem("masterLogin", "true");
 
-      navigate("/home");
-
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+    // ✅ FIX HERE
+    navigate("/master-dashboard");
+  } catch (error) {
+    alert(error.message);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 

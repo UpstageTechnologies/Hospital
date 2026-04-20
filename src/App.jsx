@@ -8,7 +8,7 @@ import DemoAbout from "./pages/DemoAbout";
 import DemoDoctorDetails from "./pages/DemoDoctorDetails";
 import Dashboard from "./pages/Dashboard";
 import DashboardNavbar from "./components/DashboardNavbar";
-import MasterDashboard from "./pages/MasterDashboard";
+import RealMasterDashboard from "./pages/RealMasterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import DemoPatientdashboard from "./pages/DemoPatientdashboard";
 import DemoDoctordashboard from "./pages/DemoDoctordashboard";
@@ -61,10 +61,10 @@ const App = () => {
         location.pathname.startsWith("/upstage")
           ? <UpstageNavbar />
           : (
-            location.pathname === "/master-dashboard" ||
-            location.pathname === "/admin-dashboard" ||
-            location.pathname === "/demo-patient-dashboard" ||
-            location.pathname === "/demo-doctor-dashboard"
+            location.pathname === "/master-appointments" ||
+location.pathname === "/admin-dashboard" ||
+location.pathname === "/demo-patient-dashboard" ||
+location.pathname === "/demo-doctor-dashboard"
           )
             ? <DashboardNavbar />   // 🔥 FIRST PRIORITY
             : location.pathname.startsWith("/demo")
@@ -80,7 +80,8 @@ const App = () => {
         <Route path="/demoabout" element={<DemoAbout />} />
         <Route path="/demodoctor/:id" element={<DemoDoctorDetails />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/master-dashboard" element={<MasterDashboard />} />
+        <Route path="/master-dashboard" element={<RealMasterDashboard />} />
+
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/demo-patient-dashboard" element={<DemoPatientdashboard />} />
         <Route path="/demo-doctor-dashboard" element={<DemoDoctordashboard />} />

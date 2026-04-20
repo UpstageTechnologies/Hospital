@@ -18,7 +18,7 @@ const Account = () => {
   const [subMenu, setSubMenu] = useState("")
   const location = useLocation();
   const hospital = location.state?.hospital || "";
-
+  const [selectedPatient, setSelectedPatient] = useState(null)
   const [doctorStep, setDoctorStep] = useState(1)
   const [doctorBasicInfo, setDoctorBasicInfo] = useState({
     name: "",
@@ -122,6 +122,7 @@ const Account = () => {
     confirmPassword: ""
   })
   const [patientAccounts, setPatientAccounts] = useState([])
+  const [callData, setCallData] = useState(null)
   const navigate = useNavigate();
   const [viewData, setViewData] = useState(null)
   const [editData, setEditData] = useState(null)
@@ -174,6 +175,32 @@ const Account = () => {
     duration: "",
     treatedBefore: ""
   })
+
+
+  const handlePrint = () => {
+    const printContent = document.getElementById("print-section")?.innerHTML;
+  
+    const win = window.open("", "", "width=900,height=700");
+  
+    win.document.write(`
+      <html>
+        <head>
+          <title>Patient Report</title>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            h2 { text-align: center; }
+            .box { margin-bottom: 10px; font-size: 16px; }
+          </style>
+        </head>
+        <body>
+          ${printContent}
+        </body>
+      </html>
+    `);
+  
+    win.document.close();
+    win.print();
+  };
 
 
 
@@ -798,7 +825,106 @@ const Account = () => {
 
   return (
 
+    
+
     <div className="flex flex-col md:flex-row min-h-screen w-full">
+
+{callData && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+    <div className="bg-white rounded-xl p-6 w-[600px]">
+
+      {/* ✅ PRINT AREA */}
+      <div id="print-section">
+
+<h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+  Patient Medical Report
+</h2>
+
+{/* Doctor Section */}
+<div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
+  <img
+    src={callData?.doctorImage || "/Doctors/doc1.png"}
+    style={{ width: "80px", height: "80px", borderRadius: "50%", marginRight: "20px" }}
+  />
+  <div>
+    <p><b>Doctor Name:</b> {callData?.doctorName || "Dr. Default"}</p>
+  </div>
+</div>
+
+{/* Patient Info */}
+<p><b>Patient Name:</b> {callData?.basicInfo?.name}</p>
+<p><b>Age:</b> {callData?.basicInfo?.age}</p>
+<p><b>Mobile:</b> {callData?.basicInfo?.contact}</p>
+<p><b>Address:</b> {callData?.basicInfo?.address}</p>
+<p><b>City:</b> {callData?.city || "N/A"}</p>
+
+{/* Appointment Info */}
+<hr style={{ margin: "15px 0" }} />
+
+<p><b>Appointment No:</b> {callData?.appointmentId || "APT001"}</p>
+<p><b>Date:</b> {callData?.date || "N/A"}</p>
+<p><b>Time:</b> {callData?.time || "N/A"}</p>
+
+{/* Medical Info */}
+<hr style={{ margin: "15px 0" }} />
+
+<p><b>Reason:</b> {callData?.reasonInfo?.visitReason}</p>
+
+{/* Fees */}
+<p><b>Fees:</b> ₹ {callData?.fees || 500}</p>
+
+{/* Tablet Details Table */}
+<h3 style={{ marginTop: "20px" }}>Tablet Details</h3>
+
+<table border="1" cellPadding="10" style={{ width: "100%", marginTop: "10px" }}>
+  <thead>
+    <tr>
+      <th>Tablet</th>
+      <th>Morning</th>
+      <th>Afternoon</th>
+      <th>Night</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Paracetamol</td>
+      <td>✔</td>
+      <td>✖</td>
+      <td>✔</td>
+    </tr>
+    <tr>
+      <td>Vitamin C</td>
+      <td>✔</td>
+      <td>✔</td>
+      <td>✖</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+      {/* ✅ PRINT BUTTON */}
+      <div className="mt-4 text-center">
+        <button
+          onClick={handlePrint}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Print
+        </button>
+      </div>
+
+      {/* ❌ CLOSE */}
+      <button
+        onClick={() => setCallData(null)}
+        className="absolute top-2 right-2"
+      >
+        X
+      </button>
+
+    </div>
+  </div>
+)}
 
 <div className="hidden md:block w-64 bg-blue-600 text-white p-4 md:p-6 min-h-screen">
 
@@ -846,6 +972,13 @@ const Account = () => {
           >
             Settings
           </li>
+
+          <li
+  className="cursor-pointer hover:text-gray-200"
+  onClick={() => setMenu("appointments")}
+>
+  Appointments
+</li>
 
         </ul>
 
@@ -1164,6 +1297,7 @@ const Account = () => {
                     </td>
 
                     <td className="border p-2 flex gap-2">
+
 
                       <button onClick={() => {
 
@@ -2403,6 +2537,13 @@ const Account = () => {
 
                     <td className="border p-2 flex gap-2">
 
+                    <button
+  onClick={() => setCallData(p)}
+  className="bg-purple-500 text-white px-2 py-1 rounded"
+>
+  Print
+</button>
+
                       <button
                         onClick={() => {
 
@@ -2554,6 +2695,109 @@ const Account = () => {
           </div>
         )}
 
+{menu === "appointments" && (
+  <div>
+    <h1 className="text-2xl font-bold mb-6">All Appointments</h1>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {patientAccounts.map((p, index) => (
+ <div key={index} onClick={() => setCallData(p)}
+ className="cursor-pointer bg-white p-4 rounded-xl shadow"
+>
+          <p><b>Patient:</b> {p.basicInfo?.name}</p>
+          <p><b>Email:</b> {p.basicInfo?.email}</p>
+          <p><b>Reason:</b> {p.reasonInfo?.visitReason}</p>
+          <p><b>Condition:</b> {p.reasonInfo?.condition}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{callData && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    
+    <div className="bg-white rounded-2xl p-8 w-[700px] relative">
+
+      <button 
+        onClick={() => setCallData(null)}
+        className="absolute top-4 right-4 text-xl"
+      >
+        ✖
+      </button>
+
+      <div className="flex flex-col items-center">
+        <img 
+          src="/Doctors/doc1.png" 
+          className="w-24 h-24 rounded-full mb-4"
+        />
+
+        <h2 className="text-xl font-bold mb-4">
+          Patient Confirmation Panel
+        </h2>
+
+        <a
+          href={`tel:${callData.basicInfo?.contact}`}
+          className="bg-green-500 text-white px-6 py-3 rounded-xl mb-6"
+        >
+          📞 Call Patient
+        </a>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+
+        <input value={callData.basicInfo?.name} disabled className="input-style"/>
+        <input value={callData.basicInfo?.contact} disabled className="input-style"/>
+
+        <input value={callData.basicInfo?.address} disabled className="input-style"/>
+        <input value="Doctor Name" disabled className="input-style"/>
+
+        <input value="Date" disabled className="input-style"/>
+        <input value="Time" disabled className="input-style"/>
+
+      </div>
+
+      <p className={`text-center mt-4 font-semibold ${
+        callData.status === "completed"
+          ? "text-green-600"
+          : callData.status === "arrived"
+          ? "text-blue-500"
+          : "text-red-500"
+      }`}>
+        Status: {callData.status || "pending"}
+      </p>
+
+      <div className="flex justify-center mt-4">
+  <button
+    onClick={handlePrint}
+    className="bg-purple-600 text-white px-6 py-2 rounded-lg"
+  >
+    🖨 Print Report
+  </button>
+</div>
+
+      <div className="flex justify-center gap-4 mt-6">
+
+        <button
+          onClick={() => setCallData({ ...callData, status: "arrived" })}
+          className="bg-blue-500 text-white px-6 py-2 rounded"
+        >
+          ✅ Arrived
+        </button>
+
+        <button
+          onClick={() => setCallData({ ...callData, status: "completed" })}
+          className="bg-green-600 text-white px-6 py-2 rounded"
+        >
+          🩺 Completed
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
  </div>
 
  {showAccountPopup && (
@@ -2643,8 +2887,38 @@ const Account = () => {
 
 </div>
 
+{selectedPatient && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+    <div className="bg-white p-6 rounded-xl w-[90%] max-w-[500px] relative">
+
+      {/* CLOSE */}
+      <button
+        onClick={() => setSelectedPatient(null)}
+        className="absolute top-2 right-3"
+      >
+        ✖
+      </button>
+
+      <h2 className="text-xl font-bold mb-4">Patient Details</h2>
+
+      <p><b>Name:</b> {selectedPatient.basicInfo?.name}</p>
+      <p><b>Email:</b> {selectedPatient.basicInfo?.email}</p>
+      <p><b>Age:</b> {selectedPatient.basicInfo?.age}</p>
+      <p><b>Gender:</b> {selectedPatient.basicInfo?.gender}</p>
+
+      <hr className="my-2" />
+
+      <p><b>Reason:</b> {selectedPatient.reasonInfo?.visitReason}</p>
+      <p><b>Condition:</b> {selectedPatient.reasonInfo?.condition}</p>
+
+    </div>
+  </div>
+)}
+
     </div >
 
+    
     
 
   )
