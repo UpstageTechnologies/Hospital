@@ -258,7 +258,7 @@ ${type === "doctor"
 
                                 <button
                                     onClick={async () => {
-                                        await setDoc(doc(db, "appointments", selectedSlotDate), {
+                                        await setDoc(doc(db, "users", "demoAdmin", "calendar", selectedSlotDate), {
                                             slots: slots
                                                 .filter(s => !s.leave) // 🔥 REMOVE leave slots permanently
                                                 .map((s, i) => ({

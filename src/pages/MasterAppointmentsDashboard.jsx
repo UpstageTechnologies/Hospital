@@ -7,6 +7,7 @@ const MasterAppointmentsDashboard = () => {
 
     const [appointments, setAppointments] = useState([])
     const [selected, setSelected] = useState(null)
+    const [activePage, setActivePage] = useState("appointments")
 
     const [step, setStep] = useState(1)
     const [checkInTime, setCheckInTime] = useState(null)
@@ -46,37 +47,77 @@ const MasterAppointmentsDashboard = () => {
         <div className="flex flex-col md:flex-row min-h-screen">
 
             {/* ✅ SIDEBAR (ONLY 3 OPTIONS) */}
-            <div className="hidden md:block w-1/5 bg-blue-600 text-white p-6">
+            <div className="hidden lg:block w-1/5 bg-blue-600 text-white p-6">
                 <h2 className="text-xl font-bold mb-6">Master Panel</h2>
-                <p className="mb-4 cursor-pointer">Home</p>
-                <p className="mb-4 cursor-pointer">Subscription</p>
-                <p className="mb-4 cursor-pointer font-bold">Appointments</p>
+                <p 
+  onClick={() => setActivePage("home")}
+  className="mb-4 cursor-pointer"
+>
+  Home
+</p>
+
+<p 
+  onClick={() => setActivePage("subscription")}
+  className="mb-4 cursor-pointer"
+>
+  Subscription
+</p>
+
+<p 
+  onClick={() => setActivePage("appointments")}
+  className="mb-4 cursor-pointer font-bold"
+>
+  Appointments
+</p>
             </div>
 
             {/* ✅ RIGHT CONTENT */}
             <div className="w-full md:w-4/5 p-4 md:p-6 pb-20">
 
-                <h1 className="text-2xl font-bold mb-6">All Appointments</h1>
+            <h1 className="text-2xl font-bold mb-6">
+  {activePage === "home" && "Home"}
+  {activePage === "subscription" && "Subscription"}
+  {activePage === "appointments" && "All Appointments"}
+</h1>
 
-                <div className="grid grid-cols-2 gap-3 md:gap-4 justify-items-center">
-                    {appointments.map((item, i) => (
-                        <div key={i}
-                            onClick={() => {
-                                setSelected(item)
-                                setStep(1)
-                                setCheckInTime(null)
-                                setDuration(0)
-                                setCheckedOut(false)
-                            }}
-                            className="border p-3 rounded-xl cursor-pointer hover:bg-gray-100 max-w-[260px]"
-                        >
-                            <p><b>Patient:</b> {item.patientName}</p>
-                            <p><b>Doctor:</b> {item.doctorName}</p>
-                            <p><b>Date:</b> {item.date}</p>
-                            <p><b>Time:</b> {item.time}</p>
-                        </div>
-                    ))}
-                </div>
+{/* 🔥 STEP-5 — இதை இங்க add பண்ணு */}
+
+{activePage === "home" && (
+  <div className="text-xl font-semibold mb-4">
+    Welcome Home
+  </div>
+)}
+
+{activePage === "subscription" && (
+  <div className="text-xl font-semibold mb-4">
+    Subscription Page
+  </div>
+)}
+
+
+
+{activePage === "appointments" && (
+  <div className="grid grid-cols-2 gap-3 md:gap-4 justify-items-center">
+    {appointments
+      .filter(
+        (item) =>
+          item.patientName &&
+          item.doctorName &&
+          item.date &&
+          item.time
+      )
+      .map((item, i) => (
+        <div key={i}
+          className="border p-3 rounded-xl max-w-[260px]"
+        >
+          <p><b>Patient:</b> {item.patientName}</p>
+          <p><b>Doctor:</b> {item.doctorName}</p>
+          <p><b>Date:</b> {item.date}</p>
+          <p><b>Time:</b> {item.time}</p>
+        </div>
+      ))}
+  </div>
+)}
 
             </div>
 
@@ -176,6 +217,35 @@ const MasterAppointmentsDashboard = () => {
 
                 </div>
             )}
+
+            {/* ✅ MOBILE BOTTOM NAV */}
+<div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 lg:hidden z-50">
+
+<button 
+    onClick={() => navigate("/master-dashboard")}
+    className="flex flex-col items-center text-sm"
+>
+    🏠
+    <span>Home</span>
+</button>
+
+<button 
+    onClick={() => navigate("/master-dashboard")}
+    className="flex flex-col items-center text-sm"
+>
+    💳
+    <span>Subscription</span>
+</button>
+
+<button 
+    onClick={() => navigate("/master-dashboard")}
+    className="flex flex-col items-center text-sm"
+>
+    📅
+    <span>Appointments</span>
+</button>
+
+</div>
 
         </div>
     )

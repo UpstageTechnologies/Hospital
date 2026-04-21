@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import UpstageNavbar from "../components/UpstageNavbar";
 
 
 const UpstageDoctors = () => {
@@ -46,7 +47,9 @@ const UpstageDoctors = () => {
     });
 
     return (
-        <div className='px-6 sm:px-10'>
+        <>
+    
+            <div className='px-6 sm:px-10'>
 
 
 
@@ -91,10 +94,42 @@ const UpstageDoctors = () => {
                                     onClick={() => navigate(`/appointment/${item.email}`)}
                                     className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
-                                    <img src={item.image} className='bg-blue-50' />
+<img
+  src={localStorage.getItem(`doctorImage_${doc.id}`) || "/user.png"}
+  onClick={(e) => {
+    e.stopPropagation();
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          const image = reader.result;
+
+          e.target.src = image;
+
+          // ✅ save permanently
+          localStorage.setItem(`doctorImage_${doc.id}`, image);
+        };
+
+        reader.readAsDataURL(file);
+      }
+    };
+
+    input.click();
+  }}
+  className='bg-blue-50 w-full h-60 object-contain cursor-pointer'
+/>
 
                                     <div className='p-4'>
-                                        <p className='text-green-500 text-sm'>● Available</p>
+                                    <p className={`text-sm ${index < 4 ? "text-green-500" : "text-red-500"}`}>
+  ● {index < 4 ? "Available" : "Not Available"}
+</p>
                                         <p className='font-medium'>{item.name}</p>
                                         <p className='text-sm text-gray-600'>{item.speciality}</p>
                                     </div>
@@ -124,10 +159,35 @@ const UpstageDoctors = () => {
                                             onClick={() => navigate(`/appointment/${item.email}`)}
                                             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
-                                            <img src={item.image} className='bg-blue-50' />
+<img
+  src="/user.png"
+  onClick={(e) => {
+    e.stopPropagation();
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          e.target.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    input.click();
+  }}
+  className='bg-blue-50 w-full h-60 object-contain cursor-pointer'
+/>
 
                                             <div className='p-4'>
-                                                <p className='text-green-500 text-sm'>● Available</p>
+                                            <p className={`text-sm ${index < 4 ? "text-green-500" : "text-red-500"}`}>
+  ● {index < 4 ? "Available" : "Not Available"}
+</p>
                                                 <p className='font-medium'>{item.name}</p>
                                                 <p className='text-sm text-gray-600'>{item.speciality}</p>
                                             </div>
@@ -148,6 +208,7 @@ const UpstageDoctors = () => {
             </div>
 
         </div>
+        </>
     );
 };
 

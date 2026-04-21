@@ -129,7 +129,7 @@ const Appointment = () => {
     const fetchSlots = async () => {
       const today = new Date().toISOString().split("T")[0]
 
-      const snap = await getDoc(doc(db, "appointments", today))
+      const snap = await getDoc(doc(db, "users", "demoAdmin", "calendar", today))
 
       if (snap.exists()) {
         const data = snap.data()

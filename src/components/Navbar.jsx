@@ -147,13 +147,15 @@ const Navbar = () => {
 
     return (
         <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 relative z-50 w-full px-4'>
-            <img className='w-16 h-16 object-contain cursor-pointer ml-2' src={hospitalLogo} alt="logo" />
+<img onClick={() => navigate("/home")} className='w-16 h-16 object-contain cursor-pointer ml-2'
+  src={hospitalLogo}
+  alt="logo"
+/>
             {!(
                 location.pathname.startsWith("/doctor-profile") ||
                 location.pathname.startsWith("/patient-dashboard")
             ) && (
-                    <ul className="hidden md:flex items-center gap-6 font-medium">
-
+                <ul className="hidden items-center gap-6 font-medium">
                         {isMaster && location.pathname === "/account" ? (
 
                             <NavLink to="/account">
@@ -268,19 +270,8 @@ const Navbar = () => {
                         </div>
                 }
 
-                <img onClick={() => setShowMenu(true)} className='w-6 md:hidden' src={assets.menu_icon} alt="" />
-                <div className={` ${showMenu ? 'fixed w-full' : 'h-0 w-0'} md:hidden right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>
-                    <div className='flex items-center justify-between px-5 py-6'>
-                        <img className='w-36' src={assets.logo} alt="" />
-                        <img className='w-7' onClick={() => setShowMenu(false)} src={assets.cross_icon} alt="" />
-                    </div>
-                    <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium'>
-                        <NavLink onClick={() => setShowMenu(false)} to='/'><p className='px-4 py-2 rounded  inline-block'>Home</p></NavLink>
-                        <NavLink onClick={() => setShowMenu(false)} to='/doctor'><p className='px-4 py-2 rounded  inline-block'>All Doctors</p></NavLink>
-                        <NavLink onClick={() => setShowMenu(false)} to='/about'><p className='px-4 py-2 rounded  inline-block'>About</p></NavLink>
-                        <NavLink onClick={() => setShowMenu(false)} to='/contact'><p className='px-4 py-2 rounded  inline-block'>Contact</p></NavLink>
-                    </ul>
-                </div>
+               
+
                 {showLogoutPopup && (
 
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">

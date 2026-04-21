@@ -1,10 +1,12 @@
-import React from "react";
+
 import { NavLink, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 
 
 const UpstageNavbar = () => {
 
     const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
    
 
     return (
@@ -14,7 +16,15 @@ const UpstageNavbar = () => {
             <img
                 src="/logos/upstage.png"
                 className="w-28 cursor-pointer"
+                onClick={() => navigate("/upstage")}
             />
+
+            {/* MOBILE MENU BUTTON */}
+<div className="lg:hidden ml-auto">
+  <button onClick={() => setMenuOpen(!menuOpen)}>
+    ☰
+  </button>
+</div>
 
             {/* MENU CENTER */}
             <ul className="hidden lg:flex flex-1 justify-center items-center gap-10 text-gray-700 font-medium">
@@ -36,6 +46,29 @@ const UpstageNavbar = () => {
                 </NavLink>
 
             </ul>
+
+            {/* MOBILE MENU */}
+{menuOpen && (
+  <div className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center gap-4 py-4 lg:hidden z-50">
+
+    <NavLink to="/upstage" onClick={() => setMenuOpen(false)}>
+      Home
+    </NavLink>
+
+    <NavLink to="/upstage-doctors" onClick={() => setMenuOpen(false)}>
+      All Doctors
+    </NavLink>
+
+    <NavLink to="/upstage-about" onClick={() => setMenuOpen(false)}>
+      About
+    </NavLink>
+
+    <NavLink to="/upstage-contact" onClick={() => setMenuOpen(false)}>
+      Contact
+    </NavLink>
+
+  </div>
+)}
 
            
 

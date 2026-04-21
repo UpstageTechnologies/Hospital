@@ -44,7 +44,9 @@ const Upstage = () => {
 
 
             <div className="flex justify-between items-center px-8 py-4 shadow">
-                <img src="/logos/upstage.png" alt="logo" className="w-28" />
+            <img  src="/logos/upstage.png"  alt="logo"  className="w-28 cursor-pointer"
+  onClick={() => navigate("/upstage")}
+/>
 
               <ul className="hidden lg:flex gap-8 font-medium">
                     <span onClick={() => navigate("/upstage")} className="cursor-pointer">Home</span>
@@ -179,11 +181,36 @@ const Upstage = () => {
                             className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer"
                         >
 
-                            <img src={doc.image} className="w-full h-60 object-contain bg-[#e6edf5] p-4" />
+<img
+  src="/user.png"
+  onClick={(e) => {
+    e.stopPropagation();
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          e.target.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    input.click();
+  }}
+  className='bg-blue-50 w-full h-60 object-contain cursor-pointer'
+/>
 
                             <div className="p-4">
 
-                                <p className="text-green-600 text-sm">● Available</p>
+                            <p className={`text-sm ${index < 4 ? "text-green-600" : "text-red-500"}`}>
+  ● {index < 4 ? "Available" : "Not Available"}
+</p>
 
                                 <h2 className="font-semibold text-lg">
                                     {doc.name}
@@ -193,9 +220,7 @@ const Upstage = () => {
                                     {doc.speciality}
                                 </p>
 
-                                <a href={doc.map} target="_blank" rel="noreferrer" className="text-blue-500 text-xs underline">
-                                    📍 {doc.hospital}
-                                </a>
+
 
                             </div>
 
