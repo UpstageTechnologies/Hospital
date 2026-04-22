@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar"
+import DemoNavbar from "../components/DemoNavbar"
 import { useState, useEffect, useContext } from "react"
 import { useParams } from "react-router-dom"
 import { AppContext } from "../context/AppContext"
@@ -22,7 +22,7 @@ const DemoDoctorDetails = () => {
 
   return (
     <div>
-      <Navbar />
+      <DemoNavbar />
 
       <div className="p-6">
 

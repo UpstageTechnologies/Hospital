@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+
 import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import {
   createUserWithEmailAndPassword,
@@ -22,6 +23,14 @@ const MasterLogin = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const isDemo = location.state?.demo === true;
+
+  useEffect(() => {
+    if (isDemo) {
+      setEmail("sundar@gmail.com");
+      setPassword("sundar11");
+    }
+  }, [isDemo]);
 
   const fromRole = location.state?.fromRole === true;
   const isRegister = location.state?.isRegister === true;

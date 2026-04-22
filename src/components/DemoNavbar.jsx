@@ -1,23 +1,26 @@
-import { useNavigate } from "react-router-dom"
-import { NavLink } from "react-router-dom"
+import { useNavigate, NavLink } from "react-router-dom"
+import { useState } from "react"
 
 const DemoNavbar = () => {
 
   const nav = useNavigate()
+  const [open, setOpen] = useState(false)
 
   return (
 
 
-    <div className="flex items-center py-4 px-6 border-b border-gray-300 bg-white">
+<div className="flex items-center justify-between py-4 px-8 border-b border-gray-300 bg-white">
 
-      LOGO
-      <img
-        src="/logos/upstage.png"
-        className="w-28 cursor-pointer"
-      />
+     
+      <p 
+  onClick={() => nav("/demohome")}
+  className="text-xl font-semibold cursor-pointer"
+>
+ Demo
+</p>
 
       {/* MENU CENTER */}
-      <ul className="flex-1 flex justify-center items-center gap-10 text-gray-700 font-medium">
+      <ul className="hidden md:flex flex-1 justify-center items-center gap-10 md:gap-12 text-gray-700 font-medium">
 
         <NavLink to="/demohome">
           <li>Home</li>
@@ -32,10 +35,30 @@ const DemoNavbar = () => {
         </NavLink>
 
         <NavLink to="/democontact">
-          <li>Contact</li>
-        </NavLink>
+   <li>Contact</li>
+</NavLink>
 
       </ul>
+
+      <div className="md:hidden ml-auto">
+  <button onClick={() => setOpen(!open)} className="text-2xl">
+    ☰
+  </button>
+</div>
+
+{open && (
+<div className="absolute top-16 right-4 bg-white shadow-lg rounded-lg p-5 z-50 flex flex-col gap-4 md:hidden">
+
+<p onClick={() => {nav("/demohome"); setOpen(false)}}>Home</p>
+
+<p onClick={() => {nav("/demodoctors"); setOpen(false)}}>All Doctors</p>
+
+<p onClick={() => {nav("/demoabout"); setOpen(false)}}>About</p>
+
+<p onClick={() => {nav("/democontact"); setOpen(false)}}>Contact</p>
+
+</div>
+)}
 
     </div>
 

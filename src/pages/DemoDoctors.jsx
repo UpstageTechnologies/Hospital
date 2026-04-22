@@ -3,7 +3,7 @@
 import { useState, useEffect, useContext } from "react"
 import { AppContext } from "../context/AppContext"
 import { useNavigate, useParams } from "react-router-dom"
-import Navbar from "../components/Navbar"
+import DemoNavbar from "../components/DemoNavbar"
 
 const DemoDoctors = () => {
 
@@ -61,7 +61,7 @@ const DemoDoctors = () => {
     return (
         <div className='px-6 sm:px-10'>
 
-            <Navbar />
+           <DemoNavbar />
 
             <p className='text-gray-600'>Browse doctors available in your city.</p>
 
@@ -101,7 +101,7 @@ const DemoDoctors = () => {
                             {filterDoc.map((item, index) => (
 
                                 <div key={index}
-                                    onClick={() => navigate(`/demodoctor/${item.email}`)}
+                                onClick={() => navigate(`/demodoctordetails/${item.email}`)}
                                     className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
                                     <img src={item.image} className='bg-blue-50' />
@@ -134,7 +134,7 @@ const DemoDoctors = () => {
                                     {groupedDoctors[hospital].map((item, index) => (
 
                                         <div key={index}
-                                            onClick={() => navigate(`/demodoctor/${item.email}`)}
+                                        onClick={() => navigate(`/demodoctordetails/${item.email}`)}
                                             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
                                             <img src={item.image} className='bg-blue-50' />

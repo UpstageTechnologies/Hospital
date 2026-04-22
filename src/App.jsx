@@ -3,8 +3,10 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 import HospitalIntro from "./pages/HospitalIntro";
 import DemoHome from "./pages/DemoHome";
+import RoleHome from "./pages/RoleHome";
 import DemoDoctors from "./pages/DemoDoctors";
 import DemoAbout from "./pages/DemoAbout";
+import DemoContact from "./pages/DemoContact";
 import DemoDoctorDetails from "./pages/DemoDoctorDetails";
 import Dashboard from "./pages/Dashboard";
 import DashboardNavbar from "./components/DashboardNavbar";
@@ -66,22 +68,23 @@ location.pathname === "/admin-dashboard" ||
 location.pathname === "/demo-patient-dashboard" ||
 location.pathname === "/demo-doctor-dashboard"
           )
-            ? <DashboardNavbar />   // 🔥 FIRST PRIORITY
-            : location.pathname.startsWith("/demo")
-              ? null
-              : <Navbar />
+            ? <DashboardNavbar />  
+            : location.pathname.startsWith("/demo") || location.pathname === "/rolehome"
+  ? null
+  : <Navbar />
       )}
 
       <Routes>
         <Route path="/" element={<HospitalIntro />} />
         <Route path="/demohome" element={<DemoHome />} />
+        <Route path="/rolehome" element={<RoleHome />} />
         <Route path="/demodoctors" element={<DemoDoctors />} />
         <Route path="/demodoctors/:city" element={<DemoDoctors />} />
         <Route path="/demoabout" element={<DemoAbout />} />
-        <Route path="/demodoctor/:id" element={<DemoDoctorDetails />} />
+        <Route path="/democontact" element={<DemoContact />} />
+        <Route path="/demodoctordetails/:id" element={<DemoDoctorDetails />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/master-dashboard" element={<RealMasterDashboard />} />
-
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/demo-patient-dashboard" element={<DemoPatientdashboard />} />
         <Route path="/demo-doctor-dashboard" element={<DemoDoctordashboard />} />

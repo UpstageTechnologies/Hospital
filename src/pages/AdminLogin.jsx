@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth, provider } from "../firebase";
 import {
     signInWithEmailAndPassword,
@@ -16,6 +16,16 @@ const AdminLogin = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const location = useLocation();
+    const isDemo = location.state?.demo === true;
+
+    useEffect(() => {
+        if (isDemo) {
+          setEmail("sundar@gmail.com");
+          setPassword("sundar11");
+        }
+      }, [isDemo]);
+    
+
     const fromRole = location.state?.fromRole === true;
 
 

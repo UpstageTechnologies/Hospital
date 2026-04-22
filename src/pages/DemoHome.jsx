@@ -78,9 +78,12 @@ const DemoHome = () => {
                         <button onClick={() => setOpen(!open)}>☰</button>
                     </div>
 
-                    <button className="bg-blue-500 text-white px-5 py-2 rounded-full">
-                        Login
-                    </button>
+                    <button 
+  onClick={() => navigate("/rolehome")}
+  className="bg-blue-500 text-white px-5 py-2 rounded-full"
+>
+  Login
+</button>
 
                 </div>
             </div>
@@ -162,7 +165,7 @@ const DemoHome = () => {
                     {doctors.map((doc, index) => (
                         <div
                             key={index}
-                            onClick={() => navigate(`/appointment/${doc.id}`)}
+                            onClick={() => navigate(`/demodoctordetails/${doc.id}`)}
                             className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer"
                         >
 

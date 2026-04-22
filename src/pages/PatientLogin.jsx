@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from "react";
 import { auth, db } from '../firebase/'
 import { useNavigate } from 'react-router-dom'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
@@ -55,6 +55,15 @@ const Login = () => {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const location = useLocation();
+
+  const isDemo = location.state?.demo === true;
+
+    useEffect(() => {
+        if (isDemo) {
+          setEmail("sundar@gmail.com");
+          setPassword("sundar11");
+        }
+      }, [isDemo]);
   const fromRole = location.state?.fromRole === true;
 
   const onSubmitHandler = async (event) => {

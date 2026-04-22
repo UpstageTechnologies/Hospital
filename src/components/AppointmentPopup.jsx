@@ -8,26 +8,19 @@ import { collection, addDoc, getDocs } from "firebase/firestore"
 const AppointmentPopup = ({ close, doctor, slotTime }) => {
 
     const navigate = useNavigate()
-
     const [step, setStep] = useState(1)
     const [showRegister, setShowRegister] = useState(false)
-
     const [users, setUsers] = useState([])
-
-    const [loginEmail, setLoginEmail] = useState("")
-    const [loginPassword, setLoginPassword] = useState("")
-
+    const [loginEmail, setLoginEmail] = useState("sundar@gmail.com")
+    const [loginPassword, setLoginPassword] = useState("sundar11")
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [address, setAddress] = useState("")
     const [phone, setPhone] = useState("")
     const [gender, setGender] = useState("")
-
     const [isLoggedIn, setIsLoggedIn] = useState(false)
-
     const [reason, setReason] = useState("")
-
     const [currentUser, setCurrentUser] = useState(null)
 
     // 🔥 REGISTER
@@ -67,34 +60,66 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
 
     // 🔥 LOGIN
     const handleLogin = async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, "users"))
 
-            const users = querySnapshot.docs.map(doc => doc.data())
-
-            const user = users.find(
-                (u) => u.email === loginEmail && u.password === loginPassword
-            )
-
-            if (!user) {
-                return alert("Invalid Login ❌")
-            }
-
-            setIsLoggedIn(true)
-            setCurrentUser(user)
-
-            // optional: persist
-            localStorage.setItem("currentUser", JSON.stringify(user))
-
-            alert("Login Success")
-            setStep(2)
-
-        } catch (err) {
-            console.log(err)
-            alert("Error")
+        // Demo patient auto login
+        if (
+          loginEmail === "sundar@gmail.com" &&
+          loginPassword === "sundar11"
+        ) {
+      
+          const demoUser = {
+            name: "Sundar",
+            email: "sundar@gmail.com",
+            address: "Madurai",
+            phone: "9876543210",
+            gender: "Male"
+          }
+      
+          setIsLoggedIn(true)
+          setCurrentUser(demoUser)
+      
+          localStorage.setItem(
+            "currentUser",
+            JSON.stringify(demoUser)
+          )
+      
+          alert("Login Success ✅")
+      
+          setStep(2) // Reason page open
+          return
         }
-    }
-
+      
+        // Normal firestore login (existing)
+        try {
+          const querySnapshot = await getDocs(collection(db,"users"))
+      
+          const users = querySnapshot.docs.map(doc => doc.data())
+      
+          const user = users.find(
+            (u) =>
+              u.email === loginEmail &&
+              u.password === loginPassword
+          )
+      
+          if (!user) {
+            return alert("Invalid Login ❌")
+          }
+      
+          setIsLoggedIn(true)
+          setCurrentUser(user)
+      
+          localStorage.setItem(
+            "currentUser",
+            JSON.stringify(user)
+          )
+      
+          setStep(2)
+      
+        } catch(err){
+          console.log(err)
+          alert("Error")
+        }
+      }
     // 🔥 BOOK
     const handleBook = () => {
         if (!isLoggedIn) {
@@ -199,18 +224,19 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
                                 <h2 className="text-xl font-bold mb-4">Login</h2>
 
                                 <input
-                                    placeholder="Email"
-                                    className="border p-2 w-full mb-2"
-                                    onChange={(e) => setLoginEmail(e.target.value)}
-                                />
+ value={loginEmail}
+ placeholder="Email"
+ className="border p-2 w-full mb-2"
+ onChange={(e) => setLoginEmail(e.target.value)}
+/>
 
-                                <input
-                                    placeholder="Password"
-                                    type="password"
-                                    className="border p-2 w-full mb-2"
-                                    onChange={(e) => setLoginPassword(e.target.value)}
-                                />
-
+<input
+ value={loginPassword}
+ placeholder="Password"
+ type="password"
+ className="border p-2 w-full mb-2"
+ onChange={(e) => setLoginPassword(e.target.value)}
+/>
                                 <button
                                     onClick={handleLogin}
                                     className="bg-blue-600 text-white px-6 py-2 w-full"
@@ -295,13 +321,6 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
                             <p className="mb-4">
                                 Appointment No: API882
                             </p>
-
-                            <button
-                                className="bg-blue-600 text-white px-6 py-2 mb-4"
-                                onClick={() => close()}
-                            >
-                                OK
-                            </button>
 
                             <p
                                 onClick={() => navigate("/dashboard")}

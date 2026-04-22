@@ -1,12 +1,12 @@
 import React from 'react'
 import { assets } from '../assets/assets'
-import Navbar from "../components/Navbar"
+import DemoNavbar from "../components/DemoNavbar"
 
 const DemoAbout = () => {
   return (
    <div className='px-4 sm:px-6 md:px-0'>
 
-    <Navbar />
+    <DemoNavbar />
        <div className='text-center text-xl sm:text-2xl pt-6 sm:pt-10 text-gray-500'>
           <p>ABOUT <span  className='text-gray-700 font-medium'>DEMO</span></p>
         </div>
