@@ -485,7 +485,15 @@ const Appointment = () => {
 
       {/* DOCTOR UI */}
      <div className='flex flex-col md:flex-row gap-6 items-center md:items-stretch w-full'>
-       <img className='w-full md:w-72 h-[250px] md:h-[300px] object-cover rounded-xl bg-blue-500' src={docInfo.image} alt="" />
+     <img
+ className='w-full md:w-72 h-[250px] md:h-[300px] object-cover rounded-xl bg-blue-500'
+ src={
+  localStorage.getItem(`doctorImage_${docInfo.email}`) ||
+  localStorage.getItem(`doctorImage_${docInfo.id}`) ||
+  docInfo.image
+ }
+ alt=""
+/>
 
         <div className='w-full md:w-[500px] border rounded-xl p-4 md:p-6 shadow-sm flex flex-col justify-center'>
           <h1 className='text-3xl font-bold'>{docInfo.name}</h1>

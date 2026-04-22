@@ -42,7 +42,7 @@ const Navbar = () => {
 
             if (currentUser) {
 
-                const docRef = doc(db, "user", currentUser.uid);
+                const docRef = doc(db, "users", currentUser.uid);
 
                 const docSnap = await getDoc(docRef);
 
