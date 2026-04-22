@@ -25,7 +25,7 @@ bg-[radial-gradient(circle_at_10%_20%,rgba(224,231,255,0.8),transparent_40%),rad
 
                     <span className="block">
                         <span className="text-black">by </span>
-                        <span className="text-blue-600"> Technology</span>
+                        <span className="text-blue-600">Upstage Technology</span>
                     </span>
 
                 </h1>
