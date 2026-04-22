@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import UpstageNavbar from "../components/UpstageNavbar";
-
+import { doc } from "firebase/firestore";
 
 const UpstageDoctors = () => {
 
