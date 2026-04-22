@@ -61,7 +61,13 @@ const PatientDashboard = () => {
                 <h1 className="text-2xl font-bold mb-6">My Appointments</h1>
 
                 <div className="grid grid-cols-2 gap-3 md:gap-4 justify-items-center">
-                    {appointments.map((item, i) => (
+                {appointments
+.filter(item =>
+  item.doctorName &&
+  item.time &&
+  item.appointmentNo
+)
+.map((item, i) => (
                         <div key={i}
                             onClick={() => {
                                 setSelected(item)

@@ -21,6 +21,46 @@ const Upstage = () => {
 
     const [doctors, setDoctors] = useState([]);
 
+    const [doctorImages, setDoctorImages] = useState({});
+
+    const handleImageUpload = (docId, event) => {
+  const file = event.target.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const imageData = reader.result;
+
+      // state update
+      setDoctorImages(prev => ({
+        ...prev,
+        [docId]: imageData
+      }));
+
+      // save permanently in browser
+      localStorage.setItem(`doctorImage_${docId}`, imageData);
+    };
+
+    reader.readAsDataURL(file);
+  }
+};
+
+useEffect(() => {
+  const savedImages = {};
+
+  doctors.forEach((doc) => {
+    const storedImage = localStorage.getItem(`doctorImage_${doc.id}`);
+
+    if (storedImage) {
+      savedImages[doc.id] = storedImage;
+    }
+  });
+
+  setDoctorImages(savedImages);
+
+}, [doctors]);
+
     useEffect(() => {
         const fetchDoctors = async () => {
             const querySnapshot = await getDocs(collection(db, "doctors"));
@@ -182,7 +222,11 @@ const Upstage = () => {
                         >
 
 <img
-  src="/user.png"
+  src={
+ doctorImages[doc.id] ||
+ "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+}
+  alt="profile"
   onClick={(e) => {
     e.stopPropagation();
 
@@ -191,19 +235,12 @@ const Upstage = () => {
     input.accept = "image/*";
 
     input.onchange = (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          e.target.src = reader.result;
-        };
-        reader.readAsDataURL(file);
-      }
+      handleImageUpload(doc.id, event);
     };
 
     input.click();
   }}
-  className='bg-blue-50 w-full h-60 object-contain cursor-pointer'
+  className="w-full h-60 object-contain bg-blue-50 cursor-pointer"
 />
 
                             <div className="p-4">

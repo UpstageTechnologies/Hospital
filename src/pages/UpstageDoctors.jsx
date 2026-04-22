@@ -95,7 +95,10 @@ const UpstageDoctors = () => {
                                     className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
 <img
-  src={localStorage.getItem(`doctorImage_${doc.id}`) || "/user.png"}
+  src={
+    localStorage.getItem(`doctorImage_${item.id}`) ||
+    "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+  }
   onClick={(e) => {
     e.stopPropagation();
 
@@ -105,6 +108,7 @@ const UpstageDoctors = () => {
 
     input.onchange = (event) => {
       const file = event.target.files[0];
+
       if (file) {
         const reader = new FileReader();
 
@@ -113,8 +117,8 @@ const UpstageDoctors = () => {
 
           e.target.src = image;
 
-          // ✅ save permanently
-          localStorage.setItem(`doctorImage_${doc.id}`, image);
+          // permanent save
+          localStorage.setItem(`doctorImage_${item.id}`, image);
         };
 
         reader.readAsDataURL(file);
@@ -123,9 +127,8 @@ const UpstageDoctors = () => {
 
     input.click();
   }}
-  className='bg-blue-50 w-full h-60 object-contain cursor-pointer'
+  className="bg-blue-50 w-full h-60 object-contain cursor-pointer"
 />
-
                                     <div className='p-4'>
                                     <p className={`text-sm ${index < 4 ? "text-green-500" : "text-red-500"}`}>
   ● {index < 4 ? "Available" : "Not Available"}
@@ -160,7 +163,10 @@ const UpstageDoctors = () => {
                                             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
 <img
-  src="/user.png"
+  src={
+    localStorage.getItem(`doctorImage_${item.id}`) ||
+    "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+  }
   onClick={(e) => {
     e.stopPropagation();
 
@@ -170,18 +176,25 @@ const UpstageDoctors = () => {
 
     input.onchange = (event) => {
       const file = event.target.files[0];
+
       if (file) {
         const reader = new FileReader();
+
         reader.onload = () => {
-          e.target.src = reader.result;
+          const image = reader.result;
+
+          e.target.src = image;
+
+          localStorage.setItem(`doctorImage_${item.id}`, image);
         };
+
         reader.readAsDataURL(file);
       }
     };
 
     input.click();
   }}
-  className='bg-blue-50 w-full h-60 object-contain cursor-pointer'
+  className="bg-blue-50 w-full h-60 object-contain cursor-pointer"
 />
 
                                             <div className='p-4'>

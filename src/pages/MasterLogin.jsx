@@ -72,7 +72,11 @@ const MasterLogin = () => {
 
         localStorage.setItem("masterLogin", "true");
 
-        navigate("/master-dashboard");
+        if (isDemo) {
+          navigate("/demomasterdashboard")
+        } else {
+          navigate("/master-dashboard")
+        }
       }
 
     } catch (error) {
@@ -97,7 +101,11 @@ const MasterLogin = () => {
     localStorage.setItem("masterLogin", "true");
 
     // ✅ FIX HERE
-    navigate("/master-dashboard");
+    if (isDemo) {
+      navigate("/demomasterdashboard")
+    } else {
+      navigate("/master-dashboard")
+    }
   } catch (error) {
     alert(error.message);
   }

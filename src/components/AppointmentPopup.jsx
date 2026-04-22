@@ -323,7 +323,7 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
                             </p>
 
                             <p
-                                onClick={() => navigate("/dashboard")}
+                                onClick={() => navigate("/patient-dashboard")}
                                 className="text-blue-600 underline cursor-pointer"
                             >
                                 Go to Dashboard

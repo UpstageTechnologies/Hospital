@@ -8,6 +8,7 @@ import DemoDoctors from "./pages/DemoDoctors";
 import DemoAbout from "./pages/DemoAbout";
 import DemoContact from "./pages/DemoContact";
 import DemoDoctorDetails from "./pages/DemoDoctorDetails";
+import DemoMasterDashboard from "./pages/DemoMasterDashboard"
 import Dashboard from "./pages/Dashboard";
 import DashboardNavbar from "./components/DashboardNavbar";
 import RealMasterDashboard from "./pages/RealMasterDashboard";
@@ -83,6 +84,7 @@ location.pathname === "/demo-doctor-dashboard"
         <Route path="/demoabout" element={<DemoAbout />} />
         <Route path="/democontact" element={<DemoContact />} />
         <Route path="/demodoctordetails/:id" element={<DemoDoctorDetails />} />
+        <Route path="/demomasterdashboard" element={<DemoMasterDashboard />}/>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/master-dashboard" element={<RealMasterDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
