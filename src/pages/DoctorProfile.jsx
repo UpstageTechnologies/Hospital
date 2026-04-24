@@ -7,6 +7,7 @@ import AdminCalendar from "../components/Calendar"
 import { setDoc } from "firebase/firestore"
 import { assets } from "../assets/assets"
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type = "doctor" }) => {
 
@@ -285,7 +286,7 @@ ${type === "doctor"
     )
 }
 
-const DoctorProfile = () => {
+const DoctorProfile = ({ hideDemoNav }) => {
 
     const [doctorData, setDoctorData] = useState(null)
     const [slots, setSlots] = useState([])
@@ -302,6 +303,8 @@ const DoctorProfile = () => {
     const [doctorEvents, setDoctorEvents] = useState({})
     const [appointmentEvents, setAppointmentEvents] = useState({})
     const navigate = useNavigate();
+    const location = useLocation();
+const isDemo = location.state?.demo === true;
 
     const handleDateSelect = (date) => {
         setSelectedDate(date)
@@ -463,6 +466,7 @@ const DoctorProfile = () => {
     return (
 
         <div className="flex flex-col md:flex-row min-h-screen pb-16 md:pb-0">
+
 
             {/* LEFT PANEL */}
             <div className="hidden md:block w-full md:w-64 bg-blue-600 text-white p-3 md:p-6">

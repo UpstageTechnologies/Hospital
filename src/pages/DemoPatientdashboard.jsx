@@ -1,7 +1,18 @@
-import PatientDashboard from "./PatientDashboard"
+import PatientDashboard from "./PatientDashboard";
 
-const DemoPatientdashboard = () => {
-  return <PatientDashboard />
+const DemoPatientDashboard=()=>{
+
+localStorage.setItem("demoUser","true");
+
+return(
+<div className="flex">
+
+<div className="flex-1">
+<PatientDashboard />
+</div>
+
+</div>
+)
 }
 
-export default DemoPatientdashboard
+export default DemoPatientDashboard;

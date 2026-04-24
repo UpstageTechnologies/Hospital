@@ -56,9 +56,33 @@ const DemoMasterDashboard = () => {
 
       {/* TOP NAVBAR */}
       <div className="flex justify-between items-center px-6 py-4 border-b bg-white">
-        <p className="text-xl font-semibold">
+        <p onClick={()=>nav("/master-login",{state:{demo:true}})} className="text-xl font-semibold">
           Demo
         </p>
+
+        <ul className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-10 text-sm font-medium">
+
+<li onClick={()=>nav("/master-login",{state:{demo:true}})}>
+MasterLogin
+</li>
+
+<li onClick={()=>nav("/admin-login",{state:{demo:true}})}>
+AdminLogin
+</li>
+
+<li onClick={()=>nav("/doctor-login",{state:{demo:true}})}>
+DoctorLogin
+</li>
+
+<li onClick={()=>nav("/staff-login",{state:{demo:true}})}>
+StaffLogin
+</li>
+
+<li onClick={()=>nav("/patient-login",{state:{demo:true}})}>
+PatientLogin
+</li>
+
+</ul>
 
         <div className="relative">
   <img

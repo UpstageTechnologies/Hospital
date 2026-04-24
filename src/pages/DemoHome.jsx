@@ -39,7 +39,7 @@ const DemoHome = () => {
 
 
             <div className="flex items-center justify-between px-4 sm:px-8 py-4 shadow">
-                <p>Demo</p>
+            <h1 onClick={() => navigate("/")} className="text-xl font-semibold">Demo</h1>
 
                 <ul className="hidden md:flex gap-8 font-medium">
                     <span onClick={() => navigate("/demohome")} className="cursor-pointer">Home</span>
@@ -79,7 +79,7 @@ const DemoHome = () => {
                     </div>
 
                     <button 
-  onClick={() => navigate("/rolehome")}
+  onClick={() => navigate("/master-login", { state: { demo: true } })}
   className="bg-blue-500 text-white px-5 py-2 rounded-full"
 >
   Login

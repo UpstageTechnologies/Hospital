@@ -9,12 +9,12 @@ import DemoAbout from "./pages/DemoAbout";
 import DemoContact from "./pages/DemoContact";
 import DemoDoctorDetails from "./pages/DemoDoctorDetails";
 import DemoMasterDashboard from "./pages/DemoMasterDashboard"
-import Dashboard from "./pages/Dashboard";
+import DemoAdminDashboard from "./pages/DemoAdminDashboard";
+import DemoDoctorDashboard from "./pages/DemoDoctorDashboard";
+import DemoStaffDashboard from "./pages/DemoStaffDashboard";
+import DemoPatientDashboard from "./pages/DemoPatientDashboard";
 import DashboardNavbar from "./components/DashboardNavbar";
 import RealMasterDashboard from "./pages/RealMasterDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import DemoPatientdashboard from "./pages/DemoPatientdashboard";
-import DemoDoctordashboard from "./pages/DemoDoctordashboard";
 import Upstage from "./pages/Upstage.jsx";
 import UpstageDoctors from "./pages/UpstageDoctors";
 import UpstageAbout from "./pages/UpstageAbout";
@@ -54,7 +54,6 @@ const App = () => {
     "/doctor-login",
     "/patient-login",
     "/staff-login",
-    "/dashboard",
   ].includes(location.pathname);
   return (
     <div className="w-full">
@@ -65,9 +64,9 @@ const App = () => {
           ? <UpstageNavbar />
           : (
             location.pathname === "/master-appointments" ||
-location.pathname === "/admin-dashboard" ||
-location.pathname === "/demo-patient-dashboard" ||
-location.pathname === "/demo-doctor-dashboard"
+location.pathname === "/demoadmindashboard" ||
+location.pathname === "/demopatientdashboard" ||
+location.pathname === "/demodoctordashboard"
           )
             ? <DashboardNavbar />  
             : location.pathname.startsWith("/demo") || location.pathname === "/rolehome"
@@ -85,11 +84,11 @@ location.pathname === "/demo-doctor-dashboard"
         <Route path="/democontact" element={<DemoContact />} />
         <Route path="/demodoctordetails/:id" element={<DemoDoctorDetails />} />
         <Route path="/demomasterdashboard" element={<DemoMasterDashboard />}/>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/demoadmindashboard" element={<DemoAdminDashboard />} />
+<Route path="/demodoctordashboard" element={<DemoDoctorDashboard />} />
+<Route path="/demostaffdashboard" element={<DemoStaffDashboard />} />
+<Route path="/demopatientdashboard" element={<DemoPatientDashboard />} />
         <Route path="/master-dashboard" element={<RealMasterDashboard />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/demo-patient-dashboard" element={<DemoPatientdashboard />} />
-        <Route path="/demo-doctor-dashboard" element={<DemoDoctordashboard />} />
         <Route path="/upstage" element={<Upstage />} />
         <Route path="/upstage-doctors" element={<UpstageDoctors />} />
         <Route path="/upstage-doctors/:city" element={<UpstageDoctors />} />

@@ -130,6 +130,25 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
             return alert("Enter reason ")
         }
 
+        const appointmentData = {
+            patientName: currentUser.name,
+            email: currentUser.email,
+            address: currentUser.address,
+            phone: currentUser.phone,
+            gender: currentUser.gender,
+            doctorName: doctor.name,
+            doctorImage: doctor.image,
+            time: slotTime,
+            reason: reason,
+            appointmentNo:
+            "API" + Math.floor(Math.random()*900+100)
+            };
+            
+            addDoc(
+            collection(db,"appointments"),
+            appointmentData
+            );
+
         setStep(4)
     }
 
@@ -140,7 +159,7 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
         if (savedUser) {
             setIsLoggedIn(true)
             setCurrentUser(savedUser)
-            setStep(2)
+            setStep(1)
         }
     }, [])
 
@@ -150,11 +169,36 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
            <div className="bg-white w-full max-w-[95%] md:w-[800px] rounded-xl flex flex-col md:flex-row overflow-hidden">
 
                 {/* LEFT */}
-               <div className="w-full md:w-1/3 bg-blue-600 text-white p-4 md:p-6 flex md:flex-col flex-row justify-around md:gap-4 gap-2">
-                    <button onClick={() => setStep(1)}>Login</button>
-                    <button onClick={() => setStep(2)}>Reason</button>
-                    <button onClick={() => setStep(3)}>Details</button>
-                </div>
+                <div className="w-full md:w-1/3 bg-blue-600 text-white p-4 md:p-6 flex md:flex-col flex-row justify-around md:gap-4 gap-2">
+
+<button
+onClick={()=>setStep(1)}
+className={`rounded px-4 py-3 ${
+step===1 ? "bg-white text-blue-600 font-bold" : ""
+}`}
+>
+Login
+</button>
+
+<button
+onClick={()=>setStep(2)}
+className={`rounded px-4 py-3 ${
+step===2 ? "bg-white text-blue-600 font-bold" : ""
+}`}
+>
+Reason
+</button>
+
+<button
+onClick={()=>setStep(3)}
+className={`rounded px-4 py-3 ${
+step===3 ? "bg-white text-blue-600 font-bold" : ""
+}`}
+>
+Details
+</button>
+
+</div>
 
                 {/* RIGHT */}
                <div className="w-full md:w-2/3 p-4 md:p-6">

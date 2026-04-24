@@ -959,6 +959,10 @@ const Account = () => {
                 Patients
               </li>
 
+              <li className="cursor-pointer hover:text-gray-200" onClick={() => setSubmenu("formasi")}>
+                Formasi
+              </li>
+
             </ul>
           )}
 

@@ -15,26 +15,40 @@ const PatientDashboard = () => {
     const [checkedOut, setCheckedOut] = useState(false)
     const navigate = useNavigate();
 
-    const userEmail = auth.currentUser?.email
+    const savedUser = JSON.parse(
+        localStorage.getItem("currentUser")
+        );
+        
+        const userEmail = savedUser?.email;
 
-    useEffect(() => {
-        const fetchAppointments = async () => {
-            const snap = await getDocs(collection(db, "appointments"))
+        useEffect(() => {
 
-            let list = []
-            snap.forEach(doc => {
-                const data = doc.data()
-                if (data.email === userEmail) {
-                    list.push(data)
-                }
-            })
-
-            setAppointments(list)
-        }
-
-        fetchAppointments()
-    }, [])
-
+            const fetchAppointments = async () => {
+            
+            const snap = await getDocs(
+            collection(db,"appointments")
+            );
+            
+            let list=[];
+            
+            snap.forEach(doc=>{
+            const data = doc.data();
+            
+            if(data.email === userEmail){
+            list.push(data);
+            }
+            
+            });
+            
+            setAppointments(list);
+            
+            };
+            
+            if(userEmail){
+            fetchAppointments();
+            }
+            
+            },[userEmail]);
     useEffect(() => {
         let interval
         if (checkInTime && !checkedOut) {

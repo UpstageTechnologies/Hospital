@@ -17,6 +17,7 @@ const AdminLogin = () => {
     const [password, setPassword] = useState("");
     const location = useLocation();
     const isDemo = location.state?.demo === true;
+    const [openMenu, setOpenMenu] = useState(false);
 
     useEffect(() => {
         if (isDemo) {
@@ -24,6 +25,8 @@ const AdminLogin = () => {
           setPassword("sundar11");
         }
       }, [isDemo]);
+
+      
     
 
     const fromRole = location.state?.fromRole === true;
@@ -33,7 +36,7 @@ const AdminLogin = () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             alert("Admin Login Success");
-            navigate("/account");
+            navigate("/demoadmindashboard");
         } catch (err) {
             alert(err.message);
         }
@@ -44,7 +47,7 @@ const AdminLogin = () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
             alert("Admin Registered Successfully");
-            navigate("/account");
+            navigate("/demoadmindashboard");
         } catch (err) {
             alert(err.message);
         }
@@ -60,7 +63,7 @@ const AdminLogin = () => {
             alert("Google Login Success");
 
 
-            navigate("/account");
+            navigate("/demoadmindashboard");
 
         } catch (err) {
             console.log(err);
@@ -69,8 +72,135 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 
-bg-gradient-to-br from-blue-100 via-purple-100 to-blue-200">
+<div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-blue-200">
+
+{isDemo && (
+<>
+{/* Desktop Navbar */}
+<div className="hidden md:block w-full bg-white border-b shadow-sm">
+<div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-8">
+
+<p onClick={() => navigate("/demohome")} className="text-2xl font-semibold">
+Demo
+</p>
+
+<ul className="flex items-center gap-12 text-base font-medium">
+<li onClick={()=>navigate("/master-login",{state:{demo:true}})}>MasterLogin</li>
+<li onClick={()=>navigate("/admin-login",{state:{demo:true}})}>AdminLogin</li>
+<li onClick={()=>navigate("/doctor-login",{state:{demo:true}})}>DoctorLogin</li>
+<li onClick={()=>navigate("/staff-login",{state:{demo:true}})}>StaffLogin</li>
+<li onClick={()=>navigate("/patient-login",{state:{demo:true}})}>PatientLogin</li>
+</ul>
+
+<span onClick={()=>navigate("/demohome")}>
+Home
+</span>
+
+</div>
+</div>
+
+
+{/* Mobile + Tablet Navbar */}
+{/* Mobile + Tablet Only */}
+<div className="md:hidden w-full bg-white border-b shadow-sm relative">
+
+  {/* Top Bar */}
+  <div className="flex items-center justify-between px-6 py-5">
+    <h2 className="text-2xl font-bold">
+      Demo
+    </h2>
+
+    <button
+      onClick={() => setOpenMenu(!openMenu)}
+      className="text-3xl font-semibold"
+    >
+      {openMenu ? "✕" : "☰"}
+    </button>
+  </div>
+
+
+  {/* Dropdown Card Menu */}
+  {openMenu && (
+    <div className="
+      absolute
+      right-4
+      top-[100px]
+      w-[320px]
+      bg-white
+      rounded-3xl
+      shadow-2xl
+      z-50
+      py-8
+      px-10
+    ">
+
+      <div
+        onClick={()=>{
+          navigate('/demohome');
+          setOpenMenu(false);
+        }}
+        className="text-2xl font-medium mb-10 cursor-pointer"
+      >
+        Home
+      </div>
+
+      <div
+        onClick={()=>{
+          navigate('/master-login',{state:{demo:true}});
+          setOpenMenu(false);
+        }}
+        className="text-2xl font-medium mb-10 cursor-pointer"
+      >
+        MasterLogin
+      </div>
+
+      <div
+        onClick={()=>{
+          navigate('/admin-login',{state:{demo:true}});
+          setOpenMenu(false);
+        }}
+        className="text-2xl font-medium mb-10 cursor-pointer"
+      >
+        AdminLogin
+      </div>
+
+      <div
+        onClick={()=>{
+          navigate('/doctor-login',{state:{demo:true}});
+          setOpenMenu(false);
+        }}
+        className="text-2xl font-medium mb-10 cursor-pointer"
+      >
+        DoctorLogin
+      </div>
+
+      <div
+        onClick={()=>{
+          navigate('/staff-login',{state:{demo:true}});
+          setOpenMenu(false);
+        }}
+        className="text-2xl font-medium mb-10 cursor-pointer"
+      >
+        StaffLogin
+      </div>
+
+      <div
+        onClick={()=>{
+          navigate('/patient-login',{state:{demo:true}});
+          setOpenMenu(false);
+        }}
+        className="text-2xl font-medium cursor-pointer"
+      >
+        PatientLogin
+      </div>
+
+    </div>
+  )}
+
+</div>
+</>
+)}
+        <div className="flex justify-center items-center min-h-[calc(100vh-80px)] px-4">
 
             <div className="backdrop-blur-lg bg-white/60 shadow-2xl 
     rounded-2xl p-6 sm:p-8 w-full max-w-[380px]">
@@ -111,13 +241,13 @@ bg-gradient-to-br from-blue-100 via-purple-100 to-blue-200">
                 )}
 
                 {/* GOOGLE */}
-                <button onClick={handleGoogle} className="google-btn w-full justify-center">
+                {/* <button onClick={handleGoogle} className="google-btn w-full justify-center">
                     <img
                         src="https://developers.google.com/identity/images/g-logo.png"
                         className="w-5"
                     />
                     Sign in with Google
-                </button>
+                </button> */}
 
                 {/* SWITCH LOGIN ↔ REGISTER */}
                 {!fromRole && (
@@ -132,6 +262,7 @@ bg-gradient-to-br from-blue-100 via-purple-100 to-blue-200">
                         </span>
                     </p>
                 )}
+            </div>
             </div>
         </div>
     );
