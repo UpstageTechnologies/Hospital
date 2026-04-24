@@ -10,7 +10,7 @@ import DemoContact from "./pages/DemoContact";
 import DemoDoctorDetails from "./pages/DemoDoctorDetails";
 import DemoMasterDashboard from "./pages/DemoMasterDashboard"
 import DemoAdminDashboard from "./pages/DemoAdminDashboard";
-import DemoDoctorDashboard from "./pages/DemoDoctorDashboard";
+import DemoDoctorDashboard from "./pages/DemoDoctorDashboard.jsx";
 import DemoStaffDashboard from "./pages/DemoStaffDashboard";
 import DemoPatientDashboard from "./pages/DemoPatientDashboard";
 import DashboardNavbar from "./components/DashboardNavbar";
