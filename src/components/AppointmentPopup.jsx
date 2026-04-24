@@ -168,7 +168,6 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
 
            <div className="bg-white w-full max-w-[95%] md:w-[800px] rounded-xl flex flex-col md:flex-row overflow-hidden">
                 <div className="w-full md:w-1/3 bg-blue-600 text-white p-4 md:p-6 flex md:flex-col flex-row justify-around md:gap-4 gap-2">
-
 <button
 onClick={()=>setStep(1)}
 className={`rounded px-4 py-3 ${
