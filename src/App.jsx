@@ -8,11 +8,11 @@ import DemoDoctors from "./pages/DemoDoctors";
 import DemoAbout from "./pages/DemoAbout";
 import DemoContact from "./pages/DemoContact";
 import DemoDoctorDetails from "./pages/DemoDoctorDetails";
-import DemoMasterDashboard from "./pages/DemoMasterDashboard"
-import DemoAdminDashboard from "./pages/DemoAdminDashboard";
+import DemoMasterDashboard from "./pages/DemoMasterDashboard.jsx"
+import DemoAdminDashboard from "./pages/DemoAdminDashboard.jsx";
 import DemoDoctorDashboard from "./pages/DemoDoctorDashboard.jsx";
-import DemoStaffDashboard from "./pages/DemoStaffDashboard";
-import DemoPatientDashboard from "./pages/DemoPatientDashboard";
+import DemoStaffDashboard from "./pages/DemoStaffDashboard.jsx";
+import DemoPatientDashboard from "./pages/DemoPatientDashboard.jsx";
 import DashboardNavbar from "./components/DashboardNavbar";
 import RealMasterDashboard from "./pages/RealMasterDashboard";
 import Upstage from "./pages/Upstage.jsx";
