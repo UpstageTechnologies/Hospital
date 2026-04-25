@@ -176,12 +176,29 @@ Patient Full Details
 
 <div className="flex justify-end mt-8">
 
+<div className="flex justify-end gap-4 mt-8">
+
+<button
+onClick={()=>{
+localStorage.setItem(
+"selectedPatient",
+JSON.stringify(selected)
+);
+navigate("/my-profile");
+}}
+className="bg-green-600 text-white px-6 py-3 rounded-lg"
+>
+View Profile
+</button>
+
 <button
 onClick={()=>setSelected(null)}
 className="bg-blue-600 text-white px-8 py-3 rounded-lg"
 >
 Close
 </button>
+
+</div>
 
 </div>
 

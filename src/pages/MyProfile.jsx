@@ -7,49 +7,53 @@ import { collection, getDocs } from "firebase/firestore";
 const MyProfile = () => {
   const [userData, setUserData] = useState(null);
   const { state } = useLocation();
+  const passedData = state || JSON.parse(localStorage.getItem("selectedPatient"));
   const [activeTab, setActiveTab] = useState("profile");
 
   useEffect(() => {
+
+    if (passedData) {
+    setUserData(passedData);
+    return;
+    }
+    
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        console.log("❌ No user");
-        return;
-      }
-
-      console.log("✅ Logged user:", user.email);
-
-      try {
-        const snap = await getDocs(collection(db, "appointments"));
-
-        let foundUser = null;
-
-        snap.forEach((docItem) => {
-          const data = docItem.data();
-
-          console.log("DB EMAIL:", data.email);
-
-          if (
-            data.email &&
-            data.email.toLowerCase().trim() ===
-            user.email.toLowerCase().trim()
-          ) {
-            console.log("🎯 MATCH FOUND");
-            foundUser = data;
-          }
-        });
-
-        if (foundUser) {
-          setUserData(foundUser);
-        } else {
-          console.log("❌ NO MATCH FOUND");
-        }
-      } catch (err) {
-        console.log("🔥 ERROR:", err);
-      }
+    
+    if (!user) return;
+    
+    try {
+    
+    const snap = await getDocs(collection(db,"appointments"));
+    
+    let foundUser=null;
+    
+    snap.forEach((docItem)=>{
+    const data=docItem.data();
+    
+    if(
+    data.email &&
+    data.email.toLowerCase().trim() ===
+    user.email.toLowerCase().trim()
+    ){
+    foundUser=data;
+    }
+    
     });
-
-    return () => unsubscribe();
-  }, []);
+    
+    if(foundUser){
+    setUserData(foundUser);
+    }
+    
+    }
+    catch(err){
+    console.log(err);
+    }
+    
+    });
+    
+    return ()=>unsubscribe();
+    
+    }, []);
 
   // LOADING
   if (!userData) {

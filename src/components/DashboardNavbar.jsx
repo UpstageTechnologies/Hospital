@@ -145,12 +145,61 @@ Demo
 
 </div>
 
+<div className="flex items-center gap-4">
+
+{/* mobile profile image */}
+<div
+onClick={() => setShowProfileMenu(!showProfileMenu)}
+className="relative cursor-pointer"
+>
+<img
+src={userImage}
+alt=""
+className="w-10 h-10 rounded-full object-cover border"
+/>
+
+{showProfileMenu && (
+<div className="absolute right-0 top-14 bg-white shadow-xl rounded-xl p-4 z-50">
+
+<div className="flex flex-col gap-4 min-w-[170px]">
+
+<p
+onClick={()=>navigate("/my-profile")}
+className="cursor-pointer hover:text-blue-600"
+>
+My Profile
+</p>
+
+<p
+onClick={()=>navigate("/my-appointment")}
+className="cursor-pointer hover:text-blue-600"
+>
+My Appointment
+</p>
+
+<p
+onClick={()=>setShowLogoutPopup(true)}
+className="cursor-pointer hover:text-red-600"
+>
+Logout
+</p>
+
+</div>
+
+</div>
+)}
+
+</div>
+
+{/* existing hamburger */}
 <button
 onClick={()=>setOpenMenu(!openMenu)}
 className="text-3xl font-semibold"
 >
 {openMenu ? "✕" : "☰"}
 </button>
+
+</div>
 
 </div>
 
