@@ -58,17 +58,27 @@ const Login = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const isDemo = location.state?.demo === true;
 
-    useEffect(() => {
-        if (isDemo) {
-          setEmail("sundar@gmail.com");
-          setPassword("sundar11");
-        }
-      }, [isDemo]);
+  useEffect(()=>{
+    if(isDemo){
+    setEmail("demopatient@gmail.com");
+    setPassword("demopatient11");
+    }
+    },[isDemo]);
 
       
   const fromRole = location.state?.fromRole === true;
 
   const onSubmitHandler = async (event) => {
+
+    if (
+      email === "demopatient@gmail.com" &&
+      password === "demopatient11"
+     ){
+      alert("Demo Patient Login Success");
+      window.location.href="/#/demopatientdashboard";
+      return;
+     }
+
     event.preventDefault()
 
     try {
@@ -122,7 +132,12 @@ const Login = () => {
         }
 
         alert("Login Success")
-        localStorage.setItem("userEmail", email)
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify({
+            email: email
+          })
+         );
         navigate('/demopatientdashboard')
       }
 
@@ -139,13 +154,20 @@ const Login = () => {
 <>
 {/* Desktop Navbar */}
 <div className="hidden md:block w-full bg-white border-b shadow-sm">
-<div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-8">
+<div className="max-w-7xl mx-auto relative flex items-center h-20 px-8">
 
-<p onClick={() => navigate("/demohome")} className="text-2xl font-semibold">
+<div className="flex items-center gap-4">
+
+<p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
+<button type="button" onClick={() => navigate("/demohome")} className="text-4xl font-bold cursor-pointer leading-none" >
+←
+</button>
 
-<ul className="flex items-center gap-12 text-base font-medium">
+</div>
+
+<ul className="absolute left-1/2 -translate-x-1/2 flex items-center gap-12 text-base font-medium ">
 <li onClick={()=>navigate("/master-login",{state:{demo:true}})}>MasterLogin</li>
 <li onClick={()=>navigate("/admin-login",{state:{demo:true}})}>AdminLogin</li>
 <li onClick={()=>navigate("/doctor-login",{state:{demo:true}})}>DoctorLogin</li>
@@ -153,9 +175,6 @@ Demo
 <li onClick={()=>navigate("/patient-login",{state:{demo:true}})}>PatientLogin</li>
 </ul>
 
-<span onClick={()=>navigate("/demohome")}>
-Home
-</span>
 
 </div>
 </div>
@@ -167,9 +186,16 @@ Home
 
   {/* Top Bar */}
   <div className="flex items-center justify-between px-6 py-5">
-    <h2 className="text-2xl font-bold">
-      Demo
-    </h2>
+  <div className="flex items-center gap-4">
+
+  <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
+Demo
+</p>
+<button type="button" onClick={() => navigate("/demohome")} className="text-4xl font-bold cursor-pointer leading-none" >
+←
+</button>
+
+</div>
 
     <button
       onClick={() => setOpenMenu(!openMenu)}
@@ -194,16 +220,6 @@ Home
       py-8
       px-10
     ">
-
-      <div
-        onClick={()=>{
-          navigate('/demohome');
-          setOpenMenu(false);
-        }}
-        className="text-2xl font-medium mb-10 cursor-pointer"
-      >
-        Home
-      </div>
 
       <div
         onClick={()=>{
@@ -269,16 +285,16 @@ Home
         autoComplete="off"
         onSubmit={onSubmitHandler}
         className="backdrop-blur-lg bg-white/60 shadow-2xl border border-white/30 
-      rounded-2xl p-6 sm:p-8 w-full max-w-[420px]"
+        rounded-2xl p-5 w-full max-w-[320px] md:max-w-[320px]"
       >
 
         <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">
           {state === 'Sign Up' ? "Create Account" : "Login"}
         </h1>
 
-        <p className="text-center text-gray-500 mb-6">
+        {/* <p className="text-center text-gray-500 mb-6">
           Please {state === 'Sign Up' ? "sign up" : "log in"} to continue
-        </p>
+        </p> */}
 
         {/* NAME */}
         {state === "Sign Up" && (
@@ -400,10 +416,10 @@ Home
             </>
           ) : (
             <>
-              Create an account?{" "}
+              {/* Create an account?{" "}
               <span onClick={() => setState('Sign Up')} className="text-blue-600 cursor-pointer">
                 Register
-              </span>
+              </span> */}
             </>
           )}
         </p>

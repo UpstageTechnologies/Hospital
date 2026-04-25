@@ -39,7 +39,16 @@ const DemoHome = () => {
 
 
             <div className="flex items-center justify-between px-4 sm:px-8 py-4 shadow">
-            <h1 onClick={() => navigate("/")} className="text-xl font-semibold">Demo</h1>
+            <div className="flex items-center gap-4">
+
+<p  onClick={() => nav("/")} className="text-xl font-semibold cursor-pointer" >
+Demo
+</p>
+<button type="button" onClick={() => window.location.assign("/")} className="text-4xl font-bold cursor-pointer leading-none" >
+←
+</button>
+
+</div>
 
                 <ul className="hidden md:flex gap-8 font-medium">
                     <span onClick={() => navigate("/demohome")} className="cursor-pointer">Home</span>

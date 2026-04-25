@@ -23,12 +23,12 @@ const DoctorLogin = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const isDemo = location.state?.demo === true;
 
-    useEffect(() => {
-        if (isDemo) {
-          setEmail("naveen007");
-          setPassword("naveen007");
-        }
-      }, [isDemo]);
+  useEffect(() => {
+    if(isDemo){
+    setEmail("demodoctor007");
+    setPassword("demo007");
+    }
+    },[isDemo]);
 
       
   const fromRole = location.state?.fromRole === true;
@@ -67,6 +67,15 @@ const DoctorLogin = () => {
 
 
   const handleSubmit = async (e) => {
+
+    if (
+      email === "demodoctor007" &&
+      password === "demo007"
+     ){
+      alert("Demo Doctor Login Success");
+      window.location.href="/#/demodoctordashboard";
+      return;
+     }
 
     e.preventDefault()
 
@@ -139,13 +148,20 @@ const DoctorLogin = () => {
 <>
 {/* Desktop Navbar */}
 <div className="hidden md:block w-full bg-white border-b shadow-sm">
-<div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-8">
+<div className="max-w-7xl mx-auto relative flex items-center h-20 px-8">
 
-<p onClick={() => navigate("/demohome")} className="text-2xl font-semibold">
+<div className="flex items-center gap-4">
+
+<p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
+<button type="button" onClick={() => navigate("/demohome")} className="text-4xl font-bold cursor-pointer leading-none" >
+←
+</button>
 
-<ul className="flex items-center gap-12 text-base font-medium">
+</div>
+
+<ul className="absolute left-1/2 -translate-x-1/2 flex items-center gap-12 text-base font-medium ">
 <li onClick={()=>navigate("/master-login",{state:{demo:true}})}>MasterLogin</li>
 <li onClick={()=>navigate("/admin-login",{state:{demo:true}})}>AdminLogin</li>
 <li onClick={()=>navigate("/doctor-login",{state:{demo:true}})}>DoctorLogin</li>
@@ -153,9 +169,6 @@ Demo
 <li onClick={()=>navigate("/patient-login",{state:{demo:true}})}>PatientLogin</li>
 </ul>
 
-<span onClick={()=>navigate("/demohome")}>
-Home
-</span>
 
 </div>
 </div>
@@ -167,9 +180,16 @@ Home
 
   {/* Top Bar */}
   <div className="flex items-center justify-between px-6 py-5">
-    <h2 className="text-2xl font-bold">
-      Demo
-    </h2>
+  <div className="flex items-center gap-4">
+
+  <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
+Demo
+</p>
+<button type="button" onClick={() => navigate("/demohome")} className="text-4xl font-bold cursor-pointer leading-none" >
+←
+</button>
+
+</div>
 
     <button
       onClick={() => setOpenMenu(!openMenu)}
@@ -194,16 +214,6 @@ Home
       py-8
       px-10
     ">
-
-      <div
-        onClick={()=>{
-          navigate('/demohome');
-          setOpenMenu(false);
-        }}
-        className="text-2xl font-medium mb-10 cursor-pointer"
-      >
-        Home
-      </div>
 
       <div
         onClick={()=>{
@@ -263,8 +273,9 @@ Home
 )}
 
 <div className="flex justify-center items-center min-h-[calc(100vh-80px)] px-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-md">
-        <div className="flex flex-col gap-5 p-6 sm:p-8 rounded-2xl bg-white shadow-xl max-w-md w-full">
+<form onSubmit={handleSubmit} className="w-full max-w-[320px] md:max-w-[320px]">
+<div className="flex flex-col gap-5 p-6 sm:p-8 w-full backdrop-blur-lg bg-white/60 shadow-2xl
+border border-white/30 rounded-2xl ">
 
           <p className='text-2xl sm:text-3xl font-semibold text-center'>
             {state === "Register" ? "Doctor Register" : "Doctor Login"}
@@ -279,13 +290,13 @@ Home
           )}
 
           <div className="w-full">
-            <p>Doctor ID</p>
+            {/* <p>Doctor ID</p> */}
             <input type="doctorid" className="w-full p-3 mt-1 rounded-lg border border-gray-300 focus:outline-none"
               onChange={(e) => setEmail(e.target.value)} value={email} required />
           </div>
 
           <div className="relative w-full">
-            <p>Password</p>
+            {/* <p>Password</p> */}
             <input autoComplete="new-password" className="border border-zinc-300 rounded w-full p-2 mt-1 pr-10"
               type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)}
               value={password} required />
@@ -330,7 +341,7 @@ Home
           </button> */}
 
 
-          {state === "Login" ? (
+          {/* {state === "Login" ? (
 
             <p>
               No doctor account?
@@ -348,7 +359,7 @@ Home
               </span>
             </p>
 
-          )}
+          )} */}
 
         </div>
       </form>

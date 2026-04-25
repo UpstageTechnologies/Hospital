@@ -163,9 +163,15 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
                     // 🔥 IMPORTANT
                     setIsEdit(!!dateEvent); // only true if exact date exists
                   } else {
-                    setSlots([{ start: "", end: "" }]);
-                    setSlotCount(1);
-                    setSlotInput(1);
+                    setSlots([
+                      { start:"10:00", end:"11:00" },
+                      { start:"13:00", end:"14:00" },
+                      { start:"17:00", end:"19:00" }
+                    ]);
+                  
+                    setSlotCount(3);
+                    setSlotInput(3);
+                  
                     setIsEdit(false);
                   }
                 }

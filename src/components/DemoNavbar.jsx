@@ -12,12 +12,16 @@ const DemoNavbar = () => {
 <div className="flex items-center justify-between py-4 px-8 border-b border-gray-300 bg-white">
 
      
-      <p 
-  onClick={() => nav("/demohome")}
-  className="text-xl font-semibold cursor-pointer"
->
- Demo
+<div className="flex items-center gap-4">
+
+<p  onClick={() => nav("/")} className="text-xl font-semibold cursor-pointer" >
+Demo
 </p>
+<button type="button" onClick={() => window.location.assign("/")} className="text-4xl font-bold cursor-pointer leading-none" >
+←
+</button>
+
+</div>
 
       {/* MENU CENTER */}
       <ul className="hidden md:flex flex-1 justify-center items-center gap-10 md:gap-12 text-gray-700 font-medium">

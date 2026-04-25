@@ -14,6 +14,12 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
     const [popup, setPopup] = useState(false)   
     const [slots, setSlots] = useState([])
     const [selectedSlotDate, setSelectedSlotDate] = useState("")
+
+    const defaultSlots = [
+        { start:"10:00", end:"11:00" },
+        { start:"13:00", end:"14:00" },
+        { start:"17:00", end:"19:00" }
+       ];
     const today = new Date()
 
     const [currentMonth, setCurrentMonth] = useState(today)
@@ -125,15 +131,14 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
                                 const dayOnly = date.split("-")[2]
                                 const eventData = events[date] || events[`day-${dayOnly}`]
 
-                                if (eventData) {
-
-                                    // ✅ REMOVE LEAVE SLOTS
-                                    const activeSlots = eventData.slots.filter(s => !s.leave)
-
-                                    setSlots(activeSlots)
-                                    setSelectedSlotDate(date)
-                                    setPopup(true)
-                                }
+                                const activeSlots =
+                                eventData?.slots?.filter(s=>!s.leave)?.length
+                                ? eventData.slots.filter(s=>!s.leave)
+                                : defaultSlots;
+                                
+                                setSlots(activeSlots);
+                                setSelectedSlotDate(date);
+                                setPopup(true);
                             }}
                             className={`aspect-square
                             flex flex-col items-center justify-center
@@ -456,6 +461,31 @@ const isDemo = location.state?.demo === true;
             setAppointmentEvents(data)
 
         })
+
+        const createDefaultSlots = async () => {
+
+            for(let d=1; d<=31; d++){
+            
+            const date =
+            `2026-04-${String(d).padStart(2,"0")}`;
+            
+            await setDoc(
+            doc(db,"users","demoAdmin","calendar",date),
+            {
+            slots:[
+             {start:"11:00", end:"12:00"},
+             {start:"16:00", end:"17:00"},
+             {start:"19:00", end:"20:00"}
+            ]
+            },
+            {merge:true}
+            );
+            
+            }
+            
+            };
+            
+            createDefaultSlots();
 
         return () => unsub()
 

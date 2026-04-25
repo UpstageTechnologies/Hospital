@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import DashboardNavbar from "../components/DashboardNavbar";
 
 const DemoMasterDashboard = () => {
 
@@ -54,81 +55,7 @@ const DemoMasterDashboard = () => {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* TOP NAVBAR */}
-      <div className="flex justify-between items-center px-6 py-4 border-b bg-white">
-        <p onClick={()=>nav("/master-login",{state:{demo:true}})} className="text-xl font-semibold">
-          Demo
-        </p>
-
-        <ul className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-10 text-sm font-medium">
-
-<li onClick={()=>nav("/master-login",{state:{demo:true}})}>
-MasterLogin
-</li>
-
-<li onClick={()=>nav("/admin-login",{state:{demo:true}})}>
-AdminLogin
-</li>
-
-<li onClick={()=>nav("/doctor-login",{state:{demo:true}})}>
-DoctorLogin
-</li>
-
-<li onClick={()=>nav("/staff-login",{state:{demo:true}})}>
-StaffLogin
-</li>
-
-<li onClick={()=>nav("/patient-login",{state:{demo:true}})}>
-PatientLogin
-</li>
-
-</ul>
-
-        <div className="relative">
-  <img
-    src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-    onClick={() => setShowProfileMenu(!showProfileMenu)}
-    className="w-10 h-10 rounded-full cursor-pointer"
-    alt=""
-  />
-
-  {showProfileMenu && (
-    <div className="absolute right-0 top-14 bg-white shadow-lg rounded-lg w-48 border z-50">
-
-      <p
-        onClick={() => {
-          setShowProfileMenu(false)
-          nav("/my-profile")
-        }}
-        className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-      >
-        My Profile
-      </p>
-
-      <p
-        onClick={() => {
-          setShowProfileMenu(false)
-          nav("/my-appointments")
-        }}
-        className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-      >
-        My Appointments
-      </p>
-
-      <p
-        onClick={() => {
-          localStorage.removeItem("masterLogin")
-          nav("/demohome")
-        }}
-        className="px-4 py-3 text-red-500 hover:bg-gray-100 cursor-pointer"
-      >
-        Logout
-      </p>
-
-    </div>
-  )}
-</div>
-      </div>
+<DashboardNavbar />
 
       <div className="flex">
 

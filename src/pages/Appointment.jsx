@@ -126,41 +126,59 @@ const Appointment = () => {
   }, [])
 
   useEffect(() => {
+
     const fetchSlots = async () => {
+   
       const today = new Date().toISOString().split("T")[0]
-
-      const snap = await getDoc(doc(db, "users", "demoAdmin", "calendar", today))
-
-      if (snap.exists()) {
-        const data = snap.data()
-
-        const formatted = [
-          {
-            date: today,
-            times: data.slots.map(s => {
-              const format = (t) => {
-                let [h, m] = t.split(":")
-                h = parseInt(h)
-
-                let ampm = h >= 12 ? "PM" : "AM"
-
-                let display = h % 12
-                if (display === 0) display = 12
-
-                return `${display}:${m}${ampm.toLowerCase()}`
-              }
-
-              return `${format(s.start)}-${format(s.end)}`
-            })
-          }
-        ]
-
-        setDocSlots(formatted)
+      const dayOnly = today.split("-")[2]
+   
+      let snap = await getDoc(
+         doc(db,"users","demoAdmin","calendar",today)
+      )
+   
+      if(!snap.exists()){
+         snap = await getDoc(
+           doc(db,"users","demoAdmin","calendar",`day-${dayOnly}`)
+         )
       }
+   
+      if(snap.exists()){
+   
+         const data = snap.data()
+   
+         setDocSlots([{
+            date:today,
+            times:data.slots?.map(s=>{
+               const format=(t)=>{
+                 let [h,m]=t.split(":")
+                 h=parseInt(h)
+                 let ampm=h>=12?"PM":"AM"
+                 let d=h%12 || 12
+                 return `${d}:${m}${ampm.toLowerCase()}`
+               }
+   
+               return `${format(s.start)}-${format(s.end)}`
+            })
+         }])
+   
+      }else{
+   
+         setDocSlots([{
+            date:today,
+            times:[
+              "10:00am-11:00am",
+              "1:00pm-2:00pm",
+              "5:00pm-7:00pm"
+            ]
+         }])
+   
+      }
+   
     }
-
+   
     fetchSlots()
-  }, [])
+   
+   },[])
 
   if (!docInfo) return <h1>Loading...</h1>
 
@@ -508,30 +526,43 @@ const Appointment = () => {
         <h2 className='text-xl text-blue-600'>Booking Slots</h2>
 
         <div className='flex flex-col gap-6 mt-5'>
-          {docSlots.map((slot, i) => (
-            <div key={i} className="flex flex-col items-center gap-3">
+        {(docSlots.length ? docSlots : [{
+ date:new Date().toISOString().split("T")[0],
+ times:[
+   "10:00am-11:00am",
+   "1:00pm-2:00pm",
+   "5:00pm-7:00pm"
+ ]
+}]).map((slot,i)=>(
 
-             <h3 className="px-6 py-2 rounded text-base bg-blue-600 text-white">
-                {new Date(slot.date).toDateString()}
-              </h3>
+<div key={i} className="flex flex-col items-center gap-3">
 
-              <div className="flex gap-3 flex-wrap justify-center">
-                {slot.times?.map((t, j) => (
-                  <button
-                    key={j}
-                    onClick={() => {
-                      setSlotTime(t)
-                      setSlotIndex(i)
-                    }}
-                    className={`px-4 py-2 border rounded ${slotIndex === i && slotTime === t ? 'bg-blue-600 text-white' : ''}`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
+<h3 className="px-6 py-2 rounded text-base bg-blue-600 text-white">
+ {new Date(slot.date).toDateString()}
+</h3>
 
-            </div>
-          ))}
+<div className="flex gap-3 flex-wrap justify-center">
+
+{slot.times.map((t,j)=>(
+<button
+ key={j}
+ onClick={()=>{
+   setSlotTime(t)
+   setSlotIndex(j)
+ }}
+ className={`px-4 py-2 border rounded
+ ${slotIndex===j ? "bg-blue-600 text-white" : ""}
+ `}
+>
+ {t}
+</button>
+))}
+
+</div>
+
+</div>
+
+))}
         </div>
 
         <button
