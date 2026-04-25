@@ -103,191 +103,92 @@ const PatientDashboard = () => {
 
             {/* ================= POPUP ================= */}
             {selected && (
-                <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40">
+<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-<div className="bg-white w-[95%] md:w-[900px] rounded-lg flex flex-col md:flex-row overflow-hidden max-h-[90vh] overflow-y-auto md:overflow-hidden">
+<div className="bg-white w-[95%] md:w-[650px] rounded-2xl shadow-2xl p-8 relative">
 
-                        {/* LEFT SIDEBAR */}
-                        <div className="w-full md:w-1/4 bg-gray-100 p-3 md:p-4 flex flex-col gap-2">
-                            <h2 className="font-bold text-lg">Appointment Panel</h2>
+{/* CLOSE */}
+<button
+onClick={()=>setSelected(null)}
+className="absolute top-4 right-5 text-2xl font-bold"
+>
+✖
+</button>
 
-                            <button
-                                onClick={() => setStep(1)}
-                                className={`w-full p-2 rounded text-white whitespace-nowrap ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}
-                            >
-                                Patient Details
-                            </button>
+{/* Doctor Image */}
+<div className="flex flex-col items-center mb-8">
 
-                            <button
-                                onClick={() => {
-                                    setStep(2)
-                                    if (!checkInTime) setCheckInTime(Date.now())
-                                }}
-                                className={`min-w-[120px] md:w-full px-4 py-2 rounded text-white whitespace-nowrap ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}
-                            >
-                                Check-In
-                            </button>
+<img
+src={selected.doctorImage}
+alt=""
+className="w-28 h-28 rounded-full border object-cover"
+/>
 
-                            <button
-                                onClick={() => setStep(3)}
-                                className={`min-w-[120px] md:w-full px-4 py-2 rounded text-white whitespace-nowrap ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}
-                            >
-                                Pay
-                            </button>
+<h2 className="text-3xl font-bold mt-4">
+Dr. {selected.doctorName}
+</h2>
 
-                        </div>
+<p className="text-gray-500">
+Consulting Doctor
+</p>
 
-                        {/* RIGHT CONTENT */}
-                        <div className="w-full md:w-3/4 p-4 md:p-6 flex flex-col justify-between">
+</div>
 
-                            <button
-                                onClick={() => setSelected(null)}
-                                className="absolute top-2 right-3 text-xl"
-                            >
-                                ✖
-                            </button>
 
-                            {/* STEP 1 */}
-                            {step === 1 && (
-                                <div className="flex flex-col h-full">
+<h3 className="text-2xl font-bold mb-6">
+Patient Full Details
+</h3>
 
-                                    <div className="flex justify-center mb-4">
-                                        <img
-                                            src={selected?.doctorImage}
-                                            alt="doctor"
-                                            className="w-20 h-20 rounded-full object-cover border"
-                                        />
-                                    </div>
+<div className="grid md:grid-cols-2 gap-5">
 
-                                    <div>
-                                        <h3 className="text-lg font-bold mb-6">
-                                            Patient & Appointment Info
-                                        </h3>
+<div className="border rounded-xl p-4">
+<b>Patient Name:</b><br/>
+{selected.patientName}
+</div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+<div className="border rounded-xl p-4">
+<b>Phone:</b><br/>
+{selected.phone}
+</div>
 
-                                            <div className="space-y-4">
-                                                <input value={selected.patientName} disabled className="w-full border p-3 rounded-xl" />
-                                                <input value={selected.phone} disabled className="w-full border p-3 rounded-xl" />
-                                                <input value={selected.address} disabled className="w-full border p-3 rounded-xl" />
-                                                <input value={selected.doctorName} disabled className="w-full border p-3 rounded-xl" />
-                                            </div>
+<div className="border rounded-xl p-4">
+<b>Address:</b><br/>
+{selected.address}
+</div>
 
-                                            <div className="space-y-4">
-                                                <input value={selected.appointmentNo} disabled className="w-full border p-3 rounded-xl" />
-                                                <input value={selected.date} disabled className="w-full border p-3 rounded-xl" />
-                                                <input value={selected.time} disabled className="w-full border p-3 rounded-xl" />
-                                            </div>
+<div className="border rounded-xl p-4">
+<b>Appointment No:</b><br/>
+{selected.appointmentNo}
+</div>
 
-                                        </div>
-                                    </div>
+<div className="border rounded-xl p-4">
+<b>Date:</b><br/>
+{selected.date}
+</div>
 
-                                    {/* FIXED BUTTON */}
-                                    <div className="flex flex-col md:flex-row justify-end gap-3 mt-6">
+<div className="border rounded-xl p-4">
+<b>Time:</b><br/>
+{selected.time}
+</div>
 
-                                        <button
-                                            onClick={() => navigate("/my-profile", { state: selected })}
-                                            className="bg-green-600 text-white px-6 py-2 rounded"
-                                        >
-                                            View Profile
-                                        </button>
+</div>
 
-                                        <button
-                                            onClick={() => setStep(step + 1)}
-                                            className="bg-blue-600 text-white px-6 py-2 rounded"
-                                        >
-                                            Next
-                                        </button>
 
-                                    </div>
+<div className="flex justify-end mt-8">
 
-                                </div>
-                            )}
+<button
+onClick={()=>setSelected(null)}
+className="bg-blue-600 text-white px-8 py-3 rounded-lg"
+>
+Close
+</button>
 
-                            {/* STEP 2 */}
-                            {step === 2 && (
-                                <div className="flex flex-col h-full text-center">
+</div>
 
-                                    <div>
-                                        <h3 className="text-lg font-bold mb-6">Consultation</h3>
+</div>
 
-                                        {!checkedOut ? (
-                                            <>
-                                                <p className="text-xl mb-4">⏱ {duration}s</p>
-
-                                                <button
-                                                    onClick={() => setCheckedOut(true)}
-                                                    className="bg-red-500 text-white px-6 py-2 rounded mb-4"
-                                                >
-                                                    Check-Out
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <p className="text-green-600 font-bold mb-4">
-                                                Completed ✅ <br />
-                                                Time: {duration}s
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* FIXED BUTTON */}
-                                    <div className="flex justify-end gap-4 mt-6">
-
-                                        <button
-                                            onClick={() => setStep(step - 1)}
-                                            className="bg-gray-400 text-white px-6 py-2 rounded"
-                                        >
-                                            Previous
-                                        </button>
-
-                                        <button
-                                            onClick={() => setStep(step + 1)}
-                                            className="bg-blue-600 text-white px-6 py-2 rounded"
-                                        >
-                                            Next
-                                        </button>
-
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* STEP 3 */}
-                            {step === 3 && (
-                                <div className="flex flex-col h-full">
-
-                                    <div>
-                                        <h3 className="text-lg font-bold mb-6">Payment</h3>
-
-                                        <div className="space-y-4 max-w-md">
-                                            <input value="Consultation Fee - ₹500" disabled className="w-full border p-3 rounded-xl" />
-                                            <input value="Service Charge - ₹100" disabled className="w-full border p-3 rounded-xl" />
-                                            <input value="Total - ₹600" disabled className="w-full border p-3 rounded-xl font-bold" />
-
-                                            <button className="bg-blue-600 text-white px-6 py-2 rounded w-full">
-                                                Pay Now
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* FIXED BUTTON */}
-                                    <div className="mt-auto flex justify-start pt-6">
-                                        <button
-                                            onClick={() => setStep(2)}
-                                            className="bg-gray-400 text-white px-6 py-2 rounded"
-                                        >
-                                            Previous
-                                        </button>
-                                    </div>
-
-                                </div>
-                            )}
-
-                        </div>
-
-                    </div>
-
-                </div>
-            )}
+</div>
+)}
 
             {/* MOBILE BOTTOM NAV */}
 <div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around items-center py-2 md:hidden z-50">
