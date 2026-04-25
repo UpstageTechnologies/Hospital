@@ -136,7 +136,8 @@ const MasterLogin = () => {
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
-<button type="button" onClick={() => navigate("/demohome")} className="text-4xl font-bold cursor-pointer leading-none" >
+<button type="button" onClick={() => navigate("/demohome")} className=" w-12 h-12 rounded-full bg-blue-600 text-white text-4xl font-bold flex items-center justify-center
+shadow-md hover:bg-blue-700 transition" >
 ←
 </button>
 
@@ -165,7 +166,8 @@ Demo
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
-<button type="button" onClick={() => navigate("/demohome")} className="text-4xl font-bold cursor-pointer leading-none" >
+<button type="button" onClick={() => navigate("/demohome")} className=" w-12 h-12 rounded-full bg-blue-600 text-white text-4xl font-bold flex items-center justify-center
+shadow-md hover:bg-blue-700 transition" >
 ←
 </button>
 
