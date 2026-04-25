@@ -1,100 +1,218 @@
-import React, { useContext } from 'react'
-import { AppContext } from '../context/AppContext'
+import React, { useContext, useState } from "react";
+import { AppContext } from "../context/AppContext";
 
 const MyAppointment = () => {
 
-  const { appointments, user, doctors } = useContext(AppContext)
+const { appointments, user, doctors } = useContext(AppContext);
+const [selected,setSelected] = useState(null);
 
-  // ✅ user check
-  if (!user) {
-    return <p className="mt-10 text-center">Login pannunga</p>
-  }
+if(!user){
+return <p className="mt-10 text-center">Login pannunga</p>
+}
 
-  const userAppointments = appointments.filter(
-    item => item.userId === user.id
-  )
+const userAppointments = appointments;
+return (
+<div className="p-6">
 
-  return (
-    <div>
+<h1 className="text-3xl font-bold mb-8">
+My Appointments
+</h1>
 
-      <p className='pb-3 mt-12 font-medium text-zinc-700 border-b'>
-        My Appointment
-      </p>
+{/* Appointment Small Boxes */}
+<div className="grid md:grid-cols-2 gap-6">
 
-      <div>
+{userAppointments.length===0 && (
+<p>No Appointments Found</p>
+)}
 
-        {userAppointments.length === 0 && (
-          <p className="mt-5 text-gray-500">No Appointments Found</p>
-        )}
+{userAppointments.map((item,index)=>{
 
-        {userAppointments.map((item, index) => {
+const doctor=doctors.find(
+d=>d.id===item.doctorId
+)
 
-          // ✅ find doctor details
-          const doctor = doctors.find(d => d.id === item.doctorId)
+return(
 
-          return (
-            <div key={index}
-              className='grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b'>
+<div
+key={index}
+onClick={()=>setSelected({
+...item,
+doctor
+})}
+className="
+border rounded-xl p-5
+shadow-sm cursor-pointer
+hover:shadow-lg hover:bg-gray-50
+"
+>
 
-              {/* Image */}
-              <div>
-                <img
-                  className='w-32 bg-indigo-50'
-                  src={doctor?.image || "/user.png"}
-                  alt=""
-                />
-              </div>
+<div className="text-center py-6 font-semibold text-lg">
+View Appointments
+</div>
 
-              {/* Details */}
-              <div className='flex-1 text-sm text-zinc-600'>
-                <p className='text-neutral-800 font-semibold'>
-                  {doctor?.name}
-                </p>
+</div>
 
-                <p>{doctor?.speciality}</p>
+)
 
-                <p className='text-zinc-700 font-medium mt-1'>Address:</p>
-                <p className='text-xs'>{doctor?.address?.line1}</p>
-                <p className='text-xs'>{doctor?.address?.line2}</p>
+})}
 
-                <p className='text-xs mt-1'>
-                  <span className='text-sm font-medium'>Date & Time:</span>
-                  {" "}
-                  {item.date} | {item.time}
-                </p>
+</div>
 
-                {/* Payment */}
-                <p className={`mt-2 font-medium ${
-                  item.isPaid ? "text-green-500" : "text-red-500"
-                }`}>
-                  {item.isPaid ? "Paid" : "Pending Payment"}
-                </p>
 
-              </div>
+{/* Popup */}
+{selected && (
 
-              {/* Buttons */}
-              <div className='flex flex-col gap-2 justify-end'>
+<div className="
+fixed inset-0 bg-black/40
+flex items-center justify-center
+z-50
+">
 
-                {!item.isPaid && (
-                  <button className='text-sm sm:min-w-48 py-2 border rounded hover:bg-blue-500 hover:text-white'>
-                    Pay Online
-                  </button>
-                )}
+<div className="
+bg-white
+w-[85%] md:w-[420px] max-h-[80vh] overflow-y-auto
+rounded-2xl
+shadow-2xl
+p-4
+relative
+">
 
-                <button className='text-sm sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white'>
-                  Cancel Appointment
-                </button>
+<button
+onClick={()=>setSelected(null)}
+className="absolute top-4 right-5 text-2xl"
+>
+✖
+</button>
 
-              </div>
 
-            </div>
-          )
-        })}
+{/* Doctor */}
+<div className="text-center mb-4">
 
-      </div>
+<img
+src={selected.doctor?.image || "/user.png"}
+alt=""
+className="
+w-14 h-14 rounded-full
+mx-auto object-cover border
+"
+/>
 
-    </div>
-  )
+<h2 className="text-3xl font-bold mt-4">
+Dr. {selected.doctor?.name}
+</h2>
+
+<p className="text-gray-500">
+{selected.doctor?.speciality}
+</p>
+
+</div>
+
+
+<h3 className="text-2xl font-bold mb-5">
+Patient Full Details
+</h3>
+
+
+<div className="grid md:grid-cols-2 gap-3">
+
+<div className="border p-3 rounded-xl">
+<b>Patient Name:</b><br/>
+{user.name}
+</div>
+
+<div className="border p-3 rounded-xl">
+<b>Doctor Name:</b><br/>
+{selected.doctor?.name}
+</div>
+
+<div className="border p-3 rounded-xl">
+<b>Date:</b><br/>
+{selected.date}
+</div>
+
+<div className="border p-3 rounded-xl">
+<b>Time:</b><br/>
+{selected.time}
+</div>
+
+<div className="border p-3 rounded-xl">
+<b>Address:</b><br/>
+{selected.doctor?.address?.line1}
+<br/>
+{selected.doctor?.address?.line2}
+</div>
+
+<div className="border p-3 rounded-xl">
+<b>Appointment Status:</b><br/>
+Confirmed
+</div>
+
+</div>
+
+
+{/* Payment */}
+<div className="mt-4 border rounded-xl p-4">
+
+<h2 className="text-xl font-bold mb-4">
+Payment Details
+</h2>
+
+<p className="mb-2">
+Consultation Fee: ₹600
+</p>
+
+<p className="mb-4">
+Status:
+<span className={
+selected.isPaid
+? " text-green-600 font-bold"
+: " text-red-500 font-bold"
+}>
+{selected.isPaid ? " Paid" : " Pending"}
+</span>
+</p>
+
+
+{!selected.isPaid && (
+
+<button
+className="
+bg-green-600 text-white
+px-6 py-3 rounded-lg
+"
+onClick={()=>alert("Payment Gateway Integrate pannalam")}
+>
+Pay Now
+</button>
+
+)}
+
+</div>
+
+
+<div className="flex justify-end mt-6">
+
+<button
+onClick={()=>setSelected(null)}
+className="
+bg-blue-600 text-white
+px-6 py-3 rounded-lg
+"
+>
+Close
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+</div>
+)
+
 }
 
 export default MyAppointment
