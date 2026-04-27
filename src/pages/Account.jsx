@@ -90,8 +90,39 @@ const Account = () => {
   const [accounts, setAccounts] = useState([])
   const [doctorAccounts, setDoctorAccounts] = useState([])
   const [adminsAccounts, setAdminsAccounts] = useState([])
+  const [pharmasiAccounts,setPharmasiAccounts]=useState([]);
   const [showAccountPopup, setShowAccountPopup] = useState(false)
   const [adminStep, setAdminStep] = useState(1)
+
+  const [pharmasiStep,setPharmasiStep] = useState(1);
+
+const [pharmasiBasicInfo,setPharmasiBasicInfo] = useState({
+name:"",
+age:"",
+gender:"",
+dob:"",
+address:"",
+contact:"",
+emrContact:"",
+email:"",
+occupation:""
+});
+
+const [pharmasiDesignation,setPharmasiDesignation] = useState({
+designation:""
+});
+
+const [pharmasiOfficial,setPharmasiOfficial] = useState({
+pharmasiId:"",
+joiningDate:"",
+relievingDate:""
+});
+
+const [pharmasiAccount,setPharmasiAccount] = useState({
+pharmasiId:"",
+password:"",
+confirmPassword:""
+});
 
   const [adminBasicInfo, setAdminBasicInfo] = useState({
     name: "",
@@ -346,6 +377,7 @@ const Account = () => {
     fetchDoctors()
     fetchAdmins()
     fetchPatients()
+    fetchPharmasi()
 
   }, [])
 
@@ -374,6 +406,35 @@ const Account = () => {
     }
 
   }
+
+  const fetchPharmasi = async () => {
+
+    try{
+    
+    const querySnapshot =
+    await getDocs(
+    collection(db,"pharmasi")
+    );
+    
+    const pharmasiList=[];
+    
+    querySnapshot.forEach((doc)=>{
+    pharmasiList.push({
+    id:doc.id,
+    ...doc.data()
+    });
+    });
+    
+    setPharmasiAccounts(
+    pharmasiList
+    );
+    
+    }
+    catch(error){
+    console.log(error)
+    }
+    
+    }
 
   const fetchPatients = async () => {
 
@@ -658,6 +719,92 @@ const Account = () => {
       console.log(err)
     }
   }
+
+  const handleCreatePharmasiFull = async()=>{
+
+    try{
+    
+    if(!pharmasiOfficial.pharmasiId){
+    alert("Enter Pharmasi ID");
+    return;
+    }
+    
+    if(
+    !pharmasiAccount.password ||
+    !pharmasiAccount.confirmPassword
+    ){
+    alert("Enter Password");
+    return;
+    }
+    
+    if(
+    pharmasiAccount.password !==
+    pharmasiAccount.confirmPassword
+    ){
+    alert("Password mismatch");
+    return;
+    }
+    
+    await setDoc(
+    doc(
+    db,
+    "pharmasi",
+    pharmasiOfficial.pharmasiId
+    ),
+    {
+    pharmasiBasicInfo,
+    pharmasiDesignation,
+    pharmasiOfficial,
+    pharmasiAccount,
+    isDisabled:false,
+    createdAt:new Date()
+    }
+    );
+    
+    alert("Pharmasi Created Successfully");
+    
+    await fetchPharmasi();
+    
+    
+    setPharmasiBasicInfo({
+    name:"",
+    age:"",
+    gender:"",
+    dob:"",
+    address:"",
+    contact:"",
+    emrContact:"",
+    email:"",
+    occupation:""
+    });
+    
+    setPharmasiDesignation({
+    designation:""
+    });
+    
+    setPharmasiOfficial({
+    pharmasiId:"",
+    joiningDate:"",
+    relievingDate:""
+    });
+    
+    setPharmasiAccount({
+    pharmasiId:"",
+    password:"",
+    confirmPassword:""
+    });
+    
+    setPharmasiStep(1);
+    
+    }
+    catch(error){
+    
+    console.log(error);
+    alert("Save Failed");
+    
+    }
+    
+    }
 
   const handleCreatePatient = async () => {
     try {
@@ -959,8 +1106,8 @@ const Account = () => {
                 Patients
               </li>
 
-              <li className="cursor-pointer hover:text-gray-200" onClick={() => setSubmenu("formasi")}>
-                Formasi
+              <li className="cursor-pointer hover:text-gray-200" onClick={() => setSubMenu("pharmasi")}>
+                pharmasi
               </li>
 
             </ul>
@@ -1022,7 +1169,7 @@ const Account = () => {
 
 
 
-            <div className="w-full md:w-3/4 p-4 md:p-6 relative overflow-visible md:overflow-hidden md:h-[450px] h-auto">
+<div className="w-full md:w-3/4 p-4 md:p-6 relative overflow-visible md:overflow-visible md:h-auto h-auto">
 
 
 
@@ -1266,105 +1413,7 @@ const Account = () => {
 
         )}
 
-        {subMenu === "admins" && (
 
-          <div className="mt-10">
-
-            <h2 className="text-xl font-bold mb-4">Created Admin Accounts</h2>
-
-            <table className="w-full border border-gray-300">
-
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="border p-2">Full Name</th>
-                  <th className="border p-2">Email</th>
-                  <th className="border p-2">Password</th>
-                  <th className="border p-2">Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {adminsAccounts.map((adm, index) => (
-                  <tr key={index}>
-
-                    <td className="border p-2">
-                      {adm.adminBasicInfo?.name}
-                    </td>
-
-                    <td className="border p-2">
-                      {adm.adminBasicInfo?.email}
-                    </td>
-
-                    <td className="border p-2">
-                      {adm.adminAccount?.password}
-                    </td>
-
-                    <td className="border p-2 flex gap-2">
-
-
-                      <button onClick={() => {
-
-                        setAdminBasicInfo(adm.adminBasicInfo)
-                        setAdminDesignation(adm.adminDesignation)
-                        setAdminOfficial(adm.adminOfficial)
-                        setAdminAccount(adm.adminAccount)
-
-                        setIsViewMode(true)
-                        setAdminStep(1)
-
-                      }} className="bg-green-500 text-white px-2 py-1 rounded">
-                        View
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setAdminBasicInfo(adm.adminBasicInfo)
-                          setAdminDesignation(adm.adminDesignation)
-                          setAdminOfficial(adm.adminOfficial)
-                          setAdminAccount(adm.adminAccount)
-
-                          setIsViewMode(false)
-                          setIsEditMode(true)
-                          setAdminStep(1)
-                        }}
-                      >
-                        Edit
-                      </button>
-
-                      <button onClick={async () => {
-                        await deleteDoc(doc(db, "admins", adm.id))
-                        fetchAdmins()
-                      }}
-                        className="bg-red-500 text-white px-2 py-1 rounded"
-                      >
-                        Delete
-                      </button>
-
-                      <button onClick={async () => {
-                        await updateDoc(doc(db, "admins", adm.id), {
-                          isDisabled: !adm.isDisabled
-                        })
-                        fetchAdmins()
-                      }}
-                        className={`px-2 py-1 rounded text-white ${adm.isDisabled ? "bg-green-500" : "bg-gray-500"
-                          }`}
-                      >
-                        {adm.isDisabled ? "Enable" : "Disable"}
-                      </button>
-
-                    </td>
-
-                  </tr>
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        )}
 
         {subMenu === "doctors" && (
 
@@ -2629,6 +2678,415 @@ const Account = () => {
         )}
 
 
+{subMenu==="pharmasi" && (
+
+<div className="w-full max-w-7xl border rounded-xl overflow-hidden
+flex flex-col md:flex-row
+min-h-[760px] md:min-h-[620px]">
+
+<div className="w-full md:w-1/4 p-4 flex md:block gap-2 md:space-y-4">
+
+<h2 className="hidden md:block text-2xl font-bold">
+Create Pharmasi Account
+</h2>
+
+<button onClick={()=>{setIsViewMode(false);
+  setPharmasiStep(1);
+  }}
+className={`w-full p-3 rounded text-white ${
+pharmasiStep===1?"bg-blue-500":"bg-gray-400"
+}`}>
+Basic Info
+</button>
+
+<button onClick={()=>{ setIsViewMode(false);
+  setPharmasiStep(2);
+  }}
+className={`w-full p-3 rounded text-white ${
+pharmasiStep===2?"bg-blue-500":"bg-gray-400"
+}`}>
+Designation
+</button>
+
+<button onClick={()=>{ setIsViewMode(false);
+  setPharmasiStep(3);
+  }}
+className={`w-full p-3 rounded text-white ${
+pharmasiStep===3?"bg-blue-500":"bg-gray-400"
+}`}>
+Official Info
+</button>
+
+<button onClick={()=>{ setIsViewMode(false);
+  setPharmasiStep(4);
+  }}
+className={`w-full p-3 rounded text-white ${
+pharmasiStep===4?"bg-blue-500":"bg-gray-400"
+}`}>
+Account
+</button>
+
+</div>
+
+
+<div className="w-full md:w-3/4 relative p-6 pb-28 min-h-[600px]">
+
+{pharmasiStep===1 && (
+<>
+<h3 className="font-bold text-xl mb-6">
+Basic Information
+</h3>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+<FloatingInput label="Name" type="name" value={pharmasiBasicInfo.name}
+onChange={(e)=> 
+setPharmasiBasicInfo({
+  ...pharmasiBasicInfo,
+  name:e.target.value
+})}/>
+
+
+<FloatingInput label="Age" type="number" value={pharmasiBasicInfo.age}
+onChange={(e)=>
+setPharmasiBasicInfo({
+  ...pharmasiBasicInfo,
+  age:e.target.value
+})}/>
+
+<select value={pharmasiBasicInfo.gender}
+onChange={(e)=>
+setPharmasiBasicInfo({
+...pharmasiBasicInfo,
+gender:e.target.value
+})
+}
+>
+<option value="">Select Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+</select>
+
+<FloatingInput label="DOB" type="date" value={pharmasiBasicInfo.dob}
+onChange={(e)=>
+setPharmasiBasicInfo({
+...pharmasiBasicInfo,
+dob:e.target.value
+})
+}
+/>
+
+<FloatingInput label="Address" className="col-span-2" inputClassName="h-[120px] pt-6" value={pharmasiBasicInfo.address}
+onChange={(e)=>
+setPharmasiBasicInfo({
+...pharmasiBasicInfo,
+address:e.target.value
+})
+}
+/>
+
+<div className="md:col-span-2 flex flex-col gap-4">
+<FloatingInput label="Contact Number" value={pharmasiBasicInfo.contact}
+onChange={(e)=>
+setPharmasiBasicInfo({
+...pharmasiBasicInfo,
+contact:e.target.value
+})
+}
+/>
+
+<FloatingInput label="EMR Contact" value={pharmasiBasicInfo.emrContact}
+onChange={(e)=>
+setPharmasiBasicInfo({
+...pharmasiBasicInfo,
+emrContact:e.target.value
+})
+}
+/>
+</div>
+
+<FloatingInput label="Email" type="email" value={pharmasiBasicInfo.email}
+onChange={(e)=>
+setPharmasiBasicInfo({
+  ...pharmasiBasicInfo,
+  email:e.target.value
+})}
+className="md:col-span-2"
+/>
+
+<FloatingInput label="Occupation" type="number" value={pharmasiBasicInfo.occupation}
+onChange={(e)=>
+setPharmasiBasicInfo({
+  ...pharmasiBasicInfo,
+  occupation:e.target.value
+})}
+className="md:col-span-2"
+/>
+
+</div>
+</>
+)}
+
+
+{pharmasiStep===2 && (
+<>
+<h3 className="font-bold text-xl mb-6">
+Designation
+</h3>
+
+<div className="max-w-xl">
+<FloatingInput label="Designation" value={pharmasiDesignation.designation}
+onChange={(e)=>
+setPharmasiDesignation({
+...pharmasiDesignation,
+designation:e.target.value
+})
+}
+/>
+</div>
+
+</>
+)}
+
+
+{pharmasiStep===3 && (
+<>
+<h3 className="font-bold text-xl mb-6">
+Official Info
+</h3>
+
+<div className="flex flex-col gap-6 max-w-md">
+<FloatingInput label="Pharmasi ID"/>
+
+
+<FloatingInput label="Joining Date" type="date" value={pharmasiOfficial.joiningDate}
+onChange={(e)=>
+setPharmasiOfficial({
+...pharmasiOfficial,
+joiningDate:e.target.value
+})
+}
+/>
+
+<FloatingInput label="Relieving Date" type="date" value={pharmasiOfficial.relievingDate}
+onChange={(e)=>
+setPharmasiOfficial({
+...pharmasiOfficial,
+relievingDate:e.target.value
+})
+}
+/>
+</div>
+
+</>
+)}
+
+
+{pharmasiStep===4 && (
+<>
+<h3 className="font-bold text-xl mb-6">
+Create Account
+</h3>
+
+<div className="flex flex-col gap-6 max-w-md">
+
+<FloatingInput label="Pharmasi ID" value={pharmasiOfficial.pharmasiId}
+onChange={(e)=>{
+setPharmasiOfficial({
+...pharmasiOfficial,
+pharmasiId:e.target.value
+});
+
+setPharmasiAccount({
+...pharmasiAccount,
+pharmasiId:e.target.value
+});
+
+}}
+/>
+
+<FloatingInput label="Password" type="password" value={pharmasiAccount.password}
+onChange={(e)=>
+setPharmasiAccount({
+...pharmasiAccount,
+password:e.target.value
+})
+}/>
+
+<FloatingInput label="Confirm Password" type="password" value={pharmasiAccount.confirmPassword}
+onChange={(e)=>
+setPharmasiAccount({
+...pharmasiAccount,
+confirmPassword:e.target.value
+})
+}/>
+
+</div>
+
+</>
+)}
+
+
+{/* FIXED BUTTONS */}
+<div className="absolute bottom-6 right-6 flex gap-4">
+
+{pharmasiStep>1 && (
+<button onClick={()=>setPharmasiStep(pharmasiStep-1)} className="bg-gray-500 text-white px-8 py-3 rounded">
+Previous
+</button>
+)}
+
+{pharmasiStep<4 ? (
+
+<button onClick={()=>setPharmasiStep(pharmasiStep+1)} className="bg-blue-500 text-white px-8 py-3 rounded">
+Next
+</button>
+
+):(
+
+<button type="button" onClick={(e)=>{
+e.preventDefault();
+e.stopPropagation();
+
+console.log("clicked");
+
+alert("Create button working");
+
+handleCreatePharmasiFull();
+}}className="bg-green-500 text-white px-8 py-2 rounded relative z-[9999] pointer-events-auto"
+style={{position:"relative"}}>
+Create Pharmasi
+</button>
+)}
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{subMenu==="pharmasi" && (
+
+<div className="mt-10">
+
+<h2 className="text-xl font-bold mb-4">
+Created Pharmasi Accounts
+</h2>
+
+<table className="w-full border border-gray-300">
+
+<thead className="bg-gray-200">
+<tr>
+<th className="border p-2">Name</th>
+<th className="border p-2">Age</th>
+<th className="border p-2">Address</th>
+<th className="border p-2">Contact</th>
+<th className="border p-2">Designation</th>
+<th className="border p-2">Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{pharmasiAccounts.map((item,index)=>(
+
+<tr key={index}>
+
+<td className="border p-2">
+{item.pharmasiBasicInfo?.name}
+</td>
+
+<td className="border p-2">
+{item.pharmasiBasicInfo?.age}
+</td>
+
+<td className="border p-2">
+{item.pharmasiBasicInfo?.address}
+</td>
+
+<td className="border p-2">
+{item.pharmasiBasicInfo?.contact}
+</td>
+
+<td className="border p-2">
+{item.pharmasiDesignation?.designation}
+</td>
+
+<td className="border p-2 flex gap-2">
+
+<button
+onClick={()=>{
+setPharmasiBasicInfo(item.pharmasiBasicInfo)
+setPharmasiDesignation(item.pharmasiDesignation)
+setPharmasiOfficial(item.pharmasiOfficial)
+setPharmasiAccount(item.pharmasiAccount)
+
+setIsViewMode(true)
+setPharmasiStep(1)
+
+}}className="bg-green-500 text-white px-2 py-1 rounded">
+View
+</button>
+
+<button onClick={()=>{
+setEditData(docData);
+
+setDoctorBasicInfo(docData.doctorBasicInfo || {});
+setDoctorDesignation(docData.doctorDesignation || {});
+setDoctorOfficial(docData.doctorOfficial || {});
+setDoctorAccount(docData.doctorAccount || {});
+
+setIsViewMode(false);
+setIsEditMode(true);
+setDoctorStep(1);
+}}
+className="bg-blue-500 text-white px-3 py-1 rounded">
+Edit
+</button>
+
+
+<button onClick={async()=>{
+await deleteDoc(
+doc(db,"pharmasi",item.id)
+)
+
+fetchPharmasi()
+
+}}className="bg-red-500 text-white px-2 py-1 rounded">
+Delete
+</button>
+
+
+<button onClick={async()=>{
+await updateDoc(
+doc(db,"pharmasi",item.id),
+{
+isDisabled:!item.isDisabled
+}
+)
+
+fetchPharmasi()
+
+}}className="bg-gray-500 text-white px-2 py-1 rounded">
+{item.isDisabled ? "Enable":"Disable"}
+</button>
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+</table>
+
+</div>
+
+)}
+
+
 
         {menu === "home" && (
           <div>
@@ -2809,47 +3267,35 @@ const Account = () => {
 
     <p className="font-bold mb-2">Account Creation</p>
 
-    <button 
-      onClick={() => {
+    <button  onClick={() => {
         setMenu("account")
         setSubMenu("admins")
         setShowAccountPopup(false)
-      }}
-      className="block w-full text-left py-2"
-    >
+      }}className="block w-full text-left py-2">
       Admins
     </button>
 
-    <button 
-      onClick={() => {
+    <button onClick={() => {
         setMenu("account")
         setSubMenu("doctors")
         setShowAccountPopup(false)
-      }}
-      className="block w-full text-left py-2"
-    >
+      }}className="block w-full text-left py-2">
       Doctors
     </button>
 
-    <button 
-      onClick={() => {
+    <button onClick={() => {
         setMenu("account")
         setSubMenu("staff")
         setShowAccountPopup(false)
-      }}
-      className="block w-full text-left py-2"
-    >
+      }}className="block w-full text-left py-2">
       Other Staffs
     </button>
 
-    <button 
-      onClick={() => {
+    <button onClick={() => {
         setMenu("account")
         setSubMenu("patients")
         setShowAccountPopup(false)
-      }}
-      className="block w-full text-left py-2"
-    >
+      }}className="block w-full text-left py-2">
       Patients
     </button>
 

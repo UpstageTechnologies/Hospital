@@ -23,6 +23,8 @@ import UpstageNavbar from "./components/UpstageNavbar";
 import Loding from "./pages/Loding";
 import Home from "./pages/Home";
 import MasterLogin from "./pages/MasterLogin";
+import PharmasiLogin from "./pages/PharmasiLogin";
+import PharmasiDashboard from "./pages/PharmasiDashboard";
 import Doctor from "./pages/Doctor";
 import Login from "./pages/PatientLogin";
 import About from "./pages/About";
@@ -105,6 +107,8 @@ location.pathname === "/demodoctordashboard"
         <Route path="/my-appointment" element={<MyAppointment />} />
         <Route path="/appointment/:docId" element={<Appointment />} />
         <Route path="/master-login" element={<MasterLogin />} />
+        <Route path="/pharmasi-login" element={<PharmasiLogin/>}/>
+        <Route path="/pharmasi-dashboard" element={<PharmasiDashboard/>}/>
         <Route path="/doctor-login" element={<DoctorLogin />} />
         <Route path="/patient-login" element={<PatientLogin />} />
         <Route path="/patient-dashboard" element={<PatientDashboard />} />

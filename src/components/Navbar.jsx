@@ -262,6 +262,14 @@ const Navbar = () => {
                                             className="cursor-pointer hover:text-black whitespace-nowrap">
                                             Staff Login
                                         </p>
+
+                                        <p onClick={() =>{
+                                            navigate('/pharmasi-login')
+                                            setShowProfileMenu(false)
+                                        }}
+                                            className="cursor-pointer hover:text-black whitespace-nowrap">
+                                            Pharmasi Login
+                                        </p>
                                     </div>
                                 </div>
                             )}

@@ -46,20 +46,7 @@ const Upstage = () => {
   }
 };
 
-useEffect(() => {
-  const savedImages = {};
 
-  doctors.forEach((doc) => {
-    const storedImage = localStorage.getItem(`doctorImage_${doc.id}`);
-
-    if (storedImage) {
-      savedImages[doc.id] = storedImage;
-    }
-  });
-
-  setDoctorImages(savedImages);
-
-}, [doctors]);
 
     useEffect(() => {
         const fetchDoctors = async () => {
@@ -222,25 +209,9 @@ useEffect(() => {
                         >
 
 <img
-  src={
- doctorImages[doc.id] ||
- "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
-}
-  alt="profile"
-  onClick={(e) => {
-    e.stopPropagation();
-
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-
-    input.onchange = (event) => {
-      handleImageUpload(doc.id, event);
-    };
-
-    input.click();
-  }}
-  className="w-full h-60 object-contain bg-blue-50 cursor-pointer"
+src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+alt="user"
+className="w-full h-60 object-contain bg-blue-50"
 />
 
                             <div className="p-4">
