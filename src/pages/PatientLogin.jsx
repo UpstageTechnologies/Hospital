@@ -74,7 +74,7 @@ const Login = () => {
       email === "demopatient@gmail.com" &&
       password === "demopatient11"
      ){
-      alert("Demo Patient Login Success");
+
       window.location.href="/#/demopatientdashboard";
       return;
      }
@@ -158,13 +158,14 @@ const Login = () => {
 
 <div className="flex items-center gap-4">
 
+<button onClick={() => navigate("/demohome")}
+className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+  <span className="text-white text-3xl font-bold -mt-1">←</span>
+</button>
+
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
-<button type="button" onClick={() => navigate("/demohome")} className=" w-12 h-12 rounded-full bg-blue-600 text-white text-4xl font-bold flex items-center justify-center
-shadow-md hover:bg-blue-700 transition" >
-←
-</button>
 
 </div>
 
@@ -189,13 +190,14 @@ shadow-md hover:bg-blue-700 transition" >
   <div className="flex items-center justify-between px-6 py-5">
   <div className="flex items-center gap-4">
 
+  <button onClick={() => navigate("/demohome")}
+className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+  <span className="text-white text-3xl font-bold -mt-1">←</span>
+</button>
   <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
-<button type="button" onClick={() => navigate("/demohome")} className=" w-12 h-12 rounded-full bg-blue-600 text-white text-4xl font-bold flex items-center justify-center
-shadow-md hover:bg-blue-700 transition" >
-←
-</button>
+
 
 </div>
 

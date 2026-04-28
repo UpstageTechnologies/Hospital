@@ -2,20 +2,15 @@ import DoctorProfile from "./DoctorProfile";
 
 const DemoDoctorDashboard = () => {
 
+localStorage.setItem("doctorEmail","demodoctor007");
 localStorage.setItem("demoUser","true");
 
 return(
 <div>
-
-<div className="flex">
-<div className="flex-1">
-<DoctorProfile />
-</div>
-
-</div>
-
+<DoctorProfile/>
 </div>
 )
+
 }
 
 export default DemoDoctorDashboard;

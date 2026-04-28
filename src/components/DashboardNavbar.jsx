@@ -30,15 +30,15 @@ return(
 
 <div className="flex items-center gap-4">
 
+
+<button onClick={() => navigate("/master-login",{state:{demo:true}})}
+className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+  <span className="text-white text-3xl font-bold -mt-1">←</span>
+</button>
 <p  onClick={() => navigate("/master-login",{state:{demo:true}})} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
-<button type="button"
-onClick={() => navigate("/master-login",{state:{demo:true}})}
-className=" w-12 h-12 rounded-full bg-blue-600 text-white text-4xl font-bold flex items-center justify-center
-shadow-md hover:bg-blue-700 transition" >
-←
-</button>
+
 
 </div>
 
@@ -46,75 +46,46 @@ shadow-md hover:bg-blue-700 transition" >
 
 <div className="flex items-center justify-center gap-14 text-base font-medium mx-auto">
 
-<button
-className={active("/master-login")}
-onClick={()=>navigate("/demomasterdashboard")}
->
+<button className={active("/master-login")}onClick={()=>navigate("/demomasterdashboard")}>
 MasterLogin
 </button>
 
-<button
-className={active("/admin-login")}
-onClick={()=>navigate("/demoadmindashboard")}
->
+<button className={active("/admin-login")} onClick={()=>navigate("/demoadmindashboard")}>
 AdminLogin
 </button>
 
-<button
-className={active("/doctor-login")}
-onClick={()=>navigate("/demodoctordashboard")}
->
+<button className={active("/doctor-login")} onClick={()=>navigate("/demodoctordashboard")}>
 DoctorLogin
 </button>
 
-<button
-className={active("/staff-login")}
-onClick={()=>navigate("/demostaffdashboard")}
->
+<button className={active("/staff-login")} onClick={()=>navigate("/demostaffdashboard")}>
 StaffLogin
 </button>
 
-<button
-className={active("/patient-login")}
-onClick={()=>navigate("/demopatientdashboard")}
->
+<button className={active("/patient-login")} onClick={()=>navigate("/demopatientdashboard")}>
 PatientLogin
 </button>
 
-<div
-onClick={() => setShowProfileMenu(!showProfileMenu)}
+<div onClick={() => setShowProfileMenu(!showProfileMenu)}
 className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-2 cursor-pointer"
 >
 
-<img
-src={userImage}
-alt=""
-className="w-10 h-10 rounded-full object-cover border"
-/>
+<img src={userImage}alt="" className="w-10 h-10 rounded-full object-cover border"/>
 
 {showProfileMenu && (
 <div className="absolute right-0 top-14 bg-white shadow-xl rounded-xl p-4 z-50">
 
 <div className="flex flex-col gap-4 min-w-[180px]">
 
-<p
-onClick={()=>navigate("/my-profile")}
-className="cursor-pointer hover:text-blue-600"
->
+<p onClick={()=>navigate("/demomyprofile")} className="cursor-pointer hover:text-blue-600">
 My Profile
 </p>
 
-<p
-onClick={()=>navigate("/my-appointment")}
-className="cursor-pointer hover:text-blue-600"
->
+<p onClick={()=>navigate("/demomyappointment")}className="cursor-pointer hover:text-blue-600">
 My Appointment
 </p>
 
-<p
-onClick={()=>setShowLogoutPopup(true)}
-className="cursor-pointer hover:text-red-600"
->
+<p onClick={()=>setShowLogoutPopup(true)} className="cursor-pointer hover:text-red-600">
 Logout
 </p>
 
@@ -139,15 +110,15 @@ Logout
 
 <div className="flex items-center gap-4">
 
+
+<button onClick={() => navigate("/master-login",{state:{demo:true}})}
+className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+  <span className="text-white text-3xl font-bold -mt-1">←</span>
+</button>
 <p  onClick={() => navigate("/master-login",{state:{demo:true}})} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
-<button type="button"
-onClick={() => navigate("/master-login",{state:{demo:true}})}
-className=" w-12 h-12 rounded-full bg-blue-600 text-white text-4xl font-bold flex items-center justify-center
-shadow-md hover:bg-blue-700 transition" >
-←
-</button>
+
 
 </div>
 
@@ -170,14 +141,14 @@ className="w-10 h-10 rounded-full object-cover border"
 <div className="flex flex-col gap-4 min-w-[170px]">
 
 <p
-onClick={()=>navigate("/my-profile")}
+onClick={()=>navigate("/demomyprofile")}
 className="cursor-pointer hover:text-blue-600"
 >
 My Profile
 </p>
 
 <p
-onClick={()=>navigate("/my-appointment")}
+onClick={()=>navigate("/demomyappointment")}
 className="cursor-pointer hover:text-blue-600"
 >
 My Appointment

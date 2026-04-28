@@ -13,6 +13,8 @@ import DemoAdminDashboard from "./pages/DemoAdminDashboard.jsx";
 import DemoDoctorDashboard from "./pages/DemoDoctorDashboard.jsx";
 import DemoStaffDashboard from "./pages/DemoStaffDashboard.jsx";
 import DemoPatientDashboard from "./pages/DemoPatientDashboard.jsx";
+import DemoMyProfile from "./pages/DemoMyProfile";
+import DemoMyAppointment from "./pages/DemoMyAppointment";
 import DashboardNavbar from "./components/DashboardNavbar";
 import RealMasterDashboard from "./pages/RealMasterDashboard";
 import Upstage from "./pages/Upstage.jsx";
@@ -87,9 +89,11 @@ location.pathname === "/demodoctordashboard"
         <Route path="/demodoctordetails/:id" element={<DemoDoctorDetails />} />
         <Route path="/demomasterdashboard" element={<DemoMasterDashboard />}/>
         <Route path="/demoadmindashboard" element={<DemoAdminDashboard />} />
-<Route path="/demodoctordashboard" element={<DemoDoctorDashboard />} />
-<Route path="/demostaffdashboard" element={<DemoStaffDashboard />} />
-<Route path="/demopatientdashboard" element={<DemoPatientDashboard />} />
+        <Route path="/demodoctordashboard" element={<DemoDoctorDashboard />} />
+        <Route path="/demostaffdashboard" element={<DemoStaffDashboard />} />
+        <Route path="/demopatientdashboard" element={<DemoPatientDashboard />} />
+        <Route path="/demomyprofile" element={<DemoMyProfile />} />
+        <Route path="/demomyappointment" element={<DemoMyAppointment />}/>
         <Route path="/master-dashboard" element={<RealMasterDashboard />} />
         <Route path="/upstage" element={<Upstage />} />
         <Route path="/upstage-doctors" element={<UpstageDoctors />} />

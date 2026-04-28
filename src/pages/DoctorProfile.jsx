@@ -491,7 +491,24 @@ const isDemo = location.state?.demo === true;
 
     }, [])
 
-    if (!doctorData) return <p className="p-10">Loading...</p>
+    useEffect(()=>{
+
+        if(
+        !doctorData &&
+        localStorage.getItem("demoUser")==="true"
+        ){
+        setDoctorData({
+        name:"Demo Doctor",
+        email:"demodoctor007",
+        slots:[]
+        });
+        }
+        
+        },[doctorData]);
+        
+        if(!doctorData){
+        return <p className="p-10">Loading...</p>
+        }
 
     return (
 
