@@ -13,6 +13,7 @@ import DemoAdminDashboard from "./pages/DemoAdminDashboard.jsx";
 import DemoDoctorDashboard from "./pages/DemoDoctorDashboard.jsx";
 import DemoStaffDashboard from "./pages/DemoStaffDashboard.jsx";
 import DemoPatientDashboard from "./pages/DemoPatientDashboard.jsx";
+import DemoPharmasiDashboard from "./pages/DemoPharmasiDashboard";
 import DemoMyProfile from "./pages/DemoMyProfile";
 import DemoMyAppointment from "./pages/DemoMyAppointment";
 import DashboardNavbar from "./components/DashboardNavbar";
@@ -58,6 +59,7 @@ const App = () => {
     "/doctor-login",
     "/patient-login",
     "/staff-login",
+    "/pharmasi-login"
   ].includes(location.pathname);
   return (
     <div className="w-full">
@@ -68,9 +70,10 @@ const App = () => {
           ? <UpstageNavbar />
           : (
             location.pathname === "/master-appointments" ||
-location.pathname === "/demoadmindashboard" ||
-location.pathname === "/demopatientdashboard" ||
-location.pathname === "/demodoctordashboard"
+            location.pathname === "/demoadmindashboard" ||
+            location.pathname === "/demopatientdashboard" ||
+            location.pathname === "/demodoctordashboard" 
+            
           )
             ? <DashboardNavbar />  
             : location.pathname.startsWith("/demo") || location.pathname === "/rolehome"
@@ -92,6 +95,7 @@ location.pathname === "/demodoctordashboard"
         <Route path="/demodoctordashboard" element={<DemoDoctorDashboard />} />
         <Route path="/demostaffdashboard" element={<DemoStaffDashboard />} />
         <Route path="/demopatientdashboard" element={<DemoPatientDashboard />} />
+        <Route path="/demo-pharmasi-dashboard" element={<DemoPharmasiDashboard />}/>
         <Route path="/demomyprofile" element={<DemoMyProfile />} />
         <Route path="/demomyappointment" element={<DemoMyAppointment />}/>
         <Route path="/master-dashboard" element={<RealMasterDashboard />} />

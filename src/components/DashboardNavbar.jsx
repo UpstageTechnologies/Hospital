@@ -66,6 +66,10 @@ StaffLogin
 PatientLogin
 </button>
 
+<button className={active("/pharmasi-login")} onClick={()=>navigate("/demo-pharmasi-dashboard")}>
+PharmasiLogin
+</button>
+
 <div onClick={() => setShowProfileMenu(!showProfileMenu)}
 className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-2 cursor-pointer"
 >
@@ -243,6 +247,16 @@ setOpenMenu(false);
 className="text-2xl font-medium cursor-pointer"
 >
 PatientLogin
+</div>
+
+<div
+onClick={()=>{
+navigate("/pharmasi-login",{state:{demo:true}});
+setOpenMenu(false);
+}}
+className="text-2xl font-medium cursor-pointer"
+>
+PharmasiLogin
 </div>
 
 </div>

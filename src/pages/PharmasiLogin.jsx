@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const PharmasiLogin = () => {
 
@@ -11,7 +11,29 @@ const [loading,setLoading] = useState(false);
 
 const navigate = useNavigate();
 
+const location = useLocation();
+const isDemo = location.state?.demo === true;
+const [openMenu,setOpenMenu] = useState(false);
+
+useEffect(() => {
+
+    if(isDemo){
+    setPharmasiId("demopharmasi002");
+    setPassword("demo02");
+    }
+    
+    }, [isDemo]);
+
 const handlePharmasiLogin = async() => {
+
+    if(
+        isDemo &&
+        pharmasiId==="demopharmasi002" &&
+        password==="demo02"
+        ){
+        navigate("/demo-pharmasi-dashboard");
+        return;
+        }
 
 if(!pharmasiId || !password){
 alert("Enter Pharmasi ID and Password");
@@ -58,7 +80,11 @@ JSON.stringify(data)
 alert("Login Success");
 
 // dashboard page redirect
-navigate("/pharmasi-dashboard");
+if(isDemo){
+    navigate("/demo-pharmasi-dashboard");
+    }else{
+    navigate("/pharmasi-dashboard");
+    }
 
 }
 catch(error){
@@ -73,6 +99,52 @@ setLoading(false);
 
 
 return(
+
+    <div className="min-h-screen bg-gray-100">
+
+{isDemo && (
+<>
+<div className="hidden md:block w-full bg-white border-b shadow-sm">
+<div className="max-w-7xl mx-auto relative flex items-center h-20 px-8">
+
+<div className="flex items-center gap-4">
+
+<button
+onClick={()=>navigate("/demohome")}
+className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center"
+>
+<span className="text-white text-3xl">←</span>
+</button>
+
+<p
+onClick={()=>navigate("/demohome")}
+className="text-xl font-semibold cursor-pointer"
+>
+Demo
+</p>
+
+</div>
+
+<ul className="absolute left-1/2 -translate-x-1/2 flex gap-12 font-medium">
+
+<li onClick={()=>navigate("/master-login",{state:{demo:true}})}>MasterLogin</li>
+
+<li onClick={()=>navigate("/admin-login",{state:{demo:true}})}>AdminLogin</li>
+
+<li onClick={()=>navigate("/doctor-login",{state:{demo:true}})}>DoctorLogin</li>
+
+<li onClick={()=>navigate("/staff-login",{state:{demo:true}})}>StaffLogin</li>
+
+<li onClick={()=>navigate("/patient-login",{state:{demo:true}})}>PatientLogin</li>
+
+<li onClick={()=>navigate("/pharmasi-login",{state:{demo:true}})}>PharmasiLogin</li>
+
+</ul>
+
+</div>
+</div>
+</>
+)}
 
 <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
 
@@ -106,6 +178,8 @@ className="w-full bg-blue-500 text-white py-4 rounded-xl"
 >
 {loading ? "Logging in..." : "Login"}
 </button>
+
+</div>
 
 </div>
 
