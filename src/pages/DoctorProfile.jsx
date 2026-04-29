@@ -307,6 +307,64 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [patientTab, setPatientTab] = useState("current")
     const [doctorEvents, setDoctorEvents] = useState({})
     const [appointmentEvents, setAppointmentEvents] = useState({})
+
+    const [type,setType] = useState("");
+const [medicine,setMedicine] = useState("");
+const [qty,setQty] = useState("");
+const [purchase,setPurchase] = useState("");
+const [sales,setSales] = useState("");
+
+const [describeItems,setDescribeItems] = useState([]);
+
+const syncPharmacyItems = () => {
+
+    const saved =
+    JSON.parse(
+    localStorage.getItem("pharmacyItems")
+    ) || [];
+    
+    const fixedItems = saved.map(item=>({
+    id: item.id || Date.now(),
+    
+    type: item.type || "",
+    
+    medicine:
+    item.medicine ||
+    item.subCategory ||
+    "",
+    
+    qty: Number(item.qty || 0),
+    
+    purchasePrice: Number(
+    item.purchasePrice ||
+    item.purchase ||
+    0
+    ),
+    
+    salesPrice: Number(
+    item.salesPrice ||
+    item.sales ||
+    0
+    )
+    }));
+    
+    setDescribeItems(fixedItems);
+    
+    };
+
+const [activeDescribeCategory,setActiveDescribeCategory]=
+useState("All");
+
+const categoryMap={
+ Tablet:["Paracetamol","Dolo"],
+ Injection:["Insulin"],
+ Capsule:["Omeprazole"],
+ Syrup:["Cough Syrup"],
+ Drops:["Eye Drops"],
+ Ointment:["Burn Cream"],
+ Inhaler:["Salbutamol"]
+};
+
     const navigate = useNavigate();
     const location = useLocation();
 const isDemo = location.state?.demo === true;
@@ -493,6 +551,34 @@ const isDemo = location.state?.demo === true;
 
     useEffect(()=>{
 
+        syncPharmacyItems();
+        
+        window.addEventListener(
+        "storage",
+        syncPharmacyItems
+        );
+        
+        const timer =
+        setInterval(
+        syncPharmacyItems,
+        1000
+        );
+        
+        return ()=>{
+        
+        window.removeEventListener(
+        "storage",
+        syncPharmacyItems
+        );
+        
+        clearInterval(timer);
+        
+        };
+        
+        },[]);
+
+    useEffect(()=>{
+
         if(
         !doctorData &&
         localStorage.getItem("demoUser")==="true"
@@ -509,6 +595,8 @@ const isDemo = location.state?.demo === true;
         if(!doctorData){
         return <p className="p-10">Loading...</p>
         }
+
+        
 
     return (
 
@@ -532,8 +620,12 @@ const isDemo = location.state?.demo === true;
                 </p>
 
                 <p onClick={() => setPage("call")} className="mb-3 cursor-pointer">
-    Call / Confirm
-</p>
+                    Call / Confirm
+                </p>
+
+                <p onClick={() => setPage("describe")}className="mb-3 cursor-pointer">
+                    Describe
+                </p>
             </div>
 
             {/* ================= APPOINTMENTS PAGE ================= */}
@@ -699,6 +791,162 @@ const isDemo = location.state?.demo === true;
   </div>
 )}
 
+
+
+{page==="describe" && (
+<div className="p-8">
+
+<h1 className="text-5xl font-bold mb-8">
+Describe
+</h1>
+
+{/* Summary */}
+<div className="bg-white rounded-3xl shadow p-8 mb-10">
+<h2 className="text-3xl font-bold mb-4">
+All Summary
+</h2>
+
+<p className="text-2xl">
+Total Sales ₹
+{
+describeItems.reduce(
+(sum,item)=>
+sum +
+(
+Number(item.salesPrice || item.sales || 0)
+*
+Number(item.qty || 0)
+),
+0
+)
+}
+</p>
+</div>
+
+
+
+<div className="flex gap-4 mt-8 flex-wrap">
+
+{
+[
+"All",
+"Tablet",
+"Injection",
+"Capsule",
+"Syrup",
+"Drops",
+"Ointment",
+"Inhaler"
+].map(cat=>(
+<button
+key={cat}
+onClick={()=>
+setActiveDescribeCategory(cat)
+}
+className={
+activeDescribeCategory===cat
+? "bg-blue-600 text-white px-6 py-3 rounded-full"
+: "border px-6 py-3 rounded-full"
+}
+>
+{cat}
+</button>
+))
+}
+
+</div>
+
+<br />
+
+
+{/* Table */}
+<div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
+
+<table className="w-full">
+
+<thead>
+<tr>
+<th>Type</th>
+<th>Medicine</th>
+<th>Qty</th>
+<th>Purchase</th>
+<th>Sales</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{
+describeItems
+.filter(item=>
+activeDescribeCategory==="All"
+? true
+: item.type===activeDescribeCategory
+)
+
+.map((item,index)=>(
+<tr key={item.id} className="border-b text-center">
+
+<td className="py-3">{item.type}</td>
+
+<td className="py-3">
+{item.medicine || item.subCategory}
+</td>
+
+<td className="py-3">
+{item.qty}
+</td>
+
+<td className="py-3">
+₹{item.purchasePrice}
+</td>
+
+<td className="py-3">
+₹{item.salesPrice}
+</td>
+
+<td className="py-3 space-x-4">
+<button
+className="text-blue-600 font-semibold"
+onClick={() => handleEdit(item)}
+>
+Edit
+</button>
+
+<button
+className="text-red-500 font-semibold"
+onClick={()=>{
+  const updated =
+  describeItems.filter(
+  x=>x.id !== item.id
+  );
+  
+  setDescribeItems(updated);
+  setInventoryItems(updated);
+  
+  localStorage.setItem(
+  "pharmacyItems",
+  JSON.stringify(updated)
+  );
+  }}
+>
+Delete
+</button>
+</td>
+
+</tr>
+))
+}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+)}
 
             {/* ================= HOME PAGE ================= */}
             {page === "home" && (
@@ -937,6 +1185,11 @@ const isDemo = location.state?.demo === true;
 <button onClick={() => setPage("profile")} className="flex flex-col items-center text-sm">
     👤
     <span>Profile</span>
+</button>
+
+<button onClick={() => setPage("describe")} className="flex flex-col items-center text-sm">
+  🧾
+  <span>Describe</span>
 </button>
 
 <button onClick={() => setPage("settings")} className="flex flex-col items-center text-sm">

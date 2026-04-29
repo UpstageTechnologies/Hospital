@@ -14,12 +14,13 @@ const DemoNavbar = () => {
      
 <div className="flex items-center gap-4">
 
+<button onClick={() => nav("/")}
+className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+  <span className="text-white text-3xl font-bold -mt-1">←</span>
+</button>
 <p  onClick={() => nav("/")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
-<button type="button" onClick={() => window.location.assign("/")} className="text-4xl font-bold cursor-pointer leading-none" >
-←
-</button>
 
 </div>
 

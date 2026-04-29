@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { auth, db } from "../firebase"
 import { doc, setDoc, getDoc, deleteDoc, updateDoc } from "firebase/firestore"
 import { collection, getDocs } from "firebase/firestore"
-import { useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 import FloatingInput from "../components/FloatingInput"
 import { createUserWithEmailAndPassword } from "firebase/auth"
@@ -15,6 +14,72 @@ import Calendar from "../components/Calendar";
 const Account = () => {
 
   const [menu, setMenu] = useState("home")
+
+  
+
+const [type,setType] = useState("");
+const [medicine,setMedicine] = useState("");
+
+const [inventoryItems,setInventoryItems]=useState([]);
+const [describeItems,setDescribeItems]=useState([]);
+
+useEffect(()=>{
+
+  const savedItems =
+  JSON.parse(
+  localStorage.getItem("pharmacyItems")
+  ) || [];
+  
+  setDescribeItems(savedItems);
+  setInventoryItems(savedItems);
+  
+  },[]);
+
+const [qty,setQty] = useState("");
+const [purchase,setPurchase] = useState("");
+const [sales,setSales] = useState("");
+
+const [activeDescribeCategory,setActiveDescribeCategory] =
+useState("All");
+
+const categoryMap={
+ Tablet:["Paracetamol","Dolo"],
+ Injection:["Insulin"],
+ Capsule:["Omeprazole"],
+ Syrup:["Cough Syrup"],
+ Drops:["Eye Drops"],
+ Ointment:["Burn Cream"],
+ Inhaler:["Salbutamol"]
+};
+
+useEffect(()=>{
+
+  const syncData=()=>{
+  
+  const savedItems =
+  JSON.parse(
+  localStorage.getItem("pharmacyItems")
+  )||[];
+  
+  setDescribeItems(savedItems);
+  setInventoryItems(savedItems);
+  
+  };
+  
+  syncData();
+  
+  window.addEventListener(
+  "storage",
+  syncData
+  );
+  
+  return ()=>window.removeEventListener(
+  "storage",
+  syncData
+  );
+  
+  },[]);
+
   const [subMenu, setSubMenu] = useState("")
   const location = useLocation();
   const hospital = location.state?.hospital || "";
@@ -1080,9 +1145,9 @@ confirmPassword:""
             Home
           </li>
 
-          <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu("subscription")} >
+          {/* <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu("subscription")} >
             Subscription
-          </li>
+          </li> */}
 
           <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu(menu === "account" ? null : "account")} >
             Account Creation
@@ -1125,6 +1190,13 @@ confirmPassword:""
           </li>
 
           <li
+className="cursor-pointer hover:text-gray-200"
+onClick={()=>setMenu("describe")}
+>
+Describe
+</li>
+
+          <li
   className="cursor-pointer hover:text-gray-200"
   onClick={() => setMenu("appointments")}
 >
@@ -1137,6 +1209,165 @@ confirmPassword:""
 
 
       <div className="flex-1 p-4 md:p-6 pb-20 md:pb-6 overflow-auto">
+
+      {menu==="describe" && (
+
+<div>
+
+<h1 className="text-5xl font-bold mb-8">
+Describe
+</h1>
+
+<div className="bg-white rounded-3xl p-8 shadow mb-8">
+<h2 className="text-3xl font-bold">
+All Summary
+</h2>
+
+<p className="text-2xl mt-4">
+Total Sales ₹
+{
+describeItems.reduce(
+  (a,b)=>a+(Number(b.salesPrice || 0)*Number(b.qty || 0)),
+0
+)
+}
+</p>
+
+</div>
+
+
+
+
+<div className="flex gap-4 mt-8 flex-wrap justify-center">
+
+{
+[
+"All",
+"Tablet",
+"Injection",
+"Capsule",
+"Syrup",
+"Drops",
+"Ointment",
+"Inhaler"
+].map(cat=>(
+
+<button
+key={cat}
+onClick={()=>
+setActiveDescribeCategory(cat)
+}
+className={`
+px-6 py-3 rounded-full border
+${
+activeDescribeCategory===cat
+? "bg-blue-600 text-white"
+:"bg-white"
+}
+`}
+>
+{cat}
+</button>
+
+))
+}
+
+</div>
+
+<br />
+
+<div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
+
+<table className="w-full">
+
+<thead>
+<tr>
+<th>Type</th>
+<th>Medicine</th>
+<th>Qty</th>
+<th>Purchase</th>
+<th>Sales</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{
+describeItems
+.filter(item=>
+
+activeDescribeCategory==="All"
+||
+item.type===activeDescribeCategory
+
+)
+
+.map((item,index)=>(
+
+<tr key={item.id} className="border-b text-center">
+
+<td className="py-3">{item.type}</td>
+
+<td className="py-3">
+{item.medicine || item.subCategory}
+</td>
+
+<td className="py-3">
+{item.qty}
+</td>
+
+<td className="py-3">
+₹{item.purchasePrice}
+</td>
+
+<td className="py-3">
+₹{item.salesPrice}
+</td>
+
+<td className="py-3 space-x-4">
+<button
+className="text-blue-600 font-semibold"
+onClick={() => handleEdit(item)}
+>
+Edit
+</button>
+
+<button
+className="text-red-500 font-semibold"
+onClick={()=>{
+  const updated =
+  describeItems.filter(
+  x=>x.id !== item.id
+  );
+  
+  setDescribeItems(updated);
+  setInventoryItems(updated);
+  
+  localStorage.setItem(
+  "pharmacyItems",
+  JSON.stringify(updated)
+  );
+  }}
+>
+Delete
+</button>
+</td>
+
+</tr>
+
+))
+}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+)}
 
         {subMenu === "admins" && (
 
@@ -3310,9 +3541,9 @@ fetchPharmasi()
   <span>Home</span>
 </button>
 
-<button onClick={() => setMenu("subscription")} className="flex flex-col items-center text-xs">
-  💳
-  <span>Subscription</span>
+<button onClick={() => setMenu("describe")} className="flex flex-col items-center text-xs">
+  🧾
+  <span>Describe</span>
 </button>
 
 <button 

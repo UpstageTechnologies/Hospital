@@ -602,7 +602,7 @@ activeCategory==="All"
 <tr key={item.id} className="border-b">
 
 <td>{item.type}</td>
-<td>{item.medicine}</td>
+<td>{item.medicine || item.subCategory}</td>
 <td>{item.qty}</td>
 <td>₹{item.purchasePrice}</td>
 <td>₹{item.salesPrice}</td>
