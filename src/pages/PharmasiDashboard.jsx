@@ -243,7 +243,7 @@ return(
 
 <div className="flex">
 
-<div className="w-64 bg-blue-600 text-white h-screen pt-8 px-6 hidden md:block">
+<div className="w-64 bg-blue-600 text-white min-h-screen pt-8 px-6 hidden md:block">
 
 <ul className="space-y-8 text-xl">
 
@@ -265,38 +265,76 @@ Entries
 
 
 
-<div className="md:hidden fixed bottom-0 left-0 right-0 bg-blue-600 text-white flex justify-around py-4">
+<div className="
+md:hidden
+fixed
+bottom-0
+left-0
+right-0
+z-50
+bg-white
+border-t
+shadow-md
+">
 
-<button onClick={()=>setMenu("home")}>
+<div className="grid grid-cols-3 py-3 text-black">
+
+<button
+onClick={()=>setMenu("home")}
+className="flex flex-col items-center gap-2"
+>
+<span className="text-2xl">🏠</span>
+<span className="text-base font-medium">
 Home
+</span>
 </button>
 
-<button onClick={()=>setMenu("inventory")}>
+<button
+onClick={()=>setMenu("inventory")}
+className="flex flex-col items-center gap-2"
+>
+<span className="text-2xl">📦</span>
+<span className="text-base font-medium">
 Inventory
+</span>
 </button>
 
-<button onClick={()=>setMenu("entries")}>
+<button
+onClick={()=>setMenu("entries")}
+className="flex flex-col items-center gap-2"
+>
+<span className="text-2xl">📝</span>
+<span className="text-base font-medium">
 Entries
+</span>
 </button>
 
 </div>
+</div>
 
 
-
-<div className="flex-1 p-4 md:p-6 lg:p-8 pb-24 md:pb-8">
+<div className="
+flex-1
+w-full
+max-w-full
+overflow-x-hidden
+px-3 sm:px-4 md:p-6 lg:p-8
+pb-24 md:pb-8
+">
 
 
 {menu==="inventory" &&(
 
 <div>
 
-<h2 className="text-4xl font-bold mb-6">
+<h2 className="text-4xl font-bold mb-6 ml-4 sm:ml-6 md:ml-0">
 Inventory
 </h2>
 
 
 
-<div className="bg-white rounded-xl p-4 md:p-6 shadow mb-6">
+<div className="bg-white rounded-3xl shadow-md p-5 md:p-6 w-[86%] sm:w-[88%] md:w-full max-w-[680px]
+ml-4 sm:ml-8 md:mx-auto mb-8">
 
 <h3 className="text-2xl font-bold mb-4">
 {activeCategory} Summary
@@ -326,12 +364,18 @@ Number(item.qty||0)),
 
 
 {/* Add Item */}
-<div className="bg-white rounded-2xl shadow p-4 md:p-6 lg:p-8 mb-8">
+<div className="bg-white rounded-3xl shadow-md p-5 md:p-6 w-[86%] sm:w-[88%] md:w-full max-w-[680px]
+ml-4 sm:ml-8 md:mx-auto mb-8">
 <h3 className="text-2xl font-bold mb-6">
 Add Item
 </h3>
 
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+<div className="
+flex flex-col gap-4
+sm:flex-col
+md:grid md:grid-cols-2
+lg:grid-cols-6
+">
 
 
 <div className="relative">
@@ -531,8 +575,6 @@ ${activeCategory===cat
 
 <th>Type</th>
 
-<th>Category</th>
-
 <th>Medicine</th>
 
 <th>Qty</th>
@@ -560,7 +602,6 @@ activeCategory==="All"
 <tr key={item.id} className="border-b">
 
 <td>{item.type}</td>
-<td>{item.subCategory}</td>
 <td>{item.medicine}</td>
 <td>{item.qty}</td>
 <td>₹{item.purchasePrice}</td>
@@ -608,7 +649,12 @@ Entries
 
 
 {/* Summary */}
-<div className="bg-white rounded-xl p-4 md:p-6 shadow mb-6">
+<div className="bg-white rounded-3xl p-5 md:p-6 shadow-md
+w-[90%]
+sm:w-[88%]
+md:w-full
+max-w-[680px]
+mx-auto mb-6">  
 
 <h3 className="text-2xl font-bold mb-4">
 {activeCategory} Summary
@@ -636,7 +682,12 @@ Number(item.qty||0)),
 </div>
 
 {/* Add Item Box */}
-<div className="bg-white rounded-2xl shadow p-8 mb-8">
+<div className="bg-white rounded-3xl shadow-md p-5 md:p-6
+w-[92%]
+sm:w-[90%]
+md:w-full
+max-w-[680px]
+mx-auto mb-8">
 
 <h3 className="text-2xl font-bold mb-6">
 Add Item
@@ -654,7 +705,7 @@ setShowTypeDropdown(true);
 }}
 onFocus={()=>setShowTypeDropdown(true)}
 placeholder="Search Type"
-className="border p-3 rounded-xl w-full"
+className="border p-3 rounded-xl w-full md:w-full max-w-full"
 />
 
 <button
@@ -758,7 +809,7 @@ className="px-4 py-3 cursor-pointer hover:bg-gray-100"
 {item}
 </div>
 
-))}x
+))}
 
 {medicine &&
 type &&
@@ -832,7 +883,14 @@ Sales
 
 
 {/* Category Buttons */}
-<div className="flex gap-3 mb-8 overflow-x-auto whitespace-nowrap pb-2">
+<div className="
+flex gap-3 mb-8
+overflow-x-auto
+whitespace-nowrap
+pb-2
+w-full
+max-w-full
+">
 
 {[
 "All",

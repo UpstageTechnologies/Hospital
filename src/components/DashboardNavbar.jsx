@@ -186,79 +186,84 @@ className="text-3xl font-semibold"
 
 
 {openMenu && (
-<div className="
+<div
+className="
 absolute
 right-4
 top-[90px]
 w-[320px]
 bg-white
-rounded-3xl
+rounded-[38px]
 shadow-2xl
 z-50
 py-8
 px-10
-">
+"
+>
+
+<div className="flex flex-col gap-8">
 
 <div
 onClick={()=>{
-navigate("/master-login",{state:{demo:true}});
+navigate('/master-login',{state:{demo:true}});
 setOpenMenu(false);
 }}
-className="text-2xl font-medium mb-10 cursor-pointer"
+className="text-[32px] font-semibold leading-none cursor-pointer"
 >
 MasterLogin
 </div>
 
 <div
 onClick={()=>{
-navigate("/admin-login",{state:{demo:true}});
+navigate('/admin-login',{state:{demo:true}});
 setOpenMenu(false);
 }}
-className="text-2xl font-medium mb-10 cursor-pointer"
+className="text-[32px] font-semibold leading-none cursor-pointer"
 >
 AdminLogin
 </div>
 
 <div
 onClick={()=>{
-navigate("/doctor-login",{state:{demo:true}});
+navigate('/doctor-login',{state:{demo:true}});
 setOpenMenu(false);
 }}
-className="text-2xl font-medium mb-10 cursor-pointer"
+className="text-[32px] font-semibold leading-none cursor-pointer"
 >
 DoctorLogin
 </div>
 
 <div
 onClick={()=>{
-navigate("/staff-login",{state:{demo:true}});
+navigate('/staff-login',{state:{demo:true}});
 setOpenMenu(false);
 }}
-className="text-2xl font-medium mb-10 cursor-pointer"
+className="text-[32px] font-semibold leading-none cursor-pointer"
 >
 StaffLogin
 </div>
 
 <div
 onClick={()=>{
-navigate("/patient-login",{state:{demo:true}});
+navigate('/patient-login',{state:{demo:true}});
 setOpenMenu(false);
 }}
-className="text-2xl font-medium cursor-pointer"
+className="text-[32px] font-semibold leading-none cursor-pointer"
 >
 PatientLogin
 </div>
 
 <div
 onClick={()=>{
-navigate("/pharmasi-login",{state:{demo:true}});
+navigate('/pharmasi-login',{state:{demo:true}});
 setOpenMenu(false);
 }}
-className="text-2xl font-medium cursor-pointer"
+className="text-[32px] font-semibold leading-none cursor-pointer"
 >
 PharmasiLogin
 </div>
 
+</div>
 </div>
 )}
 
