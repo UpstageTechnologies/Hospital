@@ -370,19 +370,12 @@ ml-4 sm:ml-8 md:mx-auto mb-8">
 Add Item
 </h3>
 
-<div className="
-flex flex-col gap-4
-sm:flex-col
-md:grid md:grid-cols-2
-lg:grid-cols-6
-">
+<div className="flex flex-col gap-4 sm:flex-col md:grid md:grid-cols-2 lg:grid-cols-6">
 
 
 <div className="relative">
 
-<input
-value={type}
-onChange={(e)=>{
+<input value={type} onChange={(e)=>{
 setType(e.target.value);
 setShowTypeDropdown(true);
 setSubCategory("");

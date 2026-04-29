@@ -800,31 +800,6 @@ const isDemo = location.state?.demo === true;
 Describe
 </h1>
 
-{/* Summary */}
-<div className="bg-white rounded-3xl shadow p-8 mb-10">
-<h2 className="text-3xl font-bold mb-4">
-All Summary
-</h2>
-
-<p className="text-2xl">
-Total Sales ₹
-{
-describeItems.reduce(
-(sum,item)=>
-sum +
-(
-Number(item.salesPrice || item.sales || 0)
-*
-Number(item.qty || 0)
-),
-0
-)
-}
-</p>
-</div>
-
-
-
 <div className="flex gap-4 mt-8 flex-wrap">
 
 {
@@ -869,9 +844,6 @@ activeDescribeCategory===cat
 <th>Type</th>
 <th>Medicine</th>
 <th>Qty</th>
-<th>Purchase</th>
-<th>Sales</th>
-<th>Action</th>
 </tr>
 </thead>
 
@@ -896,43 +868,6 @@ activeDescribeCategory==="All"
 
 <td className="py-3">
 {item.qty}
-</td>
-
-<td className="py-3">
-₹{item.purchasePrice}
-</td>
-
-<td className="py-3">
-₹{item.salesPrice}
-</td>
-
-<td className="py-3 space-x-4">
-<button
-className="text-blue-600 font-semibold"
-onClick={() => handleEdit(item)}
->
-Edit
-</button>
-
-<button
-className="text-red-500 font-semibold"
-onClick={()=>{
-  const updated =
-  describeItems.filter(
-  x=>x.id !== item.id
-  );
-  
-  setDescribeItems(updated);
-  setInventoryItems(updated);
-  
-  localStorage.setItem(
-  "pharmacyItems",
-  JSON.stringify(updated)
-  );
-  }}
->
-Delete
-</button>
 </td>
 
 </tr>
