@@ -1,4 +1,6 @@
 import React,{useState,useEffect} from "react";
+
+const STORAGE_KEY = "pharmacyItems";
 const PharmasiDashboard=()=>{
 
 const [menu,setMenu]=useState("inventory");
@@ -31,24 +33,27 @@ const [typeOptions,setTypeOptions]=useState([
     "Cetirizine"
     ]);
 
-const [items,setItems]=useState(()=>{
-    const saved=localStorage.getItem("pharmacyItems");
-    return saved ? JSON.parse(saved) : [];
-    });
+    const [items, setItems] = useState(() => {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          return saved ? JSON.parse(saved) : [];
+        } catch {
+          return [];
+        }
+      });
 
     const [entryItems,setEntryItems] = useState(()=>{
         const saved = localStorage.getItem("entryItems");
         return saved ? JSON.parse(saved) : [];
         });
 
-    useEffect(()=>{
-
-        localStorage.setItem(
-        "pharmacyItems",
-        JSON.stringify(items)
-        );
-        
-        },[items]);
+        useEffect(() => {
+            localStorage.setItem("pharmacyItems", JSON.stringify(items));
+          
+            // 🔥 FORCE UPDATE EVENT
+            window.dispatchEvent(new Event("storage"));
+          
+          }, [items]);
 
         useEffect(()=>{
 
@@ -126,50 +131,39 @@ MedicalConsumables:[
 };
 
 
-const addMedicine=()=>{
+const addMedicine = () => {
 
-    if(
-    !type||
-    !subCategory||
-    !qty||
-    !purchasePrice||
-    !salesPrice
-    ){
-    alert("Fill all fields");
-    return;
+    if(!type || !subCategory || !qty || !purchasePrice || !salesPrice){
+      alert("Fill all fields");
+      return;
     }
-    
-    const data={
-        id:Date.now(),
-        type,
-        subCategory,
-        medicine,
-        qty,
-        purchasePrice,
-        salesPrice
-        };
-    
-    if(editIndex!==null){
-    
-    const updated=[...items];
-    updated[editIndex]=data;
-    setItems(updated);
-    setEditIndex(null);
-    
-    }else{
-    
-    setItems([...items,data]);
-    
+  
+    const data = {
+      id: Date.now(),
+      type,
+      subCategory,
+      medicine,
+      qty,
+      purchasePrice,
+      salesPrice
+    };
+  
+    if(editIndex !== null){
+      const updated = [...items];
+      updated[editIndex] = data;
+      setItems(updated);
+      setEditIndex(null);
+    } else {
+      setItems(prev => [...prev, data]); // 🔥 IMPORTANT
     }
-    
+  
     setType("");
     setSubCategory("");
     setMedicine("");
     setQty("");
     setPurchasePrice("");
     setSalesPrice("");
-    
-    };
+  };
 
     const addEntrySale = ()=>{
 
@@ -231,11 +225,9 @@ unitPrice * Number(qty);
         
         };
 
-    const deleteItem=(index)=>{
-        setItems(
-        items.filter((_,i)=>i!==index)
-        );
-        };
+        const deleteItem = (index) => {
+            setItems(prev => prev.filter((_, i) => i !== index));
+          };
 
 
 return(

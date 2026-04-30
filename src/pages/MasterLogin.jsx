@@ -39,63 +39,28 @@ const MasterLogin = () => {
 
   const [state, setState] = useState(isRegister ? "Register" : "Login");
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async () => {
 
-    if (
-      email === "demomaster@gmail.com" &&
-      password === "demomaster123"
-    ){
-    
-    // demo user -> NO alert
-    window.location.href="/#/demomasterdashboard";
-    
+  if (
+    email === "demomaster@gmail.com" &&
+    password === "demomaster123"
+  ){
+    localStorage.setItem("masterLogin", "true");
+    navigate("/demomasterdashboard");
     return;
-    }
-    e.preventDefault();
+  }
 
-    try {
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
 
-      if (state === "Register") {
+    localStorage.setItem("masterLogin","true");
 
-        if (password !== confirmPassword) {
-          alert("Passwords do not match");
-          return;
-        }
-
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-        await updateProfile(userCredential.user, {
-          displayName: name
-        });
-
-        await setDoc(doc(db, "master", userCredential.user.uid), {
-          name,
-          email,
-          hospital,
-          role: "master"
-        });
-
-        alert("Registered Successfully");
-        setState("Login");
-      }
-
-      else {
-
-        await signInWithEmailAndPassword(auth, email, password);
-
-        localStorage.setItem("masterLogin", "true");
-
-        if (isDemo) {
-          navigate("/demomasterdashboard")
-        } else {
-          navigate("/master-dashboard")
-        }
-      }
-
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+    alert("Master Login Success");
+    navigate("/demomasterdashboard");
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
   const handleGoogleLogin = async () => {
   try {
@@ -133,12 +98,14 @@ const MasterLogin = () => {
 <div className="hidden md:block w-full bg-white border-b shadow-sm">
 <div className="max-w-7xl mx-auto relative flex items-center h-20 px-8">
 
-<div className="flex items-center gap-4">
+<div className="absolute left-2 flex items-center gap-4">
 
 
 <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="left-0 !w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+  <span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
@@ -148,12 +115,63 @@ Demo
 </div>
 
 <ul className="absolute left-1/2 -translate-x-1/2 flex items-center gap-12 text-base font-medium ">
-<li onClick={()=>navigate("/master-login",{state:{demo:true}})}>MasterLogin</li>
-<li onClick={()=>navigate("/admin-login",{state:{demo:true}})}>AdminLogin</li>
-<li onClick={()=>navigate("/doctor-login",{state:{demo:true}})}>DoctorLogin</li>
-<li onClick={()=>navigate("/staff-login",{state:{demo:true}})}>StaffLogin</li>
-<li onClick={()=>navigate("/patient-login",{state:{demo:true}})}>PatientLogin</li>
-<li onClick={()=>navigate("/pharmasi-login",{state:{demo:true}})}>PharmasiLogin</li>
+
+  <li onClick={()=>{
+    if(localStorage.getItem("masterLogin")==="true"){
+      navigate("/demomasterdashboard")
+    }else{
+      navigate("/master-login",{state:{demo:true}})
+    }
+  }}>
+  MasterLogin
+  </li>
+
+
+  <li onClick={()=>{
+  if(localStorage.getItem("adminLogin")==="true"){
+    navigate("/demoadmindashboard")
+  }else{
+    navigate("/admin-login",{state:{demo:true}})
+  }
+}}>
+AdminLogin
+</li>
+<li onClick={()=>{
+  if(localStorage.getItem("doctorLogin")==="true"){
+    navigate("/demodoctordashboard")
+  }else{
+    navigate("/doctor-login",{state:{demo:true}})
+  }
+}}>
+DoctorLogin
+</li>
+<li onClick={()=>{
+  if(localStorage.getItem("staffLogin")==="true"){
+    navigate("/demostaffdashboard")
+  }else{
+    navigate("/staff-login",{state:{demo:true}})
+  }
+}}>
+StaffLogin
+</li>
+<li onClick={()=>{
+  if(localStorage.getItem("patientLogin")==="true"){
+    navigate("/demopatientdashboard")
+  }else{
+    navigate("/patient-login",{state:{demo:true}})
+  }
+}}>
+PatientLogin
+</li>
+<li onClick={()=>{
+  if(localStorage.getItem("pharmasiLogin")==="true"){
+    navigate("/demopharmasidashboard")
+  }else{
+    navigate("/pharmasi-login",{state:{demo:true}})
+  }
+}}>
+PharmasiLogin
+</li>
 </ul>
 
 </div>
@@ -169,8 +187,10 @@ Demo
   <div className="flex items-center gap-4">
 
   <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="left-0 !w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
@@ -277,7 +297,10 @@ PharmasiLogin
 
 <div className="flex justify-center items-center min-h-[calc(100vh-80px)] px-4">
 
-      <form onSubmit={handleSubmit}
+<form onSubmit={(e)=>{
+  e.preventDefault();
+  handleLogin();
+}}
         className="backdrop-blur-lg bg-white/60 border border-white/30 
       shadow-2xl rounded-2xl p-6 sm:p-8 w-full max-w-[400px]">
 

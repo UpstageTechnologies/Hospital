@@ -298,7 +298,7 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [newSlot, setNewSlot] = useState("")
     const [doctorImage, setDoctorImage] = useState("")
     const [appointments, setAppointments] = useState([])
-    const [page, setPage] = useState("home")
+    const [page, setPage] = useState("appointments")
     const [callData, setCallData] = useState(null)
     const [selected, setSelected] = useState(null)
     const [selectedDate, setSelectedDate] = useState(null)
@@ -557,25 +557,15 @@ const isDemo = location.state?.demo === true;
         "storage",
         syncPharmacyItems
         );
-        
-        const timer =
-        setInterval(
-        syncPharmacyItems,
-        1000
-        );
-        
+    
         return ()=>{
-        
-        window.removeEventListener(
-        "storage",
-        syncPharmacyItems
-        );
-        
-        clearInterval(timer);
-        
+            window.removeEventListener(
+            "storage",
+            syncPharmacyItems
+            );
         };
-        
-        },[]);
+    
+    },[]);
 
     useEffect(()=>{
 

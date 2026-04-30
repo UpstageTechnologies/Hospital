@@ -474,7 +474,8 @@ const Appointment = () => {
                               time: slotTime,
                               reason,
                               appointmentNo,
-                              email: userData?.email,
+                              patientEmail: auth.currentUser?.email,  // 🔥 FINAL FIX
+                              doctorImage: docInfo.image,
                               createdAt: serverTimestamp()
                             }
 

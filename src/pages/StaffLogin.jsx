@@ -26,35 +26,28 @@ const StaffLogin = () => {
 
     const handleLogin = async () => {
 
-      if(
-        staffId==="demostaff001" &&
-        password==="demo001"
-        ){
-        navigate("/demostaffdashboard");
-        return;
-        }
-
-        const docRef = doc(db, "staffs", staffId)
-        const docSnap = await getDoc(docRef)
-
-        if (!docSnap.exists()) {
-            alert("Invalid Staff ID")
-            return
-        }
-
-        const data = docSnap.data()
-
-
-        if (data.staffAccount?.password !== password) {
-            alert("Wrong Password")
-            return
-        }
-
-        localStorage.setItem("staffId", staffId)
-
-        navigate("/demostaffdashboard")
-
-    }
+      if (
+          staffId === "demostaff001" &&
+          password === "demo001"
+      ){
+  
+          localStorage.setItem("staffLogin", "true");
+  
+          navigate("/demostaffdashboard");
+          return;
+      }
+  
+      try {
+          await signInWithEmailAndPassword(auth, staffId, password);
+  
+          localStorage.setItem("staffLogin","true");
+  
+          alert("Staff Login Success");
+          navigate("/demostaffdashboard");
+      } catch (err) {
+          alert(err.message);
+      }
+  };
 
     return (
 <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-blue-200">
@@ -64,11 +57,13 @@ const StaffLogin = () => {
 <div className="hidden md:block w-full bg-white border-b shadow-sm">
 <div className="max-w-7xl mx-auto relative flex items-center h-20 px-8">
 
-<div className="flex items-center gap-4">
+<div className="absolute left-2 flex items-center gap-4">
 
 <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
@@ -99,8 +94,10 @@ Demo
   <div className="flex items-center gap-4">
 
   <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
   <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo

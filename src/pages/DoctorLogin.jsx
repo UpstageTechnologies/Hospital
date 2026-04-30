@@ -54,7 +54,7 @@ const DoctorLogin = () => {
       alert("Doctor Google Signup Success")
       console.log("Login success", email)
       if(isDemo){
-        window.location.href="/#/demodoctordashboard"
+        navigate("/demodoctordashboard")
         }else{
         navigate("/doctor-profile")
         }
@@ -71,11 +71,18 @@ const DoctorLogin = () => {
     if (
       email === "demodoctor007" &&
       password === "demo007"
-     ){
+    ){
+      localStorage.removeItem("masterLogin");
+    localStorage.removeItem("staffLogin");
+    localStorage.removeItem("doctorLogin");
+    localStorage.removeItem("patientLogin");
+    localStorage.removeItem("pharmasiLogin");
+      localStorage.setItem("doctorLogin", "true");
       
+    
       window.location.href="/#/demodoctordashboard";
       return;
-     }
+    }
 
     e.preventDefault()
 
@@ -122,8 +129,13 @@ const DoctorLogin = () => {
 
 
         alert("Doctor Login Success")
+        localStorage.removeItem("masterLogin");
+    localStorage.removeItem("staffLogin");
+    localStorage.removeItem("doctorLogin");
+    localStorage.removeItem("patientLogin");
+    localStorage.removeItem("pharmasiLogin");
+        localStorage.setItem("doctorLogin","true");
 
-        localStorage.setItem("doctorEmail", email)
 
         if(isDemo){
           window.location.href="/#/demodoctordashboard"
@@ -150,12 +162,14 @@ const DoctorLogin = () => {
 <div className="hidden md:block w-full bg-white border-b shadow-sm">
 <div className="max-w-7xl mx-auto relative flex items-center h-20 px-8">
 
-<div className="flex items-center gap-4">
+<div className="absolute left-2 flex items-center gap-4">
 
 
 <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
@@ -188,8 +202,10 @@ Demo
 
 
   <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
   <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo

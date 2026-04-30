@@ -41,13 +41,14 @@ const DemoHome = () => {
             <div className="flex items-center justify-between px-4 sm:px-8 py-4 shadow">
             <div className="flex items-center gap-4">
                 
-            <button onClick={() => window.location.assign("/")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
-</button>
-<p  onClick={() => nav("/")} className="text-xl font-semibold cursor-pointer" >
-Demo
-</p>
+            <button onClick={() => navigate("/")}className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+            <span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+                 ←
+            </span>
+            </button>
+            <p  onClick={() => navigate("/")} className="text-xl font-semibold cursor-pointer" >
+                Demo
+            </p>
 
 
 </div>

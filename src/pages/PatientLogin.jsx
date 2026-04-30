@@ -73,78 +73,21 @@ const Login = () => {
     if (
       email === "demopatient@gmail.com" &&
       password === "demopatient11"
-     ){
-
-      window.location.href="/#/demopatientdashboard";
+    ){
+      localStorage.setItem("patientLogin","true");
+      navigate("/demopatientdashboard");
       return;
-     }
-
-    event.preventDefault()
-
-    try {
-      if (state === "Sign Up") {
-
-        if (password !== confirmPassword) {
-          alert("Password and Confirm Password not match")
-          return
-        }
-
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-        await updateProfile(userCredential.user, {
-          displayName: name
-        });
-
-        await setDoc(doc(db, "users", userCredential.user.uid), {
-          name: name,
-          email: email,
-          address: address,
-          phone: phone,
-          gender: gender,
-          role: "user"
-        });
-
-        alert("Account Created Successfully");
-        setState("Login")
-
-      }
-
-      else {
-
-
-        const userCredential = await signInWithEmailAndPassword(auth, email, password)
-
-        const uid = userCredential.user.uid
-
-        const userRef = doc(db, "users", uid)
-        const userSnap = await getDoc(userRef)
-
-        if (!userSnap.exists()) {
-          alert("No patient record found ")
-          return
-        }
-
-        const userData = userSnap.data()
-
-        if (userData.isDisabled) {
-          alert("Your account is disabled")
-          return
-        }
-
-        alert("Login Success")
-        localStorage.setItem(
-          "currentUser",
-          JSON.stringify({
-            email: email
-          })
-         );
-        navigate('/demopatientdashboard')
-      }
-
-    } catch (error) {
-      alert(error.message)
     }
-
+    
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    
+      localStorage.setItem("patientLogin","true");
+    
+      navigate("/demopatientdashboard");
+    } catch(err){
+      alert(err.message);
+    }
   }
 
   return (
@@ -156,11 +99,13 @@ const Login = () => {
 <div className="hidden md:block w-full bg-white border-b shadow-sm">
 <div className="max-w-7xl mx-auto relative flex items-center h-20 px-8">
 
-<div className="flex items-center gap-4">
+<div className="absolute left-2 flex items-center gap-4">
 
 <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+  <span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
 
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
@@ -192,8 +137,10 @@ Demo
   <div className="flex items-center gap-4">
 
   <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
   <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo

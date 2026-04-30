@@ -13,7 +13,7 @@ import Calendar from "../components/Calendar";
 
 const Account = () => {
 
-  const [menu, setMenu] = useState("home")
+  const [menu, setMenu] = useState("appointments")
 
   
 
@@ -1035,6 +1035,60 @@ confirmPassword:""
     }
   }
 
+  const handleItemPrint = (item) => {
+
+    const win = window.open("", "", "width=900,height=700");
+  
+    win.document.write(`
+      <html>
+        <head>
+          <title>Medicine Bill</title>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            h2 { text-align: center; }
+            .box { margin: 10px 0; font-size: 16px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid black; padding: 8px; text-align: center; }
+          </style>
+        </head>
+  
+        <body>
+  
+          <h2>Pharmacy Bill</h2>
+  
+          <div class="box"><b>Patient Name:</b> ${selectedPatient?.name || "Demo Patient"}</div>
+          <div class="box"><b>Date:</b> ${new Date().toLocaleDateString()}</div>
+  
+          <table>
+            <tr>
+              <th>Medicine</th>
+              <th>Type</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+  
+            <tr>
+              <td>${item.medicine || item.subCategory}</td>
+              <td>${item.type}</td>
+              <td>${item.qty}</td>
+              <td>₹${item.salesPrice}</td>
+              <td>₹${item.qty * item.salesPrice}</td>
+            </tr>
+          </table>
+  
+          <h3 style="text-align:right; margin-top:20px;">
+            Grand Total: ₹${item.qty * item.salesPrice}
+          </h3>
+  
+        </body>
+      </html>
+    `);
+  
+    win.document.close();
+    win.print();
+  };
+
   return (
 
     
@@ -1351,6 +1405,13 @@ onClick={()=>{
   }}
 >
 Delete
+</button>
+
+<button
+className="text-green-600 font-semibold"
+onClick={() => handleItemPrint(item)}
+>
+Print
 </button>
 </td>
 

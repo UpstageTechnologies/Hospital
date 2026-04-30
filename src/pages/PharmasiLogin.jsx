@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const PharmasiLogin = () => {
@@ -19,83 +17,24 @@ useEffect(() => {
 
     if(isDemo){
     setPharmasiId("demopharmasi002");
-    setPassword("demo02");
+    setPassword("demo002");
     }
     
     }, [isDemo]);
 
-const handlePharmasiLogin = async() => {
+    const handleLogin = () => {
 
-    if(
-        isDemo &&
-        pharmasiId==="demopharmasi002" &&
-        password==="demo02"
-        ){
-        navigate("/demo-pharmasi-dashboard");
-        return;
-        }
-
-if(!pharmasiId || !password){
-alert("Enter Pharmasi ID and Password");
-return;
-}
-
-try{
-
-setLoading(true);
-
-// formasi collection check
-const ref = doc(db,"pharmasi",pharmasiId);
-
-const snap = await getDoc(ref);
-
-if(!snap.exists()){
-alert("Pharmasi account not found");
-setLoading(false);
-return;
-}
-
-const data = snap.data();
-
-// disabled check
-if(data.isDisabled){
-alert("Account Disabled");
-setLoading(false);
-return;
-}
-
-// password check
-if(data.pharmasiAccount?.password !== password){
-alert("Invalid Password");
-setLoading(false);
-return;
-}
-
-// session store
-localStorage.setItem(
-"pharmasiUser",
-JSON.stringify(data)
-);
-
-alert("Login Success");
-
-// dashboard page redirect
-if(isDemo){
-    navigate("/demo-pharmasi-dashboard");
-    }else{
-    navigate("/pharmasi-dashboard");
-    }
-
-}
-catch(error){
-console.log(error);
-alert("Login Failed");
-}
-finally{
-setLoading(false);
-}
-
-};
+      if (
+        pharmasiId === "demopharmasi002" &&
+        password === "demo002"
+      ) {
+        localStorage.setItem("pharmasiLogin", "true");
+        navigate("/demopharmasidashboard");
+      } else {
+        alert("Invalid Pharmasi ID or Password");
+      }
+    
+    };
 
 
 return (
@@ -111,7 +50,9 @@ return (
     onClick={()=>navigate("/demohome")}
     className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center"
     >
-    <span className="text-white text-3xl font-bold -mt-1">←</span>
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
     </button>
     
     <p
@@ -142,9 +83,11 @@ return (
 
   <button onClick={() => navigate("/demohome")}
 className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
-<p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
+<p  onClick={() => navigate("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
 
@@ -310,7 +253,7 @@ PharmasiLogin
     {/* SAME BUTTON AS PATIENT LOGIN */}
     <button
     type="button"
-    onClick={handlePharmasiLogin}
+    onClick={handleLogin}
     disabled={loading}
     className="
     w-full

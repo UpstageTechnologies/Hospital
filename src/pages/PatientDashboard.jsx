@@ -24,31 +24,88 @@ const PatientDashboard = () => {
         useEffect(() => {
 
             const fetchAppointments = async () => {
-            
-            const snap = await getDocs(
-            collection(db,"appointments")
-            );
-            
-            let list=[];
-            
-            snap.forEach(doc=>{
-            const data = doc.data();
-            
-            if(data.email === userEmail){
-            list.push(data);
+          
+              const snap = await getDocs(collection(db, "appointments"))
+          
+              let list = []
+          
+              snap.forEach(doc => {
+                const data = doc.data()
+          
+                console.log("DATA:", data)
+                console.log("USER:", userEmail)
+          
+                if (
+                  data?.patientEmail &&
+                  userEmail &&
+                  data.patientEmail.toLowerCase() === userEmail.toLowerCase()
+                ) {
+                  list.push(data)
+                }
+              })
+          
+              console.log("FINAL LIST:", list)
+          
+              if (list.length === 0) {
+
+                console.log("⚠️ No real appointments found, showing demo data");
+              
+                setAppointments([
+                  {
+                    doctorName: "Dr. Kumar",
+                    time: "10:00 AM",
+                    appointmentNo: "APT101",
+                    patientName: savedUser?.name || "Demo User",
+                    phone: "9876543210",
+                    address: "Chennai",
+                    date: "2026-04-10",
+                    doctorImage: "https://randomuser.me/api/portraits/men/32.jpg"
+                  },
+                  {
+                    doctorName: "Dr. Priya",
+                    time: "11:30 AM",
+                    appointmentNo: "APT102",
+                    patientName: savedUser?.name || "Demo User",
+                    phone: "9876543211",
+                    address: "Coimbatore",
+                    date: "2026-04-11",
+                    doctorImage: "https://randomuser.me/api/portraits/women/44.jpg"
+                  },
+                  {
+                    doctorName: "Dr. Arjun",
+                    time: "2:00 PM",
+                    appointmentNo: "APT103",
+                    patientName: savedUser?.name || "Demo User",
+                    phone: "9876543212",
+                    address: "Madurai",
+                    date: "2026-04-12",
+                    doctorImage: "https://randomuser.me/api/portraits/men/55.jpg"
+                  },
+                  {
+                    doctorName: "Dr. Meena",
+                    time: "4:30 PM",
+                    appointmentNo: "APT104",
+                    patientName: savedUser?.name || "Demo User",
+                    phone: "9876543213",
+                    address: "Salem",
+                    date: "2026-04-13",
+                    doctorImage: "https://randomuser.me/api/portraits/women/65.jpg"
+                  }
+                ]);
+              
+              } else {
+                console.log("✅ Real appointments found:", list);
+                setAppointments(list);
+              }
+          
             }
-            
-            });
-            
-            setAppointments(list);
-            
-            };
-            
-            if(userEmail){
-            fetchAppointments();
+          
+            if (userEmail) {
+              fetchAppointments()
             }
-            
-            },[userEmail]);
+          
+          }, [userEmail])
+        
     useEffect(() => {
         let interval
         if (checkInTime && !checkedOut) {

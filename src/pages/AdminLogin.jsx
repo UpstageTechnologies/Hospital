@@ -34,19 +34,25 @@ const AdminLogin = () => {
 
     const handleLogin = async () => {
 
-      if (
-        email === "demoadminid001" &&
-        password === "demo001"
-       ){
+        if (
+            email === "demoadminid001" &&
+            password === "demo001"
+        ){
         
-        window.location.href="/#/demoadmindashboard";
-        return;
-       }
+            localStorage.setItem("adminLogin", "true");
+        
+            navigate("/demoadmindashboard");
+            return;
+        }
+        
         try {
             await signInWithEmailAndPassword(auth, email, password);
+        
+            localStorage.setItem("adminLogin","true");
+        
             alert("Admin Login Success");
             navigate("/demoadmindashboard");
-        } catch (err) {
+        }catch (err) {
             alert(err.message);
         }
     };
@@ -93,8 +99,10 @@ const AdminLogin = () => {
 
 
 <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
 <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
@@ -121,13 +129,15 @@ Demo
 <div className="md:hidden w-full bg-white border-b shadow-sm relative">
 
   {/* Top Bar */}
-  <div className="flex items-center justify-between px-6 py-5">
+  <div className="flex items-center justify-between px-4 sm:px-8 py-4 shadow">
   <div className="flex items-center gap-4">
 
 
   <button onClick={() => navigate("/demohome")}
-className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-  <span className="text-white text-3xl font-bold -mt-1">←</span>
+className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
+  <span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
+  ←
+</span>
 </button>
   <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
