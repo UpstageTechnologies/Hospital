@@ -91,43 +91,12 @@ const UpstageDoctors = () => {
                             {filterDoc.map((item, index) => (
 
                                 <div key={index}
-                                    onClick={() => navigate(`/appointment/${item.email}`)}
+                                onClick={() => navigate(`/upstage-appointment/${encodeURIComponent(item.email || item.id)}`)}
                                     className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
 <img
-  src={
-    localStorage.getItem(`doctorImage_${item.id}`) ||
-    "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
-  }
-  onClick={(e) => {
-    e.stopPropagation();
-
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-
-      if (file) {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          const image = reader.result;
-
-          e.target.src = image;
-
-          // permanent save
-          localStorage.setItem(`doctorImage_${item.id}`, image);
-        };
-
-        reader.readAsDataURL(file);
-      }
-    };
-
-    input.click();
-  }}
-  className="bg-blue-50 w-full h-60 object-contain cursor-pointer"
+  src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+  className="bg-blue-50 w-full h-60 object-contain"
 />
                                     <div className='p-4'>
                                     <p className={`text-sm ${index < 4 ? "text-green-500" : "text-red-500"}`}>
@@ -159,42 +128,12 @@ const UpstageDoctors = () => {
                                     {groupedDoctors[hospital].map((item, index) => (
 
                                         <div key={index}
-                                            onClick={() => navigate(`/appointment/${item.email}`)}
+                                        onClick={() => navigate(`/upstage-appointment/${encodeURIComponent(item.email || item.id)}`)}
                                             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
 <img
-  src={
-    localStorage.getItem(`doctorImage_${item.id}`) ||
-    "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
-  }
-  onClick={(e) => {
-    e.stopPropagation();
-
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-
-      if (file) {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          const image = reader.result;
-
-          e.target.src = image;
-
-          localStorage.setItem(`doctorImage_${item.id}`, image);
-        };
-
-        reader.readAsDataURL(file);
-      }
-    };
-
-    input.click();
-  }}
-  className="bg-blue-50 w-full h-60 object-contain cursor-pointer"
+  src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+  className="bg-blue-50 w-full h-60 object-contain"
 />
 
                                             <div className='p-4'>

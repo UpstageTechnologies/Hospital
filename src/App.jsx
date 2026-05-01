@@ -20,6 +20,7 @@ import DashboardNavbar from "./components/DashboardNavbar";
 import RealMasterDashboard from "./pages/RealMasterDashboard";
 import Upstage from "./pages/Upstage.jsx";
 import UpstageDoctors from "./pages/UpstageDoctors";
+import UpstageAppointmentPage from "./pages/UpstageAppointmentPage"
 import UpstageAbout from "./pages/UpstageAbout";
 import UpstageContact from "./pages/UpstageContact";
 import UpstageNavbar from "./components/UpstageNavbar";
@@ -101,6 +102,7 @@ const App = () => {
         <Route path="/master-dashboard" element={<RealMasterDashboard />} />
         <Route path="/upstage" element={<Upstage />} />
         <Route path="/upstage-doctors" element={<UpstageDoctors />} />
+        <Route path="/upstage-appointment/:docId" element={<UpstageAppointmentPage />} />
         <Route path="/upstage-doctors/:city" element={<UpstageDoctors />} />
         <Route path="/upstage-about" element={<UpstageAbout />} />
         <Route path="/upstage-contact" element={<UpstageContact />} />

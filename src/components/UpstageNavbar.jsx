@@ -1,23 +1,40 @@
 
 import { NavLink, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { auth } from "../firebase"
+import { onAuthStateChanged } from "firebase/auth"
 
 
 const UpstageNavbar = () => {
 
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false)
+const [user, setUser] = useState(null)
    
 
     return (
         <div className="flex items-center py-4 px-6 border-b border-gray-300 bg-white">
 
-            {/* LOGO */}
-            <img
-                src="/logos/upstage.png"
-                className="w-28 cursor-pointer"
-                onClick={() => navigate("/upstage")}
-            />
+
+<div className="flex items-center gap-3">
+
+  <button
+    onClick={() => navigate("/upstage")}
+    className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-lg border-2 border-white ml-2 hover:scale-110 transition"
+  >
+    <span className="text-white text-lg relative -top-[2px]">
+      ←
+    </span>
+  </button>
+
+  <img
+    src="/logos/upstage.png"
+    className="w-28 cursor-pointer"
+    onClick={() => navigate("/upstage")}
+  />
+
+</div>  
 
             {/* MOBILE MENU BUTTON */}
 <div className="lg:hidden ml-auto">

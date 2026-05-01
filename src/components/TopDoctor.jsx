@@ -31,7 +31,7 @@ const TopDoctor = ({ hospital }) => {
                             key={index}
                             onClick={() => {
                                 // 🔥 USE INDEX ONLY (NO ID PROBLEM)
-                                navigate(`/appointment/${index}`);
+                                navigate(`/appointment/${encodeURIComponent(doc.email)}`);
                                 window.scrollTo(0, 0);
                             }}
                             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'>

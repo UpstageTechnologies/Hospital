@@ -6,7 +6,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 
 const Upstage = () => {
-
+    
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -71,9 +71,24 @@ const Upstage = () => {
 
 
             <div className="flex justify-between items-center px-8 py-4 shadow">
-            <img  src="/logos/upstage.png"  alt="logo"  className="w-28 cursor-pointer"
+            <div className="flex items-center gap-3">
+
+<button
+  onClick={() => navigate("/")}
+  className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-lg border-2 border-white ml-2 hover:scale-110 transition"
+>
+  <span className="text-white text-lg relative -top-[2px]">
+    ←
+  </span>
+</button>
+
+<img
+  src="/logos/upstage.png"
+  className="w-28 cursor-pointer"
   onClick={() => navigate("/upstage")}
 />
+
+</div>
 
               <ul className="hidden lg:flex gap-8 font-medium">
                     <span onClick={() => navigate("/upstage")} className="cursor-pointer">Home</span>

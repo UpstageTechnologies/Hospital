@@ -16,7 +16,7 @@ const Appointment = () => {
   const navigate = useNavigate()
 
   const { doctors, currencySymbol } = useContext(AppContext)
-  const { docId } = useParams()
+  
 
   const [docInfo, setDocInfo] = useState(null)
   const [docSlots, setDocSlots] = useState([])
@@ -42,33 +42,38 @@ const Appointment = () => {
   const [appointmentNo, setAppointmentNo] = useState("")
   const selectedDate = new Date().toDateString()
 
-  const decodedId = docId ? decodeURIComponent(docId).trim() : ""
+  const { docId } = useParams()
+const decodedId = decodeURIComponent(docId)
 
-  useEffect(() => {
-    if (!doctors || doctors.length === 0) return
-    const doctor = doctors.find(doc => doc.email === decodedId)
-    if (doctor) setDocInfo(doctor)
-  }, [doctors, decodedId])
+useEffect(() => {
+  if (!doctors || doctors.length === 0) return
 
-  useEffect(() => {
-    const fetchDoctor = async () => {
-      if (!decodedId) return
-      const snap = await getDoc(doc(db, "doctors", decodedId))
+  const doctor = doctors.find(doc => doc.email === decodedId)
 
-      if (snap.exists()) {
-        const data = snap.data()
-
-        setDocInfo({
-          id: decodedId,
-          ...data
-        })
+  if (doctor) setDocInfo(doctor)
+}, [doctors, decodedId])
 
 
-      }
-    }
 
-    if (!docInfo) fetchDoctor()
-  }, [decodedId, docInfo])
+  // useEffect(() => {
+  //   const fetchDoctor = async () => {
+  //     if (!decodedId) return
+  //     const snap = await getDoc(doc(db, "doctors", decodedId))
+
+  //     if (snap.exists()) {
+  //       const data = snap.data()
+
+  //       setDocInfo({
+  //         id: decodedId,
+  //         ...data
+  //       })
+
+
+  //     }
+  //   }
+
+  //   if (!docInfo) fetchDoctor()
+  // }, [decodedId, docInfo])
 
 
 
@@ -180,7 +185,14 @@ const Appointment = () => {
    
    },[])
 
-  if (!docInfo) return <h1>Loading...</h1>
+   if (!docInfo) {
+    return (
+      <div className="text-center mt-20">
+        <h1 className="text-xl font-bold">Doctor Not Found ❌</h1>
+        <p className="text-gray-500">Check ID or data issue</p>
+      </div>  
+    )
+  }
 
   return (
     <div className='p-4'>
@@ -544,7 +556,7 @@ const Appointment = () => {
 
 <div className="flex gap-3 flex-wrap justify-center">
 
-{slot.times.map((t,j)=>(
+{(slot.times || []).map((t,j)=>(
 <button
  key={j}
  onClick={()=>{
