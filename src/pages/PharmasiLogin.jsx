@@ -134,7 +134,7 @@ MasterLogin
 
 <div
 onClick={()=>{
-navigate('/admin-login',{state:{demo:true}});
+navigate("/admin-login",{state:{demo:true}});
 setOpenMenu(false);
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
@@ -144,7 +144,7 @@ AdminLogin
 
 <div
 onClick={()=>{
-navigate('/doctor-login',{state:{demo:true}});
+navigate("/doctor-login",{state:{demo:true}});
 setOpenMenu(false);
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
@@ -154,7 +154,7 @@ DoctorLogin
 
 <div
 onClick={()=>{
-navigate('/staff-login',{state:{demo:true}});
+navigate("/staff-login",{state:{demo:true}});
 setOpenMenu(false);
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
@@ -164,7 +164,7 @@ StaffLogin
 
 <div
 onClick={()=>{
-navigate('/patient-login',{state:{demo:true}});
+navigate("/patient-login",{state:{demo:true}});
 setOpenMenu(false);
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
@@ -174,7 +174,7 @@ PatientLogin
 
 <div
 onClick={()=>{
-navigate('/pharmasi-login',{state:{demo:true}});
+navigate("/pharmasi-login",{state:{demo:true}});
 setOpenMenu(false);
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
