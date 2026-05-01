@@ -49,11 +49,16 @@ const [typeOptions,setTypeOptions]=useState([
 
         useEffect(() => {
             localStorage.setItem("pharmacyItems", JSON.stringify(items));
-          
-            // 🔥 FORCE UPDATE EVENT
             window.dispatchEvent(new Event("storage"));
           
           }, [items]);
+
+          useEffect(() => {
+            const stored = localStorage.getItem("pharmacyItems");
+            if (stored) {
+              setItems(JSON.parse(stored));
+            }
+          }, []);
 
         useEffect(()=>{
 
@@ -63,6 +68,13 @@ const [typeOptions,setTypeOptions]=useState([
             );
             
             },[entryItems]);
+
+            useEffect(() => {
+              const stored = localStorage.getItem("entryItems");
+              if (stored) {
+                setEntryItems(JSON.parse(stored));
+              }
+            }, []);
 
 const categoryMap={
 
@@ -142,7 +154,7 @@ const addMedicine = () => {
       id: Date.now(),
       type,
       subCategory,
-      medicine,
+      medicine: medicine || subCategory,
       qty,
       purchasePrice,
       salesPrice
@@ -193,7 +205,7 @@ unitPrice * Number(qty);
         const saleData = {
         id:Date.now(),
         type,
-        medicine,
+        medicine: medicine || subCategory,
         qty,
         purchasePrice: inventoryItem.purchasePrice,
         salesPrice: totalSales
@@ -387,7 +399,8 @@ className="absolute right-5 top-1/2 -translate-y-1/2 text-2xl"
 <div className="
 absolute top-full left-0 mt-2
 bg-white shadow-lg rounded-xl
-w-full z-50 p-1
+w-full z-50 p-2
+max-h-60 overflow-y-auto
 ">
 
 {[
@@ -405,13 +418,8 @@ onClick={()=>{
 setType(item);
 setShowTypeDropdown(false);
 }}
-className="
-px-4 py-2
-text-base font-medium
-cursor-pointer
-hover:bg-gray-100
-rounded-lg
-"
+className="px-4 py-2 text-sm font-medium cursor-pointer break-words whitespace-normal"
+style={{ wordBreak: "break-word" }}
 >
 {item}
 </div>
@@ -455,7 +463,13 @@ className="border px-4 py-3 text-lg rounded-xl w-full"
 
 {showMedicineDropdown && (
 
-<div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-xl w-full z-50 p-1">
+<div className="
+absolute top-full left-0 mt-2
+bg-white shadow-lg rounded-xl
+w-full z-50 p-2
+max-h-60 overflow-y-auto
+break-words
+">
 
 {type &&
 categoryMap[type]
@@ -470,7 +484,8 @@ subCategory.toLowerCase()
 setSubCategory(item);
 setShowMedicineDropdown(false);
 }}
-className=" px-4 py-2 text-base font-medium cursor-pointer hover:bg-gray-100 rounded-lg">
+className="px-4 py-2 text-sm font-medium cursor-pointer hover:bg-gray-100 rounded-lg break-words whitespace-normal"
+style={{ wordBreak: "break-word" }}>
 {item}
 </div>
 
@@ -705,6 +720,7 @@ className="absolute right-4 top-3 text-xl"
 absolute top-16 left-0 w-full
 bg-white border rounded-xl shadow-lg z-50
 max-h-60 overflow-y-auto
+p-2
 ">
 
 {typeOptions
@@ -718,7 +734,7 @@ onClick={()=>{
 setType(item);
 setShowTypeDropdown(false);
 }}
-className="px-4 py-3 cursor-pointer hover:bg-gray-100 text-base"
+className="px-4 py-2 text-sm font-medium cursor-pointer break-words whitespace-normal"
 >
 {item}
 </div>
@@ -789,7 +805,8 @@ onClick={()=>{
 setMedicine(item);
 setShowMedicineDropdown(false);
 }}
-className="px-4 py-3 cursor-pointer hover:bg-gray-100"
+className="px-4 py-3 text-sm cursor-pointer hover:bg-gray-100 break-words whitespace-normal"
+style={{ wordBreak: "break-word" }}
 >
 {item}
 </div>
