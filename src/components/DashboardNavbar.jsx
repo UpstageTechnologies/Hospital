@@ -121,7 +121,7 @@ PatientLogin
 className={active("/pharmasi-login")}
 onClick={()=>{
   if(isLogged("pharmasi")){
-    navigate("/demo-pharmasi-dashboard")
+    navigate("/demopharmasidashboard")
   }else{
     navigate("/pharmasi-login",{state:{demo:true}})
   }
@@ -343,7 +343,7 @@ PatientLogin
 <div
 onClick={()=>{
   if(isLogged("pharmasi")){
-    navigate("/demo-pharmasi-dashboard")
+    navigate("/demopharmasidashboard")
   }else{
     navigate("/pharmasi-login",{state:{demo:true}})
   }

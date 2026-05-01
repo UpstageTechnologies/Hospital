@@ -279,8 +279,12 @@ PatientLogin
 
 <div
 onClick={()=>{
-navigate("/pharmasi-login",{state:{demo:true}});
-setOpenMenu(false);
+  if(localStorage.getItem("pharmasiLogin")==="true"){
+    navigate("/demopharmasidashboard")
+  }else{
+    navigate("/pharmasi-login",{state:{demo:true}})
+  }
+  setOpenMenu(false);
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
 >
