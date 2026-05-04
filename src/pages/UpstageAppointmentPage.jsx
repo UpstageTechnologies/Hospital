@@ -42,7 +42,7 @@ const UpstageAppointmentPage = () => {
 
           <img
             className="w-full max-w-[280px] md:w-72 h-[250px] md:h-[300px] object-cover rounded-xl bg-blue-500"
-            src={docInfo.image}
+            src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
             alt=""
           />
 

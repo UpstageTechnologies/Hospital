@@ -14,6 +14,8 @@ const [purchasePrice,setPurchasePrice]=useState("");
 const [salesPrice,setSalesPrice]=useState("");
 const [showTypeDropdown,setShowTypeDropdown]=useState(false);
 const [showMedicineDropdown,setShowMedicineDropdown]=useState(false);
+const [entryType,setEntryType] = useState("")
+const [showEntryDropdown,setShowEntryDropdown] = useState(false)
 
 const [typeOptions,setTypeOptions]=useState([
     "Tablet",
@@ -156,6 +158,7 @@ const addMedicine = () => {
       subCategory,
       medicine: medicine || subCategory,
       qty,
+      entryType: "Purchase",
       purchasePrice,
       salesPrice
     };
@@ -177,51 +180,73 @@ const addMedicine = () => {
     setSalesPrice("");
   };
 
-    const addEntrySale = ()=>{
+  const addEntrySale = () => {
 
-        if(!type || !medicine || !qty){
-        alert("Fill all fields");
-        return;
-        }
-        
-        const inventoryItem = items.find(
-        item =>
-        item.type===type &&
-        (item.subCategory===medicine || item.medicine===medicine)
-        );
-        
-        if(!inventoryItem){
-        alert("Medicine not found in inventory");
-        return;
-        }
-        
-        const unitPrice =
-Number(inventoryItem.salesPrice) /
-Number(inventoryItem.qty);
-
-const totalSales =
-unitPrice * Number(qty);
-        
-        const saleData = {
-        id:Date.now(),
-        type,
-        medicine: medicine || subCategory,
-        qty,
-        purchasePrice: inventoryItem.purchasePrice,
-        salesPrice: totalSales
-        };
-        
-        setEntryItems([
+    if(!type || !medicine || !qty){
+      alert("Fill all fields");
+      return;
+    }
+  
+    const inventoryItem = items.find(
+      item =>
+      item.type===type &&
+      (item.subCategory===medicine || item.medicine===medicine)
+    );
+  
+    if(!inventoryItem){
+      alert("Medicine not found in inventory");
+      return;
+    }
+  
+    const totalSales =
+      Number(inventoryItem.salesPrice) * Number(qty);
+  
+    const saleData = {
+      id: Date.now(),
+      type,
+      medicine: medicine || subCategory,
+      qty,
+      entryType: "Sales",
+      purchasePrice: inventoryItem.purchasePrice,
+      salesPrice: totalSales
+    };
+  
+    if(editIndex !== null){
+      const updated = [...entryItems];
+      updated[editIndex] = saleData;
+      setEntryItems(updated);
+      setEditIndex(null);
+    } else {
+      setEntryItems([
         ...entryItems,
         saleData
-        ]);
-        
-        setType("");
-        setMedicine("");
-        setQty("");
-        setSalesPrice("");
-        
-        };
+      ]);
+    }
+  
+    setType("");
+    setMedicine("");
+    setQty("");
+    setSalesPrice("");
+  };
+
+  // ✅ EDIT ENTRY
+const editEntryItem = (index) => {
+
+  const item = entryItems[index];
+
+  setType(item.type);
+  setMedicine(item.medicine);
+  setQty(item.qty);
+  setSalesPrice(item.salesPrice);
+
+  setEditIndex(index);
+};
+
+// ✅ DELETE ENTRY
+const deleteEntryItem = (index) => {
+  setEntryItems(prev => prev.filter((_, i) => i !== index));
+};
+
     const editItem=(index)=>{
 
         const item=items[index];
@@ -337,8 +362,9 @@ Inventory
 
 
 
-<div className="bg-white rounded-3xl shadow-md p-5 md:p-6 w-[86%] sm:w-[88%] md:w-full max-w-[680px]
-ml-4 sm:ml-8 md:mx-auto mb-8">
+<div className="bg-white rounded-3xl shadow-md p-5 md:p-6
+w-[86%] sm:w-[88%] md:w-full lg:w-full
+ml-4 sm:ml-8 md:mx-0 lg:mx-0 mb-8">
 
 <h3 className="text-2xl font-bold mb-4">
 {activeCategory} Summary
@@ -368,8 +394,9 @@ Number(item.qty||0)),
 
 
 {/* Add Item */}
-<div className="bg-white rounded-3xl shadow-md p-5 md:p-6 w-[86%] sm:w-[88%] md:w-full max-w-[680px]
-ml-4 sm:ml-8 md:mx-auto mb-8">
+<div className="bg-white rounded-3xl shadow-md p-5 md:p-6
+w-[86%] sm:w-[88%] md:w-full lg:w-full
+ml-4 sm:ml-8 md:mx-0 lg:mx-0 mb-8">
 <h3 className="text-2xl font-bold mb-6">
 Add Item
 </h3>
@@ -652,9 +679,8 @@ Entries
 <div className="bg-white rounded-3xl p-5 md:p-6 shadow-md
 w-[90%]
 sm:w-[88%]
-md:w-full
-max-w-[680px]
-mx-auto mb-6">  
+md:w-full lg:w-full
+ml-4 sm:ml-8 md:mx-0 lg:mx-0 mb-6"> 
 
 <h3 className="text-2xl font-bold mb-4">
 {activeCategory} Summary
@@ -685,9 +711,8 @@ Number(item.qty||0)),
 <div className="bg-white rounded-3xl shadow-md p-5 md:p-6
 w-[92%]
 sm:w-[90%]
-md:w-full
-max-w-[680px]
-mx-auto mb-8">
+md:w-full lg:w-full
+ml-4 sm:ml-8 md:mx-0 lg:mx-0 mb-8">
 
 <h3 className="text-2xl font-bold mb-6">
 Add Item
@@ -848,14 +873,12 @@ const selectedItem = items.find(
     
     if(selectedItem && enteredQty){
     
-        const unitSalesPrice =
-        Number(selectedItem.salesPrice) /
-        Number(selectedItem.qty);
-        
-        setSalesPrice(
-         unitSalesPrice * Number(enteredQty)
-        );
-    
+      const unitSalesPrice =
+      Number(selectedItem.salesPrice);
+      
+      setSalesPrice(
+        unitSalesPrice * Number(enteredQty)
+      );
     }
 
 }}
@@ -874,12 +897,43 @@ className="border p-3 rounded-xl bg-gray-100"
 
 </div>
 
-<button
-onClick={addEntrySale}
-className="mt-6 bg-green-500 text-white px-6 py-3 rounded-xl"
->
-Sales
-</button>
+<div className="relative mt-6 w-full sm:w-[250px]">
+
+  <div
+    onClick={()=>setShowEntryDropdown(!showEntryDropdown)}
+    className="border-2 border-blue-400 rounded-2xl px-6 py-4 cursor-pointer flex justify-between items-center text-lg font-semibold"
+  >
+    {entryType || "Choose"}
+    <span>▼</span>
+  </div>
+
+  {showEntryDropdown && (
+    <div className="absolute top-full left-0 mt-3 w-full bg-white rounded-2xl shadow-lg z-50 p-3">
+      
+      <div
+        onClick={()=>{
+          setEntryType("Purchase")
+          setShowEntryDropdown(false)
+        }}
+        className="py-3 px-4 text-lg cursor-pointer hover:bg-gray-100 rounded-lg"
+      >
+        Purchase
+      </div>
+
+      <div
+        onClick={()=>{
+          setEntryType("Sales")
+          setShowEntryDropdown(false)
+        }}
+        className="py-3 px-4 text-lg cursor-pointer hover:bg-gray-100 rounded-lg"
+      >
+        Sales
+      </div>
+
+    </div>
+  )}
+
+</div>
 
 </div>
 
@@ -938,11 +992,14 @@ ${activeCategory===cat
 <tbody>
 
 {entryItems
-.filter(item=>
-activeCategory==="All"
-? true
-: item.type===activeCategory
-)
+.filter(item => {
+  if(activeCategory !== "All" && item.type !== activeCategory) return false
+
+  if(entryType === "Purchase") return item.entryType === "Purchase"
+  if(entryType === "Sales") return item.entryType === "Sales"
+
+  return true
+})
 .map((item,index)=>(
 
 
@@ -959,11 +1016,11 @@ activeCategory==="All"
 
 <td className="space-x-4">
 
-<button onClick={()=>editItem(index)} className="text-blue-600 font-semibold">
+<button onClick={()=>editEntryItem(index)} className="text-blue-600 font-semibold">
 Edit
 </button>
 
-<button onClick={()=>deleteItem(index)}className="text-red-600 font-semibold">
+<button onClick={()=>deleteEntryItem(index)} className="text-red-600 font-semibold">
 Delete
 </button>
 

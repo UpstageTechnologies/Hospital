@@ -94,10 +94,8 @@ const UpstageDoctors = () => {
                                 onClick={() => navigate(`/upstage-appointment/${encodeURIComponent(item.email || item.id)}`)}
                                     className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
-<img
-  src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
-  className="bg-blue-50 w-full h-60 object-contain"
-/>
+            <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+                className="bg-blue-50 w-full h-60 object-contain"/>
                                     <div className='p-4'>
                                     <p className={`text-sm ${index < 4 ? "text-green-500" : "text-red-500"}`}>
   ● {index < 4 ? "Available" : "Not Available"}

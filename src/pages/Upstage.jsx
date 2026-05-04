@@ -223,11 +223,8 @@ const Upstage = () => {
                             className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer"
                         >
 
-<img
-src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
-alt="user"
-className="w-full h-60 object-contain bg-blue-50"
-/>
+        <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" alt="user"
+className="w-full h-60 object-contain bg-blue-50"/>
 
                             <div className="p-4">
 

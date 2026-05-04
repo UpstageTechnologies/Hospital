@@ -146,7 +146,7 @@ const Navbar = () => {
 
 
     return (
-        <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 relative z-50 w-full px-4'>
+<div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-300 px-10'>
 <img onClick={() => navigate("/home")} className='w-16 h-16 object-contain cursor-pointer ml-2'
   src={hospitalLogo}
   alt="logo"
@@ -155,7 +155,7 @@ const Navbar = () => {
                 location.pathname.startsWith("/doctor-profile") ||
                 location.pathname.startsWith("/patient-dashboard")
             ) && (
-                <ul className="hidden items-center gap-6 font-medium">
+            <ul className="flex items-center gap-10 font-medium mx-auto">
                         {isMaster && location.pathname === "/account" ? (
 
                             <NavLink to="/account">

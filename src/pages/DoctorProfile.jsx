@@ -79,9 +79,13 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
 
         return `${h.toString().padStart(2, "0")}:${m}`
     }
+    
 
     return (
+
+        
         <div className="bg-white rounded-2xl shadow p-2 sm:p-4 md:p-6 w-full md:max-w-[650px] mx-auto">
+
 
             {/* HEADER */}
             <div className="flex justify-between items-center mb-6">

@@ -8,12 +8,14 @@ const PatientDashboard = () => {
 
     const [appointments, setAppointments] = useState([])
     const [selected, setSelected] = useState(null)
-
+    const [currentAppointments, setCurrentAppointments] = useState([])
+    const [historyAppointments, setHistoryAppointments] = useState([])
     const [step, setStep] = useState(1)
     const [checkInTime, setCheckInTime] = useState(null)
     const [duration, setDuration] = useState(0)
     const [checkedOut, setCheckedOut] = useState(false)
     const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState("appointments")
 
     const savedUser = JSON.parse(
         localStorage.getItem("currentUser")
@@ -105,6 +107,27 @@ const PatientDashboard = () => {
             }
           
           }, [userEmail])
+
+          useEffect(() => {
+            const now = new Date()
+          
+            const current = []
+            const history = []
+          
+            appointments.forEach(item => {
+              const dateTime = new Date(`${item.date} ${item.time}`)
+          
+              if (dateTime >= now) {
+                current.push(item)
+              } else {
+                history.push(item)
+              }
+            })
+          
+            setCurrentAppointments(current)
+            setHistoryAppointments(history)
+          
+          }, [appointments])
         
     useEffect(() => {
         let interval
@@ -123,7 +146,19 @@ const PatientDashboard = () => {
             <div className="hidden md:block w-1/5 bg-blue-600 text-white p-6">
                 <h2 className="text-xl font-bold mb-6">Patient Panel</h2>
                 <p className="mb-4 cursor-pointer">Home</p>
-                <p className="mb-4 cursor-pointer font-bold">Appointments</p>
+                <p 
+  className="mb-4 cursor-pointer"
+  onClick={() => setActiveTab("appointments")}
+>
+  Appointments
+</p>
+
+<p 
+  className="mb-4 cursor-pointer"
+  onClick={() => setActiveTab("history")}
+>
+  Appointment History
+</p>
             </div>
 
             {/* RIGHT CONTENT */}
@@ -131,8 +166,8 @@ const PatientDashboard = () => {
 
                 <h1 className="text-2xl font-bold mb-6">My Appointments</h1>
 
-                <div className="grid grid-cols-2 gap-3 md:gap-4 justify-items-center">
-                {appointments
+                <div className="grid grid-cols-2 gap-2 md:gap-2 lg:gap-3">
+                {currentAppointments
 .filter(item =>
   item.doctorName &&
   item.time &&
@@ -147,7 +182,7 @@ const PatientDashboard = () => {
                                 setDuration(0)
                                 setCheckedOut(false)
                             }}
-                            className="border p-3 rounded-xl cursor-pointer hover:bg-gray-100 max-w-[260px] mx-auto"
+                            className="border p-3 rounded-xl cursor-pointer hover:bg-gray-100 w-full max-w-[220px]"
                         >
                             <p><b>Doctor:</b> {item.doctorName}</p>
                             <p><b>Time:</b> {item.time}</p>
@@ -155,6 +190,28 @@ const PatientDashboard = () => {
                         </div>
                     ))}
                 </div>
+
+
+
+{activeTab === "history" && (
+  <>
+    <h2 className="text-xl font-bold mt-10 mb-4">
+      Appointment History
+    </h2>
+
+    <div className="grid grid-cols-2 gap-2 md:gap-3">
+      {historyAppointments.map((item, i) => (
+        <div key={i}
+          className="border p-3 rounded-xl bg-gray-100 max-w-[220px]"
+        >
+          <p><b>Doctor:</b> {item.doctorName}</p>
+          <p><b>Time:</b> {item.time}</p>
+          <p><b>Appointment No:</b> {item.appointmentNo}</p>
+        </div>
+      ))}
+    </div>
+  </>
+)}
 
             </div>
 

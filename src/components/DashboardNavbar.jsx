@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { auth } from "../firebase";
 import { assets } from "../assets/assets";
+
 
 
 
@@ -9,11 +10,24 @@ const DashboardNavbar = () => {
 
 const navigate = useNavigate();
 const location = useLocation();
+const query = new URLSearchParams(location.search)
+const tabFromURL = query.get("tab")
+
+const [activeTab, setActiveTab] = useState(tabFromURL || "appointments")
+
+useEffect(() => {
+  if (tabFromURL) {
+    setActiveTab(tabFromURL)
+  }
+}, [tabFromURL])
+
 const [openMenu, setOpenMenu] = useState(false);
 const active = (path)=>
 location.pathname===path ? "text-blue-600 font-bold" : "";
 const [showProfileMenu, setShowProfileMenu] = useState(false);
 const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+
+
 
 
 const isLogged = (role) => {
@@ -145,6 +159,13 @@ className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-2 cur
 My Profile
 </p>
 
+<p
+onClick={()=>navigate("/demodoctordashboard?tab=settings")}
+className="cursor-pointer hover:text-blue-600"
+>
+Settings
+</p>
+
 <p onClick={()=>navigate("/demomyappointment")}className="cursor-pointer hover:text-blue-600">
 My Appointment
 </p>
@@ -211,6 +232,13 @@ onClick={()=>navigate("/demomyprofile")}
 className="cursor-pointer hover:text-blue-600"
 >
 My Profile
+</p>
+
+<p
+onClick={()=>navigate("/demodoctordashboard?tab=settings")}
+className="cursor-pointer hover:text-blue-600"
+>
+Settings
 </p>
 
 <p
