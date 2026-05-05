@@ -41,7 +41,13 @@ const AdminLogin = () => {
         
             localStorage.setItem("adminLogin", "true");
         
-            navigate("/demoadmindashboard");
+            alert("Admin Login Success");
+
+if (isDemo) {
+  navigate("/demoadmindashboard");
+} else {
+  navigate("/account"); // 👈 create this route
+}
             return;
         }
         
@@ -51,7 +57,13 @@ const AdminLogin = () => {
             localStorage.setItem("adminLogin","true");
         
             alert("Admin Login Success");
-            navigate("/demoadmindashboard");
+            alert("Admin Login Success");
+
+if (isDemo) {
+  navigate("/demoadmindashboard");
+} else {
+  navigate("/account"); // 👈 create this route
+}
         }catch (err) {
             alert(err.message);
         }

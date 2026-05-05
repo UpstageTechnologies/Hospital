@@ -660,25 +660,26 @@ const isDemo = location.state?.demo === true;
                                     const timeLabel =
                                         `${hour > 12 ? hour - 12 : hour}:${min === 0 ? "00" : min} ${hour >= 12 ? "PM" : "AM"}`
 
-                                    const booking = appointments.find(a => {
+                                        const bookings = appointments.filter(a => {
 
-                                        if (!a.date || !a.time) return false
+                                            if (!a.date || !a.time) return false
+                                          
+                                            if (a.date !== selectedDate) return false
+                                          
+                                            const [start] = a.time.split("-")   // 🔥 start time மட்டும் எடு
 
-                                        const d = new Date(a.date).toLocaleDateString("en-CA")
-
-                                        const timePart = a.time.split("-")[0] // "9:30am"
-
-                                        let [h, m] = timePart.replace(/am|pm/i, "").split(":")
-                                        h = parseInt(h)
-                                        m = parseInt(m || "0")
-
-                                        if (timePart.toLowerCase().includes("pm") && h !== 12) h += 12
-                                        if (timePart.toLowerCase().includes("am") && h === 12) h = 0
-
-                                        const totalMinutes = h * 60 + m
-
-                                        return d === selectedDate && totalMinutes === minutes
-                                    })
+                                            let cleanTime = start.toLowerCase().replace(" ", "")
+                                            
+                                            let isPM = cleanTime.includes("pm")
+                                            let [h, m] = cleanTime.replace("am", "").replace("pm", "").split(":").map(Number)
+                                            
+                                            if (isPM && h !== 12) h += 12
+                                            if (!isPM && h === 12) h = 0
+                                            
+                                            const totalMinutes = h * 60 + m
+                                            
+                                            return totalMinutes === minutes
+                                          })
 
                                     const current = new Date()
                                     const currentMinutes = current.getHours() * 60 + current.getMinutes()
@@ -700,12 +701,16 @@ const isDemo = location.state?.demo === true;
                                                     </div>
                                                 )}
 
-                                                {booking && (
-                                                    <div className="absolute left-4 top-0 bg-yellow-400 text-black px-3 py-1 rounded-lg text-sm shadow">
-                                                        <div>👤 {booking.patientName}</div>
-                                                        <div className="text-xs">📝 {booking.reason}</div>
-                                                    </div>
-                                                )}
+{bookings.length > 0 && bookings.map((booking, index) => (
+
+<div key={index}
+  className="absolute left-4 top-0 bg-yellow-400 text-black px-3 py-1 rounded-lg text-sm shadow"
+>
+  <div>👤 {booking.patientName}</div>
+  <div className="text-xs">📝 {booking.reason}</div>
+</div>
+
+))}
 
                                             </div>
 

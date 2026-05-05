@@ -229,6 +229,15 @@ confirmPassword:""
     confirmPassword: ""
   })
   const [patientAccounts, setPatientAccounts] = useState([])
+
+  const currentAppointments = patientAccounts.filter(
+    (p) => p.status !== "completed"
+  );
+  
+  const historyAppointments = patientAccounts.filter(
+    (p) => p.status === "completed"
+  );
+
   const [callData, setCallData] = useState(null)
   const navigate = useNavigate();
   const [viewData, setViewData] = useState(null)
@@ -893,7 +902,9 @@ confirmPassword:""
         medicalHistory,
         reasonInfo,
         accountInfo,
+        status: "pending",
         isDisabled: false
+        
       })
 
       alert("Patient saved ")
@@ -1235,6 +1246,13 @@ Describe
   Appointments
 </li>
 
+<li
+  className="cursor-pointer hover:text-gray-200"
+  onClick={() => setMenu("history")}
+>
+  Appointment History
+</li>
+
 
 
         </ul>
@@ -1486,14 +1504,44 @@ Print
         )}
 
 {menu === "appointments" && (
+
   <div>
-    <h1 className="text-2xl font-bold mb-6">All Appointments</h1>
+
+    
+    <h1 className="text-2xl font-bold mb-6">Current Appointments</h1>
 
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {patientAccounts.map((p, index) => (
- <div key={index} onClick={() => setCallData(p)}
- className="cursor-pointer bg-white p-4 rounded-xl shadow"
->
+    {currentAppointments.length === 0 ? (
+  <p>No Current Appointments</p>
+) : (
+  currentAppointments.map((p, index) => (
+    <div
+      key={index}
+      onClick={() => setCallData(p)}
+      className="cursor-pointer bg-white p-4 rounded-xl shadow"
+    >
+      <p><b>Patient:</b> {p.basicInfo?.name}</p>
+      <p><b>Email:</b> {p.basicInfo?.email}</p>
+      <p><b>Reason:</b> {p.reasonInfo?.visitReason}</p>
+      <p><b>Condition:</b> {p.reasonInfo?.condition}</p>
+    </div>
+  ))
+)}
+    </div>
+
+  </div>
+)}
+
+{menu === "history" && (
+  <div>
+    <h1 className="text-2xl font-bold mb-6">Appointment History</h1>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {historyAppointments.map((p, index) => (
+        <div
+          key={index}
+          className="bg-gray-200 p-4 rounded-xl"
+        >
           <p><b>Patient:</b> {p.basicInfo?.name}</p>
           <p><b>Email:</b> {p.basicInfo?.email}</p>
           <p><b>Reason:</b> {p.reasonInfo?.visitReason}</p>

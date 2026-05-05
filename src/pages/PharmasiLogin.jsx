@@ -29,7 +29,11 @@ useEffect(() => {
         password === "demo002"
       ) {
         localStorage.setItem("pharmasiLogin", "true");
-        navigate("/demopharmasidashboard");
+        if (isDemo) {
+          navigate("/demopharmasidashboard");
+        } else {
+          navigate("/pharmasi-dashboard");
+        }
       } else {
         alert("Invalid Pharmasi ID or Password");
       }

@@ -8,6 +8,42 @@ import DashboardNavbar from "../components/DashboardNavbar";
 const DemoMyProfile = () => {
 
 const [userData,setUserData] = useState(null);
+const [isEdit, setIsEdit] = useState(false);
+
+const [editData, setEditData] = useState({
+  patientName: "",
+  phone: "",
+  address: "",
+  email: "",
+  doctorName: "",
+  date: "",
+  time: ""
+});
+
+useEffect(() => {
+    if (userData) {
+      setEditData(userData);
+    }
+  }, [userData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleUpdate = () => {
+    setUserData(editData);
+  
+    // optional localStorage save
+    localStorage.setItem("selectedPatient", JSON.stringify(editData));
+  
+    setIsEdit(false);
+  
+    alert("Profile Updated ✅");
+  };
 
 const { state } = useLocation();
 
@@ -122,45 +158,100 @@ My Profile
 {activeTab==="profile" && (
 <>
 
-<div className="flex items-center gap-6 mb-10">
-<img
-src={assets.profile_pic}
-className="w-28 h-28 rounded-full"
-alt=""
+<div className="flex items-center gap-6 mb-8">
+    <img
+      src={assets.profile_pic}
+      className="w-28 h-28 rounded-full"
+      alt=""
+    />
+
+    <h1 className="text-3xl font-bold">
+      {userData.patientName}
+    </h1>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+<div className="border p-4 rounded break-words space-y-2">
+
+{isEdit ? (
+<>
+<input
+name="patientName"
+value={editData.patientName}
+onChange={handleChange}
+className="border p-2 w-full rounded"
 />
 
-<h1 className="text-3xl font-bold">
-{userData.patientName}
-</h1>
+<input
+name="phone"
+value={editData.phone}
+onChange={handleChange}
+className="border p-2 w-full rounded"
+/>
 
-</div>
-
-
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-<div className="border p-4 rounded break-words">
+<input
+name="address"
+value={editData.address}
+onChange={handleChange}
+className="border p-2 w-full rounded"
+/>
+</>
+) : (
+<>
 <p><b>Name:</b> {userData.patientName}</p>
 <p><b>Phone:</b> {userData.phone}</p>
 <p><b>Address:</b> {userData.address}</p>
+</>
+)}
+
 </div>
 
-<div className="border p-4 rounded break-words">
+
+
+<div className="border p-4 rounded break-words space-y-2">
+
+{isEdit ? (
+<>
+<input name="email" value={editData.email} onChange={handleChange} className="border p-2 w-full rounded" />
+
+<input name="doctorName" value={editData.doctorName} onChange={handleChange} className="border p-2 w-full rounded" />
+
+<input name="date" value={editData.date} onChange={handleChange} className="border p-2 w-full rounded" />
+
+<input name="time" value={editData.time} onChange={handleChange} className="border p-2 w-full rounded" />
+</>
+) : (
+<>
 <p><b>Email:</b> {userData.email}</p>
 <p><b>Doctor:</b> {userData.doctorName}</p>
 <p><b>Date:</b> {userData.date}</p>
 <p><b>Time:</b> {userData.time}</p>
-</div>
+</>
+)}
 
 </div>
 
 
-<div className="mt-10 border rounded p-6">
-<h2 className="text-lg font-bold mb-4">
-Payment Details
-</h2>
-
-<p><b>Paid Amount:</b> ₹600</p>
 </div>
+
+<div className="flex justify-end mt-6">
+  {isEdit ? (
+    <button
+      onClick={handleUpdate}
+      className="bg-green-500 text-white px-6 py-2 rounded"
+    >
+      Update
+    </button>
+  ) : (
+    <button
+      onClick={() => setIsEdit(true)}
+      className="bg-blue-500 text-white px-6 py-2 rounded"
+    >
+      Edit
+    </button>
+  )}
+</div>
+
 
 </>
 )}

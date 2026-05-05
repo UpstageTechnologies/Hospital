@@ -75,7 +75,11 @@ const Login = () => {
       password === "demopatient11"
     ){
       localStorage.setItem("patientLogin","true");
-      navigate("/demopatientdashboard");
+      if (isDemo) {
+        navigate("/demopatientdashboard");
+      } else {
+        navigate("/patient-dashboard");
+      }
       return;
     }
     
@@ -84,7 +88,11 @@ const Login = () => {
     
       localStorage.setItem("patientLogin","true");
     
-      navigate("/demopatientdashboard");
+      if (isDemo) {
+        navigate("/demopatientdashboard");
+      } else {
+        navigate("/patient-dashboard");
+      }
     } catch(err){
       alert(err.message);
     }

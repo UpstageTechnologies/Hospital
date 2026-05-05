@@ -1,6 +1,6 @@
-import DemoNavbar from "../components/DemoNavbar"
+
 import { useState, useEffect, useContext } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { AppContext } from "../context/AppContext"
 import AppointmentPopup from "../components/AppointmentPopup"
 
@@ -9,20 +9,64 @@ const DemoDoctorDetails = () => {
 
   const { doctors } = useContext(AppContext)
   const { id } = useParams()
+  const navigate = useNavigate()
   const [docInfo, setDocInfo] = useState(null)
   const [slotTime, setSlotTime] = useState("")
   const [slotIndex, setSlotIndex] = useState(null)
   const [showPopup, setShowPopup] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(new Date())
   useEffect(() => {
     const doctor = doctors.find(doc => doc.email === id)
     if (doctor) setDocInfo(doctor)
   }, [doctors, id])
 
+  const formatDate = (date) => {
+    return date.toDateString()
+  }
+
   if (!docInfo) return <h1>Loading...</h1>
 
   return (
     <div>
-      <DemoNavbar />
+        <div className="flex items-center justify-between py-4 px-8 border-b border-gray-300 bg-white">
+
+{/* LEFT SIDE */}
+<div className="flex items-center gap-4">
+
+  <button
+    onClick={() => navigate(-1)}   // 🔥 BACK FIX
+    className="!w-9 !h-9 rounded-full bg-blue-600 flex items-center justify-center shadow-md"
+  >
+    <span className="text-white text-lg relative -top-[2px]">
+      ←
+    </span>
+  </button>
+
+  <p
+    onClick={() => navigate("/demodoctors")}
+    className="text-xl font-semibold cursor-pointer"
+  >
+    Demo
+  </p>
+
+</div>
+
+{/* CENTER MENU */}
+<ul className="hidden md:flex flex-1 justify-center items-center gap-10 text-gray-700 font-medium">
+
+  <li onClick={() => navigate("/demohome")} className="cursor-pointer">Home</li>
+
+  <li onClick={() => navigate("/demodoctors")} className="cursor-pointer">All Doctors</li>
+
+  <li onClick={() => navigate("/demoabout")} className="cursor-pointer">About</li>
+
+  <li onClick={() => navigate("/democontact")} className="cursor-pointer">Contact</li>
+
+</ul>
+
+</div>
+
+
 
       <div className="p-6">
 
@@ -47,12 +91,29 @@ const DemoDoctorDetails = () => {
         <div className='mt-10 flex flex-col items-center px-2 sm:px-0'>
           <h2 className='text-xl text-blue-600'>Booking Slots</h2>
 
-          <div className="mt-4">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded">
-              Thu Apr 09 2026
-            </button>
-          </div>
+          <div className="flex gap-3 mt-4">
+  {/* TODAY */}
+  <button
+    onClick={() => setSelectedDate(new Date())}
+    className="bg-blue-600 text-white px-4 py-2 rounded"
+  >
+    {formatDate(new Date())}
+  </button>
 
+  {/* TOMORROW */}
+  <button
+    onClick={() => {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      setSelectedDate(tomorrow)
+    }}
+    className="border px-4 py-2 rounded"
+  >
+    {formatDate(
+      new Date(new Date().setDate(new Date().getDate() + 1))
+    )}
+  </button>
+</div>
           <div className="flex gap-2 sm:gap-3 flex-wrap justify-center mt-4">
             {["10:00am-11:00am", "1:00pm-2:00pm", "5:00pm-7:00pm"].map((t, i) => (
               <button
@@ -81,10 +142,11 @@ const DemoDoctorDetails = () => {
 
           {showPopup && (
             <AppointmentPopup
-              close={() => setShowPopup(false)}
-              doctor={docInfo}
-              slotTime={slotTime}
-            />
+  close={() => setShowPopup(false)}
+  doctor={docInfo}
+  slotTime={slotTime}
+  date={selectedDate}   // 🔥 ADD THIS
+/>
           )}
         </div>
 

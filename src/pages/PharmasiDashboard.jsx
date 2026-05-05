@@ -180,48 +180,49 @@ const addMedicine = () => {
     setSalesPrice("");
   };
 
-  const addEntrySale = () => {
+  const addEntryPurchase = () => {
 
-    if(!type || !medicine || !qty){
+    if(!type || !medicine || !qty || !purchasePrice){
       alert("Fill all fields");
       return;
     }
   
-    const inventoryItem = items.find(
-      item =>
-      item.type===type &&
-      (item.subCategory===medicine || item.medicine===medicine)
-    );
+    const data = {
+      id: Date.now(),
+      type,
+      medicine,
+      qty,
+      entryType: "Purchase",
+      purchasePrice,
+      salesPrice
+    };
   
-    if(!inventoryItem){
-      alert("Medicine not found in inventory");
+    setEntryItems([...entryItems, data]);
+  
+    setType("");
+    setMedicine("");
+    setQty("");
+    setPurchasePrice("");
+  };
+
+  const addEntrySale = () => {
+
+    if(!type || !medicine || !qty || !salesPrice){
+      alert("Fill all fields");
       return;
     }
   
-    const totalSales =
-      Number(inventoryItem.salesPrice) * Number(qty);
-  
-    const saleData = {
+    const data = {
       id: Date.now(),
       type,
-      medicine: medicine || subCategory,
+      medicine,
       qty,
       entryType: "Sales",
-      purchasePrice: inventoryItem.purchasePrice,
-      salesPrice: totalSales
+      purchasePrice,
+      salesPrice
     };
   
-    if(editIndex !== null){
-      const updated = [...entryItems];
-      updated[editIndex] = saleData;
-      setEntryItems(updated);
-      setEditIndex(null);
-    } else {
-      setEntryItems([
-        ...entryItems,
-        saleData
-      ]);
-    }
+    setEntryItems([...entryItems, data]);
   
     setType("");
     setMedicine("");
@@ -556,7 +557,10 @@ className="border p-3 rounded-xl"/>
 </div>
 
 
-<button onClick={addMedicine}className="mt-6 w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl">
+<button
+onClick={addMedicine}
+className="mt-6 w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl"
+>
 Add Item
 </button>
 
@@ -935,6 +939,21 @@ className="border p-3 rounded-xl bg-gray-100"
 
 </div>
 
+<button
+onClick={()=>{
+  if(entryType === "Purchase"){
+    addEntryPurchase();
+  } else if(entryType === "Sales"){
+    addEntrySale();
+  } else {
+    alert("Select Entry Type");
+  }
+}}
+className="mt-6 bg-green-500 text-white px-6 py-3 rounded-xl"
+>
+Save Entry
+</button>
+
 </div>
 
 
@@ -984,7 +1003,9 @@ ${activeCategory===cat
 <th>Type</th>
 <th>Medicine</th>
 <th>Qty</th>
-<th>Sales</th>
+<th>
+  {entryType === "Purchase" ? "Purchase" : "Sales"}
+</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -1011,7 +1032,13 @@ ${activeCategory===cat
 
 <td>{item.qty}</td>
 
-<td>₹{item.salesPrice}</td>
+<td>
+  ₹{
+    entryType === "Purchase"
+      ? item.purchasePrice
+      : item.salesPrice
+  }
+</td>
 
 
 <td className="space-x-4">

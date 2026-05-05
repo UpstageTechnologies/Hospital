@@ -47,58 +47,7 @@ const PatientDashboard = () => {
               })
           
               console.log("FINAL LIST:", list)
-          
-              if (list.length === 0) {
-
-                console.log("⚠️ No real appointments found, showing demo data");
-              
-                setAppointments([
-                  {
-                    doctorName: "Dr. Kumar",
-                    time: "10:00 AM",
-                    appointmentNo: "APT101",
-                    patientName: savedUser?.name || "Demo User",
-                    phone: "9876543210",
-                    address: "Chennai",
-                    date: "2026-04-10",
-                    doctorImage: "https://randomuser.me/api/portraits/men/32.jpg"
-                  },
-                  {
-                    doctorName: "Dr. Priya",
-                    time: "11:30 AM",
-                    appointmentNo: "APT102",
-                    patientName: savedUser?.name || "Demo User",
-                    phone: "9876543211",
-                    address: "Coimbatore",
-                    date: "2026-04-11",
-                    doctorImage: "https://randomuser.me/api/portraits/women/44.jpg"
-                  },
-                  {
-                    doctorName: "Dr. Arjun",
-                    time: "2:00 PM",
-                    appointmentNo: "APT103",
-                    patientName: savedUser?.name || "Demo User",
-                    phone: "9876543212",
-                    address: "Madurai",
-                    date: "2026-04-12",
-                    doctorImage: "https://randomuser.me/api/portraits/men/55.jpg"
-                  },
-                  {
-                    doctorName: "Dr. Meena",
-                    time: "4:30 PM",
-                    appointmentNo: "APT104",
-                    patientName: savedUser?.name || "Demo User",
-                    phone: "9876543213",
-                    address: "Salem",
-                    date: "2026-04-13",
-                    doctorImage: "https://randomuser.me/api/portraits/women/65.jpg"
-                  }
-                ]);
-              
-              } else {
-                console.log("✅ Real appointments found:", list);
-                setAppointments(list);
-              }
+              setAppointments(list);
           
             }
           
@@ -109,19 +58,41 @@ const PatientDashboard = () => {
           }, [userEmail])
 
           useEffect(() => {
+
             const now = new Date()
           
-            const current = []
-            const history = []
+            let current = []
+            let history = []
           
             appointments.forEach(item => {
-              const dateTime = new Date(`${item.date} ${item.time}`)
           
-              if (dateTime >= now) {
+              if (!item.date || !item.time) return;
+          
+              const datePart = new Date(item.date)
+          
+              const endTime = item.time.split("-")[1]?.trim()
+              if (!endTime) return;
+          
+              const [time, modifier] = endTime.match(/(\d+:\d+)(am|pm)/i).slice(1)
+          
+              let [hours, minutes] = time.split(":").map(Number)
+          
+              if (modifier.toLowerCase() === "pm" && hours !== 12) {
+                hours += 12
+              }
+              if (modifier.toLowerCase() === "am" && hours === 12) {
+                hours = 0
+              }
+          
+              const fullDateTime = new Date(datePart)
+              fullDateTime.setHours(hours, minutes, 0, 0)
+          
+              if (fullDateTime >= now) {
                 current.push(item)
               } else {
                 history.push(item)
               }
+          
             })
           
             setCurrentAppointments(current)
@@ -164,44 +135,39 @@ const PatientDashboard = () => {
             {/* RIGHT CONTENT */}
             <div className="w-full md:w-4/5 p-4 md:p-6 pb-20">
 
-                <h1 className="text-2xl font-bold mb-6">My Appointments</h1>
+            {activeTab === "appointments" && (
+  <>
+    <h1 className="text-2xl font-bold mb-6">My Appointments</h1>
 
-                <div className="grid grid-cols-2 gap-2 md:gap-2 lg:gap-3">
-                {currentAppointments
-.filter(item =>
-  item.doctorName &&
-  item.time &&
-  item.appointmentNo
-)
-.map((item, i) => (
-                        <div key={i}
-                            onClick={() => {
-                                setSelected(item)
-                                setStep(1)
-                                setCheckInTime(null)
-                                setDuration(0)
-                                setCheckedOut(false)
-                            }}
-                            className="border p-3 rounded-xl cursor-pointer hover:bg-gray-100 w-full max-w-[220px]"
-                        >
-                            <p><b>Doctor:</b> {item.doctorName}</p>
-                            <p><b>Time:</b> {item.time}</p>
-                            <p><b>Appointment No:</b> {item.appointmentNo}</p>
-                        </div>
-                    ))}
-                </div>
-
+    <div className="grid grid-cols-2 gap-2 md:gap-2 lg:gap-3">
+      {currentAppointments
+        .filter(item => item.doctorName && item.time)
+        .map((item, i) => (
+          <div
+            key={i}
+            onClick={() => setSelected(item)}
+            className="bg-white shadow-md p-4 rounded-xl cursor-pointer hover:scale-105 transition w-full max-w-[250px]"
+          >
+            <p className="font-bold text-lg">{item.doctorName}</p>
+            <p className="text-gray-600">{item.date}</p>
+            <p className="text-gray-600">{item.time}</p>
+          </div>
+        ))}
+    </div>
+  </>
+)}
 
 
 {activeTab === "history" && (
   <>
-    <h2 className="text-xl font-bold mt-10 mb-4">
+    <h1 className="text-2xl font-bold mb-6">
       Appointment History
-    </h2>
+    </h1>
 
     <div className="grid grid-cols-2 gap-2 md:gap-3">
       {historyAppointments.map((item, i) => (
-        <div key={i}
+        <div
+          key={i}
           className="border p-3 rounded-xl bg-gray-100 max-w-[220px]"
         >
           <p><b>Doctor:</b> {item.doctorName}</p>
@@ -212,7 +178,6 @@ const PatientDashboard = () => {
     </div>
   </>
 )}
-
             </div>
 
             {/* ================= POPUP ================= */}

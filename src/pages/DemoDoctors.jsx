@@ -3,7 +3,7 @@
 import { useState, useEffect, useContext } from "react"
 import { AppContext } from "../context/AppContext"
 import { useNavigate, useParams } from "react-router-dom"
-import DemoNavbar from "../components/DemoNavbar"
+
 
 const DemoDoctors = () => {
 
@@ -61,7 +61,43 @@ const DemoDoctors = () => {
     return (
         <div className='px-6 sm:px-10'>
 
-           <DemoNavbar />
+<div className="flex items-center justify-between py-4 px-8 border-b border-gray-300 bg-white">
+
+{/* LEFT SIDE */}
+<div className="flex items-center gap-4">
+
+  <button
+    onClick={() => navigate(-1)}   // 🔥 BACK FIX
+    className="!w-9 !h-9 rounded-full bg-blue-600 flex items-center justify-center shadow-md"
+  >
+    <span className="text-white text-lg relative -top-[2px]">
+      ←
+    </span>
+  </button>
+
+  <p
+    onClick={() => navigate("/demohome")}
+    className="text-xl font-semibold cursor-pointer"
+  >
+    Demo
+  </p>
+
+</div>
+
+{/* CENTER MENU */}
+<ul className="hidden md:flex flex-1 justify-center items-center gap-10 text-gray-700 font-medium">
+
+  <li onClick={() => navigate("/demohome")} className="cursor-pointer">Home</li>
+
+  <li onClick={() => navigate("/demodoctors")} className="cursor-pointer">All Doctors</li>
+
+  <li onClick={() => navigate("/demoabout")} className="cursor-pointer">About</li>
+
+  <li onClick={() => navigate("/democontact")} className="cursor-pointer">Contact</li>
+
+</ul>
+
+</div>
 
             <p className='text-gray-600'>Browse doctors available in your city.</p>
 

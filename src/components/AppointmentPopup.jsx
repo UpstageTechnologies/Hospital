@@ -5,7 +5,7 @@ import { db } from "../firebase"
 import { collection, addDoc, getDocs } from "firebase/firestore"
 
 
-const AppointmentPopup = ({ close, doctor, slotTime }) => {
+const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
 
     const navigate = useNavigate()
     const [step, setStep] = useState(1)
@@ -121,34 +121,37 @@ const AppointmentPopup = ({ close, doctor, slotTime }) => {
         }
       }
     // 🔥 BOOK
-    const handleBook = () => {
+    const handleBook = async () => {
+
         if (!isLoggedIn) {
             return alert("Login first ")
         }
-
+    
         if (!reason) {
             return alert("Enter reason ")
         }
-
+    
         const appointmentData = {
             patientName: currentUser.name,
-            email: currentUser.email,
+            patientEmail: currentUser.email,
             address: currentUser.address,
             phone: currentUser.phone,
             gender: currentUser.gender,
             doctorName: doctor.name,
             doctorImage: doctor.image,
+            speciality: doctor.speciality,
             time: slotTime,
+            date: (date || new Date()).toISOString().split("T")[0],
             reason: reason,
-            appointmentNo:
-            "API" + Math.floor(Math.random()*900+100)
-            };
-            
-            addDoc(
+            appointmentNo: "API" + Math.floor(Math.random()*900+100)
+        };
+    
+        // 🔥 IMPORTANT FIX
+        await addDoc(
             collection(db,"appointments"),
             appointmentData
-            );
-
+        );
+    
         setStep(4)
     }
 

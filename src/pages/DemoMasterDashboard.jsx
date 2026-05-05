@@ -451,36 +451,116 @@ useEffect(() => {
 
               <div className="grid md:grid-cols-3 gap-6 mt-10">
 
-                <div className="border rounded-xl p-6 shadow">
-                  <h2 className="text-xl font-bold">
-                    Total Doctors
-                  </h2>
-                  <p className="text-3xl mt-4 text-blue-600">
-                    32
-                  </p>
-                </div>
+              <div 
+  onClick={() => setTab("doctorsList")}
+  className="border rounded-xl p-6 shadow cursor-pointer hover:scale-105"
+>
+  <h2 className="text-xl font-bold">Total Doctors</h2>
+  <p className="text-3xl mt-4 text-blue-600">
+    {doctorAccounts.slice(0,10).length}
+  </p>
+</div>
 
-                <div className="border rounded-xl p-6 shadow">
-                  <h2 className="text-xl font-bold">
-                    Total Patients
-                  </h2>
-                  <p className="text-3xl mt-4 text-blue-600">
-                    120
-                  </p>
-                </div>
+<div 
+  onClick={() => setTab("patientsList")}
+  className="border rounded-xl p-6 shadow cursor-pointer hover:scale-105"
+>
+  <h2 className="text-xl font-bold">Total Patients</h2>
+  <p className="text-3xl mt-4 text-blue-600">
+    {patientAccounts.slice(0,20).length}
+  </p>
+</div>
 
-                <div className="border rounded-xl p-6 shadow">
-                  <h2 className="text-xl font-bold">
-                    Appointments
-                  </h2>
-                  <p className="text-3xl mt-4 text-blue-600">
-                    5
-                  </p>
-                </div>
+<div 
+  onClick={() => setTab("appointmentsList")}
+  className="border rounded-xl p-6 shadow cursor-pointer hover:scale-105"
+>
+  <h2 className="text-xl font-bold">Appointments</h2>
+  <p className="text-3xl mt-4 text-blue-600">
+    {appointments.length}
+  </p>
+</div>
 
               </div>
             </div>
           )}
+
+{tab === "doctorsList" && (
+  <div>
+    <h1 className="text-3xl font-bold mb-6">Doctors</h1>
+
+    <div className="grid md:grid-cols-3 gap-4">
+      {doctorAccounts.slice(0,10).map((doc, i) => (
+        <div 
+  key={i} 
+  onClick={() => setSelected({
+    ...doc,
+    type: "doctor",
+    image: "https://randomuser.me/api/portraits/men/" + (i+10) + ".jpg"
+  })}
+  className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
+>
+
+          <p className="font-bold">{doc.doctorBasicInfo?.name}</p>
+          <p>{doc.doctorDesignation?.designation}</p>
+          <p className="text-gray-500">{doc.doctorBasicInfo?.email}</p>
+
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{tab === "patientsList" && (
+  <div>
+    <h1 className="text-3xl font-bold mb-6">Patients</h1>
+
+    <div className="grid md:grid-cols-3 gap-4">
+      {patientAccounts.slice(0,20).map((p, i) => (
+        <div 
+  key={i}
+  onClick={() => setSelected({
+    ...p,
+    type: "patient",
+    image: "https://randomuser.me/api/portraits/women/" + (i+20) + ".jpg"
+  })}
+  className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
+>
+
+          <p className="font-bold">{p.basicInfo?.name}</p>
+          <p>{p.basicInfo?.age} yrs</p>
+          <p className="text-gray-500">{p.basicInfo?.contact}</p>
+
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{tab === "appointmentsList" && (
+  <div>
+    <h1 className="text-3xl font-bold mb-6">Appointments</h1>
+
+    <div className="grid md:grid-cols-2 gap-4">
+      {appointments.map((item, i) => (
+        <div 
+  key={i}
+  onClick={() => setSelected({
+    ...item,
+    type: "appointment"
+  })}
+  className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
+>
+          <p><b>Patient:</b> {item.patient}</p>
+          <p><b>Doctor:</b> {item.doctor}</p>
+          <p><b>Date:</b> {item.date}</p>
+          <p><b>Time:</b> {item.time}</p>
+
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
 
           {/* SUBSCRIPTION */}
@@ -2542,6 +2622,99 @@ fetchPharmasi()
 
         </div>
       )}
+
+{selected && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+
+    <div className="bg-white rounded-xl p-6 w-[350px] shadow-xl relative">
+
+      {/* CLOSE */}
+      <button 
+        onClick={() => setSelected(null)}
+        className="absolute top-2 right-3 text-xl"
+      >
+        ✖
+      </button>
+
+      {/* DOCTOR */}
+      {selected.type === "doctor" && (
+        <div className="text-center">
+
+          <img 
+            src={selected.image}
+            className="w-24 h-24 rounded-full mx-auto mb-4"
+          />
+
+          <h2 className="text-xl font-bold">
+            {selected.doctorBasicInfo?.name}
+          </h2>
+
+          <p>{selected.doctorDesignation?.designation}</p>
+          <p className="text-gray-500">
+            {selected.doctorBasicInfo?.email}
+          </p>
+
+        </div>
+      )}
+
+      {/* PATIENT */}
+      {selected.type === "patient" && (
+        <div className="text-center">
+
+          <img 
+            src={selected.image}
+            className="w-24 h-24 rounded-full mx-auto mb-4"
+          />
+
+          <h2 className="text-xl font-bold">
+            {selected.basicInfo?.name}
+          </h2>
+
+          <p>Age: {selected.basicInfo?.age}</p>
+          <p>{selected.basicInfo?.contact}</p>
+
+        </div>
+      )}
+
+      {/* APPOINTMENT */}
+      {selected.type === "appointment" && (
+        <div>
+
+          <div className="flex gap-4 items-center mb-4">
+
+            <img 
+              src={selected.patientImg}
+              className="w-16 h-16 rounded-full"
+            />
+
+            <div>
+              <p><b>Patient:</b> {selected.patient}</p>
+            </div>
+
+          </div>
+
+          <div className="flex gap-4 items-center mb-4">
+
+            <img 
+              src={selected.doctorImg}
+              className="w-16 h-16 rounded-full"
+            />
+
+            <div>
+              <p><b>Doctor:</b> {selected.doctor}</p>
+            </div>
+
+          </div>
+
+          <p><b>Date:</b> {selected.date}</p>
+          <p><b>Time:</b> {selected.time}</p>
+
+        </div>
+      )}
+
+    </div>
+  </div>
+)}
 
 
       {/* MOBILE + TAB BOTTOM MENU */}

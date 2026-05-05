@@ -46,7 +46,11 @@ const MasterLogin = () => {
     password === "demomaster123"
   ){
     localStorage.setItem("masterLogin", "true");
-    navigate("/demomasterdashboard");
+    if (isDemo) {
+      navigate("/demomasterdashboard")
+    } else {
+      navigate("/master-dashboard")
+    }
     return;
   }
 
@@ -56,7 +60,11 @@ const MasterLogin = () => {
     localStorage.setItem("masterLogin","true");
 
     alert("Master Login Success");
-    navigate("/demomasterdashboard");
+    if (isDemo) {
+      navigate("/demomasterdashboard")
+    } else {
+      navigate("/master-dashboard")
+    }
   } catch (err) {
     alert(err.message);
   }

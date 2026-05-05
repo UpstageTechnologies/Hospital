@@ -147,10 +147,26 @@ const Navbar = () => {
 
     return (
 <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-300 px-10'>
-<img onClick={() => navigate("/home")} className='w-16 h-16 object-contain cursor-pointer ml-2'
-  src={hospitalLogo}
-  alt="logo"
-/>
+<div className="flex items-center gap-3">
+
+
+  <button
+    onClick={() => navigate("/select-hospital")}
+    className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center shadow-md hover:scale-105 transition"
+  >
+    <span className="text-white text-lg relative -top-[1px]">
+      ←
+    </span>
+  </button>
+
+  <img
+    onClick={() => navigate("/home")}
+    className="w-16 h-16 object-contain cursor-pointer"
+    src={hospitalLogo}
+    alt="logo"
+  />
+
+</div>
             {!(
                 location.pathname.startsWith("/doctor-profile") ||
                 location.pathname.startsWith("/patient-dashboard")
