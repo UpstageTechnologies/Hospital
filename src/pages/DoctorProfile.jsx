@@ -175,8 +175,8 @@ ${type === "doctor"
 )}
 
                             {eventData && eventData.slots && (
-                                <p className="text-[9px] sm:text-xs text-blue-500 mt-1 leading-none">
-                                    {eventData.slots.filter(s => !s.leave).length} slots
+                                <p className="text-[8px] sm:text-xs text-blue-500 mt-1 leading-none text-center px-1">
+{eventData.slots.filter(s => !s.leave).length} Appointments
                                 </p>
                             )}
 
@@ -303,7 +303,6 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [doctorImage, setDoctorImage] = useState("")
     const [appointments, setAppointments] = useState([])
     const [page, setPage] = useState("appointments")
-    const [callData, setCallData] = useState(null)
     const [selected, setSelected] = useState(null)
     const [selectedDate, setSelectedDate] = useState(null)
     const [selectedAppointment, setSelectedAppointment] = useState(null)
@@ -317,7 +316,7 @@ const [medicine,setMedicine] = useState("");
 const [qty,setQty] = useState("");
 const [purchase,setPurchase] = useState("");
 const [sales,setSales] = useState("");
-
+const [search,setSearch] = useState("");
 const [describeItems,setDescribeItems] = useState([]);
 
 const syncPharmacyItems = () => {
@@ -613,10 +612,6 @@ const isDemo = location.state?.demo === true;
                     Settings
                 </p>
 
-                <p onClick={() => setPage("call")} className="mb-3 cursor-pointer">
-                    Call / Confirm
-                </p>
-
                 <p onClick={() => setPage("describe")}className="mb-3 cursor-pointer">
                     Describe
                 </p>
@@ -726,69 +721,6 @@ const isDemo = location.state?.demo === true;
                 </div>
             )}
 
-{page === "call" && callData && (
-  <div className="p-6 w-full">
-
-    <h1 className="text-2xl font-bold mb-6">
-      📞 Patient Confirmation Panel
-    </h1>
-
-    <div className="bg-white shadow-xl rounded-2xl p-6 max-w-[700px]">
-
-      {/* IMAGE */}
-      <div className="flex justify-center mb-4">
-        <img
-          src={callData.patientImage || assets.profile_pic}
-          className="w-24 h-24 rounded-full"
-        />
-      </div>
-
-      {/* CALL BUTTON */}
-      <div className="flex justify-center mb-6">
-        <button
-          onClick={() => window.open(`tel:${callData.phone}`)}
-          className="bg-green-500 text-white px-6 py-3 rounded-xl"
-        >
-          📞 Call Patient
-        </button>
-      </div>
-
-      {/* DETAILS */}
-      <div className="grid grid-cols-2 gap-4">
-
-        <input value={callData.patientName} disabled className="w-full border p-3 rounded-xl"/>
-        <input value={callData.phone || ""} disabled className="w-full border p-3 rounded-xl"/>
-
-        <input value={callData.address || ""} disabled className="w-full border p-3 rounded-xl"/>
-        <input value={callData.doctorName} disabled className="w-full border p-3 rounded-xl"/>
-
-        <input value={callData.date} disabled className="w-full border p-3 rounded-xl"/>
-        <input value={callData.time} disabled className="w-full border p-3 rounded-xl"/>
-
-      </div>
-
-      {/* CONFIRM BUTTONS */}
-      <div className="flex justify-center gap-4 mt-6">
-
-        <button
-          onClick={() => updateStatus(callData.appointmentNo, "arrived")}
-          className="bg-blue-500 text-white px-5 py-2 rounded"
-        >
-          ✅ Arrived
-        </button>
-
-        <button
-          onClick={() => updateStatus(callData.appointmentNo, "completed")}
-          className="bg-green-600 text-white px-5 py-2 rounded"
-        >
-          🩺 Completed
-        </button>
-
-      </div>
-
-    </div>
-  </div>
-)}
 
 
 
@@ -834,39 +766,161 @@ activeDescribeCategory===cat
 
 
 {/* Table */}
+{/* SEARCH BAR */}
+<div className="mb-6">
+
+<input
+type="text"
+placeholder="Search Medicine / Category"
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+className="
+w-full
+border
+p-4
+rounded-2xl
+outline-none
+text-lg
+"
+/>
+
+</div>
+
+{/* TABLE */}
 <div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
 
 <table className="w-full">
 
 <thead>
-<tr>
-<th>Type</th>
-<th>Medicine</th>
-<th>Qty</th>
+
+<tr className="border-b">
+
+<th className="py-4 w-[25%] text-center">
+Type
+</th>
+
+<th className="py-4 w-[35%] text-center">
+Medicine
+</th>
+
+<th className="py-4 w-[25%] text-center">
+Qty
+</th>
+
+<th className="py-4 w-[15%] text-center">
+
+<button
+onClick={()=>window.print()}
+className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-6
+py-3
+rounded-2xl
+font-semibold
+mx-auto
+flex
+items-center
+justify-center
+"
+>
+🖨 Print
+</button>
+
+</th>
+
 </tr>
+
 </thead>
 
 <tbody>
 
+
 {
 describeItems
-.filter(item=>
-activeDescribeCategory==="All"
+.filter(item => {
+
+const matchCategory =
+activeDescribeCategory === "All"
 ? true
-: item.type===activeDescribeCategory
-)
+: item.type === activeDescribeCategory;
+
+const matchSearch =
+item.type.toLowerCase().includes(search.toLowerCase()) ||
+
+(item.medicine || "")
+.toLowerCase()
+.includes(search.toLowerCase());
+
+return matchCategory && matchSearch;
+
+})
 
 .map((item,index)=>(
-<tr key={item.id} className="border-b text-center">
+<tr
+key={item.id}
+className="
+border-b
+text-center
+align-middle
+"
+>
 
-<td className="py-3">{item.type}</td>
+<td className="py-5 text-center align-middle">{item.type}</td>
 
-<td className="py-3">
+<td className="py-5 text-center align-middle">
 {item.medicine || item.subCategory}
 </td>
 
-<td className="py-3">
+<td className="py-5 text-center align-middle">
+
+<div className="flex justify-center items-center gap-4">
+
+<button
+onClick={()=>{
+const updated = [...describeItems];
+
+if(updated[index].qty > 0){
+updated[index].qty -= 1;
+}
+
+setDescribeItems(updated);
+
+localStorage.setItem(
+"pharmacyItems",
+JSON.stringify(updated)
+);
+}}
+className="bg-red-500 text-white w-8 h-8 rounded-full"
+>
+-
+</button>
+
+<span className="font-bold text-lg">
 {item.qty}
+</span>
+
+<button
+onClick={()=>{
+const updated = [...describeItems];
+
+updated[index].qty += 1;
+
+setDescribeItems(updated);
+
+localStorage.setItem(
+"pharmacyItems",
+JSON.stringify(updated)
+);
+}}
+className="bg-green-500 text-white w-8 h-8 rounded-full"
+>
++
+</button>
+
+</div>
+
 </td>
 
 </tr>
@@ -898,7 +952,6 @@ activeDescribeCategory==="All"
                                 key={index}
                                 onClick={() => {
                                     setSelectedAppointment(item)
-                                    setCallData(item)   // ✅ முக்கியம்
                                     setStep(1)
                                 }}
                                 className="bg-white shadow-md rounded-xl p-5 flex items-center gap-4 cursor-pointer hover:shadow-lg transition w-full"

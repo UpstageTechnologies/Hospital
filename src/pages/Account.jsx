@@ -14,15 +14,10 @@ import Calendar from "../components/Calendar";
 const Account = () => {
 
   const [menu, setMenu] = useState("appointments")
-
-
-  
-
-const [type,setType] = useState("");
-const [medicine,setMedicine] = useState("");
-
-const [inventoryItems,setInventoryItems]=useState([]);
-const [describeItems,setDescribeItems]=useState([]);
+  const [type,setType] = useState("");
+  const [medicine,setMedicine] = useState("");
+  const [inventoryItems,setInventoryItems]=useState([]);
+  const [describeItems,setDescribeItems]=useState([]);
 
 useEffect(()=>{
 
@@ -96,6 +91,7 @@ useEffect(()=>{
   const hospital = location.state?.hospital || "";
   const [selectedPatient, setSelectedPatient] = useState(null)
   const [doctorStep, setDoctorStep] = useState(1)
+  const [doctorImage, setDoctorImage] = useState("")
   const [doctorBasicInfo, setDoctorBasicInfo] = useState({
     name: "",
     age: "",
@@ -951,14 +947,6 @@ confirmPassword:""
 
       const email = doctorBasicInfo.email
 
-      const doctorImages = [
-        "/Doctors/doc1.png",
-        "/Doctors/doc2.png",
-        "/Doctors/doc3.png",
-        "/Doctors/doc4.png",
-        "/Doctors/doc5.png",
-        "/Doctors/doc6.png"
-      ];
 
       await setDoc(doc(db, "doctors", email), {
 
@@ -973,12 +961,15 @@ confirmPassword:""
         speciality: doctorDesignation.designation,
         hospital: doctorBasicInfo.address,
         map: `https://www.google.com/maps?q=${doctorBasicInfo.address}`,
-        image: doctorImages[Math.floor(Math.random() * doctorImages.length)],
+        image:
+  doctorImage ||
+  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
         isDisabled: false
 
       })
 
       alert("Doctor saved")
+      setDoctorImage("")
       fetchDoctors()
 
     } catch (err) {
@@ -1136,6 +1127,47 @@ confirmPassword:""
     src={callData?.doctorImage || "/Doctors/doc1.png"}
     style={{ width: "80px", height: "80px", borderRadius: "50%", marginRight: "20px" }}
   />
+
+<div className="flex flex-col items-center mb-6">
+
+<label htmlFor="doctor-image">
+
+  <img
+    src={
+      doctorImage ||
+      "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+    }
+    alt="doctor"
+    className="w-28 h-28 rounded-full object-cover border-4 border-blue-500 cursor-pointer"
+  />
+
+</label>
+
+<input
+  type="file"
+  id="doctor-image"
+  hidden
+  accept="image/*"
+  onChange={(e) => {
+
+    const file = e.target.files[0]
+
+    if (file) {
+
+      setDoctorImage(
+        URL.createObjectURL(file)
+      )
+
+    }
+
+  }}
+/>
+
+<p className="text-sm text-gray-500 mt-2">
+  Click image to upload
+</p>
+
+</div>
   <div>
     <p><b>Doctor Name:</b> {callData?.doctorName || "Dr. Default"}</p>
   </div>
@@ -1227,31 +1259,17 @@ confirmPassword:""
           </li> */}
 
 
-          <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu("doctors")} >
-            Doctors
+          <li className="cursor-pointer hover:text-gray-200" onClick={()=>setMenu("describe")}>
+            Describe
           </li>
 
+          <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu("appointments")}>
+            Appointments
+          </li>
 
-          <li
-className="cursor-pointer hover:text-gray-200"
-onClick={()=>setMenu("describe")}
->
-Describe
-</li>
-
-          <li
-  className="cursor-pointer hover:text-gray-200"
-  onClick={() => setMenu("appointments")}
->
-  Appointments
-</li>
-
-<li
-  className="cursor-pointer hover:text-gray-200"
-  onClick={() => setMenu("history")}
->
-  Appointment History
-</li>
+          <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu("history")}>
+            Appointment History
+        </li>
 
 
 
@@ -1432,63 +1450,6 @@ Print
 
 
 
-
-
-        {menu === "home" && (
-          <div>
-            <p className="text-2xl font-bold">Welcome Admin Dashboard</p>
-          </div>
-        )}
-
-        {menu === "subscription" && (
-          <div>
-            <h1 className="text-2xl font-bold">Subscription</h1>
-          </div>
-        )}
-
-        {menu === "doctors" && (
-
-          <div>
-
-            <h1 className="text-2xl font-bold mb-6">Doctors</h1>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
-
-              {doctorList.map((doc) => (
-
-                <div
-                  key={doc.id}
-                  onClick={() => navigate(`/appointment/${doc.id}`)}
-                  className="cursor-pointer border border-blue-200 rounded-xl overflow-hidden hover:translate-y-[-8px] transition duration-300 max-w-[240px]"
-                >
-
-                  <img
-                    src={doc.image}
-                    className="bg-blue-50 w-full h-[150px] object-cover"
-                  />
-
-                  <div className="p-3">
-
-                    <div className="flex items-center gap-2 text-green-500 text-sm">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <p>Available</p>
-                    </div>
-
-                    <p className="font-semibold">{doc.name}</p>
-                    <p className="text-gray-600">{doc.speciality}</p>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
-
-          </div>
-
-        )}
-
         {menu === "settings" && (
           <div className="flex justify-center items-start mt-10">
             <Calendar
@@ -1640,34 +1601,55 @@ Print
 
 
       {/* MOBILE + TAB BOTTOM NAV */}
-<div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around items-center py-2 md:hidden z-50">
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg md:hidden z-50">
 
-<button onClick={() => setMenu("home")} className="flex flex-col items-center text-xs">
-  🏠
-  <span>Home</span>
-</button>
+<div className="flex justify-around items-center py-3">
 
-<button onClick={() => setMenu("describe")} className="flex flex-col items-center text-xs">
-  🧾
-  <span>Describe</span>
-</button>
+  {/* HOME */}
+  <button
+    onClick={() => setMenu("home")}
+    className={`flex flex-col items-center text-xs ${
+      menu === "home" ? "text-blue-600" : "text-gray-600"
+    }`}
+  >
+    <span className="text-xl">🏠</span>
+    <span className="mt-1">Home</span>
+  </button>
 
-<button 
-  onClick={() => {
-    setShowAccountPopup(!showAccountPopup)
-  }}
-  className="flex flex-col items-center text-xs"
->
-  👥
-  <span>Account</span>
-</button>
+  {/* DESCRIBE */}
+  <button
+    onClick={() => setMenu("describe")}
+    className={`flex flex-col items-center text-xs ${
+      menu === "describe" ? "text-blue-600" : "text-gray-600"
+    }`}
+  >
+    <span className="text-xl">🧾</span>
+    <span className="mt-1">Describe</span>
+  </button>
 
-<button onClick={() => setMenu("doctors")} className="flex flex-col items-center text-xs">
-  🩺
-  <span>Doctors</span>
-</button>
+  {/* APPOINTMENTS */}
+  <button
+    onClick={() => setMenu("appointments")}
+    className={`flex flex-col items-center text-xs ${
+      menu === "appointments" ? "text-blue-600" : "text-gray-600"
+    }`}
+  >
+    <span className="text-xl">📅</span>
+    <span className="mt-1">Appointments</span>
+  </button>
 
+  {/* HISTORY */}
+  <button
+    onClick={() => setMenu("history")}
+    className={`flex flex-col items-center text-xs ${
+      menu === "history" ? "text-blue-600" : "text-gray-600"
+    }`}
+  >
+    <span className="text-xl">📜</span>
+    <span className="mt-1">History</span>
+  </button>
 
+</div>
 
 </div>
 

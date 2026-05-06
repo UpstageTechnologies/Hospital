@@ -72,7 +72,8 @@ const [doctorBasicInfo, setDoctorBasicInfo] = useState({
 
 const [doctorDesignation, setDoctorDesignation] = useState({
   designation: "",
-  qualification: ""
+  qualification: "",
+  doctorImage: ""
 })
 
 const [doctorOfficial, setDoctorOfficial] = useState({
@@ -80,6 +81,8 @@ const [doctorOfficial, setDoctorOfficial] = useState({
   joiningDate: "",
   relievingDate: ""
 })
+const defaultDoctorAvatar =
+  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 
 const [doctorAccount, setDoctorAccount] = useState({
   doctorId: "",
@@ -262,6 +265,47 @@ const handleCreateDoctorFull = async () => {
   alert("Doctor created")
 }
 
+const handleUpdateDoctor = async () => {
+
+  try {
+
+    // document id from firestore
+    const docId = editData?.id
+
+    if (!docId) {
+      alert("Document ID Missing")
+      return
+    }
+
+    await updateDoc(
+      doc(db, "doctors", docId),
+      {
+        doctorBasicInfo,
+        doctorDesignation,
+        doctorOfficial,
+        doctorAccount
+      }
+    )
+
+    alert("Doctor Updated Successfully")
+
+    await fetchDoctors()
+
+    setIsEditMode(false)
+    setIsViewMode(false)
+
+    setEditData(null)
+
+    setDoctorStep(1)
+
+  } catch (err) {
+
+    console.log("UPDATE ERROR :", err)
+
+    alert(err.message)
+  }
+}
+
 const handleCreateStaffFull = async () => {
   const id = staffOfficial.staffId
 
@@ -436,6 +480,53 @@ useEffect(() => {
 
 
         {/* RIGHT CONTENT */}
+
+        {tab === "account" && subMenu === "" && (
+
+<div className="w-full flex justify-center items-center py-10">
+
+  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-3xl">
+
+    <div
+      onClick={() => setSubMenu("admins")}
+      className="bg-blue-500 text-white rounded-2xl p-6 text-center cursor-pointer shadow hover:scale-105 transition"
+    >
+      <p className="text-xl font-bold">Admins</p>
+    </div>
+
+    <div
+      onClick={() => setSubMenu("doctors")}
+      className="bg-green-500 text-white rounded-2xl p-6 text-center cursor-pointer shadow hover:scale-105 transition"
+    >
+      <p className="text-xl font-bold">Doctors</p>
+    </div>
+
+    <div
+      onClick={() => setSubMenu("staff")}
+      className="bg-purple-500 text-white rounded-2xl p-6 text-center cursor-pointer shadow hover:scale-105 transition"
+    >
+      <p className="text-xl font-bold">Staff</p>
+    </div>
+
+    <div
+      onClick={() => setSubMenu("patients")}
+      className="bg-orange-500 text-white rounded-2xl p-6 text-center cursor-pointer shadow hover:scale-105 transition"
+    >
+      <p className="text-xl font-bold">Patients</p>
+    </div>
+
+    <div
+      onClick={() => setSubMenu("pharmasi")}
+      className="bg-pink-500 text-white rounded-2xl p-6 text-center cursor-pointer shadow hover:scale-105 transition"
+    >
+      <p className="text-xl font-bold">Pharmasi</p>
+    </div>
+
+  </div>
+
+</div>
+)}
+
         <div className="flex-1 p-6 md:p-10 pb-24">
 
           {/* HOME */}
@@ -904,37 +995,45 @@ useEffect(() => {
 
         {subMenu === "doctors" && (
 
-          <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[450px]">
+    <div className="flex flex-col md:flex-row w-full max-w-7xl border rounded-lg overflow-hidden mx-auto
+                      min-h-[auto] md:h-[450px]">
 
 
-            <div className="w-1/4 p-4 space-y-3">
+    <div className=" w-full md:w-1/4  p-4 flex md:block gap-2 overflow-x-auto md:space-y-3">
 
               <h2 className="text-xl font-bold mb-4">Create Doctor Account</h2>
 
               <button onClick={() => setDoctorStep(1)}
-                className={`w-full p-2 rounded text-white ${doctorStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
+                className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Basic Info
               </button>
 
               <button onClick={() => setDoctorStep(2)}
-                className={`w-full p-2 rounded text-white ${doctorStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+                className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Designation
               </button>
 
               <button onClick={() => setDoctorStep(3)}
-                className={`w-full p-2 rounded text-white ${doctorStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+                className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Official Info
               </button>
 
               <button onClick={() => setDoctorStep(4)}
-                className={`w-full p-2 rounded text-white ${doctorStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
+                className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Account
               </button>
 
             </div>
 
 
-            <div className="w-3/4 p-6 relative overflow-hidden h-[450px]">
+            <div className="
+w-full md:w-3/4
+p-3 md:p-6
+relative
+overflow-y-auto
+min-h-[600px]
+bg-white
+">
 
 
               {doctorStep === 1 && (
@@ -945,7 +1044,7 @@ useEffect(() => {
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
 
                     <FloatingInput label="Name" required value={doctorBasicInfo.name} disabled={isViewMode}
@@ -1028,7 +1127,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
                     <button onClick={() => setDoctorStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
@@ -1044,6 +1149,36 @@ useEffect(() => {
                   <h3 className="text-lg font-bold mb-6">
                     Designation
                   </h3>
+
+                  <div className="flex flex-col items-center mb-6">
+
+  <img
+    src={
+      doctorDesignation.doctorImage || defaultDoctorAvatar
+    }
+    alt="doctor"
+    className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
+  />
+
+  <input
+    type="file"
+    accept="image/*"
+    className="mt-4"
+    onChange={(e) => {
+      const file = e.target.files[0]
+
+      if (file) {
+        const imageUrl = URL.createObjectURL(file)
+
+        setDoctorDesignation({
+          ...doctorDesignation,
+          doctorImage: imageUrl
+        })
+      }
+    }}
+  />
+
+</div>
 
                   <div className="grid grid-cols-2 gap-6 max-w-4xl">
 
@@ -1067,7 +1202,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
 
                     <button onClick={() => setDoctorStep(1)} className="bg-gray-500 text-white px-8 py-2 rounded">
                       Previous
@@ -1121,7 +1262,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
                     <button onClick={() => setDoctorStep(2)} className="bg-gray-500 text-white px-8 py-2 rounded">
                       Previous
                     </button>
@@ -1173,7 +1320,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
 
                     <button onClick={() => setDoctorStep(3)} className="bg-gray-500 text-white px-8 py-2 rounded">
                       Previous
@@ -1221,15 +1374,15 @@ useEffect(() => {
                     <tr key={index}>
 
                       <td className="border p-2">
-                        {docData.name}
+                      {docData.doctorBasicInfo?.name}
                       </td>
 
                       <td className="border p-2">
-                        {docData.speciality}
+                      {docData.doctorDesignation?.designation}
                       </td>
 
                       <td className="border p-2">
-                        {docData.hospital}
+                      {docData.doctorBasicInfo?.address}
                       </td>
 
                       {/* <td className="border p-2">
@@ -1331,19 +1484,19 @@ useEffect(() => {
 
               <h2 className="text-xl font-bold mb-4">Create Staff Account</h2>
 
-              <button onClick={() => setStaffStep(1)} className={`w-full p-2 rounded text-white ${staffStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStaffStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Basic Info
               </button>
 
-              <button onClick={() => setStaffStep(2)} className={`w-full p-2 rounded text-white ${staffStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStaffStep(2)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Designation
               </button>
 
-              <button onClick={() => setStaffStep(3)} className={`w-full p-2 rounded text-white ${staffStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStaffStep(3)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Official Info
               </button>
 
-              <button onClick={() => setStaffStep(4)} className={`w-full p-2 rounded text-white ${staffStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStaffStep(4)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
                 create Account
               </button>
 
@@ -1361,7 +1514,7 @@ useEffect(() => {
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
 
                     <FloatingInput label="Name" required value={staffBasicInfo.name} disabled={isViewMode}
@@ -1444,7 +1597,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
                     <button onClick={() => setStaffStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
@@ -1483,7 +1642,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
 
                     <button onClick={() => setStaffStep(1)} className="bg-gray-500 text-white px-8 py-2 rounded">
                       Previous
@@ -1537,7 +1702,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
                     <button onClick={() => setStaffStep(2)} className="bg-gray-500 text-white px-8 py-2 rounded">
                       Previous
                     </button>
@@ -1589,7 +1760,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
 
                     <button onClick={() => setStaffStep(3)} className="bg-gray-500 text-white px-8 py-2 rounded">
                       Previous
@@ -1728,23 +1905,23 @@ useEffect(() => {
                 Create Patient Account
               </h2>
 
-              <button onClick={() => setStep(1)} className={`w-full p-2 rounded text-white ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Basic Info
               </button>
 
-              <button onClick={() => setStep(2)} className={`w-full p-2 rounded text-white ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStep(2)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Insurance
               </button>
 
-              <button onClick={() => setStep(3)} className={`w-full p-2 rounded text-white ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStep(3)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Medical History
               </button>
 
-              <button onClick={() => setStep(4)} className={`w-full p-2 rounded text-white ${step === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStep(4)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Reason
               </button>
 
-              <button onClick={() => setStep(5)} className={`w-full p-2 rounded text-white ${step === 5 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <button onClick={() => setStep(5)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 5 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Create Account
               </button>
 
@@ -1763,7 +1940,7 @@ useEffect(() => {
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
 
                     <FloatingInput label="Name" required value={basicInfo.name} disabled={isViewMode}
@@ -1824,7 +2001,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
                     <button onClick={() => setStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
@@ -1865,7 +2048,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
 
                     <button onClick={() => setStep(1)} className="bg-gray-500 text-white px-6 py-2 rounded">
                       Previous
@@ -1915,7 +2104,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
 
                     <button onClick={() => setStep(2)} className="bg-gray-500 text-white px-6 py-2 rounded">
                       Previous
@@ -1981,7 +2176,13 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
 
                     <button onClick={() => setStep(3)} className="bg-gray-500 text-white px-6 py-2 rounded">
                       Previous
@@ -2021,7 +2222,13 @@ useEffect(() => {
                     />
                   </div>
 
-                  <div className="absolute bottom-4 right-6 flex gap-4">
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
 
                     <button onClick={() => setStep(4)} className="bg-gray-500 text-white px-8 py-2 rounded">
                       Previous
@@ -2733,6 +2940,14 @@ fetchPharmasi()
         <button onClick={()=>setTab("appointments")}>
           📅
           <p>Appointments</p>
+        </button>
+
+        <button onClick={() => {
+  setTab("account")
+  setSubMenu("")
+}}className="flex flex-col items-center text-black">
+       <span className="text-2xl">👨‍⚕️</span>
+       <p className="text-sm">Accounts</p>
         </button>
 
       </div>

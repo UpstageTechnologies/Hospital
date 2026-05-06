@@ -9,7 +9,6 @@ const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
 
     const navigate = useNavigate()
     const [step, setStep] = useState(1)
-    const [showRegister, setShowRegister] = useState(false)
     const [users, setUsers] = useState([])
     const [loginEmail, setLoginEmail] = useState("sundar@gmail.com")
     const [loginPassword, setLoginPassword] = useState("sundar11")
@@ -169,7 +168,15 @@ const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
     return (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
 
-           <div className="bg-white w-full max-w-[95%] md:w-[800px] rounded-xl flex flex-col md:flex-row overflow-hidden">
+<div className="relative bg-white w-full max-w-[95%] md:w-[800px] rounded-xl flex flex-col md:flex-row overflow-hidden">
+
+  {/* CLOSE BUTTON */}
+  <button
+    onClick={close}
+    className="absolute top-3 right-4 text-2xl font-bold text-gray-500 hover:text-black"
+  >
+    ✕
+  </button>
                 <div className="w-full md:w-1/3 bg-blue-600 text-white p-4 md:p-6 flex md:flex-col flex-row justify-around md:gap-4 gap-2">
 <button
 onClick={()=>setStep(1)}
@@ -204,103 +211,34 @@ Details
                <div className="w-full md:w-2/3 p-4 md:p-6">
 
                     {/* STEP 1 */}
-                    {step === 1 && (
-                        showRegister ? (
-                            <>
-                                <h2 className="text-xl font-bold mb-4">Create Account</h2>
+{/* STEP 1 */}
+{step === 1 && (
+  <>
+    <h2 className="text-xl font-bold mb-4">Login</h2>
 
-                                <input
-                                    placeholder="Name"
-                                    className="border p-2 w-full mb-2"
-                                    onChange={(e) => setName(e.target.value)}
-                                />
+    <input
+      value={loginEmail}
+      placeholder="Email"
+      className="border p-2 w-full mb-2"
+      onChange={(e) => setLoginEmail(e.target.value)}
+    />
 
-                                <input
-                                    placeholder="Email"
-                                    className="border p-2 w-full mb-2"
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
+    <input
+      value={loginPassword}
+      placeholder="Password"
+      type="password"
+      className="border p-2 w-full mb-2"
+      onChange={(e) => setLoginPassword(e.target.value)}
+    />
 
-                                <input
-                                    placeholder="Password"
-                                    type="password"
-                                    className="border p-2 w-full mb-2"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-
-                                <input
-                                    placeholder="Address"
-                                    className="border p-2 w-full mb-2"
-                                    onChange={(e) => setAddress(e.target.value)}
-                                />
-
-                                <input
-                                    placeholder="Phone Number"
-                                    className="border p-2 w-full mb-2"
-                                    onChange={(e) => setPhone(e.target.value)}
-                                />
-
-                                <select
-                                    className="border p-2 w-full mb-2"
-                                    onChange={(e) => setGender(e.target.value)}
-                                >
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-
-                                <button
-                                    onClick={handleRegister}
-                                    className="bg-blue-600 text-white px-6 py-2 w-full"
-                                >
-                                    Create Account
-                                </button>
-
-                                <p
-                                    onClick={() => setShowRegister(false)}
-                                    className="text-blue-600 cursor-pointer"
-                                >
-                                    Already have account? Login
-                                </p>
-                            </>
-                        ) : (
-                            <>
-                                <h2 className="text-xl font-bold mb-4">Login</h2>
-
-                                <input
- value={loginEmail}
- placeholder="Email"
- className="border p-2 w-full mb-2"
- onChange={(e) => setLoginEmail(e.target.value)}
-/>
-
-<input
- value={loginPassword}
- placeholder="Password"
- type="password"
- className="border p-2 w-full mb-2"
- onChange={(e) => setLoginPassword(e.target.value)}
-/>
-                                <button
-                                    onClick={handleLogin}
-                                    className="bg-blue-600 text-white px-6 py-2 w-full"
-                                >
-                                    Login
-                                </button>
-
-                                <p className="text-center">
-                                    Create account?{" "}
-                                    <span
-                                        onClick={() => setShowRegister(true)}
-                                        className="text-blue-600 cursor-pointer"
-                                    >
-                                        Register here
-                                    </span>
-                                </p>
-                            </>
-                        )
-                    )}
-
+    <button
+      onClick={handleLogin}
+      className="bg-blue-600 text-white px-6 py-2 w-full rounded"
+    >
+      Login
+    </button>
+  </>
+)}
                     {/* STEP 2 */}
                     {step === 2 && (
                         <>
@@ -367,7 +305,7 @@ Details
                             </p>
 
                             <p
-                                onClick={() => navigate("/patient-dashboard")}
+                                onClick={() => navigate("/demopatientdashboard")}
                                 className="text-blue-600 underline cursor-pointer"
                             >
                                 Go to Dashboard

@@ -92,7 +92,7 @@ const Login = () => {
         navigate("/demopatientdashboard");
       } else {
         navigate("/patient-dashboard");
-      }
+      } 
     } catch(err){
       alert(err.message);
     }

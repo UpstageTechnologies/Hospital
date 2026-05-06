@@ -181,7 +181,13 @@ const DemoHome = () => {
                             className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer"
                         >
 
-                            <img src={doc.image} className="w-full h-60 object-contain bg-[#e6edf5] p-4" />
+<img
+  src={
+    doc.doctorDesignation?.doctorImage ||
+    "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+  }
+  className="w-full h-60 object-cover bg-[#e6edf5] p-4"
+/>
 
                             <div className="p-4">
 

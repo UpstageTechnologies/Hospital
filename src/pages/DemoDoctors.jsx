@@ -140,7 +140,14 @@ const DemoDoctors = () => {
                                 onClick={() => navigate(`/demodoctordetails/${item.email}`)}
                                     className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all'>
 
-                                    <img src={item.image} className='bg-blue-50' />
+<img
+  src={
+    item.image ||
+    item.doctorDesignation?.doctorImage ||
+    "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+  }
+  alt=""
+/>
 
                                     <div className='p-4'>
                                         <p className='text-green-500 text-sm'>● Available</p>

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc
+} from "firebase/firestore";
 import { auth } from "../firebase"
 import { useNavigate } from "react-router-dom";
 
@@ -42,7 +47,10 @@ const PatientDashboard = () => {
                   userEmail &&
                   data.patientEmail.toLowerCase() === userEmail.toLowerCase()
                 ) {
-                  list.push(data)
+                  list.push({
+                    id: doc.id,
+                    ...data
+                  })
                 }
               })
           
@@ -110,6 +118,173 @@ const PatientDashboard = () => {
         return () => clearInterval(interval)
     }, [checkInTime, checkedOut])
 
+    const handlePrint = (item) => {
+
+      const printWindow = window.open("", "_blank")
+    
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Patient Report</title>
+    
+            <style>
+            body{
+              font-family: Arial;
+              padding:20px;
+            }
+
+            
+            
+            @media(max-width:600px){
+            
+              body{
+                padding:10px;
+              }
+            
+              h1{
+                font-size:22px;
+              }
+            
+              p{
+                font-size:14px;
+              }
+            
+              .box{
+                padding:10px;
+              }
+            
+            }
+    
+              h1{
+                text-align:center;
+                color:#2563eb;
+              }
+    
+              .box{
+                border:1px solid #ccc;
+                padding:15px;
+                margin-bottom:15px;
+                border-radius:10px;
+              }
+    
+              p{
+                font-size:18px;
+                margin:8px 0;
+              }
+    
+            </style>
+    
+          </head>
+    
+          <body>
+    
+            <h1>Patient Appointment Report</h1>
+    
+            <div class="box">
+              <p><b>Patient Name:</b> ${item.patientName || "Sundar"}</p>
+    
+              <p><b>Age:</b> ${item.age || "25"}</p>
+    
+              <p><b>Address:</b> ${item.address || "Madurai"}</p>
+    
+              <p><b>City:</b> ${item.city || "Madurai"}</p>
+    
+              <p><b>Doctor Name:</b> ${item.doctorName}</p>
+    
+              <p><b>Date:</b> ${item.date}</p>
+    
+              <p><b>Time:</b> ${item.time}</p>
+    
+              <p><b>Reason:</b> ${item.reason || ""}</p>
+    
+              <p><b>Injection:</b> ${item.injection || ""}</p>
+    
+              <p><b>Tablet:</b> ${item.tablet || ""}</p>
+    
+              <p><b>Doctor Notes:</b> ${item.notes || ""}</p>
+    
+              <p><b>Appointment No:</b> ${item.appointmentNo}</p>
+            </div>
+    
+          </body>
+        </html>
+      `)
+    
+      printWindow.document.close()
+      printWindow.print()
+    }
+
+    const handleCancelAppointment = async (id) => {
+
+      const confirmCancel = window.confirm(
+        "Are you sure want to cancel appointment?"
+      )
+    
+      if (!confirmCancel) return
+    
+      try {
+    
+        await deleteDoc(doc(db, "appointments", id))
+    
+        setCurrentAppointments((prev) =>
+          prev.filter((item) => item.id !== id)
+        )
+    
+        setSelected(null)
+    
+        alert("Appointment Cancelled ✅")
+    
+      } catch (err) {
+    
+        console.log(err)
+    
+        alert("Cancel Failed ❌")
+      }
+    }
+
+    const getMedicalData = (reason) => {
+
+      const text = (reason || "").toLowerCase()
+    
+      if (text.includes("fever")) {
+        return {
+          injection: "Paracetamol Injection",
+          tablet: "Dolo 650",
+          notes: "Take rest and drink more water"
+        }
+      }
+    
+      if (text.includes("head")) {
+        return {
+          injection: "Diclofenac Injection",
+          tablet: "Saridon",
+          notes: "Avoid stress and take proper sleep"
+        }
+      }
+    
+      if (text.includes("knee")) {
+        return {
+          injection: "Pain Relief Injection",
+          tablet: "Aceclofenac",
+          notes: "Avoid heavy walking"
+        }
+      }
+    
+      if (text.includes("hiv")) {
+        return {
+          injection: "ART Injection",
+          tablet: "Antiviral Tablet",
+          notes: "Regular monitoring required"
+        }
+      }
+    
+      return {
+        injection: "General Injection",
+        tablet: "Vitamin Tablet",
+        notes: "Follow doctor advice"
+      }
+    }
+
     return (
 <div className="flex flex-col md:flex-row min-h-screen">
 
@@ -160,21 +335,145 @@ const PatientDashboard = () => {
 
 {activeTab === "history" && (
   <>
-    <h1 className="text-2xl font-bold mb-6">
-      Appointment History
-    </h1>
+    <div className="flex items-center justify-between mb-6">
+      <h1 className="text-3xl font-bold">
+        Appointment History
+      </h1>
 
-    <div className="grid grid-cols-2 gap-2 md:gap-3">
-      {historyAppointments.map((item, i) => (
-        <div
-          key={i}
-          className="border p-3 rounded-xl bg-gray-100 max-w-[220px]"
-        >
-          <p><b>Doctor:</b> {item.doctorName}</p>
-          <p><b>Time:</b> {item.time}</p>
-          <p><b>Appointment No:</b> {item.appointmentNo}</p>
-        </div>
-      ))}
+    </div>
+
+    <div className="w-full overflow-x-scroll scrollbar-thin pb-24">
+
+    <table className="min-w-[1400px] border border-gray-300 text-sm md:text-base bg-white">
+
+        <thead className="bg-blue-600 text-white">
+
+          <tr>
+
+            <th className="border p-3">Date</th>
+
+            <th className="border p-3">Doctor</th>
+
+            <th className="border p-3">Time</th>
+
+            <th className="border p-3">Reason</th>
+
+            <th className="border p-3">Injection</th>
+
+            <th className="border p-3">Tablet</th>
+
+            <th className="border p-3">Doctor Notes</th>
+
+            <th className="border p-3">Appointment No</th>
+
+            <th className="border p-4 min-w-[180px]">Actions</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+        {historyAppointments.map((item, i) => {
+
+const medical = getMedicalData(item.reason)
+
+return (
+
+            <tr key={i} className="text-center">
+
+              {/* DATE */}
+              <td className="border p-3">
+                {item.date}
+              </td>
+
+              {/* DOCTOR */}
+              <td className="border p-3">
+                {item.doctorName}
+              </td>
+
+              {/* TIME */}
+              <td className="border p-3">
+                {item.time}
+              </td>
+
+              {/* REASON */}
+              <td className="border p-3">
+                <textarea
+                  defaultValue={item.reason || ""}
+                  className="border p-2 rounded w-full"
+                />
+              </td>
+
+              {/* INJECTION */}
+              <td className="border p-3">
+                <input
+                  type="text"
+                  value={medical.injection}
+readOnly
+                  placeholder="Injection"
+                  className="border p-2 rounded w-full"
+                />
+              </td>
+
+              {/* TABLET */}
+              <td className="border p-3">
+                <input
+                  type="text"
+                  value={medical.tablet}
+readOnly
+                  placeholder="Tablet"
+                  className="border p-2 rounded w-full"
+                />
+              </td>
+
+              {/* NOTES */}
+              <td className="border p-3">
+                <textarea
+                  value={medical.notes}
+                  readOnly
+                  placeholder="Doctor Notes"
+                  className="border p-2 rounded w-full"
+                />
+              </td>
+
+              {/* APPOINTMENT NO */}
+              <td className="border p-3 font-bold">
+                {item.appointmentNo}
+              </td>
+
+              {/* ACTIONS */}
+              <td className="border p-3">
+
+              <div className="flex flex-col gap-3 min-w-[120px]">
+
+                  <button
+                    className="bg-green-600 text-white px-4 py-2 rounded"
+                    onClick={() => alert("Updated Successfully ✅")}
+                  >
+                    Save
+                  </button>
+
+                  <button
+                    onClick={() => handlePrint(item)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                  >
+                    Print
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+)
+})}
+
+        </tbody>
+
+      </table>
+
     </div>
   </>
 )}
@@ -184,7 +483,7 @@ const PatientDashboard = () => {
             {selected && (
 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-<div className="bg-white w-[95%] md:w-[650px] rounded-2xl shadow-2xl p-8 relative">
+<div className="bg-white w-[95%] md:w-[650px] max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-4 md:p-8 relative">
 
 {/* CLOSE */}
 <button
@@ -200,10 +499,10 @@ className="absolute top-4 right-5 text-2xl font-bold"
 <img
 src={selected.doctorImage}
 alt=""
-className="w-28 h-28 rounded-full border object-cover"
+className="w-24 h-24 md:w-28 md:h-28 rounded-full border object-cover"
 />
 
-<h2 className="text-3xl font-bold mt-4">
+<h2 className="text-xl md:text-3xl font-bold mt-4 text-center">
 Dr. {selected.doctorName}
 </h2>
 
@@ -218,7 +517,7 @@ Consulting Doctor
 Patient Full Details
 </h3>
 
-<div className="grid md:grid-cols-2 gap-5">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 <div className="border rounded-xl p-4">
 <b>Patient Name:</b><br/>
@@ -255,19 +554,15 @@ Patient Full Details
 
 <div className="flex justify-end mt-8">
 
-<div className="flex justify-end gap-4 mt-8">
+<div className="flex flex-col md:flex-row justify-end gap-4 mt-8">
 
 <button
-onClick={()=>{
-localStorage.setItem(
-"selectedPatient",
-JSON.stringify(selected)
-);
-navigate("/my-profile");
-}}
-className="bg-green-600 text-white px-6 py-3 rounded-lg"
+  onClick={() =>
+    handleCancelAppointment(selected.id)
+  }
+  className="bg-red-600 text-white px-6 py-3 rounded-lg"
 >
-View Profile
+  Cancel Appointment
 </button>
 
 <button
@@ -287,26 +582,41 @@ Close
 )}
 
             {/* MOBILE BOTTOM NAV */}
-<div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around items-center py-2 md:hidden z-50">
+            <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg flex justify-around items-center py-3 md:hidden z-50">
 
-<button onClick={() => navigate("/home")} className="flex flex-col items-center text-sm">
-    🏠
-    <span>Home</span>
+{/* HOME */}
+<button
+  onClick={() => navigate("")}
+  className="flex flex-col items-center text-xs"
+>
+  <span className="text-xl">🏠</span>
+  <span>Home</span>
 </button>
 
-<button onClick={() => navigate("/appointments")} className="flex flex-col items-center text-sm font-bold">
-    📅
-    <span>Appointments</span>
+{/* APPOINTMENTS */}
+<button
+  onClick={() => setActiveTab("appointments")}
+  className={`flex flex-col items-center text-xs ${
+    activeTab === "appointments"
+      ? "text-blue-600 font-bold"
+      : "text-black"
+  }`}
+>
+  <span className="text-xl">📅</span>
+  <span>Appointments</span>
 </button>
 
-<button onClick={() => navigate("/my-profile")} className="flex flex-col items-center text-sm">
-    👤
-    <span>Profile</span>
-</button>
-
-<button className="flex flex-col items-center text-sm">
-    ⚙️
-    <span>Settings</span>
+{/* HISTORY */}
+<button
+  onClick={() => setActiveTab("history")}
+  className={`flex flex-col items-center text-xs ${
+    activeTab === "history"
+      ? "text-blue-600 font-bold"
+      : "text-black"
+  }`}
+>
+  <span className="text-xl">📜</span>
+  <span>History</span>
 </button>
 
 </div>

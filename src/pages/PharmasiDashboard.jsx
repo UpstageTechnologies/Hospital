@@ -1003,9 +1003,8 @@ ${activeCategory===cat
 <th>Type</th>
 <th>Medicine</th>
 <th>Qty</th>
-<th>
-  {entryType === "Purchase" ? "Purchase" : "Sales"}
-</th>
+<th>Purchase</th>
+<th>Sales</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -1032,13 +1031,9 @@ ${activeCategory===cat
 
 <td>{item.qty}</td>
 
-<td>
-  ₹{
-    entryType === "Purchase"
-      ? item.purchasePrice
-      : item.salesPrice
-  }
-</td>
+<td>₹{item.purchasePrice}</td>
+
+<td>₹{item.salesPrice}</td>
 
 
 <td className="space-x-4">

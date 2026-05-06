@@ -192,7 +192,7 @@ rounded-2xl text-center cursor-pointer ${color}`}
 )}
 
               {event?.slots && (
-                <p className="text-xs text-blue-200">
+                <p className="text-xs text-blue-900 font-semibold">
                   {event.slots.length} slots
                 </p>
               )}
