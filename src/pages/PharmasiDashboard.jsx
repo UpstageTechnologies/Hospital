@@ -178,34 +178,10 @@ const addMedicine = () => {
     setQty("");
     setPurchasePrice("");
     setSalesPrice("");
+    setEntryType("");
   };
 
   const addEntryPurchase = () => {
-
-    if(!type || !medicine || !qty || !purchasePrice){
-      alert("Fill all fields");
-      return;
-    }
-  
-    const data = {
-      id: Date.now(),
-      type,
-      medicine,
-      qty,
-      entryType: "Purchase",
-      purchasePrice,
-      salesPrice
-    };
-  
-    setEntryItems([...entryItems, data]);
-  
-    setType("");
-    setMedicine("");
-    setQty("");
-    setPurchasePrice("");
-  };
-
-  const addEntrySale = () => {
 
     if(!type || !medicine || !qty || !salesPrice){
       alert("Fill all fields");
@@ -217,8 +193,12 @@ const addMedicine = () => {
       type,
       medicine,
       qty,
-      entryType: "Sales",
-      purchasePrice,
+      entryType: "Purchase",
+  
+      // ✅ purchase amount save
+      purchasePrice: salesPrice,
+  
+      // ✅ sales amount save
       salesPrice
     };
   
@@ -227,7 +207,60 @@ const addMedicine = () => {
     setType("");
     setMedicine("");
     setQty("");
+    setPurchasePrice("");
     setSalesPrice("");
+    setEntryType("");
+  };
+
+  const addEntrySale = () => {
+
+    if(!type || !medicine || !qty){
+      alert("Fill all fields");
+      return;
+    }
+  
+    // 🔥 inventory la irundhu item edukkum
+    const selectedItem = items.find(
+      item =>
+        item.type === type &&
+        (item.subCategory === medicine ||
+         item.medicine === medicine)
+    );
+  
+    // 🔥 purchase + sales auto set
+    const unitPurchasePrice =
+      Number(selectedItem?.purchasePrice || 0);
+  
+    const unitSalesPrice =
+      Number(selectedItem?.salesPrice || 0);
+  
+    const totalPurchase =
+      unitPurchasePrice * Number(qty);
+  
+    const totalSales =
+      unitSalesPrice * Number(qty);
+  
+    const data = {
+      id: Date.now(),
+      type,
+      medicine,
+      qty,
+      entryType: "Sales",
+  
+      // ✅ NOW SAVING
+      purchasePrice: totalPurchase,
+  
+      salesPrice: totalSales
+    };
+  
+    setEntryItems([...entryItems, data]);
+  
+    setType("");
+    setMedicine("");
+    setQty("");
+    setPurchasePrice("");
+    setSalesPrice("");
+    setEntryType("");
   };
 
   // ✅ EDIT ENTRY
@@ -1012,16 +1045,14 @@ ${activeCategory===cat
 <tbody>
 
 {entryItems
-.filter(item => {
-  if(activeCategory !== "All" && item.type !== activeCategory) return false
+.filter(item =>
 
-  if(entryType === "Purchase") return item.entryType === "Purchase"
-  if(entryType === "Sales") return item.entryType === "Sales"
+  activeCategory === "All"
+    ? true
+    : item.type === activeCategory
 
-  return true
-})
+)
 .map((item,index)=>(
-
 
 <tr key={item.id} className="border-b">
 
@@ -1035,14 +1066,19 @@ ${activeCategory===cat
 
 <td>₹{item.salesPrice}</td>
 
-
 <td className="space-x-4">
 
-<button onClick={()=>editEntryItem(index)} className="text-blue-600 font-semibold">
+<button
+onClick={()=>editEntryItem(index)}
+className="text-blue-600 font-semibold"
+>
 Edit
 </button>
 
-<button onClick={()=>deleteEntryItem(index)} className="text-red-600 font-semibold">
+<button
+onClick={()=>deleteEntryItem(index)}
+className="text-red-600 font-semibold"
+>
 Delete
 </button>
 
