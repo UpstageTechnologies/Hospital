@@ -2953,6 +2953,7 @@ fetchPharmasi()
 
 )}
 
+
         </div>
 
       </div>
@@ -3100,33 +3101,49 @@ fetchPharmasi()
 
 
       {/* MOBILE + TAB BOTTOM MENU */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t flex justify-around py-3">
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg flex justify-around items-center py-2 px-2 md:hidden z-50">
 
-        <button onClick={()=>setTab("home")}>
-          🏠
-          <p>Home</p>
-        </button>
+  <button
+    onClick={()=>setTab("home")}
+    className="flex flex-col items-center justify-center flex-1 text-center"
+  >
+    <span className="text-xl">🏠</span>
+    <p className="text-[12px] mt-1">Home</p>
+  </button>
 
-        <button onClick={()=>setTab("subscription")}>
-          💳
-          <p>Subscription</p>
-        </button>
+  <button
+    onClick={()=>setTab("subscription")}
+    className="flex flex-col items-center justify-center flex-1 text-center"
+  >
+    <span className="text-xl">💳</span>
+    <p className="text-[12px] mt-1">Subscription</p>
+  </button>
 
-        <button onClick={()=>setTab("appointments")}>
-          📅
-          <p>Appointments</p>
-        </button>
+  <button
+    onClick={()=>setTab("appointments")}
+    className="flex flex-col items-center justify-center flex-1 text-center"
+  >
+    <span className="text-xl">📅</span>
+    <p className="text-[12px] mt-1">Appointments</p>
+  </button>
 
-        <button onClick={() => {
-  setTab("account")
-  setSubMenu("")
-}}className="flex flex-col items-center text-black">
-       <span className="text-2xl">👨‍⚕️</span>
-       <p className="text-sm">Accounts</p>
-        </button>
+  <button
+    onClick={()=>setTab("payment")}
+    className="flex flex-col items-center justify-center flex-1 text-center"
+  >
+    <span className="text-xl">💰</span>
+    <p className="text-[12px] mt-1">Payment</p>
+  </button>
 
-      </div>
+  <button
+    onClick={()=>setTab("account")}
+    className="flex flex-col items-center justify-center flex-1 text-center"
+  >
+    <span className="text-xl">🧑‍⚕️</span>
+    <p className="text-[12px] mt-1">Accounts</p>
+  </button>
 
+</div>
     </div>
   )
 }
