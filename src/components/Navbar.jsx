@@ -146,8 +146,8 @@ const Navbar = () => {
 
 
     return (
-<div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-300 px-10'>
-<div className="flex items-center gap-3">
+<div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-300 px-4 md:px-10 relative'>
+<div className="flex items-center gap-4">
 
 
   <button
@@ -171,7 +171,7 @@ const Navbar = () => {
                 location.pathname.startsWith("/doctor-profile") ||
                 location.pathname.startsWith("/patient-dashboard")
             ) && (
-            <ul className="flex items-center gap-10 font-medium mx-auto">
+<ul className="hidden md:flex items-center gap-10 font-medium mx-auto">
                         {isMaster && location.pathname === "/account" ? (
 
                             <NavLink to="/account">
@@ -203,7 +203,267 @@ const Navbar = () => {
                     </ul>
                 )}
 
-            <div className='flex items-center gap-4 relative'>
+                {/* MOBILE MENU */}
+
+<div className="flex items-center gap-4 md:hidden">
+
+{
+user ? (
+
+<>
+
+<img
+  onClick={(e) => {
+    e.stopPropagation()
+    setShowProfileMenu(prev => !prev)
+  }}
+  className='w-10 h-10 rounded-full object-cover cursor-pointer'
+  src={userImage}
+  alt=""
+/>
+
+<button
+  onClick={() => setShowMenu(!showMenu)}
+  className="text-3xl"
+>
+  ☰
+</button>
+
+</>
+
+) : (
+
+<>
+
+<img
+  onClick={(e) => {
+    e.stopPropagation()
+    setShowProfileMenu(prev => !prev)
+  }}
+  className="w-10 h-10 cursor-pointer"
+  src={assets.login1_icon}
+  alt=""
+/>
+
+<button
+  onClick={() => setShowMenu(!showMenu)}
+  className="text-3xl"
+>
+  ☰
+</button>
+
+</>
+
+)
+
+}
+
+</div>
+
+{showProfileMenu && (
+
+<div
+className="absolute top-20 right-4 bg-white shadow-xl rounded-xl p-4 flex flex-col gap-4 z-[9999] md:hidden w-52"
+onClick={(e) => e.stopPropagation()}
+>
+
+{
+user ? (
+
+<>
+
+<button
+type="button"
+className="text-left cursor-pointer"
+onClick={(e) => {
+e.preventDefault()
+e.stopPropagation()
+setShowProfileMenu(false)
+navigate('/my-profile')
+}}
+>
+My Profile
+</button>
+
+<button
+type="button"
+className="text-left cursor-pointer"
+onClick={(e) => {
+e.preventDefault()
+e.stopPropagation()
+setShowProfileMenu(false)
+navigate('/my-appointment')
+}}
+>
+My Appointment
+</button>
+
+<button
+type="button"
+className="text-left cursor-pointer w-full"
+onClick={(e) => {
+e.preventDefault()
+e.stopPropagation()
+setShowProfileMenu(false)
+
+setTimeout(() => {
+setShowLogoutPopup(true)
+}, 100)
+
+}}
+>
+Logout
+</button>
+
+</>
+
+) : (
+
+<>
+
+<p onClick={() => {
+navigate('/master-login')
+setShowProfileMenu(false)
+}}>
+Master Login
+</p>
+
+<p onClick={() => {
+navigate('/admin-login')
+setShowProfileMenu(false)
+}}>
+Admin Login
+</p>
+
+<p onClick={() => {
+navigate('/doctor-login')
+setShowProfileMenu(false)
+}}>
+Doctor Login
+</p>
+
+<p onClick={() => {
+navigate('/patient-login')
+setShowProfileMenu(false)
+}}>
+Patient Login
+</p>
+
+<p onClick={() => {
+navigate('/staff-login')
+setShowProfileMenu(false)
+}}>
+Staff Login
+</p>
+
+<p onClick={() => {
+navigate('/pharmasi-login')
+setShowProfileMenu(false)
+}}>
+Pharmasi Login
+</p>
+
+</>
+
+)
+
+}
+
+</div>
+
+)}
+
+{showMenu && (
+
+<div className="absolute top-20 right-4 bg-white shadow-xl rounded-xl p-4 flex flex-col gap-4 z-50 md:hidden w-44">
+
+<p onClick={() => {
+navigate("/home")
+setShowMenu(false)
+}}>
+Home
+</p>
+
+<p onClick={() => {
+navigate("/doctor")
+setShowMenu(false)
+}}>
+All Doctors
+</p>
+
+<p onClick={() => {
+navigate("/about")
+setShowMenu(false)
+}}>
+About
+</p>
+
+<p onClick={() => {
+navigate("/contact")
+setShowMenu(false)
+}}>
+Contact
+</p>
+
+</div>
+
+)}
+
+
+{showLogoutPopup && (
+
+<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+
+    <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+
+        <h2 className="text-lg font-semibold mb-4">
+            Are you sure you want to logout?
+        </h2>
+
+        <div className="flex justify-center gap-4">
+
+            <button onClick={() => setShowLogoutPopup(false)} className="px-4 py-2 bg-gray-300 rounded" >
+                Cancel
+            </button>
+
+            <button onClick={() => {
+auth.signOut()
+localStorage.removeItem("masterLogin")
+setShowLogoutPopup(false)
+
+// 👇 இது தான் correct logic
+const path = location.pathname
+
+if (path.includes("account")) {
+navigate("/account")
+}
+else if (path.includes("doctor")) {
+navigate("/doctor-dashboard")
+}
+else if (path.includes("patient")) {
+navigate("/patient-dashboard")
+}
+else if (path.includes("staff")) {
+navigate("/staff-dashboard")
+}
+else {
+navigate("/home")
+}
+}}
+                className="px-4 py-2 bg-red-500 text-white rounded"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+)}
+
+<div className='hidden md:flex items-center gap-4 relative'>
 
                 {
                     user ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
@@ -296,58 +556,6 @@ const Navbar = () => {
 
                
 
-                {showLogoutPopup && (
-
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-
-                        <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
-
-                            <h2 className="text-lg font-semibold mb-4">
-                                Are you sure you want to logout?
-                            </h2>
-
-                            <div className="flex justify-center gap-4">
-
-                                <button onClick={() => setShowLogoutPopup(false)} className="px-4 py-2 bg-gray-300 rounded" >
-                                    Cancel
-                                </button>
-
-                                <button onClick={() => {
-    auth.signOut()
-    localStorage.removeItem("masterLogin")
-    setShowLogoutPopup(false)
-
-    // 👇 இது தான் correct logic
-    const path = location.pathname
-
-    if (path.includes("account")) {
-        navigate("/account")
-    }
-    else if (path.includes("doctor")) {
-        navigate("/doctor-dashboard")
-    }
-    else if (path.includes("patient")) {
-        navigate("/patient-dashboard")
-    }
-    else if (path.includes("staff")) {
-        navigate("/staff-dashboard")
-    }
-    else {
-        navigate("/home")
-    }
-}}
-                                    className="px-4 py-2 bg-red-500 text-white rounded"
-                                >
-                                    Logout
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                )}
 
             </div>
         </div>

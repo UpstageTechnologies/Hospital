@@ -895,7 +895,7 @@ const openPaytm = () => {
 
 <div className="flex flex-col md:flex-row w-full max-w-7xl border rounded-lg overflow-hidden md:h-[450px] h-auto">
 
-<div className="w-full md:w-1/4 md:min-w-[200px] p-4 flex md:block overflow-x-auto md:overflow-visible gap-2 md:space-y-3">
+<div className="w-full md:w-1/4 p-3 flex md:flex-col gap-3 overflow-x-auto md:overflow-visible scrollbar-hide">
 <h2 className="hidden md:block text-xl font-bold">Create Admin Account</h2>
 
               <button onClick={() => setAdminStep(1)}
@@ -922,7 +922,7 @@ const openPaytm = () => {
 
 
 
-<div className="w-full md:w-3/4 p-4 md:p-6 relative overflow-visible md:overflow-visible md:h-auto h-auto">
+            <div className="w-full md:w-3/4 p-4 md:p-6 overflow-y-auto pb-24">
 
 
 
@@ -933,7 +933,7 @@ const openPaytm = () => {
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
 
                     <FloatingInput label="Name" required value={adminBasicInfo.name} disabled={isViewMode}
@@ -3101,49 +3101,38 @@ fetchPharmasi()
 
 
       {/* MOBILE + TAB BOTTOM MENU */}
-      <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg flex justify-around items-center py-2 px-2 md:hidden z-50">
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t flex justify-around py-3">
 
-  <button
-    onClick={()=>setTab("home")}
-    className="flex flex-col items-center justify-center flex-1 text-center"
-  >
-    <span className="text-xl">🏠</span>
-    <p className="text-[12px] mt-1">Home</p>
-  </button>
+        <button onClick={()=>setTab("home")}>
+          🏠
+          <p>Home</p>
+        </button>
 
-  <button
-    onClick={()=>setTab("subscription")}
-    className="flex flex-col items-center justify-center flex-1 text-center"
-  >
-    <span className="text-xl">💳</span>
-    <p className="text-[12px] mt-1">Subscription</p>
-  </button>
+        <button onClick={()=>setTab("subscription")}>
+          💳
+          <p>Subscription</p>
+        </button>
 
-  <button
-    onClick={()=>setTab("appointments")}
-    className="flex flex-col items-center justify-center flex-1 text-center"
-  >
-    <span className="text-xl">📅</span>
-    <p className="text-[12px] mt-1">Appointments</p>
-  </button>
+        <button onClick={()=>setTab("appointments")}>
+          📅
+          <p>Appointments</p>
+        </button>
 
-  <button
-    onClick={()=>setTab("payment")}
-    className="flex flex-col items-center justify-center flex-1 text-center"
-  >
-    <span className="text-xl">💰</span>
-    <p className="text-[12px] mt-1">Payment</p>
-  </button>
+        <button onClick={()=>setTab("payment")}>
+  💰
+  <p>Payment</p>
+</button>
 
-  <button
-    onClick={()=>setTab("account")}
-    className="flex flex-col items-center justify-center flex-1 text-center"
-  >
-    <span className="text-xl">🧑‍⚕️</span>
-    <p className="text-[12px] mt-1">Accounts</p>
-  </button>
+        <button onClick={() => {
+  setTab("account")
+  setSubMenu("")
+}}className="flex flex-col items-center text-black">
+       <span className="text-2xl">👨‍⚕️</span>
+       <p className="text-sm">Accounts</p>
+        </button>
 
-</div>
+      </div>
+
     </div>
   )
 }

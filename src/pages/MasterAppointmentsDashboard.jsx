@@ -8,13 +8,18 @@ const MasterAppointmentsDashboard = () => {
     const [appointments, setAppointments] = useState([])
     const [selected, setSelected] = useState(null)
     const [activePage, setActivePage] = useState("appointments")
-
+    const [showMenu, setShowMenu] = useState(false)
     const [step, setStep] = useState(1)
     const [checkInTime, setCheckInTime] = useState(null)
     const [duration, setDuration] = useState(0)
     const [checkedOut, setCheckedOut] = useState(false)
 
     const navigate = useNavigate();
+
+    const paymentDetails = {
+      upiId: "demohospital@okaxis",
+      amount: 4999
+    }
 
     // ✅ ALL appointments (no filter)
     useEffect(() => {
@@ -69,7 +74,18 @@ const MasterAppointmentsDashboard = () => {
 >
   Appointments
 </p>
+
+<p 
+  onClick={() => setActivePage("payment")}
+  className="mb-4 cursor-pointer"
+>
+  Payment
+</p>
             </div>
+
+            {/* MOBILE TOP NAVBAR */}
+
+
 
             {/* ✅ RIGHT CONTENT */}
             <div className="w-full md:w-4/5 p-4 md:p-6 pb-20">
@@ -78,6 +94,7 @@ const MasterAppointmentsDashboard = () => {
   {activePage === "home" && "Home"}
   {activePage === "subscription" && "Subscription"}
   {activePage === "appointments" && "All Appointments"}
+  {activePage === "payment" && "Payment"}
 </h1>
 
 {/* 🔥 STEP-5 — இதை இங்க add பண்ணு */}
@@ -94,18 +111,91 @@ const MasterAppointmentsDashboard = () => {
   </div>
 )}
 
+{activePage === "payment" && (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <div className="border rounded-2xl p-6 shadow">
+      <h2 className="text-2xl font-bold mb-6">
+        Payment Details
+      </h2>
+
+      <div className="space-y-4">
+        <div className="flex justify-between border-b pb-2">
+          <span>Hospital</span>
+          <span>Demo Hospital</span>
+        </div>
+
+        <div className="flex justify-between border-b pb-2">
+          <span>Plan</span>
+          <span>Premium Plan</span>
+        </div>
+
+        <div className="flex justify-between border-b pb-2">
+          <span>Amount</span>
+          <span className="text-blue-600 font-bold">
+            ₹4999
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div className="border rounded-2xl p-6 shadow">
+      <h2 className="text-2xl font-bold mb-6">
+        Payment Options
+      </h2>
+
+      <div className="space-y-4">
+
+      <button
+onClick={() => {
+
+window.location.href =
+`tez://upi/pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
+
+}}
+className="w-full bg-blue-600 text-white p-4 rounded-xl"
+>
+Pay with GPay
+</button>
+
+<button
+onClick={() => {
+
+window.location.href =
+`phonepe://pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
+
+}}
+className="w-full bg-purple-600 text-white p-4 rounded-xl"
+>
+Pay with PhonePe
+</button>
+
+<button
+onClick={() => {
+
+window.location.href =
+`paytmmp://pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
+
+}}
+className="w-full bg-cyan-600 text-white p-4 rounded-xl"
+>
+Pay with Paytm
+</button>
+      </div>
+    </div>
+
+  </div>
+)}
+
 
 
 {activePage === "appointments" && (
   <div className="grid grid-cols-2 gap-3 md:gap-4 justify-items-center">
     {appointments
-      .filter(
-        (item) =>
-          item.patientName &&
-          item.doctorName &&
-          item.date &&
-          item.time
-      )
+.filter((item) => {
+    const today = new Date().toISOString().split("T")[0]
+    return item.date === today
+  })
       .map((item, i) => (
         <div key={i}
           className="border p-3 rounded-xl max-w-[260px]"
@@ -243,6 +333,14 @@ const MasterAppointmentsDashboard = () => {
 >
     📅
     <span>Appointments</span>
+</button>
+
+<button 
+    onClick={() => setActivePage("payment")}
+    className="flex flex-col items-center text-sm"
+>
+    💰
+    <span>Payment</span>
 </button>
 
 </div>
