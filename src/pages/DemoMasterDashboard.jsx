@@ -379,38 +379,6 @@ useEffect(() => {
   fetchPharmasi()
 }, [])
 
-const [paymentDetails] = useState({
-  plan: "Premium Master Plan",
-  amount: 4999,
-  expiry: "Dec 2026",
-  hospital: "Demo Hospital",
-  upiId: "demohospital@okaxis"
-})
-
-const openGpay = () => {
-
-  const upiLink =
-    `gpay://upi/pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
-
-  window.location.href = upiLink
-}
-
-const openPhonePe = () => {
-
-  const upiLink =
-    `phonepe://pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
-
-  window.location.href = upiLink
-}
-
-const openPaytm = () => {
-
-  const upiLink =
-    `paytmmp://pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
-
-  window.location.href = upiLink
-}
-
   const appointments = [
     {
       patient:"Uma",
@@ -490,12 +458,6 @@ const openPaytm = () => {
               Appointments
             </p>
 
-            <p
-  onClick={() => setTab("payment")}
-  className="cursor-pointer"
->
-  Payment
-</p>
 
             <p
   onClick={() => setAccountMenu(!accountMenu)}
@@ -722,141 +684,6 @@ const openPaytm = () => {
               </div>
             </div>
           )}
-
-          {/* PAYMENT */}
-
-{tab === "payment" && (
-
-<div className="w-full">
-
-  <h1 className="text-3xl md:text-4xl font-bold">
-    Payment Details
-  </h1>
-
-  <p className="text-gray-500 mt-2">
-    Manage your subscription payment securely
-  </p>
-
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-
-    {/* LEFT CARD */}
-
-    <div className="border rounded-2xl p-6 shadow bg-white">
-
-      <h2 className="text-2xl font-bold mb-6">
-        Subscription Info
-      </h2>
-
-      <div className="space-y-4">
-
-        <div className="flex justify-between border-b pb-3">
-          <span className="font-medium">Hospital</span>
-          <span>{paymentDetails.hospital}</span>
-        </div>
-
-        <div className="flex justify-between border-b pb-3">
-          <span className="font-medium">Plan</span>
-          <span>{paymentDetails.plan}</span>
-        </div>
-
-        <div className="flex justify-between border-b pb-3">
-          <span className="font-medium">Expiry</span>
-          <span>{paymentDetails.expiry}</span>
-        </div>
-
-        <div className="flex justify-between border-b pb-3">
-          <span className="font-medium">Amount</span>
-          <span className="text-blue-600 font-bold">
-            ₹ {paymentDetails.amount}
-          </span>
-        </div>
-
-      </div>
-
-    </div>
-
-
-    {/* RIGHT CARD */}
-
-    <div className="border rounded-2xl p-6 shadow bg-white">
-
-      <h2 className="text-2xl font-bold mb-6">
-        Payment Options
-      </h2>
-
-      <div className="space-y-4">
-
-        {/* GPAY */}
-
-        <button
-  onClick={() => {
-
-    const link =
-      `tez://upi/pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
-
-      window.location.href = link
-  }}
-
-  className="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl text-lg font-semibold transition"
->
-  Pay with GPay
-</button>
-
-
-        {/* PHONEPE */}
-
-        <button
-  onClick={() => {
-
-    const link =
-      `phonepe://pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
-
-      window.location.href = link
-  }}
-
-  className="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-xl text-lg font-semibold transition"
->
-  Pay with PhonePe
-</button>
-
-
-        {/* PAYTM */}
-
-        <button
-  onClick={() => {
-
-    const link =
-      `paytmmp://pay?pa=${paymentDetails.upiId}&pn=DemoHospital&am=${paymentDetails.amount}&cu=INR`
-
-      window.location.href = link
-  }}
-
-  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white p-4 rounded-xl text-lg font-semibold transition"
->
-  Pay with Paytm
-</button>
-
-      </div>
-
-      <div className="mt-6 bg-gray-100 rounded-xl p-4">
-
-        <p className="text-sm text-gray-600">
-          UPI ID
-        </p>
-
-        <p className="font-bold text-lg">
-          {paymentDetails.upiId}
-        </p>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-)}
 
 
           {/* APPOINTMENTS */}
@@ -3118,10 +2945,6 @@ fetchPharmasi()
           <p>Appointments</p>
         </button>
 
-        <button onClick={()=>setTab("payment")}>
-  💰
-  <p>Payment</p>
-</button>
 
         <button onClick={() => {
   setTab("account")
