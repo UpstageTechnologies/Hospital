@@ -39,6 +39,46 @@ const MasterLogin = () => {
 
   const [state, setState] = useState(isRegister ? "Register" : "Login");
 
+  const handleRegister = async () => {
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+  
+    try {
+  
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+  
+      const user = userCredential.user;
+  
+      await updateProfile(user, {
+        displayName: name,
+      });
+  
+      await setDoc(doc(db, "master", user.uid), {
+        name,
+        hospital,
+        phone,
+        email,
+        role: "master",
+      });
+  
+      alert("Registration Success");
+  
+      localStorage.setItem("masterLogin", "true");
+  
+      navigate("/master-dashboard");
+  
+    } catch (error) {
+      alert(error.message);
+      console.log(error);
+    }
+  };
   const handleLogin = async () => {
 
   if (
@@ -311,7 +351,9 @@ PharmasiLogin
 
 <form onSubmit={(e)=>{
   e.preventDefault();
-  handleLogin();
+  state === "Login"
+  ? handleLogin()
+  : handleRegister();
 }}
         className="backdrop-blur-lg bg-white/60 border border-white/30 
       shadow-2xl rounded-2xl p-6 sm:p-8 w-full max-w-[400px]">

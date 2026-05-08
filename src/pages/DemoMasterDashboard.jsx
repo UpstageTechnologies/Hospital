@@ -2944,7 +2944,7 @@ fetchPharmasi()
           📅
           <p>Appointments</p>
         </button>
-
+ 
 
         <button onClick={() => {
   setTab("account")

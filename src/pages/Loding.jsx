@@ -195,9 +195,6 @@ const Loding = () => {
                     <button onClick={() => navigate("/master-login", { state: { isRegister: true } })} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg mb-3 transition">
                         New User →
                     </button>
-
-
-
                 </div>
 
             </div>
