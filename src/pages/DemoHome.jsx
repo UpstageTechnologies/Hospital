@@ -5,9 +5,11 @@ import { useState, useEffect } from "react"
 import { collection, getDocs } from "firebase/firestore"
 import { db } from "../firebase"   // 👈 correct path check panniko
 
+
 const DemoHome = () => {
 
     const navigate = useNavigate()
+   
     const [open, setOpen] = useState(false)
     const specialityData = [
         { name: "General physician", image: "/speciality/General_physician.svg" },
@@ -227,7 +229,6 @@ const DemoHome = () => {
                     <img className='w-full absolute bottom-0 right-0 max-w-md' src={assets.appointment_img} alt="" />
                 </div>
             </div>
-
         </div>
     )
 }

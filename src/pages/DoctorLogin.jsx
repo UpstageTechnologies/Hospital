@@ -3,8 +3,9 @@ import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import {
   GoogleAuthProvider,
-  signInWithPopup
-} from "firebase/auth";
+  signInWithPopup,
+  signInWithEmailAndPassword
+  } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useLocation } from "react-router-dom";

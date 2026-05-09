@@ -9,6 +9,7 @@ import { assets } from "../assets/assets"
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
+
 const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type = "doctor" }) => {
 
     const [popup, setPopup] = useState(false)   
@@ -86,9 +87,10 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
         
         <div className="bg-white rounded-2xl shadow p-2 sm:p-4 md:p-6 w-full md:max-w-[650px] mx-auto">
 
-
             {/* HEADER */}
             <div className="flex justify-between items-center mb-6">
+
+                
                 <button onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
                     className="bg-blue-500 text-white px-2 sm:px-3 py-2 rounded-lg sm:rounded-xl text-sm">◀</button>
 
@@ -595,7 +597,6 @@ const isDemo = location.state?.demo === true;
 
         <div className="flex flex-col md:flex-row min-h-screen pb-16 md:pb-0">
 
-
             {/* LEFT PANEL */}
             <div className="hidden md:block w-full md:w-64 bg-blue-600 text-white p-3 md:p-6">
                 <p onClick={() => setPage("home")} className="mb-3 md:mb-3 cursor-pointer shrink-0">Home</p>
@@ -647,7 +648,7 @@ const isDemo = location.state?.demo === true;
 
                             <div className="space-y-4">
 
-                                {Array.from({ length: 20 }, (_, i) => 9 * 60 + i * 30).map((minutes, i) => {
+                                {Array.from({ length: 27 }, (_, i) => 9 * 60 + i * 30).map((minutes, i) => {
 
                                     const hour = Math.floor(minutes / 60)
                                     const min = minutes % 60
@@ -657,25 +658,65 @@ const isDemo = location.state?.demo === true;
 
                                         const bookings = appointments.filter(a => {
 
-                                            if (!a.date || !a.time) return false
-                                          
-                                            if (a.date !== selectedDate) return false
-                                          
-                                            const [start] = a.time.split("-")   // 🔥 start time மட்டும் எடு
+                                            if (!a.date || !a.time) return false;
+                                            
+                                            // ✅ selected date match
+                                            if (
+                                            String(a.date).trim() !==
+                                            String(selectedDate).trim()
+                                            )
+                                            return false;
+                                            
+                                            // ✅ only current doctor appointments
+                                            const currentDoctor =
+a.doctorEmail ||
+a.doctorId;
 
-                                            let cleanTime = start.toLowerCase().replace(" ", "")
+if (
+currentDoctor !== doctorData?.email
+)
+return false;
                                             
-                                            let isPM = cleanTime.includes("pm")
-                                            let [h, m] = cleanTime.replace("am", "").replace("pm", "").split(":").map(Number)
+                                            // ✅ remove demo appointments
+                                            if (a.isDemo === true)
+                                            return false;
                                             
-                                            if (isPM && h !== 12) h += 12
-                                            if (!isPM && h === 12) h = 0
-                                            
-                                            const totalMinutes = h * 60 + m
-                                            
-                                            return totalMinutes === minutes
-                                          })
+                                            const startTime = a.time
+.split("-")[0]
+.trim()
+.toLowerCase();
 
+const matchMap = {
+"10:00am":600,
+"10:30am":630,
+"11:00am":660,
+"11:30am":690,
+"12:00pm":720,
+"12:30pm":750,
+"1:00pm":780,
+"1:30pm":810,
+"2:00pm":840,
+"2:30pm":870,
+"3:00pm":900,
+"3:30pm":930,
+"4:00pm":960,
+"4:30pm":990,
+"5:00pm":1020,
+"5:30pm":1050,
+"6:00pm":1080,
+"6:30pm":1110,
+"7:00pm":1140,
+"7:30pm":1170,
+"8:00pm":1200,
+"8:30pm":1230,
+"9:00pm":1260,
+"9:30pm":1290,
+"10:00pm":1320
+};
+
+return matchMap[startTime] === minutes;
+                                            
+                                            });
                                     const current = new Date()
                                     const currentMinutes = current.getHours() * 60 + current.getMinutes()
 
@@ -696,16 +737,41 @@ const isDemo = location.state?.demo === true;
                                                     </div>
                                                 )}
 
-{bookings.length > 0 && bookings.map((booking, index) => (
+{bookings.length > 0 && (
 
-<div key={index}
-  className="absolute left-4 top-0 bg-yellow-400 text-black px-3 py-1 rounded-lg text-sm shadow"
+<div className="ml-6 flex flex-col gap-2">
+
+{bookings.map((booking,index)=>(
+
+<div
+key={index}
+className="
+bg-yellow-100
+border
+border-yellow-400
+rounded-xl
+px-4
+py-2
+shadow
+w-fit
+"
 >
-  <div>👤 {booking.patientName}</div>
-  <div className="text-xs">📝 {booking.reason}</div>
+
+<p className="font-semibold text-black">
+👤 {booking.patientName}
+</p>
+
+<p className="text-sm text-gray-700">
+📝 {booking.reason || booking.problem || "No Reason"}
+</p>
+
 </div>
 
 ))}
+
+</div>
+
+)}
 
                                             </div>
 

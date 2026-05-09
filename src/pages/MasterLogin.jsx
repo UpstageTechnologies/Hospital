@@ -347,7 +347,7 @@ PharmasiLogin
 </>
 )}
 
-<div className="flex justify-center items-center min-h-[calc(100vh-80px)] px-4">
+<div className="flex justify-center items-center py-10 px-4 min-h-screen">
 
 <form onSubmit={(e)=>{
   e.preventDefault();
@@ -358,9 +358,15 @@ PharmasiLogin
         className="backdrop-blur-lg bg-white/60 border border-white/30 
       shadow-2xl rounded-2xl p-6 sm:p-8 w-full max-w-[400px]">
 
-        <h1 className="text-3xl font-bold text-center mb-4">
-          {state === "Login" ? "Master Login" : "Master Register"}
-        </h1>
+<h1 className="text-5xl font-bold text-center mb-2">
+  {state === "Login" ? "Login" : "Register"}
+</h1>
+
+<p className="text-center text-gray-500 mb-8 text-lg">
+  {state === "Login"
+    ? "Login to your master account"
+    : "Create your master account"}
+</p>
 
         {state === "Register" && (
           <>
@@ -398,11 +404,52 @@ PharmasiLogin
           {state === "Login" ? "Login" : "Register"}
         </button>
 
-        <button type="button" onClick={handleGoogleLogin}
-          className="google-btn">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5" />
-          Sign in with Google
-        </button>
+        <div className="flex items-center gap-3 my-6">
+  <div className="flex-1 h-[1px] bg-gray-300"></div>
+
+  <p className="text-gray-400 text-sm">
+    OR
+  </p>
+
+  <div className="flex-1 h-[1px] bg-gray-300"></div>
+</div>
+
+<button
+  type="button"
+  onClick={handleGoogleLogin}
+  className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 text-lg font-medium hover:bg-gray-50 transition"
+>
+  <img
+    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+    className="w-6"
+  />
+
+  {state === "Login"
+    ? "Sign in with Google"
+    : "Sign up with Google"}
+</button>
+
+{!isDemo && (
+
+<p className="text-center mt-6 text-gray-600">
+
+  {state === "Login"
+    ? "Don't have an account?"
+    : "Already have an account?"}
+
+  <span
+    onClick={() =>
+      setState(state === "Login" ? "Register" : "Login")
+    }
+    className="text-blue-600 ml-2 cursor-pointer font-semibold"
+  >
+    {state === "Login" ? "Register" : "Login"}
+  </span>
+
+</p>
+
+)}
+
       </form>
       </div>
     </div>

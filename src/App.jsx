@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 import HospitalIntro from "./pages/HospitalIntro";
@@ -38,6 +38,7 @@ import MyAppointment from "./pages/MyAppointment";
 import Appointment from "./pages/Appointment";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import UpgradePopup from "./components/UpgradePopup";
 import DoctorLogin from "./pages/DoctorLogin";
 import PatientLogin from "./pages/PatientLogin";
 import PatientDashboard from "./pages/PatientDashboard";
@@ -51,6 +52,28 @@ import StaffProfile from "./pages/StaffProfile";
 const App = () => {
 
   const location = useLocation();
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
+  useEffect(() => {
+
+    const isDemoPage =
+      location.pathname.startsWith("/demo");
+  
+    if (!isDemoPage) {
+      return;
+    }
+  
+    const timer = setTimeout(() => {
+  
+      setShowUpgrade(true);
+  
+    }, 5 * 1000);
+  
+    return () => clearTimeout(timer);
+  
+  }, [location.pathname]);
+
+  
   const hideLayout = [
     "/",
     "/upstage",
@@ -130,6 +153,11 @@ const App = () => {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {!hideLayout && location.pathname !== "/account" && <Footer />}
+
+      <UpgradePopup
+  open={showUpgrade}
+  onClose={() => setShowUpgrade(false)}
+/>
 
     </div>
   );

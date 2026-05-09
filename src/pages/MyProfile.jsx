@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { db, auth } from "../firebase";
 import { useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  doc,
+  getDoc
+  } from "firebase/firestore";
 
 const MyProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -17,31 +20,42 @@ const MyProfile = () => {
     return;
     }
     
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe =
+    auth.onAuthStateChanged(async (user) => {
     
     if (!user) return;
     
     try {
     
-    const snap = await getDocs(collection(db,"appointments"));
+    const doctorRef =
+    doc(db,"doctors",user.email);
     
-    let foundUser=null;
+    const doctorSnap =
+    await getDoc(doctorRef);
     
-    snap.forEach((docItem)=>{
-    const data=docItem.data();
+    if (doctorSnap.exists()) {
     
-    if(
-    data.email &&
-    data.email.toLowerCase().trim() ===
-    user.email.toLowerCase().trim()
-    ){
-    foundUser=data;
-    }
-    
+    setUserData({
+    ...doctorSnap.data(),
+    role:"doctor"
     });
     
-    if(foundUser){
-    setUserData(foundUser);
+    return;
+    }
+    
+    const patientRef =
+    doc(db,"patients",user.email);
+    
+    const patientSnap =
+    await getDoc(patientRef);
+    
+    if (patientSnap.exists()) {
+    
+    setUserData({
+    ...patientSnap.data(),
+    role:"patient"
+    });
+    
     }
     
     }
@@ -94,7 +108,7 @@ const MyProfile = () => {
             alt="profile"
           />
           <h1 className="text-3xl font-bold">
-            {userData.patientName}
+          {userData.name || userData.patientName}
           </h1>
         </div>
 

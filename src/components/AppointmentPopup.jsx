@@ -137,12 +137,15 @@ const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
             phone: currentUser.phone,
             gender: currentUser.gender,
             doctorName: doctor.name,
-            doctorImage: doctor.image,
-            speciality: doctor.speciality,
+doctorEmail: doctor.email,
+doctorImage: doctor.image,
+speciality: doctor.speciality,
             time: slotTime,
             date: (date || new Date()).toISOString().split("T")[0],
             reason: reason,
-            appointmentNo: "API" + Math.floor(Math.random()*900+100)
+            appointmentNo: "API" + Math.floor(Math.random()*900+100),
+
+            isDemo: doctor.demo === true,
         };
     
         // 🔥 IMPORTANT FIX

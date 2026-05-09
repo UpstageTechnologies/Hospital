@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { auth, db } from '../firebase'
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+    doc,
+    getDoc,
+    setDoc,
+    collection,
+    getDocs
+    } from "firebase/firestore";
 import { useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -17,6 +23,8 @@ const Navbar = () => {
     const [isMaster, setIsMaster] = useState(false)
     const [userImage, setUserImage] = useState(assets.profile_pic)
     const [user, setUser] = useState(null);
+    const [userName,setUserName] = useState("");
+const [userRole,setUserRole] = useState("");
     const [showLogoutPopup, setShowLogoutPopup] = useState(false)
 
     useEffect(() => {
@@ -36,33 +44,78 @@ const Navbar = () => {
 
     useEffect(() => {
 
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-
-            setUser(currentUser)
-
-            if (currentUser) {
-
-                const docRef = doc(db, "user", currentUser.uid);
-
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-
-                    setUserImage(docSnap.data().image || assets.profile_pic);
-
-                }
-
-            } else {
-
-                setUserImage(assets.profile_pic)
-
-            }
-
+        const unsubscribe =
+        onAuthStateChanged(auth, async (currentUser) => {
+        
+        setUser(currentUser);
+        
+        if (!currentUser) return;
+        
+        try {
+        
+        const collections = [
+        "doctors",
+        "patients",
+        "staff",
+        "master",
+        "admin"
+        ];
+        
+        for (const col of collections) {
+        
+        const snap = await getDocs(collection(db,col));
+        
+        let foundUser = null;
+        
+        snap.forEach((docItem) => {
+        
+        const data = docItem.data();
+        
+        if (
+        data.email &&
+        data.email.toLowerCase().trim() ===
+        currentUser.email.toLowerCase().trim()
+        ) {
+        
+        foundUser = data;
+        
+        }
+        
         });
-
+        
+        if (foundUser) {
+        
+        setUserName(
+        foundUser.doctorName ||
+        foundUser.patientName ||
+        foundUser.name ||
+        foundUser.fullName ||
+        "User"
+        );
+        
+        setUserRole(col);
+        
+        setUserImage(
+        foundUser.image ||
+        assets.profile_pic
+        );
+        
+        break;
+        
+        }
+        
+        }
+        
+        }
+        catch(err){
+        console.log(err)
+        }
+        
+        });
+        
         return () => unsubscribe();
-
-    }, []);
+        
+        }, []);
 
     useEffect(() => {
 
@@ -468,6 +521,10 @@ navigate("/home")
                 {
                     user ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
 
+<p className="font-semibold">
+  {userName}
+</p>
+
                         <img className='w-8 h-8 rounded-full object-cover' src={userImage} alt="" />
                         <img className='w-2.5 ' src={assets.dropdown_icon} alt="" />
                         {showProfileMenu && (
@@ -481,6 +538,22 @@ navigate("/home")
                                     <p onClick={() => navigate('/my-appointment')} className="cursor-pointer hover:text-black">
                                         My Appointment
                                     </p>
+
+                                    <p
+onClick={() => {
+
+if(userRole==="doctors"){
+navigate("/doctor-dashboard")
+}
+else{
+navigate("/settings")
+}
+
+}}
+className="cursor-pointer hover:text-black"
+>
+Settings
+</p>
 
                                     <p onClick={() => setShowLogoutPopup(true)} className="cursor-pointer hover:text-black">
                                         Logout

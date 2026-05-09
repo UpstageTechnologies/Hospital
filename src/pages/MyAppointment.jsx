@@ -10,7 +10,19 @@ if(!user){
 return <p className="mt-10 text-center">Login pannunga</p>
 }
 
-const userAppointments = appointments;
+const userAppointments = appointments.filter(item=>{
+
+    if (item.isDemo === true) return false;
+    
+    if(user?.role==="doctor"){
+    
+    return item.doctorEmail === user.email;
+    
+    }
+    
+    return item.patientEmail === user.email;
+    
+    });
 return (
 <div className="p-6">
 
@@ -210,7 +222,7 @@ Close
 
 )}
 
-</div>
+</div>  
 )
 
 }

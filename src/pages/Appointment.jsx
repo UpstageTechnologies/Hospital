@@ -40,7 +40,8 @@ const Appointment = () => {
   // 🔥 NEW STATES
   const [userData, setUserData] = useState(null)
   const [appointmentNo, setAppointmentNo] = useState("")
-  const selectedDate = new Date().toDateString()
+  const selectedDate =
+new Date().toISOString().split("T")[0]
 
   const { docId } = useParams()
 const decodedId = decodeURIComponent(docId)
@@ -113,6 +114,8 @@ useEffect(() => {
       if (user) {
 
         setIsLoggedIn(true) // ✅ ADD THIS
+
+
 
         const snap = await getDoc(doc(db, "users", user.uid))
 
@@ -358,6 +361,13 @@ useEffect(() => {
 
                             setIsLoggedIn(true)
 
+                            localStorage.setItem(
+                              "currentUser",
+                              JSON.stringify({
+                               email: auth.currentUser.email
+                              })
+                              )
+
                           }}
                           className="bg-blue-600 text-white px-6 py-2 rounded w-full mb-3"
                         >
@@ -383,6 +393,13 @@ useEffect(() => {
                             }, { merge: true })
 
                             setUserData(userData)
+
+                            localStorage.setItem(
+                              "currentUser",
+                              JSON.stringify({
+                               email: user.email
+                              })
+                              )
                             setPatientName(userData.name)
                             setStep(2)
                           }}
@@ -478,6 +495,7 @@ useEffect(() => {
 
                             const appointmentData = {
                               doctorId: decodedId,
+                              doctorEmail: docInfo.email,
                               doctorName: docInfo.name,
                               patientName,
                               phone,
