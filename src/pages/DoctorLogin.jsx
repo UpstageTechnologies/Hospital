@@ -72,14 +72,22 @@ const DoctorLogin = () => {
     if (
       email === "demodoctor007" &&
       password === "demo007"
-    ){
+      ){
       
-      localStorage.setItem("doctorLogin", "true");
+      localStorage.setItem(
+      "doctorLogin",
+      "true"
+      );
       
-    
+      localStorage.setItem(
+      "doctorEmail",
+      email
+      );
+      
       window.location.href="/#/demodoctordashboard";
+      
       return;
-    }
+      }
 
     e.preventDefault()
 
@@ -124,11 +132,23 @@ const DoctorLogin = () => {
           return
         }
 
+        alert("Doctor Login Success");
 
-        alert("Doctor Login Success")
+        localStorage.setItem(
+        "doctorLogin",
+        "true"
+        );
         
-        localStorage.setItem("doctorLogin","true");
-
+        localStorage.setItem(
+        "doctorEmail",
+        email
+        );
+        
+        if(isDemo){
+        window.location.href="/#/demodoctordashboard"
+        }else{
+        navigate("/doctor-profile")
+        }
 
         if(isDemo){
           window.location.href="/#/demodoctordashboard"

@@ -8,6 +8,8 @@ import { setDoc } from "firebase/firestore"
 import { assets } from "../assets/assets"
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import TodayVisitors from "../components/TodayVisitors";
+import PatientsTable from "../components/PatientsTable";
 
 
 const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type = "doctor" }) => {
@@ -304,6 +306,7 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [newSlot, setNewSlot] = useState("")
     const [doctorImage, setDoctorImage] = useState("")
     const [appointments, setAppointments] = useState([])
+    const [patientsData,setPatientsData] = useState([]);
     const [page, setPage] = useState("appointments")
     const [selected, setSelected] = useState(null)
     const [selectedDate, setSelectedDate] = useState(null)
@@ -413,50 +416,122 @@ const isDemo = location.state?.demo === true;
             console.log(err)
         }
     }
-
     useEffect(() => {
-        const email = localStorage.getItem("doctorEmail")
-        if (!email) return
 
         const fetchData = async () => {
-            const ref = doc(db, "doctors", email)
-            const snap = await getDoc(ref)
-
-            if (snap.exists()) {
-                const data = snap.data()
-                setDoctorData(data)
-                setDoctorImage(data.image)
-                setSlots(data.slots || [])
-            }
+        
+        try {
+        
+        const email =
+        localStorage.getItem("doctorEmail");
+        
+        console.log("LOGIN EMAIL", email);
+        
+        if (!email) {
+        console.log("NO EMAIL");
+        return;
         }
-
-        fetchData()
-    }, [])
+        
+        const doctorsSnap =
+        await getDocs(collection(db, "doctors"));
+        
+        let foundDoctor = null;
+        
+        doctorsSnap.forEach((docItem) => {
+        
+        const data = docItem.data();
+        
+        console.log("DOCTOR DOC", data);
+        
+        if (
+        data.email === email ||
+        docItem.id === email
+        ) {
+        foundDoctor = data;
+        }
+        
+        });
+        
+        console.log("FOUND DOCTOR", foundDoctor);
+        
+        if (foundDoctor) {
+        
+        setDoctorData(foundDoctor);
+        
+        setDoctorImage(
+        foundDoctor.image || ""
+        );
+        
+        setSlots(
+        foundDoctor.slots || []
+        );
+        
+        } else {
+        
+        console.log(
+        "DOCTOR NOT FOUND"
+        );
+        
+        }
+        
+        } catch (err) {
+        
+        console.log(
+        "DOCTOR FETCH ERROR",
+        err
+        );
+        
+        }
+        
+        };
+        
+        fetchData();
+        
+        }, []);
 
     useEffect(() => {
-        const fetchAppointments = async () => {
 
-            const email = localStorage.getItem("doctorEmail")
-            const snap = await getDocs(collection(db, "appointments"))
+    if (!doctorData) return;
 
-            let list = []
+    const fetchAppointments = async () => {
 
-            snap.forEach(doc => {
-                const data = doc.data()
+        const email =
+        localStorage.getItem("doctorEmail");
 
-                if (
-                    data.doctorEmail === email ||
-                    data.doctorId === email
-                ) {
-                    list.push(data)
-                }
-            })
+        const snap = await getDocs(
+        collection(db, "appointments")
+        );
 
-            setAppointments(list)
-        }
+        let list = [];
 
-        fetchAppointments()
-    }, [])
+        snap.forEach(docItem => {
+
+            const data = docItem.data();
+            
+            console.log("Firestore Data", data);
+            
+            console.log("doctorEmail DB:", data.doctorEmail);
+            console.log("doctorId DB:", data.doctorId);
+            console.log("doctorName DB:", data.doctorName);
+            
+            console.log("LOGIN EMAIL:", email);
+            console.log("DOCTOR DATA:", doctorData);
+            
+            list.push(data);
+            
+            });
+
+        console.log("Appointments:", list);
+
+        setAppointments(list);
+    };
+
+    fetchAppointments();
+
+}, [doctorData]);
+useEffect(() => {
+    console.log("UPDATED APPOINTMENTS", appointments);
+    }, [appointments]);
 
     useEffect(() => {
 
@@ -556,6 +631,17 @@ const isDemo = location.state?.demo === true;
 
     useEffect(()=>{
 
+        const savedPatients =
+        JSON.parse(
+        localStorage.getItem("patientsData")
+        ) || [];
+        
+        setPatientsData(savedPatients);
+        
+        },[]);
+
+    useEffect(()=>{
+
         syncPharmacyItems();
         
         window.addEventListener(
@@ -571,28 +657,10 @@ const isDemo = location.state?.demo === true;
         };
     
     },[]);
-
-    useEffect(()=>{
-
-        if(
-        !doctorData &&
-        localStorage.getItem("demoUser")==="true"
-        ){
-        setDoctorData({
-        name:"Demo Doctor",
-        email:"demodoctor007",
-        slots:[]
-        });
-        }
-        
-        },[doctorData]);
-        
+    console.log("doctorData", doctorData);
         if(!doctorData){
         return <p className="p-10">Loading...</p>
         }
-
-        
-
     return (
 
         <div className="flex flex-col md:flex-row min-h-screen pb-16 md:pb-0">
@@ -615,6 +683,10 @@ const isDemo = location.state?.demo === true;
 
                 <p onClick={() => setPage("describe")}className="mb-3 cursor-pointer">
                     Describe
+                </p>
+
+                <p onClick={() => setPage("patients")}className="mb-3 cursor-pointer">
+                    Patients
                 </p>
             </div>
 
@@ -656,66 +728,113 @@ const isDemo = location.state?.demo === true;
                                     const timeLabel =
                                         `${hour > 12 ? hour - 12 : hour}:${min === 0 ? "00" : min} ${hour >= 12 ? "PM" : "AM"}`
 
-                                        const bookings = appointments.filter(a => {
+                                        const bookings = appointments.filter((a) => {
 
-                                            if (!a.date || !a.time) return false;
+                                            try {
                                             
-                                            // ✅ selected date match
-                                            if (
-                                            String(a.date).trim() !==
-                                            String(selectedDate).trim()
-                                            )
+                                            if (!a) return false;
+                                            
+                                            if (!a.date) return false;
+                                            
+                                            if (!a.time) return false;
+                                            const formatDate = (value) => {
+
+                                                try {
+                                                
+                                                if (!value) return "";
+                                                
+                                                const d = new Date(value);
+                                                
+                                                if (isNaN(d.getTime()))
+                                                return "";
+                                                
+                                                return d.toISOString().split("T")[0];
+                                                
+                                                } catch {
+                                                return "";
+                                                }
+                                                
+                                                };
+                                                
+                                                const bookingDate =
+                                                formatDate(a.date);
+                                                
+                                                const currentSelected =
+                                                formatDate(selectedDate);
+                                                
+                                                if (!bookingDate || !currentSelected)
+                                                return false;
+                                            
+                                            if (bookingDate !== currentSelected)
                                             return false;
                                             
-                                            // ✅ only current doctor appointments
-                                            const currentDoctor =
-a.doctorEmail ||
-a.doctorId;
-
-if (
-currentDoctor !== doctorData?.email
-)
-return false;
+                                            const doctorEmail =
+                                            String(a.doctorEmail || "").trim();
                                             
-                                            // ✅ remove demo appointments
-                                            if (a.isDemo === true)
+                                            const doctorName =
+                                            String(a.doctorName || "").trim();
+                                            
+                                            const currentDoctorEmail =
+                                            String(doctorData?.email || "").trim();
+                                            
+                                            const currentDoctorName =
+                                            String(doctorData?.name || "").trim();
+                                            const isDoctorMatch =
+doctorEmail === currentDoctorEmail ||
+doctorName === currentDoctorName ||
+String(a.doctorId || "").trim() === currentDoctorEmail;
+                                            if (!isDoctorMatch)
                                             return false;
                                             
-                                            const startTime = a.time
-.split("-")[0]
-.trim()
-.toLowerCase();
-
-const matchMap = {
-"10:00am":600,
-"10:30am":630,
-"11:00am":660,
-"11:30am":690,
-"12:00pm":720,
-"12:30pm":750,
-"1:00pm":780,
-"1:30pm":810,
-"2:00pm":840,
-"2:30pm":870,
-"3:00pm":900,
-"3:30pm":930,
-"4:00pm":960,
-"4:30pm":990,
-"5:00pm":1020,
-"5:30pm":1050,
-"6:00pm":1080,
-"6:30pm":1110,
-"7:00pm":1140,
-"7:30pm":1170,
-"8:00pm":1200,
-"8:30pm":1230,
-"9:00pm":1260,
-"9:30pm":1290,
-"10:00pm":1320
-};
-
-return matchMap[startTime] === minutes;
+                                            const clean = (t) =>
+                                            String(t)
+                                            .toLowerCase()
+                                            .replace(/\s/g, "")
+                                            .trim();
                                             
+                                            const convert = (time) => {
+                                            
+                                            const value = clean(time);
+                                            
+                                            const match =
+                                            value.match(/(\d+):(\d+)(am|pm)/);
+                                            
+                                            if (!match) return 0;
+                                            
+                                            let h = parseInt(match[1]);
+                                            let m = parseInt(match[2]);
+                                            let ap = match[3];
+                                            
+                                            if (ap === "pm" && h !== 12)
+                                            h += 12;
+                                            
+                                            if (ap === "am" && h === 12)
+                                            h = 0;
+                                            
+                                            return h * 60 + m;
+                                            };
+                                            
+                                            const splitTime =
+                                            a.time.split("-");
+                                            
+                                            if (splitTime.length < 2)
+                                            return false;
+                                            
+                                            const start =
+                                            convert(splitTime[0]);
+                                            
+                                            const end =
+                                            convert(splitTime[1]);
+                                            
+                                            return minutes >= start && minutes < end;
+                                            
+                                            } catch(err) {
+                                            
+                                            console.log("BOOKING ERROR", err);
+                                            
+                                            return false;
+                                            
+                                            }
                                             });
                                     const current = new Date()
                                     const currentMinutes = current.getHours() * 60 + current.getMinutes()
@@ -788,218 +907,17 @@ w-fit
             )}
 
 
-
-
 {page==="describe" && (
-<div className="p-8">
-
-<h1 className="text-5xl font-bold mb-8">
-Describe
-</h1>
-
-<div className="flex gap-4 mt-8 flex-wrap">
-
-{
-[
-"All",
-"Tablet",
-"Injection",
-"Capsule",
-"Syrup",
-"Drops",
-"Ointment",
-"Inhaler"
-].map(cat=>(
-<button
-key={cat}
-onClick={()=>
-setActiveDescribeCategory(cat)
-}
-className={
-activeDescribeCategory===cat
-? "bg-blue-600 text-white px-6 py-3 rounded-full"
-: "border px-6 py-3 rounded-full"
-}
->
-{cat}
-</button>
-))
-}
-
-</div>
-
-<br />
+<TodayVisitors appointments={appointments} />
+)}
 
 
-{/* Table */}
-{/* SEARCH BAR */}
-<div className="mb-6">
+{page==="patients" && (
 
-<input
-type="text"
-placeholder="Search Medicine / Category"
-value={search}
-onChange={(e)=>setSearch(e.target.value)}
-className="
-w-full
-border
-p-4
-rounded-2xl
-outline-none
-text-lg
-"
+<PatientsTable
+patientsData={patientsData}
 />
 
-</div>
-
-{/* TABLE */}
-<div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
-
-<table className="w-full">
-
-<thead>
-
-<tr className="border-b">
-
-<th className="py-4 w-[25%] text-center">
-Type
-</th>
-
-<th className="py-4 w-[35%] text-center">
-Medicine
-</th>
-
-<th className="py-4 w-[25%] text-center">
-Qty
-</th>
-
-<th className="py-4 w-[15%] text-center">
-
-<button
-onClick={()=>window.print()}
-className="
-bg-blue-600
-hover:bg-blue-700
-text-white
-px-6
-py-3
-rounded-2xl
-font-semibold
-mx-auto
-flex
-items-center
-justify-center
-"
->
-🖨 Print
-</button>
-
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-
-{
-describeItems
-.filter(item => {
-
-const matchCategory =
-activeDescribeCategory === "All"
-? true
-: item.type === activeDescribeCategory;
-
-const matchSearch =
-item.type.toLowerCase().includes(search.toLowerCase()) ||
-
-(item.medicine || "")
-.toLowerCase()
-.includes(search.toLowerCase());
-
-return matchCategory && matchSearch;
-
-})
-
-.map((item,index)=>(
-<tr
-key={item.id}
-className="
-border-b
-text-center
-align-middle
-"
->
-
-<td className="py-5 text-center align-middle">{item.type}</td>
-
-<td className="py-5 text-center align-middle">
-{item.medicine || item.subCategory}
-</td>
-
-<td className="py-5 text-center align-middle">
-
-<div className="flex justify-center items-center gap-4">
-
-<button
-onClick={()=>{
-const updated = [...describeItems];
-
-if(updated[index].qty > 0){
-updated[index].qty -= 1;
-}
-
-setDescribeItems(updated);
-
-localStorage.setItem(
-"pharmacyItems",
-JSON.stringify(updated)
-);
-}}
-className="bg-red-500 text-white w-8 h-8 rounded-full"
->
--
-</button>
-
-<span className="font-bold text-lg">
-{item.qty}
-</span>
-
-<button
-onClick={()=>{
-const updated = [...describeItems];
-
-updated[index].qty += 1;
-
-setDescribeItems(updated);
-
-localStorage.setItem(
-"pharmacyItems",
-JSON.stringify(updated)
-);
-}}
-className="bg-green-500 text-white w-8 h-8 rounded-full"
->
-+
-</button>
-
-</div>
-
-</td>
-
-</tr>
-))
-}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
 )}
 
             {/* ================= HOME PAGE ================= */}
