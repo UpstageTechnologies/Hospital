@@ -84,9 +84,33 @@ const Login = () => {
     }
     
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-    
-      localStorage.setItem("patientLogin","true");
+      const userCredential =
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+const user = userCredential.user;
+
+localStorage.setItem("patientLogin","true");
+
+localStorage.setItem(
+"patientEmail",
+user.email
+);
+
+const patientData = {
+patientBasicInfo:{
+name:user.displayName || email.split("@")[0],
+email:user.email
+}
+};
+
+localStorage.setItem(
+"patientData",
+JSON.stringify(patientData)
+);
     
       if (isDemo) {
         navigate("/demopatientdashboard");

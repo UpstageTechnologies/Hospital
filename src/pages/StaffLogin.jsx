@@ -38,15 +38,73 @@ const StaffLogin = () => {
       }
   
       try {
-          await signInWithEmailAndPassword(auth, staffId, password);
-  
-          localStorage.setItem("staffLogin","true");
-  
-          alert("Staff Login Success");
+
+        const staffRef =
+        doc(db, "staffs", staffId);
+    
+        const staffSnap =
+        await getDoc(staffRef);
+    
+        if (!staffSnap.exists()) {
+    
+            alert("Staff not found");
+            return;
+    
+        }
+    
+        const data = staffSnap.data();
+    
+        if (
+          data.staffAccount?.password !== password
+        ) {
+    
+            alert("Wrong Password");
+            return;
+    
+        }
+    
+        // ✅ LOGIN SAVE
+        localStorage.setItem(
+          "staffLogin",
+          "true"
+        );
+    
+        localStorage.setItem(
+          "staffId",
+          staffId
+        );
+    
+        localStorage.setItem(
+          "staffEmail",
+          data.staffBasicInfo?.email || ""
+        );
+    
+        localStorage.setItem(
+          "staffName",
+          data.staffBasicInfo?.name || "Staff"
+        );
+    
+        localStorage.setItem(
+          "staffData",
+          JSON.stringify(data)
+        );
+    
+        alert("Staff Login Success");
+    
+        if(isDemo){
           navigate("/demostaffdashboard");
-      } catch (err) {
-          alert(err.message);
-      }
+        }
+        else{
+          navigate("/staff-dashboard");
+        }
+    
+    } catch (err) {
+    
+        console.log(err);
+    
+        alert(err.message);
+    
+    }
   };
 
     return (

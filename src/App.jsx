@@ -12,6 +12,7 @@ import DemoMasterDashboard from "./pages/DemoMasterDashboard.jsx"
 import DemoAdminDashboard from "./pages/DemoAdminDashboard.jsx";
 import DemoDoctorDashboard from "./pages/DemoDoctorDashboard.jsx";
 import DemoStaffDashboard from "./pages/DemoStaffDashboard.jsx";
+import StaffDashboard from "./pages/StaffDashboard";
 import DemoPatientDashboard from "./pages/DemoPatientDashboard.jsx";
 import DemoPharmasiDashboard from "./pages/DemoPharmasiDashboard";
 import DemoMyProfile from "./pages/DemoMyProfile";
@@ -72,8 +73,6 @@ const App = () => {
     return () => clearTimeout(timer);
   
   }, [location.pathname]);
-
-  
   const hideLayout = [
     "/",
     "/upstage",
@@ -118,6 +117,7 @@ const App = () => {
         <Route path="/demoadmindashboard" element={<DemoAdminDashboard />} />
         <Route path="/demodoctordashboard" element={<DemoDoctorDashboard />} />
         <Route path="/demostaffdashboard" element={<DemoStaffDashboard />} />
+        <Route path="/staff-dashboard" element={<StaffDashboard />}/>
         <Route path="/demopatientdashboard" element={<DemoPatientDashboard />} />
         <Route path="/demopharmasidashboard" element={<DemoPharmasiDashboard />}/>
         <Route path="/demomyprofile" element={<DemoMyProfile />} />

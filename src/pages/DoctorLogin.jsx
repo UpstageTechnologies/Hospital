@@ -51,9 +51,6 @@ const DoctorLogin = () => {
         image: user.photoURL,
         role: "doctor"
       }, { merge: true })
-
-      alert("Doctor Google Signup Success")
-      console.log("Login success", email)
       if(isDemo){
         navigate("/demodoctordashboard")
         }else{
@@ -80,9 +77,10 @@ const DoctorLogin = () => {
       );
       
       localStorage.setItem(
-      "doctorEmail",
-      email
-      );
+        "hospitalName",
+        data.hospital.toLowerCase().trim()
+        );
+       
       
       window.location.href="/#/demodoctordashboard";
       
@@ -134,27 +132,40 @@ const DoctorLogin = () => {
 
         alert("Doctor Login Success");
 
-        localStorage.setItem(
-          "hospitalName",
-          data.hospitalName
-          );
+localStorage.setItem(
+"hospitalName",
+data.hospital
+);
 
-        localStorage.setItem(
-        "doctorLogin",
-        "true"
-        );
-        
-        localStorage.setItem(
-        "doctorEmail",
-        email
-        );
-        
-        if(isDemo){
-        window.location.href="/#/demodoctordashboard"
-        }else{
-        navigate("/doctor-profile")
-        }
+console.log(
+"HOSPITAL",
+data.hospital
+);
 
+localStorage.setItem(
+"doctorLogin",
+"true"
+);
+
+localStorage.setItem(
+"doctorEmail",
+email
+);
+localStorage.setItem(
+  "doctorName",
+  data.doctorBasicInfo?.name || "Doctor"
+);
+
+localStorage.setItem(
+  "doctorData",
+  JSON.stringify(data)
+);
+
+if(isDemo){
+window.location.href="/#/demodoctordashboard"
+}else{
+navigate("/doctor-profile")
+}
         if(isDemo){
           window.location.href="/#/demodoctordashboard"
           }else{
@@ -347,14 +358,18 @@ border border-white/30 rounded-2xl ">
 
           <div className="w-full">
             {/* <p>Doctor ID</p> */}
-            <input type="doctorid" className="w-full p-3 mt-1 rounded-lg border border-gray-300 focus:outline-none"
+            <input
+type="text"
+placeholder="Enter Doctor ID" className="w-full p-3 mt-1 rounded-lg border border-gray-300 focus:outline-none"
               onChange={(e) => setEmail(e.target.value)} value={email} required />
           </div>
 
           <div className="relative w-full">
             {/* <p>Password</p> */}
             <input autoComplete="new-password" className="border border-zinc-300 rounded w-full p-2 mt-1 pr-10"
-              type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)}
+              type={showPassword ? "text" : "password"} 
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
               value={password} required />
             <span
               className="absolute right-3 top-[65%] -translate-y-1/2 cursor-pointer text-gray-500"

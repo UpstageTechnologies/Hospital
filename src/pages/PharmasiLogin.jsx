@@ -24,21 +24,71 @@ useEffect(() => {
 
     const handleLogin = () => {
 
+      if(isDemo){
+      
       if (
-        pharmasiId === "demopharmasi002" &&
-        password === "demo002"
+      pharmasiId === "demopharmasi002" &&
+      password === "demo002"
       ) {
-        localStorage.setItem("pharmasiLogin", "true");
-        if (isDemo) {
-          navigate("/demopharmasidashboard");
-        } else {
-          navigate("/pharmasi-dashboard");
-        }
-      } else {
-        alert("Invalid Pharmasi ID or Password");
+      
+      localStorage.setItem("pharmasiLogin", "true");
+      
+      const pharmasiData = {
+      pharmasiBasicInfo:{
+      name: pharmasiId,
+      id: pharmasiId
       }
-    
-    };
+      };
+      
+      localStorage.setItem(
+      "pharmasiData",
+      JSON.stringify(pharmasiData)
+      );
+      
+      navigate("/demopharmasidashboard");
+      
+      }
+      else{
+      
+      alert("Invalid Demo Login");
+      
+      }
+      
+      }
+      
+      else{
+      
+      if(pharmasiId && password){
+      
+      localStorage.setItem(
+      "pharmasiLogin",
+      "true"
+      );
+      
+      const pharmasiData = {
+      pharmasiBasicInfo:{
+      name: pharmasiId,
+      id: pharmasiId
+      }
+      };
+      
+      localStorage.setItem(
+      "pharmasiData",
+      JSON.stringify(pharmasiData)
+      );
+      
+      navigate("/pharmasi-dashboard");
+      
+      }
+      else{
+      
+      alert("Enter ID & Password");
+      
+      }
+      
+      }
+      
+      };
 
 
 return (

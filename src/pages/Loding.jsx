@@ -85,6 +85,47 @@ const Loding = () => {
             localStorage.setItem("hospitalName", hospital);
 localStorage.setItem("selectedHospital", hospital.toLowerCase());
 
+// ✅ CLEAR OLD LOGIN SESSION
+localStorage.removeItem("adminLogin");
+localStorage.removeItem("adminEmail");
+localStorage.removeItem("adminName");
+localStorage.removeItem("adminData");
+
+localStorage.removeItem("doctorLogin");
+localStorage.removeItem("doctorEmail");
+localStorage.removeItem("doctorName");
+localStorage.removeItem("doctorData");
+
+localStorage.removeItem("patientLogin");
+localStorage.removeItem("patientEmail");
+localStorage.removeItem("patientName");
+localStorage.removeItem("patientData");
+
+localStorage.removeItem("staffLogin");
+localStorage.removeItem("staffEmail");
+localStorage.removeItem("staffName");
+localStorage.removeItem("staffData");
+localStorage.removeItem("staffId");
+
+localStorage.removeItem("masterLogin");
+localStorage.removeItem("masterData");
+
+localStorage.removeItem("pharmasiLogin");
+localStorage.removeItem("pharmasiData");
+localStorage.removeItem("pharmasiId");
+
+localStorage.removeItem("doctorLogin");
+localStorage.removeItem("doctorData");
+
+localStorage.removeItem("patientLogin");
+localStorage.removeItem("patientData");
+
+localStorage.removeItem("staffLogin");
+localStorage.removeItem("staffData");
+
+localStorage.removeItem("adminLogin");
+localStorage.removeItem("adminData");
+
            
             if (user) {
                 await setDoc(doc(db, "users", user.uid), {

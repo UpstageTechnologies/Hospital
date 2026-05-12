@@ -30,52 +30,48 @@ localStorage.getItem("hospitalName");
 
 useEffect(() => {
 
-    if(
-        location.pathname.includes("doctor-dashboard") ||
-        location.pathname.includes("admin-dashboard") ||
-        location.pathname.includes("staff-dashboard") ||
-        location.pathname.includes("patient-dashboard")
-        ){
-        setHospitalLogo(assets.logo);
-        return;
-        }
+const hospitalName =
+localStorage.getItem("hospitalName");
 
-    const hospitalName =
-        localStorage.getItem("hospitalName");
+if (!hospitalName) {
 
-    if (!hospitalName) return;
-
-    if (hospitalName.toLowerCase() === "gh") {
-
-        setHospitalLogo(ghLogo);
-
-    }
-
-    else if (
-        hospitalName.toLowerCase() === "apollo"
-    ) {
-
-        setHospitalLogo(apolloLogo);
-
-    }
-    else if (
-        hospitalName.toLowerCase() === "arunhospital"
-    ) {
-    
-        setHospitalLogo(arunhospitalLogo);
+    setHospitalLogo(ghLogo);
+    return;
     
     }
 
-    else if (
-        hospitalName.toLowerCase() ===
-        "rajesh hospital"
-    ) {
+if (hospitalName.toLowerCase() === "gh") {
 
-        setHospitalLogo(rajeshLogo);
+setHospitalLogo(ghLogo);
 
-    }
+}
 
-}, []);
+else if (
+hospitalName.toLowerCase() === "apollo"
+) {
+
+setHospitalLogo(apolloLogo);
+
+}
+
+else if (
+hospitalName.toLowerCase() === "arunhospital"
+) {
+
+setHospitalLogo(arunhospitalLogo);
+
+}
+
+else if (
+hospitalName.toLowerCase() ===
+"rajesh hospital"
+) {
+
+setHospitalLogo(rajeshLogo);
+
+}
+
+}, [location.pathname]);
 
 
     const [showProfileMenu, setShowProfileMenu] = useState(false)
@@ -83,35 +79,8 @@ useEffect(() => {
     const [isMaster, setIsMaster] = useState(false)
     const [userImage, setUserImage] = useState(assets.profile_pic)
     const [user, setUser] = useState(false);
-    useEffect(() => {
-
-        const unsubscribe =
-        onAuthStateChanged(auth, async (currentUser) => {
-        
-        if(currentUser){
-        
-        setUser(true);
-        
-        setUserName(
-        currentUser.displayName || "Profile"
-        );
-        
-        }
-        else{
-        
-        setUser(false);
-        setUserName("");
-        
-        }
-        
-        });
-        
-        return () => unsubscribe();
-        
-        }, []);
-
-
     const [userName,setUserName] = useState("");
+    
 const [userRole,setUserRole] = useState("");
     const [showLogoutPopup, setShowLogoutPopup] = useState(false)
 
@@ -129,153 +98,146 @@ const [userRole,setUserRole] = useState("");
         return () => window.removeEventListener("storage", checkMaster)
 
     }, [])
-
     useEffect(() => {
 
-        const unsubscribe =
-        onAuthStateChanged(auth, async (currentUser) => {
+        const doctorEmail =
+        localStorage.getItem("doctorEmail");
         
-            if(currentUser){
-                setUser(true);
-                }
+        const patientEmail =
+        localStorage.getItem("patientEmail");
         
-        if (!currentUser) return;
+        const staffEmail =
+        localStorage.getItem("staffEmail");
         
-        try {
+        const adminEmail =
+        localStorage.getItem("adminEmail");
         
-        const collections = [
-        "doctors",
-        "patients",
-        "staff",
-        "master",
-        "admin"
-        ];
+        const masterLogin =
+        localStorage.getItem("masterLogin");
         
-        for (const col of collections) {
-        
-        const snap = await getDocs(collection(db,col));
-        
-        let foundUser = null;
-        
-        snap.forEach((docItem) => {
-        
-        const data = docItem.data();
-        
-        if (
-        data.email &&
-        data.email.toLowerCase().trim() ===
-        currentUser.email.toLowerCase().trim()
-        ) {
-        
-        foundUser = data;
-        
-        }
-        
-        });
-        
-        if (foundUser) {
-        
-        setUserName(
-        foundUser.doctorName ||
-        foundUser.patientName ||
-        foundUser.name ||
-        foundUser.fullName ||
-        "User"
-        );
-        
-        setUserRole(col);
-        
-        setUserImage(
-        foundUser.image ||
-        assets.profile_pic
-        );
-        
-        break;
-        
-        }
-        
-        }
-        
-        }
-        catch(err){
-        console.log(err)
-        }
-        
-        });
-        
-        return () => unsubscribe();
-        
-        }, []);
-        useEffect(() => {
-
-            const doctorEmail =
-            localStorage.getItem("doctorEmail");
-            
-            const patientEmail =
-            localStorage.getItem("patientEmail");
-            
-            const staffEmail =
-            localStorage.getItem("staffEmail");
-            
-            const adminEmail =
-            localStorage.getItem("adminEmail");
-            
-            const masterLogin =
-            localStorage.getItem("masterLogin");
-            
-            if(
+        if(
             doctorEmail ||
             patientEmail ||
             staffEmail ||
             adminEmail ||
-            masterLogin
+            masterLogin === "true"
             ){
-            
+        
+        setUser(true);
+        
+        }
+        else{
+        
+        setUser(false);
+        
+        }
+        
+    }, []);
+    useEffect(() => {
+
+        const adminData =
+        JSON.parse(
+          localStorage.getItem("adminData")
+        );
+      
+        const doctorData =
+        JSON.parse(
+          localStorage.getItem("doctorData")
+        );
+
+        const patientData =
+JSON.parse(
+localStorage.getItem("patientData")
+);
+
+const staffData =
+JSON.parse(
+localStorage.getItem("staffData")
+);
+
+const pharmasiData =
+JSON.parse(
+localStorage.getItem("pharmasiData")
+);
+
+const masterData =
+JSON.parse(
+localStorage.getItem("masterData")
+);
+      
+        if(adminData){
+      
+          setUser(true);
+      
+          setUserName(
+            adminData.adminBasicInfo?.name || "Admin"
+          );
+      
+          setUserRole("admins");
+      
+        }
+      
+        else if(doctorData){
+      
+          setUser(true);
+      
+          setUserName(
+            doctorData.doctorBasicInfo?.name || "Doctor"
+          );
+      
+          setUserRole("doctors");
+      
+        }
+
+        else if(patientData){
+
             setUser(true);
             
+            setUserName(
+            patientData.patientBasicInfo?.name || "Patient"
+            );
+            
+            setUserRole("patients");
+            
             }
-            else{
+
+            else if(staffData){
+
+                setUser(true);
             
-            setUser(false);
+                setUserName(
+                  staffData.staffBasicInfo?.name || "Staff"
+                );
+            
+                setUserRole("staffs");
             
             }
-            
-            }, []);
 
+            else if(pharmasiData){
 
-    const handleImageChange = async (e) => {
-        const file = e.target.files[0]
-
-        if (file) {
-
-            const reader = new FileReader()
-
-            reader.onloadend = async () => {
-
-                const imageUrl = reader.result
-
-                setUserImage(imageUrl)
-
-                const user = auth.currentUser
-
-                if (user) {
-
-                    await setDoc(doc(db, "users", user.uid), {
-                        image: imageUrl
-                    }, { merge: true })
-
+                setUser(true);
+                
+                setUserName(
+                pharmasiData.pharmasiBasicInfo?.name || "Pharmasi"
+                );
+                
+                setUserRole("pharmasi");
+                
                 }
 
-            }
+                else if(masterData){
 
-            reader.readAsDataURL(file)
-
-        }
-    }
-
-
-
-
+                    setUser(true);
+                    
+                    setUserName(
+                    masterData.masterBasicInfo?.name || "Master"
+                    );
+                    
+                    setUserRole("master");
+                    
+                    }
+      
+      }, []);
     return (
 <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-300 px-4 md:px-10 relative'>
 <div className="flex items-center gap-4">
@@ -297,11 +259,13 @@ alt="logo"
 </div>
 {
 !(
-location.pathname.includes("patient-dashboard") ||
-location.pathname.includes("doctor-dashboard") ||
-location.pathname.includes("staff-dashboard") ||
-location.pathname.includes("admin-dashboard")
-) && (
+    location.pathname.includes("patient-dashboard") ||
+    location.pathname.includes("staff-dashboard") ||
+    location.pathname.includes("/account") ||
+    location.pathname.includes("doctor-profile") ||
+    location.pathname.includes("pharmasi-dashboard") ||
+    location.pathname.includes("master-dashboard")
+    ) && (
 <ul className="hidden md:flex items-center gap-10 font-medium mx-auto">
                         {isMaster && location.pathname === "/account" ? (
 
@@ -353,28 +317,34 @@ location.pathname.includes("admin-dashboard")
             </button>
 
             <button onClick={() => {
-auth.signOut()
-localStorage.removeItem("masterLogin")
-setShowLogoutPopup(false)
 
-// 👇 இது தான் correct logic
-const path = location.pathname
+auth.signOut();
 
-if (path.includes("account")) {
-navigate("/account")
-}
-else if (path.includes("doctor")) {
-navigate("/doctor-dashboard")
-}
-else if (path.includes("patient")) {
-navigate("/patient-dashboard")
-}
-else if (path.includes("staff")) {
-navigate("/staff-dashboard")
-}
-else {
-navigate("/home")
-}
+// ✅ CLEAR ALL LOGIN DATA
+localStorage.removeItem("masterLogin");
+localStorage.removeItem("adminLogin");
+localStorage.removeItem("adminEmail");
+localStorage.removeItem("adminName");
+localStorage.removeItem("adminData");
+localStorage.removeItem("doctorName");
+localStorage.removeItem("doctorData");
+localStorage.removeItem("doctorLogin");
+localStorage.removeItem("patientEmail");
+localStorage.removeItem("staffId");
+localStorage.removeItem("staffName");
+localStorage.removeItem("staffData");
+localStorage.removeItem("staffLogin");
+
+setShowLogoutPopup(false);
+
+// ✅ RESET UI
+setUser(false);
+setUserName("");
+
+// ✅ GO HOME
+setShowProfileMenu(false);
+navigate("/home");
+
 }}
                 className="px-4 py-2 bg-red-500 text-white rounded"
             >

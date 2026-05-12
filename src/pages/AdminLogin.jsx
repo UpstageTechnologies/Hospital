@@ -5,6 +5,8 @@ import {
     createUserWithEmailAndPassword,
     signInWithPopup
 } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
@@ -30,46 +32,86 @@ const AdminLogin = () => {
     
 
     const fromRole = location.state?.fromRole === true;
-
-
     const handleLogin = async () => {
 
+        // ✅ DEMO LOGIN
         if (
             email === "demoadminid001" &&
             password === "demo001"
         ){
-        
             localStorage.setItem("adminLogin", "true");
-        
-            alert("Admin Login Success");
 
-if (isDemo) {
-  navigate("/demoadmindashboard");
-} else {
-  navigate("/account"); // 👈 create this route
-}
+            localStorage.setItem(
+              "adminEmail",
+              "demoadminid001"
+            );
+            
+            localStorage.setItem(
+              "adminName",
+              "Demo Admin"
+            );
+    
+    
+            navigate("/account");
+    
             return;
         }
-        
+    
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-        
-            localStorage.setItem("adminLogin","true");
-        
-            alert("Admin Login Success");
-            alert("Admin Login Success");
+    
+            // ✅ FIRESTORE FETCH USING ADMIN ID
+            const adminRef = doc(db, "admins", email);
+    
+            const adminSnap = await getDoc(adminRef);
+    
+            if (!adminSnap.exists()) {
+    
+                alert("Admin ID not found");
+    
+                return;
+            }
+    
+            const adminData = adminSnap.data();
+    
+            // ✅ PASSWORD CHECK
+            if (
+              adminData.adminAccount?.password !== password
+            ) {
+    
+                alert("Invalid Password");
+    
+                return;
+            }
+    
+           // ✅ SAVE LOGIN
+localStorage.setItem("adminLogin", "true");
 
-if (isDemo) {
-  navigate("/demoadmindashboard");
-} else {
-  navigate("/account"); // 👈 create this route
-}
-        }catch (err) {
+localStorage.setItem(
+  "adminEmail",
+  email
+);
+
+localStorage.setItem(
+  "adminName",
+  adminData.adminBasicInfo?.name || "Admin"
+);
+
+localStorage.setItem(
+  "adminData",
+  JSON.stringify(adminData)
+);
+    
+    
+            navigate("/account");
+    
+        } catch (err) {
+    
+            console.log(err);
+    
             alert(err.message);
+    
         }
     };
-
-
     const handleRegister = async () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
@@ -264,8 +306,8 @@ rounded-2xl p-6 sm:p-8 w-full max-w-[350px]">
 
                 {/* EMAIL */}
                 <input
-                    type="email"
-                    placeholder="Enter Email"
+                    type="text"
+                    placeholder="Enter Admin ID"
                     autoComplete="off"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

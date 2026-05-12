@@ -95,9 +95,33 @@ const MasterLogin = () => {
   }
 
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    const userCredential =
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
 
-    localStorage.setItem("masterLogin","true");
+const user = userCredential.user;
+
+localStorage.setItem(
+"masterLogin",
+"true"
+);
+
+const masterData = {
+masterBasicInfo:{
+name:
+user.displayName ||
+email.split("@")[0],
+email:user.email
+}
+};
+
+localStorage.setItem(
+"masterData",
+JSON.stringify(masterData)
+);
 
     alert("Master Login Success");
     if (isDemo) {
