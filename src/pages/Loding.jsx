@@ -82,7 +82,8 @@ const Loding = () => {
             const user = auth.currentUser;
 
             
-            localStorage.setItem("selectedHospital", hospital.toLowerCase());
+            localStorage.setItem("hospitalName", hospital);
+localStorage.setItem("selectedHospital", hospital.toLowerCase());
 
            
             if (user) {

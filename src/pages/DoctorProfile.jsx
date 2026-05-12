@@ -12,6 +12,7 @@ import TodayVisitors from "../components/TodayVisitors";
 import PatientsTable from "../components/PatientsTable";
 
 
+
 const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type = "doctor" }) => {
 
     const [popup, setPopup] = useState(false)   
@@ -311,6 +312,7 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [selected, setSelected] = useState(null)
     const [selectedDate, setSelectedDate] = useState(null)
     const [selectedAppointment, setSelectedAppointment] = useState(null)
+    const [selectedPatient, setSelectedPatient] = useState(null)
     const [step, setStep] = useState(1)
     const [patientTab, setPatientTab] = useState("current")
     const [doctorEvents, setDoctorEvents] = useState({})
@@ -661,9 +663,12 @@ useEffect(() => {
         if(!doctorData){
         return <p className="p-10">Loading...</p>
         }
-    return (
+        return (
 
-        <div className="flex flex-col md:flex-row min-h-screen pb-16 md:pb-0">
+            <>
+           
+            
+            <div className="flex flex-col md:flex-row min-h-[calc(100vh-90px)] pb-16 md:pb-0">
 
             {/* LEFT PANEL */}
             <div className="hidden md:block w-full md:w-64 bg-blue-600 text-white p-3 md:p-6">
@@ -671,10 +676,6 @@ useEffect(() => {
 
                 <p onClick={() => setPage("appointments")} className="mb-3 md:mb-3 cursor-pointer shrink-0">
                     Appointments
-                </p>
-
-                <p onClick={() => setPage("profile")} className="mb-3 md:mb-3 cursor-pointer shrink-0">
-                    Profile
                 </p>
 
                 <p onClick={() => setPage("settings")} className="mb-3 md:mb-3 cursor-pointer shrink-0">
@@ -1153,9 +1154,12 @@ patientsData={patientsData}
     <span>Appointments</span>
 </button>
 
-<button onClick={() => setPage("profile")} className="flex flex-col items-center text-sm">
-    👤
-    <span>Profile</span>
+<button
+  onClick={() => setPage("patients")}
+  className="flex flex-col items-center text-sm"
+>
+    🧑‍⚕️
+    <span>Patients</span>
 </button>
 
 <button onClick={() => setPage("describe")} className="flex flex-col items-center text-sm">
@@ -1170,109 +1174,6 @@ patientsData={patientsData}
 
 </div>
 
-            {page === "profile" && (
-                <div className="p-8 w-full">
-
-                    <h1 className="text-2xl font-bold mb-6">
-                        Patient History
-                    </h1>
-
-                    {/* TABS */}
-                    <div className="flex gap-4 mb-6">
-
-                        <button
-                            onClick={() => setPatientTab("current")}
-                            className={`px-4 py-2 rounded-xl
-          ${patientTab === "current"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100"}
-        `}
-                        >
-                            Current Condition
-                        </button>
-
-                        <button
-                            onClick={() => setPatientTab("previous")}
-                            className={`px-4 py-2 rounded-xl
-          ${patientTab === "previous"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100"}
-        `}
-                        >
-                            Previous Condition
-                        </button>
-
-                        <button
-                            onClick={() => setPatientTab("details")}
-                            className={`px-4 py-2 rounded-xl
-          ${patientTab === "details"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100"}
-        `}
-                        >
-                            Patient Details
-                        </button>
-
-                    </div>
-
-                    {/* CONTENT */}
-
-                    {patientTab === "current" && (
-                        <div className="bg-blue-50 p-6 rounded-xl">
-                            <h3 className="font-bold text-blue-700 mb-2">
-                                Current Condition
-                            </h3>
-                            <p>Patient currently has fever and mild cough.</p>
-                        </div>
-                    )}
-
-                    {patientTab === "previous" && (
-                        <div className="bg-yellow-50 p-6 rounded-xl">
-                            <h3 className="font-bold text-yellow-700 mb-2">
-                                Previous Condition
-                            </h3>
-                            <p>Patient had viral infection last month.</p>
-                        </div>
-                    )}
-
-                    {patientTab === "details" && (
-                        <div className="bg-gray-50 p-6 rounded-2xl space-y-4">
-
-                            {/* BASIC DETAILS */}
-                            <div className="bg-white p-5 rounded-xl shadow space-y-2">
-                                <p><b>Hospital Name:</b> City Hospital</p>
-                                <p><b>Doctor Name:</b> {doctorData?.name}</p>
-                                <p><b>Patient Name:</b> Sundar</p>
-                                <p><b>Age:</b> 35</p>
-                                <p><b>Mobile Number:</b> 5678909876</p>
-                                <p><b>Address:</b> Coimbatore</p>
-                            </div>
-
-                            {/* CURRENT CONDITION */}
-                            <div className="bg-blue-50 p-5 rounded-xl">
-                                <p className="font-semibold text-blue-700">
-                                    Current Condition
-                                </p>
-                                <p className="text-gray-700 mt-1">
-                                    Fever, mild cough, under treatment.
-                                </p>
-                            </div>
-
-                            {/* PREVIOUS CONDITION */}
-                            <div className="bg-yellow-50 p-5 rounded-xl">
-                                <p className="font-semibold text-yellow-700">
-                                    Previous Condition
-                                </p>
-                                <p className="text-gray-700 mt-1">
-                                    Viral infection, recovered last month.
-                                </p>
-                            </div>
-
-                        </div>
-                    )}
-
-                </div>
-            )}
             {page === "settings" && (
                 <div className="w-full px-2 sm:px-4 md:p-8 flex justify-center md:justify-center">
 
@@ -1290,8 +1191,10 @@ patientsData={patientsData}
 
 
 
-        </div>
-    )
+</div>
+
+</>
+)
 }
 
 export default DoctorProfile

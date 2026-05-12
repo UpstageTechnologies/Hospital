@@ -67,7 +67,7 @@ const App = () => {
   
       setShowUpgrade(true);
   
-    }, 5 * 1000);
+    }, 10 * 60 * 1000);
   
     return () => clearTimeout(timer);
   

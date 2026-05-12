@@ -135,6 +135,11 @@ const DoctorLogin = () => {
         alert("Doctor Login Success");
 
         localStorage.setItem(
+          "hospitalName",
+          data.hospitalName
+          );
+
+        localStorage.setItem(
         "doctorLogin",
         "true"
         );

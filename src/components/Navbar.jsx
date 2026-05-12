@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
+import ghLogo from '/logos/gh.png'
+import apolloLogo from '/logos/appolo.png'
+import rajeshLogo from '/logos/rajesh.png'
 import { auth, db } from '../firebase'
 import {
     doc,
@@ -18,11 +21,73 @@ const Navbar = () => {
     const location = useLocation();
 
     const [hospitalLogo, setHospitalLogo] = useState(assets.logo);
+
+useEffect(() => {
+
+    const hospitalName =
+        localStorage.getItem("hospitalName");
+
+    if (!hospitalName) return;
+
+    if (hospitalName.toLowerCase() === "gh") {
+
+        setHospitalLogo(ghLogo);
+
+    }
+
+    else if (
+        hospitalName.toLowerCase() === "apollo"
+    ) {
+
+        setHospitalLogo(apolloLogo);
+
+    }
+
+    else if (
+        hospitalName.toLowerCase() ===
+        "rajesh hospital"
+    ) {
+
+        setHospitalLogo(rajeshLogo);
+
+    }
+
+}, []);
+
+
     const [showProfileMenu, setShowProfileMenu] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
     const [isMaster, setIsMaster] = useState(false)
     const [userImage, setUserImage] = useState(assets.profile_pic)
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(false);
+    useEffect(() => {
+
+        const unsubscribe =
+        onAuthStateChanged(auth, async (currentUser) => {
+        
+        if(currentUser){
+        
+        setUser(true);
+        
+        setUserName(
+        currentUser.displayName || "Profile"
+        );
+        
+        }
+        else{
+        
+        setUser(false);
+        setUserName("");
+        
+        }
+        
+        });
+        
+        return () => unsubscribe();
+        
+        }, []);
+
+
     const [userName,setUserName] = useState("");
 const [userRole,setUserRole] = useState("");
     const [showLogoutPopup, setShowLogoutPopup] = useState(false)
@@ -47,7 +112,9 @@ const [userRole,setUserRole] = useState("");
         const unsubscribe =
         onAuthStateChanged(auth, async (currentUser) => {
         
-        setUser(currentUser);
+            if(currentUser){
+                setUser(true);
+                }
         
         if (!currentUser) return;
         
@@ -116,53 +183,41 @@ const [userRole,setUserRole] = useState("");
         return () => unsubscribe();
         
         }, []);
+        useEffect(() => {
 
-    useEffect(() => {
-
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-
-            let hospital = localStorage.getItem("selectedHospital");
-
-            if (!hospital && currentUser) {
-                const docRef = doc(db, "users", currentUser.uid);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    hospital = docSnap.data().hospital;
-                }
+            const doctorEmail =
+            localStorage.getItem("doctorEmail");
+            
+            const patientEmail =
+            localStorage.getItem("patientEmail");
+            
+            const staffEmail =
+            localStorage.getItem("staffEmail");
+            
+            const adminEmail =
+            localStorage.getItem("adminEmail");
+            
+            const masterLogin =
+            localStorage.getItem("masterLogin");
+            
+            if(
+            doctorEmail ||
+            patientEmail ||
+            staffEmail ||
+            adminEmail ||
+            masterLogin
+            ){
+            
+            setUser(true);
+            
             }
-
-            if (location.pathname.startsWith("/upstage")) {
-                setHospitalLogo("/logos/upstage.png");
-                return;
+            else{
+            
+            setUser(false);
+            
             }
-
-           const name = (hospital || "").toLowerCase();
-
-            if (name.includes("rajesh")) {
-                setHospitalLogo("/logos/rajesh.png");
-            }
-            else if (name === "gh" || name.includes("government hospital")) {
-                setHospitalLogo("/logos/gh.png");
-            }
-            else if (name.includes("apollo")) {
-                setHospitalLogo("/logos/appolo.png");
-            }
-            else if (name.includes("vk")) {
-                setHospitalLogo("/logos/vk.png");
-            }
-            else if (name.includes("upstage")) {
-                setHospitalLogo("/logos/upstage.png");
-            }
-            else {
-                setHospitalLogo("/logos/default.png");
-            }
-
-        });
-
-        return () => unsubscribe();
-
-   }, [location.pathname]);
+            
+            }, []);
 
 
     const handleImageChange = async (e) => {
@@ -203,27 +258,27 @@ const [userRole,setUserRole] = useState("");
 <div className="flex items-center gap-4">
 
 
-  <button
-    onClick={() => navigate("/select-hospital")}
-    className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center shadow-md hover:scale-105 transition"
-  >
-    <span className="text-white text-lg relative -top-[1px]">
-      ←
-    </span>
-  </button>
 
-  <img
-    onClick={() => navigate("/home")}
-    className="w-16 h-16 object-contain cursor-pointer"
-    src={hospitalLogo}
-    alt="logo"
-  />
+<img
+onClick={() => navigate("/home")}
+className="
+w-[120px]
+h-[60px]
+object-contain
+cursor-pointer
+"
+src={hospitalLogo}
+alt="logo"
+/>
 
 </div>
-            {!(
-                location.pathname.startsWith("/doctor-profile") ||
-                location.pathname.startsWith("/patient-dashboard")
-            ) && (
+{
+!(
+location.pathname.includes("patient-dashboard") ||
+location.pathname.includes("doctor-dashboard") ||
+location.pathname.includes("staff-dashboard") ||
+location.pathname.includes("admin-dashboard")
+) && (
 <ul className="hidden md:flex items-center gap-10 font-medium mx-auto">
                         {isMaster && location.pathname === "/account" ? (
 
@@ -256,211 +311,6 @@ const [userRole,setUserRole] = useState("");
                     </ul>
                 )}
 
-                {/* MOBILE MENU */}
-
-<div className="flex items-center gap-4 md:hidden">
-
-{
-user ? (
-
-<>
-
-<img
-  onClick={(e) => {
-    e.stopPropagation()
-    setShowProfileMenu(prev => !prev)
-  }}
-  className='w-10 h-10 rounded-full object-cover cursor-pointer'
-  src={userImage}
-  alt=""
-/>
-
-<button
-  onClick={() => setShowMenu(!showMenu)}
-  className="text-3xl"
->
-  ☰
-</button>
-
-</>
-
-) : (
-
-<>
-
-<img
-  onClick={(e) => {
-    e.stopPropagation()
-    setShowProfileMenu(prev => !prev)
-  }}
-  className="w-10 h-10 cursor-pointer"
-  src={assets.login1_icon}
-  alt=""
-/>
-
-<button
-  onClick={() => setShowMenu(!showMenu)}
-  className="text-3xl"
->
-  ☰
-</button>
-
-</>
-
-)
-
-}
-
-</div>
-
-{showProfileMenu && (
-
-<div
-className="absolute top-20 right-4 bg-white shadow-xl rounded-xl p-4 flex flex-col gap-4 z-[9999] md:hidden w-52"
-onClick={(e) => e.stopPropagation()}
->
-
-{
-user ? (
-
-<>
-
-<button
-type="button"
-className="text-left cursor-pointer"
-onClick={(e) => {
-e.preventDefault()
-e.stopPropagation()
-setShowProfileMenu(false)
-navigate('/my-profile')
-}}
->
-My Profile
-</button>
-
-<button
-type="button"
-className="text-left cursor-pointer"
-onClick={(e) => {
-e.preventDefault()
-e.stopPropagation()
-setShowProfileMenu(false)
-navigate('/my-appointment')
-}}
->
-My Appointment
-</button>
-
-<button
-type="button"
-className="text-left cursor-pointer w-full"
-onClick={(e) => {
-e.preventDefault()
-e.stopPropagation()
-setShowProfileMenu(false)
-
-setTimeout(() => {
-setShowLogoutPopup(true)
-}, 100)
-
-}}
->
-Logout
-</button>
-
-</>
-
-) : (
-
-<>
-
-<p onClick={() => {
-navigate('/master-login')
-setShowProfileMenu(false)
-}}>
-Master Login
-</p>
-
-<p onClick={() => {
-navigate('/admin-login')
-setShowProfileMenu(false)
-}}>
-Admin Login
-</p>
-
-<p onClick={() => {
-navigate('/doctor-login')
-setShowProfileMenu(false)
-}}>
-Doctor Login
-</p>
-
-<p onClick={() => {
-navigate('/patient-login')
-setShowProfileMenu(false)
-}}>
-Patient Login
-</p>
-
-<p onClick={() => {
-navigate('/staff-login')
-setShowProfileMenu(false)
-}}>
-Staff Login
-</p>
-
-<p onClick={() => {
-navigate('/pharmasi-login')
-setShowProfileMenu(false)
-}}>
-Pharmasi Login
-</p>
-
-</>
-
-)
-
-}
-
-</div>
-
-)}
-
-{showMenu && (
-
-<div className="absolute top-20 right-4 bg-white shadow-xl rounded-xl p-4 flex flex-col gap-4 z-50 md:hidden w-44">
-
-<p onClick={() => {
-navigate("/home")
-setShowMenu(false)
-}}>
-Home
-</p>
-
-<p onClick={() => {
-navigate("/doctor")
-setShowMenu(false)
-}}>
-All Doctors
-</p>
-
-<p onClick={() => {
-navigate("/about")
-setShowMenu(false)
-}}>
-About
-</p>
-
-<p onClick={() => {
-navigate("/contact")
-setShowMenu(false)
-}}>
-Contact
-</p>
-
-</div>
-
-)}
 
 
 {showLogoutPopup && (
@@ -516,13 +366,13 @@ navigate("/home")
 
 )}
 
-<div className='hidden md:flex items-center gap-4 relative'>
+<div className='flex items-center gap-4 relative'>
 
                 {
                     user ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
 
 <p className="font-semibold">
-  {userName}
+  {userName || "Profile"}
 </p>
 
                         <img className='w-8 h-8 rounded-full object-cover' src={userImage} alt="" />
