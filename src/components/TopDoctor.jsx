@@ -20,10 +20,16 @@ const TopDoctor = ({ hospital }) => {
 
             <div className='w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 pt-5 px-3 sm:px-0'>
 
-                {doctors
-                    ?.filter(doc =>
-                        !hospital || doc.hospital?.toLowerCase().includes(hospital.toLowerCase())
-                    )
+            {doctors
+    ?.filter(doc =>
+
+        !hospital ||
+
+        doc.doctorBasicInfo?.address
+            ?.toLowerCase()
+            ?.includes(hospital.toLowerCase())
+
+    )
                     .slice(0, 10)
                     .map((doc, index) => (
 
@@ -37,7 +43,10 @@ const TopDoctor = ({ hospital }) => {
                             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'>
 
 
-                            <img className='w-full h-40 object-cover bg-blue-50' src={doc.image} alt="" />
+                            <img className='w-full h-40 object-cover bg-blue-50' src={
+  doc.image ||
+  doc.doctorDesignation?.doctorImage
+} alt="" />
 
                             <div className='p-4'>
                                 <div className='flex items-center gap-2 text-sm text-green-500'>
@@ -46,11 +55,16 @@ const TopDoctor = ({ hospital }) => {
                                 </div>
 
 
-                                <p className='font-medium'>{doc.name}</p>
-                                <p className='text-sm text-gray-600'>{doc.speciality}</p>
+                                <p className='font-medium'>
+  {doc.name || doc.doctorBasicInfo?.name}
+</p>
+
+<p className='text-sm text-gray-600'>
+  {doc.speciality || doc.doctorBasicInfo?.speciality}
+</p>
 
                                 <a href={doc.map} target="_blank" rel="noreferrer" className="text-blue-500 text-xs underline">
-                                    📍 {doc.hospital}
+                                📍 {doc.hospital || doc.doctorBasicInfo?.address}
                                 </a>
 
                             </div>

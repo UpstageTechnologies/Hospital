@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import ghLogo from '/logos/gh.png'
 import apolloLogo from '/logos/appolo.png'
 import rajeshLogo from '/logos/rajesh.png'
+import arunhospitalLogo from '/logos/arunhospital.png'
 import { auth, db } from '../firebase'
 import {
     doc,
@@ -41,6 +42,13 @@ useEffect(() => {
 
         setHospitalLogo(apolloLogo);
 
+    }
+    else if (
+        hospitalName.toLowerCase() === "arunhospital"
+    ) {
+    
+        setHospitalLogo(arunhospitalLogo);
+    
     }
 
     else if (

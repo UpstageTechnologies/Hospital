@@ -24,9 +24,24 @@ const Doctor = () => {
 
    
     if (selectedHospital) {
-      filtered = filtered.filter(doc =>
-        doc.hospital?.toLowerCase().includes(selectedHospital)
-      );
+
+      filtered = filtered.filter(doc => {
+    
+        const doctorHospital =
+          (
+            doc.hospital ||
+            doc.doctorBasicInfo?.address ||
+            ""
+          )
+          .toLowerCase()
+          .trim();
+    
+        return doctorHospital.includes(
+          selectedHospital.toLowerCase().trim()
+        );
+    
+      });
+    
     }
 
     setFilterDoc(filtered);
@@ -56,11 +71,21 @@ const Doctor = () => {
                 key={index}
                 onClick={(e) => {
                   e.stopPropagation();  
-                  navigate(`/appointment/${encodeURIComponent(item.email)}`);
+                  navigate(
+                    `/appointment/${
+                    encodeURIComponent(
+                    item.email ||
+                    item.doctorBasicInfo?.email
+                    )
+                    }`
+                    );
                 }}
                 className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'
               >
-                <img className='w-full h-[220px] object-cover object-top bg-blue-50' src={item.image} alt="" />
+                <img className='w-full h-[220px] object-cover object-top bg-blue-50' src={
+  item.image ||
+  item.doctorDesignation?.doctorImage
+} alt="" />
 
                 <div className='p-4'>
                   <div className='flex items-center gap-2 text-sm text-green-500'>
@@ -68,8 +93,8 @@ const Doctor = () => {
                     <p>Available</p>
                   </div>
 
-                  <p className='font-medium'>{item.name}</p>
-                  <p className='text-sm text-gray-600'>{item.speciality}</p>
+                  <p className='font-medium'>{item.name || item.doctorBasicInfo?.name}</p>
+                  <p className='text-sm text-gray-600'>{item.speciality || item.doctorBasicInfo?.speciality}</p>
                 </div>
               </div>
             ))
