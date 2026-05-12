@@ -25,9 +25,12 @@ const TopDoctor = ({ hospital }) => {
 
         !hospital ||
 
-        doc.doctorBasicInfo?.address
-            ?.toLowerCase()
-            ?.includes(hospital.toLowerCase())
+        doc.hospital
+?.toLowerCase()
+?.trim()
+.includes(
+hospital.toLowerCase().trim()
+)
 
     )
                     .slice(0, 10)

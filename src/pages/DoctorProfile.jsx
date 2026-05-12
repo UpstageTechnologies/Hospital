@@ -572,6 +572,20 @@ useEffect(() => {
     useEffect(() => {
 
         const email = localStorage.getItem("doctorEmail")
+
+        if(email === "demodoctor007"){
+
+            setDoctorData({
+            name:"Demo Doctor",
+            email:"demodoctor007",
+            image:assets.profile_pic,
+            speciality:"General physician"
+            });
+            
+            setDoctorImage(assets.profile_pic);
+            
+            return;
+            }
         if (!email) return
 
         const ref = collection(db, "users", "demoAdmin", "calendar")

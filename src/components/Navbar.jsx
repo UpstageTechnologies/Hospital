@@ -23,7 +23,22 @@ const Navbar = () => {
 
     const [hospitalLogo, setHospitalLogo] = useState(assets.logo);
 
+    const hospitalName =
+localStorage.getItem("hospitalName");
+
+
+
 useEffect(() => {
+
+    if(
+        location.pathname.includes("doctor-dashboard") ||
+        location.pathname.includes("admin-dashboard") ||
+        location.pathname.includes("staff-dashboard") ||
+        location.pathname.includes("patient-dashboard")
+        ){
+        setHospitalLogo(assets.logo);
+        return;
+        }
 
     const hospitalName =
         localStorage.getItem("hospitalName");

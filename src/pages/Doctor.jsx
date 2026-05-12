@@ -28,13 +28,11 @@ const Doctor = () => {
       filtered = filtered.filter(doc => {
     
         const doctorHospital =
-          (
-            doc.hospital ||
-            doc.doctorBasicInfo?.address ||
-            ""
-          )
-          .toLowerCase()
-          .trim();
+(
+doc.hospital || ""
+)
+.toLowerCase()
+.trim();
     
         return doctorHospital.includes(
           selectedHospital.toLowerCase().trim()

@@ -189,7 +189,7 @@ className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-cente
   ←
 </span>
 </button>
-<p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
+<p  onClick={() => navigate("/demohome")} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
 
@@ -225,7 +225,7 @@ className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-cente
   ←
 </span>
 </button>
-  <p  onClick={() => nav("/demohome")} className="text-xl font-semibold cursor-pointer" >
+<p onClick={() => navigate("/demohome")} className="text-xl font-semibold cursor-pointer">
 Demo
 </p>
 
