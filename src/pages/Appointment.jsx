@@ -505,7 +505,9 @@ useEffect(() => {
                               reason,
                               appointmentNo,
                               patientEmail: auth.currentUser?.email,  // 🔥 FINAL FIX
-                              doctorImage: docInfo.image,
+                              doctorImage:
+  docInfo.image ||
+  docInfo.doctorDesignation?.doctorImage,
                               createdAt: serverTimestamp()
                             }
 
@@ -539,14 +541,21 @@ useEffect(() => {
  src={
   localStorage.getItem(`doctorImage_${docInfo.email}`) ||
   localStorage.getItem(`doctorImage_${docInfo.id}`) ||
-  docInfo.image
- }
+  docInfo.image ||
+  docInfo.doctorDesignation?.doctorImage
+}
  alt=""
 />
 
         <div className='w-full md:w-[500px] border rounded-xl p-4 md:p-6 shadow-sm flex flex-col justify-center'>
-          <h1 className='text-3xl font-bold'>{docInfo.name}</h1>
-          <p className='text-gray-600 mt-2'>{docInfo.speciality}</p>
+        <h1 className='text-3xl font-bold'>
+  {docInfo.name}
+</h1>
+
+<p className='text-gray-600 mt-2'>
+  {docInfo.speciality ||
+   docInfo.doctorDesignation?.designation}
+</p>
           <p className='text-gray-600 mt-2'>{docInfo.experience || "5 Years Experience"}</p>
           <p className='mt-3 font-medium'>Fee: {currencySymbol}{docInfo.fees || 50}</p>
         </div>
