@@ -8,6 +8,7 @@ import FloatingInput from "../components/FloatingInput"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { useLocation } from "react-router-dom";
 import Calendar from "../components/Calendar";
+import PatientProfileView from "../components/PatientProfileView";
 
 
 
@@ -17,19 +18,18 @@ const Account = () => {
   const [type,setType] = useState("");
   const [medicine,setMedicine] = useState("");
   const [inventoryItems,setInventoryItems]=useState([]);
-  const [describeItems,setDescribeItems]=useState([]);
+  const [patientsData,setPatientsData] = useState([]);
 
-useEffect(()=>{
+  useEffect(()=>{
 
-  const savedItems =
-  JSON.parse(
-  localStorage.getItem("pharmacyItems")
-  ) || [];
-  
-  setDescribeItems(savedItems);
-  setInventoryItems(savedItems);
-  
-  },[]);
+    const storedPatients =
+    JSON.parse(
+    localStorage.getItem("patientsData")
+    ) || [];
+    
+    setPatientsData(storedPatients);
+    
+    },[]);
 
 const [qty,setQty] = useState("");
 const [purchase,setPurchase] = useState("");
@@ -48,33 +48,7 @@ const categoryMap={
  Inhaler:["Salbutamol"]
 };
 
-useEffect(()=>{
 
-  const syncData=()=>{
-  
-  const savedItems =
-  JSON.parse(
-  localStorage.getItem("pharmacyItems")
-  )||[];
-  
-  setDescribeItems(savedItems);
-  setInventoryItems(savedItems);
-  
-  };
-  
-  syncData();
-  
-  window.addEventListener(
-  "storage",
-  syncData
-  );
-  
-  return ()=>window.removeEventListener(
-  "storage",
-  syncData
-  );
-  
-  },[]);
 
   const location = useLocation();
 
@@ -226,13 +200,123 @@ confirmPassword:""
   })
   const [patientAccounts, setPatientAccounts] = useState([])
 
-  const currentAppointments = patientAccounts.filter(
-    (p) => p.status !== "completed"
+  const today = new Date().toISOString().split("T")[0];
+
+  const currentAppointments =
+patientAccounts.filter((p) => {
+
+  const historyAppointments =
+patientAccounts.filter((p) => {
+
+if (!p.date || !p.time)
+return false;
+
+const now = new Date();
+
+const endTime =
+p.time.split("-")[1]?.trim();
+
+if (!endTime) return false;
+
+const match =
+endTime.match(
+/(\d+):(\d+)(am|pm)/i
+);
+
+if (!match) return false;
+
+let hours =
+parseInt(match[1]);
+
+const minutes =
+parseInt(match[2]);
+
+const modifier =
+match[3].toLowerCase();
+
+if (
+modifier === "pm" &&
+hours !== 12
+) {
+hours += 12;
+}
+
+if (
+modifier === "am" &&
+hours === 12
+) {
+hours = 0;
+}
+
+const appointmentEnd =
+new Date(p.date);
+
+appointmentEnd.setHours(
+hours,
+minutes,
+0,
+0
+);
+
+return appointmentEnd < now;
+
+});
+
+  if (!p.date || !p.time)
+    return false;
+
+  const now = new Date();
+
+  const endTime =
+    p.time.split("-")[1]?.trim();
+
+  if (!endTime) return false;
+
+  const match =
+    endTime.match(
+      /(\d+):(\d+)(am|pm)/i
+    );
+
+  if (!match) return false;
+
+  let hours =
+    parseInt(match[1]);
+
+  const minutes =
+    parseInt(match[2]);
+
+  const modifier =
+    match[3].toLowerCase();
+
+  if (
+    modifier === "pm" &&
+    hours !== 12
+  ) {
+    hours += 12;
+  }
+
+  if (
+    modifier === "am" &&
+    hours === 12
+  ) {
+    hours = 0;
+  }
+
+  const appointmentEnd =
+    new Date(p.date);
+
+  appointmentEnd.setHours(
+    hours,
+    minutes,
+    0,
+    0
   );
+
+  return appointmentEnd >= now;
+
+});
   
-  const historyAppointments = patientAccounts.filter(
-    (p) => p.status === "completed"
-  );
+
 
   const [callData, setCallData] = useState(null)
   const navigate = useNavigate();
@@ -463,6 +547,77 @@ confirmPassword:""
   }, [])
 
 
+  useEffect(() => {
+
+    const handleBackButton = (event) => {
+  
+      event.preventDefault();
+  
+      // ✅ if not home → go home
+      if (menu !== "home") {
+  
+        setMenu("home");
+  
+        window.history.pushState(
+          null,
+          "",
+          window.location.href
+        );
+  
+      }
+  
+      // ✅ if already home → logout popup
+      else {
+  
+        const confirmLogout =
+          window.confirm(
+            "Are you sure you want to logout?"
+          );
+  
+        if (confirmLogout) {
+  
+          localStorage.clear();
+  
+          navigate("/select-hospital");
+  
+        }
+  
+        else {
+  
+          window.history.pushState(
+            null,
+            "",
+            window.location.href
+          );
+  
+        }
+  
+      }
+  
+    };
+  
+    window.history.pushState(
+      null,
+      "",
+      window.location.href
+    );
+  
+    window.addEventListener(
+      "popstate",
+      handleBackButton
+    );
+  
+    return () => {
+  
+      window.removeEventListener(
+        "popstate",
+        handleBackButton
+      );
+  
+    };
+  
+  }, [menu]);
+
 
 
   const fetchAdmins = async () => {
@@ -517,25 +672,35 @@ confirmPassword:""
     
     }
 
-  const fetchPatients = async () => {
+    const fetchPatients = async () => {
 
-    try {
-
-      const querySnapshot = await getDocs(collection(db, "patients"))
-
-      const patientList = []
-
-      querySnapshot.forEach((doc) => {
-        patientList.push(doc.data())
-      })
-
-      setPatientAccounts(patientList)
-
-    } catch (error) {
-      console.log(error)
+      try {
+    
+        const querySnapshot =
+          await getDocs(
+            collection(db, "appointments")
+          )
+    
+        const patientList = []
+    
+        querySnapshot.forEach((doc) => {
+    
+          patientList.push({
+            id: doc.id,
+            ...doc.data()
+          })
+    
+        })
+    
+        setPatientAccounts(patientList)
+    
+      } catch (error) {
+    
+        console.log(error)
+    
+      }
+    
     }
-
-  }
 
 
   const createAccount = async (role) => {
@@ -899,8 +1064,8 @@ confirmPassword:""
         reasonInfo,
         accountInfo,
         status: "pending",
-        isDisabled: false
-        
+        isDisabled: false,
+        createdAt: new Date()
       })
 
       alert("Patient saved ")
@@ -1260,7 +1425,7 @@ confirmPassword:""
 
 
           <li className="cursor-pointer hover:text-gray-200" onClick={()=>setMenu("describe")}>
-            Describe
+            Prescribe
           </li>
 
           <li className="cursor-pointer hover:text-gray-200" onClick={() => setMenu("appointments")}>
@@ -1282,171 +1447,7 @@ confirmPassword:""
 
 
 
-      {menu==="describe" && (
 
-<div>
-
-<h1 className="text-5xl font-bold mb-8">
-Describe
-</h1>
-
-<div className="bg-white rounded-3xl p-8 shadow mb-8">
-<h2 className="text-3xl font-bold">
-All Summary
-</h2>
-
-<p className="text-2xl mt-4">
-Total Sales ₹
-{
-describeItems.reduce(
-  (a,b)=>a+(Number(b.salesPrice || 0)*Number(b.qty || 0)),
-0
-)
-}
-</p>
-
-</div>
-
-
-
-
-<div className="flex gap-4 mt-8 flex-wrap justify-center">
-
-{
-[
-"All",
-"Tablet",
-"Injection",
-"Capsule",
-"Syrup",
-"Drops",
-"Ointment",
-"Inhaler"
-].map(cat=>(
-
-<button
-key={cat}
-onClick={()=>
-setActiveDescribeCategory(cat)
-}
-className={`
-px-6 py-3 rounded-full border
-${
-activeDescribeCategory===cat
-? "bg-blue-600 text-white"
-:"bg-white"
-}
-`}
->
-{cat}
-</button>
-
-))
-}
-
-</div>
-
-<br />
-
-<div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
-
-<table className="w-full">
-
-<thead>
-<tr>
-<th>Type</th>
-<th>Medicine</th>
-<th>Qty</th>
-<th>Purchase</th>
-<th>Sales</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody>
-
-{
-describeItems
-.filter(item=>
-
-activeDescribeCategory==="All"
-||
-item.type===activeDescribeCategory
-
-)
-
-.map((item,index)=>(
-
-<tr key={item.id} className="border-b text-center">
-
-<td className="py-3">{item.type}</td>
-
-<td className="py-3">
-{item.medicine || item.subCategory}
-</td>
-
-<td className="py-3">
-{item.qty}
-</td>
-
-<td className="py-3">
-₹{item.purchasePrice}
-</td>
-
-<td className="py-3">
-₹{item.salesPrice}
-</td>
-
-<td className="py-3 space-x-4">
-<button
-className="text-blue-600 font-semibold"
-onClick={() => handleEdit(item)}
->
-Edit
-</button>
-
-<button
-className="text-red-500 font-semibold"
-onClick={()=>{
-  const updated =
-  describeItems.filter(
-  x=>x.id !== item.id
-  );
-  
-  setDescribeItems(updated);
-  setInventoryItems(updated);
-  
-  localStorage.setItem(
-  "pharmacyItems",
-  JSON.stringify(updated)
-  );
-  }}
->
-Delete
-</button>
-
-<button
-className="text-green-600 font-semibold"
-onClick={() => handleItemPrint(item)}
->
-Print
-</button>
-</td>
-
-</tr>
-
-))
-}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-)}
 
 
 
@@ -1481,10 +1482,17 @@ Print
       onClick={() => setCallData(p)}
       className="cursor-pointer bg-white p-4 rounded-xl shadow"
     >
-      <p><b>Patient:</b> {p.basicInfo?.name}</p>
-      <p><b>Email:</b> {p.basicInfo?.email}</p>
-      <p><b>Reason:</b> {p.reasonInfo?.visitReason}</p>
-      <p><b>Condition:</b> {p.reasonInfo?.condition}</p>
+<p><b>Patient:</b> {p.patientName}</p>
+
+<p><b>Email:</b> {p.patientEmail}</p>
+
+<p><b>Reason:</b> {p.reason}</p>
+
+<p><b>Doctor:</b> {p.doctorName}</p>
+
+<p><b>Date:</b> {p.date}</p>
+
+<p><b>Time:</b> {p.time}</p>
     </div>
   ))
 )}
@@ -1493,24 +1501,226 @@ Print
   </div>
 )}
 
-{menu === "history" && (
-  <div>
-    <h1 className="text-2xl font-bold mb-6">Appointment History</h1>
+{menu==="describe" && (
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {historyAppointments.map((p, index) => (
-        <div
-          key={index}
-          className="bg-gray-200 p-4 rounded-xl"
-        >
-          <p><b>Patient:</b> {p.basicInfo?.name}</p>
-          <p><b>Email:</b> {p.basicInfo?.email}</p>
-          <p><b>Reason:</b> {p.reasonInfo?.visitReason}</p>
-          <p><b>Condition:</b> {p.reasonInfo?.condition}</p>
-        </div>
-      ))}
-    </div>
+<div className="p-6 w-full">
+
+<h1 className="text-5xl font-bold mb-8">
+Prescribe
+</h1>
+
+<div className="overflow-x-auto bg-white rounded-2xl shadow">
+
+<table className="w-full">
+
+<thead className="bg-blue-600 text-white">
+
+<tr>
+
+<th className="p-4 text-left">
+Patient
+</th>
+
+<th className="p-4 text-left">
+Doctor
+</th>
+
+<th className="p-4 text-left">
+Reason
+</th>
+
+<th className="p-4 text-left">
+Solution
+</th>
+
+<th className="p-4 text-left">
+Tablet
+</th>
+
+<th className="p-4 text-left">
+Action
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{patientsData.length === 0 ? (
+
+<tr>
+
+<td
+colSpan="6"
+className="text-center p-6"
+>
+
+No Patients Found
+
+</td>
+
+</tr>
+
+) : (
+
+patientsData.map((item,index)=>(
+
+<tr
+key={index}
+className="border-b"
+>
+
+<td className="p-4">
+{item.patientName}
+</td>
+
+<td className="p-4">
+{item.doctorName}
+</td>
+
+<td className="p-4">
+{item.reasonNotes}
+</td>
+
+<td className="p-4">
+{item.solution || "Not Updated"}
+</td>
+
+<td className="p-4">
+{item.tablet || "Not Updated"}
+</td>
+
+<td className="p-4">
+
+<button
+
+onClick={()=>
+setSelectedPatient(item)
+}
+
+className="
+bg-green-500
+hover:bg-green-600
+text-white
+px-4
+py-2
+rounded-xl
+"
+
+>
+
+Visit
+
+</button>
+
+</td>
+
+</tr>
+
+))
+
+)}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+)}
+
+{menu === "history" && (
+
+<div>
+
+  <h1 className="text-2xl font-bold mb-6">
+    Appointment History
+  </h1>
+
+  <div className="overflow-x-auto bg-white rounded-xl shadow">
+
+    <table className="w-full">
+
+      <thead className="bg-blue-600 text-white">
+
+        <tr>
+
+          <th className="p-3 text-left">Patient</th>
+
+          <th className="p-3 text-left">Email</th>
+
+          <th className="p-3 text-left">Reason</th>
+
+          <th className="p-3 text-left">Condition</th>
+
+          <th className="p-3 text-left">Date</th>
+
+          <th className="p-3 text-left">Time</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        {historyAppointments.length === 0 ? (
+
+          <tr>
+            <td colSpan="6" className="p-4 text-center">
+              No History Found
+            </td>
+          </tr>
+
+        ) : (
+
+          historyAppointments.map((p, index) => (
+
+            <tr
+              key={index}
+              className="border-b"
+            >
+
+              <td className="p-3">
+              {p.patientName}
+              </td>
+
+              <td className="p-3">
+              {p.patientEmail}
+              </td>
+
+              <td className="p-3">
+              {p.reason}
+              </td>
+
+              <td className="p-3">
+              General Checkup
+              </td>
+
+              <td className="p-3">
+                {p.date}
+              </td>
+
+              <td className="p-3">
+                {p.time}
+              </td>
+
+            </tr>
+
+          ))
+
+        )}
+
+      </tbody>
+
+    </table>
+
   </div>
+
+</div>
+
 )}
 
 {callData && (
@@ -1585,7 +1795,37 @@ Print
         </button>
 
         <button
-          onClick={() => setCallData({ ...callData, status: "completed" })}
+          onClick={async () => {
+
+            const updatedData = {
+              ...callData,
+              status: "completed"
+            };
+          
+            setCallData(updatedData);
+          
+            try {
+          
+              await updateDoc(
+                doc(
+                  db,
+                  "patients",
+                  callData.basicInfo?.email
+                ),
+                {
+                  status: "completed"
+                }
+              );
+          
+              fetchPatients();
+          
+            } catch (error) {
+          
+              console.log(error);
+          
+            }
+          
+          }}
           className="bg-green-600 text-white px-6 py-2 rounded"
         >
           🩺 Completed
@@ -1624,7 +1864,7 @@ Print
     }`}
   >
     <span className="text-xl">🧾</span>
-    <span className="mt-1">Describe</span>
+    <span className="mt-1">Prescribe</span>
   </button>
 
   {/* APPOINTMENTS */}
@@ -1654,32 +1894,57 @@ Print
 </div>
 
 {selectedPatient && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-    <div className="bg-white p-6 rounded-xl w-[90%] max-w-[500px] relative">
+<div className="
+fixed
+inset-0
+bg-black/40
+z-50
+overflow-y-auto
+py-10
+">
 
-      {/* CLOSE */}
-      <button
-        onClick={() => setSelectedPatient(null)}
-        className="absolute top-2 right-3"
-      >
-        ✖
-      </button>
+<PatientProfileView
 
-      <h2 className="text-xl font-bold mb-4">Patient Details</h2>
+patient={selectedPatient}
 
-      <p><b>Name:</b> {selectedPatient.basicInfo?.name}</p>
-      <p><b>Email:</b> {selectedPatient.basicInfo?.email}</p>
-      <p><b>Age:</b> {selectedPatient.basicInfo?.age}</p>
-      <p><b>Gender:</b> {selectedPatient.basicInfo?.gender}</p>
+onSave={(updatedPatient)=>{
 
-      <hr className="my-2" />
+const updatedPatients =
+patientsData.map((p)=>{
 
-      <p><b>Reason:</b> {selectedPatient.reasonInfo?.visitReason}</p>
-      <p><b>Condition:</b> {selectedPatient.reasonInfo?.condition}</p>
+if(
+p.appointmentNo ===
+updatedPatient.appointmentNo
+){
 
-    </div>
-  </div>
+return updatedPatient;
+
+}
+
+return p;
+
+});
+
+setPatientsData(updatedPatients);
+
+localStorage.setItem(
+"patientsData",
+JSON.stringify(updatedPatients)
+);
+
+setSelectedPatient(null);
+
+}}
+
+onClose={()=>{
+setSelectedPatient(null);
+}}
+
+/>
+
+</div>
+
 )}
 
     </div >

@@ -262,12 +262,32 @@ useEffect(() => {
                   </button>
 
                   {/* 👇 GAP + LINK */}
-                  <p
-                    onClick={() => navigate("/patient-dashboard")}
-                    className="mt-4 text-blue-600 cursor-pointer underline"
-                  >
-                    Go to Dashboard
-                  </p>
+                  <button
+onClick={() => {
+
+localStorage.setItem(
+"currentUser",
+JSON.stringify({
+email:
+auth.currentUser?.email
+})
+);
+
+navigate("/patient-dashboard");
+
+}}
+
+className="
+mt-4
+text-blue-600
+underline
+cursor-pointer
+"
+>
+
+Go to Dashboard
+
+</button>
                 </div>
               ) : (
                 <>

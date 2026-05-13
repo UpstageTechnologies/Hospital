@@ -25,6 +25,7 @@ const PatientDashboard = () => {
     const savedUser = JSON.parse(
         localStorage.getItem("currentUser")
         );
+        console.log(savedUser)
         
         const userEmail = savedUser?.email;
 

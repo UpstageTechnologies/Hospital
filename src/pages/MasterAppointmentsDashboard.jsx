@@ -577,6 +577,74 @@ if(blocked) return
       },[])
 
     const navigate = useNavigate(); 
+
+    useEffect(() => {
+
+      window.history.pushState(
+        { page: activePage },
+        ""
+      );
+    
+      const handleBackButton = () => {
+    
+        // 🔥 account / appointments / payment iruntha
+        if (
+          activePage === "appointments" ||
+          activePage === "account" ||
+          activePage === "payment"
+        ) {
+    
+          setActivePage("home");
+          setSubMenu("");
+    
+          window.history.pushState(
+            { page: "home" },
+            ""
+          );
+    
+        }
+    
+        // 🔥 home la iruntha
+        else {
+    
+          const logout = window.confirm(
+            "Do you want to logout?"
+          );
+    
+          if (logout) {
+    
+            localStorage.clear();
+    
+            navigate("/select-hospital");
+    
+          } else {
+    
+            window.history.pushState(
+              { page: "home" },
+              ""
+            );
+    
+          }
+    
+        }
+    
+      };
+    
+      window.addEventListener(
+        "popstate",
+        handleBackButton
+      );
+    
+      return () => {
+    
+        window.removeEventListener(
+          "popstate",
+          handleBackButton
+        );
+    
+      };
+    
+    }, [activePage]);
     // ✅ ALL appointments (no filter)
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -608,7 +676,7 @@ if(blocked) return
         <div className="flex flex-col md:flex-row min-h-screen">
 
             {/* ✅ SIDEBAR (ONLY 3 OPTIONS) */}
-            <div className="hidden lg:block w-1/5 bg-blue-600 text-white p-6">
+            <div className="hidden md:block w-1/5 bg-blue-600 text-white p-6">
                 <h2 className="text-xl font-bold mb-6">Master Panel</h2>
                 <p 
   onClick={() => {
@@ -620,15 +688,6 @@ if(blocked) return
   Home
 </p>
 
-<p 
-  onClick={() => {
-    setActivePage("subscription")
-    setSubMenu("")
-  }}
-  className="mb-4 cursor-pointer"
->
-  Subscription
-</p>
 
 <div className="mb-8">
 
@@ -757,11 +816,6 @@ Pharmasi
   </div>
 )}
 
-{activePage === "subscription" && (
-  <div className="text-xl font-semibold mb-4">
-    Subscription Page
-  </div>
-)}
 {activePage === "payment" && (
  <HospitalPaymentSection />
 )}
@@ -2995,8 +3049,7 @@ fetchPharmasi()
 
 <div className="w-full flex justify-center items-center py-10">
 
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-3xl">
-
+<div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:hidden">
     <div
       onClick={() => setSubMenu("admins")}
       className="bg-blue-500 text-white rounded-2xl p-6 text-center cursor-pointer shadow"
@@ -3168,20 +3221,6 @@ fetchPharmasi()
       </span>
     </button>
 
-    {/* SUBSCRIPTION */}
-    <button
-      onClick={() => {
-        setActivePage("subscription")
-        setSubMenu("")
-      }}
-      className="flex flex-col items-center justify-center flex-1 text-gray-700"
-    >
-      <span className="text-lg">💳</span>
-
-      <span className="text-[11px] sm:text-xs">
-        Subscription
-      </span>
-    </button>
 
     {/* UPGRADE */}
     <button

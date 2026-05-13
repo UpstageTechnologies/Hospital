@@ -28,50 +28,31 @@ localStorage.getItem("hospitalName");
 
 
 
-useEffect(() => {
-
-const hospitalName =
-localStorage.getItem("hospitalName");
-
-if (!hospitalName) {
-
-    setHospitalLogo(ghLogo);
-    return;
-    
+const hospitalLogos = {
+    gh: ghLogo,
+    apollo: apolloLogo,
+    arunhospital: arunhospitalLogo,
+    "rajesh hospital": rajeshLogo
+  };
+  
+  useEffect(() => {
+  
+    const savedHospital =
+      localStorage.getItem("hospitalName");
+  
+    if (!savedHospital) {
+      setHospitalLogo(ghLogo);
+      return;
     }
-
-if (hospitalName.toLowerCase() === "gh") {
-
-setHospitalLogo(ghLogo);
-
-}
-
-else if (
-hospitalName.toLowerCase() === "apollo"
-) {
-
-setHospitalLogo(apolloLogo);
-
-}
-
-else if (
-hospitalName.toLowerCase() === "arunhospital"
-) {
-
-setHospitalLogo(arunhospitalLogo);
-
-}
-
-else if (
-hospitalName.toLowerCase() ===
-"rajesh hospital"
-) {
-
-setHospitalLogo(rajeshLogo);
-
-}
-
-}, [location.pathname]);
+  
+    const logo =
+      hospitalLogos[
+        savedHospital.toLowerCase()
+      ];
+  
+    setHospitalLogo(logo || ghLogo);
+  
+  }, [location.pathname]);
 
 
     const [showProfileMenu, setShowProfileMenu] = useState(false)
@@ -263,9 +244,15 @@ alt="logo"
     location.pathname.includes("staff-dashboard") ||
     location.pathname.includes("/account") ||
     location.pathname.includes("doctor-profile") ||
+    location.pathname.includes("doctor-profile-page") ||
+    location.pathname.includes("staff-profile") ||
+    location.pathname.includes("pharmasi-profile") ||
+    location.pathname.includes("master-profile") ||
+    location.pathname.includes("admin-profile") ||
     location.pathname.includes("pharmasi-dashboard") ||
-    location.pathname.includes("master-dashboard")
-    ) && (
+    location.pathname.includes("master-dashboard") ||
+    location.pathname.includes("my-profile")
+) && (
 <ul className="hidden md:flex items-center gap-10 font-medium mx-auto">
                         {isMaster && location.pathname === "/account" ? (
 
@@ -343,7 +330,7 @@ setUserName("");
 
 // ✅ GO HOME
 setShowProfileMenu(false);
-navigate("/home");
+navigate("select-hospital");
 
 }}
                 className="px-4 py-2 bg-red-500 text-white rounded"
@@ -372,38 +359,82 @@ navigate("/home");
                         <img className='w-2.5 ' src={assets.dropdown_icon} alt="" />
                         {showProfileMenu && (
                             <div className='absolute right-0 top-full mt-2 bg-white shadow-lg rounded-md p-4 text-base font-medium text-gray-600 z-50'>
-                                <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
+                      <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
 
-                                    <p onClick={() => navigate('/my-profile')} className="cursor-pointer hover:text-black">
-                                        My Profile
-                                    </p>
-
-                                    <p onClick={() => navigate('/my-appointment')} className="cursor-pointer hover:text-black">
-                                        My Appointment
-                                    </p>
-
-                                    <p
+                      <p
 onClick={() => {
 
-if(userRole==="doctors"){
-navigate("/doctor-dashboard")
+if(userRole === "master"){
+navigate("/master-profile")
 }
+
+else if(userRole === "admins"){
+navigate("/admin-profile")
+}
+
+else if(userRole === "doctors"){
+navigate("/doctor-profile-page")
+}
+
+else if(userRole === "staffs"){
+navigate("/staff-profile")
+}
+
+else if(userRole === "pharmasi"){
+navigate("/pharmasi-profile")
+}
+
 else{
-navigate("/settings")
+navigate("/my-profile")
 }
 
 }}
 className="cursor-pointer hover:text-black"
 >
-Settings
+My Profile
 </p>
 
-                                    <p onClick={() => setShowLogoutPopup(true)} className="cursor-pointer hover:text-black">
-                                        Logout
-                                    </p>
+<p
+  onClick={() => {
 
+    if(userRole === "master"){
+      navigate("/master-dashboard")
+    }
 
-                                </div>
+    else if(userRole === "admins"){
+      navigate("/admin-dashboard")
+    }
+
+    else if(userRole === "doctors"){
+      navigate("/doctor-dashboard")
+    }
+
+    else if(userRole === "staffs"){
+      navigate("/staff-dashboard")
+    }
+
+    else if(userRole === "pharmasi"){
+      navigate("/pharmasi-dashboard")
+    }
+
+    else if(userRole === "patients"){
+      navigate("/patient-dashboard")
+    }
+
+  }}
+  className="cursor-pointer hover:text-black"
+>
+  Settings
+</p>
+
+<p
+  onClick={() => setShowLogoutPopup(true)}
+  className="cursor-pointer hover:text-black"
+>
+  Logout
+</p>
+
+</div>
                             </div>
                         )}
                     </div>

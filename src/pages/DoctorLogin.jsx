@@ -69,23 +69,28 @@ const DoctorLogin = () => {
     if (
       email === "demodoctor007" &&
       password === "demo007"
-      ){
-      
+    ){
+    
       localStorage.setItem(
-      "doctorLogin",
-      "true"
+        "doctorLogin",
+        "true"
       );
-      
+    
       localStorage.setItem(
         "hospitalName",
-        data.hospital.toLowerCase().trim()
-        );
-       
-      
-      window.location.href="/#/demodoctordashboard";
-      
+        "arun hospital"
+      );
+    
+      localStorage.setItem(
+        "doctorEmail",
+        email
+      );
+    
+      window.location.href =
+        "/#/demodoctordashboard";
+    
       return;
-      }
+    }
 
     e.preventDefault()
 

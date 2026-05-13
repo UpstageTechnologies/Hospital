@@ -9,24 +9,14 @@ const StaffProfile = () => {
 
     useEffect(() => {
 
-        const staffId = localStorage.getItem("staffId")
-
-        if (!staffId) return
-
-        const fetchData = async () => {
-
-            const ref = doc(db, "staffs", staffId)
-            const snap = await getDoc(ref)
-
-            if (snap.exists()) {
-                setStaffData(snap.data())
-            }
-
+        const savedStaff =
+        JSON.parse(localStorage.getItem("staffData"));
+        
+        if(savedStaff){
+        setStaffData(savedStaff);
         }
-
-        fetchData()
-
-    }, [])
+        
+        }, []);
 
     if (!staffData) return <p className="p-10">Loading...</p>
 

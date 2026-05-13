@@ -312,6 +312,12 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [selected, setSelected] = useState(null)
     const [selectedDate, setSelectedDate] = useState(null)
     const [selectedAppointment, setSelectedAppointment] = useState(null)
+    const [visitPopup, setVisitPopup] = useState(null);
+
+const [visitForm, setVisitForm] = useState({
+  solution: "",
+  tablet: ""
+});
     const [selectedPatient, setSelectedPatient] = useState(null)
     const [step, setStep] = useState(1)
     const [patientTab, setPatientTab] = useState("current")
@@ -420,74 +426,18 @@ const isDemo = location.state?.demo === true;
     }
     useEffect(() => {
 
-        const fetchData = async () => {
+        const savedDoctor =
+        JSON.parse(localStorage.getItem("doctorData"));
         
-        try {
+        if(savedDoctor){
         
-        const email =
-        localStorage.getItem("doctorEmail");
-        
-        console.log("LOGIN EMAIL", email);
-        
-        if (!email) {
-        console.log("NO EMAIL");
-        return;
-        }
-        
-        const doctorsSnap =
-        await getDocs(collection(db, "doctors"));
-        
-        let foundDoctor = null;
-        
-        doctorsSnap.forEach((docItem) => {
-        
-        const data = docItem.data();
-        
-        console.log("DOCTOR DOC", data);
-        
-        if (
-        data.email === email ||
-        docItem.id === email
-        ) {
-        foundDoctor = data;
-        }
-        
-        });
-        
-        console.log("FOUND DOCTOR", foundDoctor);
-        
-        if (foundDoctor) {
-        
-        setDoctorData(foundDoctor);
+        setDoctorData(savedDoctor);
         
         setDoctorImage(
-        foundDoctor.image || ""
-        );
-        
-        setSlots(
-        foundDoctor.slots || []
-        );
-        
-        } else {
-        
-        console.log(
-        "DOCTOR NOT FOUND"
+        savedDoctor.image || ""
         );
         
         }
-        
-        } catch (err) {
-        
-        console.log(
-        "DOCTOR FETCH ERROR",
-        err
-        );
-        
-        }
-        
-        };
-        
-        fetchData();
         
         }, []);
 

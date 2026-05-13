@@ -10,62 +10,24 @@ import {
 const MyProfile = () => {
   const [userData, setUserData] = useState(null);
   const { state } = useLocation();
-  const passedData = state || JSON.parse(localStorage.getItem("selectedPatient"));
   const [activeTab, setActiveTab] = useState("profile");
 
   useEffect(() => {
 
-    if (passedData) {
-    setUserData(passedData);
-    return;
-    }
+    const patientData =
+    JSON.parse(localStorage.getItem("patientData"));
     
-    const unsubscribe =
-    auth.onAuthStateChanged(async (user) => {
-    
-    if (!user) return;
-    
-    try {
-    
-    const doctorRef =
-    doc(db,"doctors",user.email);
-    
-    const doctorSnap =
-    await getDoc(doctorRef);
-    
-    if (doctorSnap.exists()) {
+    if(patientData){
     
     setUserData({
-    ...doctorSnap.data(),
-    role:"doctor"
-    });
-    
-    return;
-    }
-    
-    const patientRef =
-    doc(db,"patients",user.email);
-    
-    const patientSnap =
-    await getDoc(patientRef);
-    
-    if (patientSnap.exists()) {
-    
-    setUserData({
-    ...patientSnap.data(),
-    role:"patient"
+    name: patientData.patientBasicInfo?.name,
+    email: patientData.patientBasicInfo?.email,
+    phone: patientData.patientBasicInfo?.contact,
+    address: patientData.patientBasicInfo?.address,
+    role:"Patient"
     });
     
     }
-    
-    }
-    catch(err){
-    console.log(err);
-    }
-    
-    });
-    
-    return ()=>unsubscribe();
     
     }, []);
 

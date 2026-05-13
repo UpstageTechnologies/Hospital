@@ -123,7 +123,7 @@ localStorage.setItem(
 JSON.stringify(masterData)
 );
 
-    alert("Master Login Success");
+    
     if (isDemo) {
       navigate("/demomasterdashboard")
     } else {

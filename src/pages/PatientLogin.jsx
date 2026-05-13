@@ -70,6 +70,8 @@ const Login = () => {
 
   const onSubmitHandler = async (event) => {
 
+    event.preventDefault();
+
     if (
       email === "demopatient@gmail.com" &&
       password === "demopatient11"

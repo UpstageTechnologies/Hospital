@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import PatientProfileView from "./PatientProfileView";
 
@@ -7,6 +6,20 @@ const PatientsTable = ({ patientsData }) => {
 
     const [selectedPatient,setSelectedPatient] =
 useState(null);
+
+const [patients,setPatients] =
+useState([]);
+
+useEffect(()=>{
+
+const storedPatients =
+JSON.parse(
+localStorage.getItem("patientsData")
+) || patientsData;
+
+setPatients(storedPatients);
+
+},[patientsData]);
 
 return (
 
@@ -42,7 +55,7 @@ Patients
 
 <tbody>
 
-{patientsData.map((item,index)=>(
+{patients.map((item,index)=>(
 
 <tr
 key={index}
@@ -62,11 +75,11 @@ className="border-b"
 </td>
 
 <td className="p-4">
-{item.solution}
+{item.solution || "Not Updated"}
 </td>
 
 <td className="p-4">
-{item.tablet}
+{item.tablet || "Not Updated"}
 </td>
 
 <td className="p-4">
@@ -113,15 +126,42 @@ py-10
 >
 
 <PatientProfileView
+
 patient={selectedPatient}
 
-onSave={()=>{
+onSave={(updatedPatient)=>{
+
+const updatedPatients =
+patients.map((p)=>{
+
+if(
+p.appointmentNo ===
+updatedPatient.appointmentNo
+){
+
+return updatedPatient;
+
+}
+
+return p;
+
+});
+
+setPatients(updatedPatients);
+
+localStorage.setItem(
+"patientsData",
+JSON.stringify(updatedPatients)
+);
+
 setSelectedPatient(null);
+
 }}
 
 onClose={()=>{
 setSelectedPatient(null);
 }}
+
 />
 
 </div>

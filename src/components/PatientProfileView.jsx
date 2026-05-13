@@ -8,12 +8,15 @@ const PatientProfileView = ({
     onClose
     }) => {
 
-const [solution,setSolution] =
-useState("");
-
-const [tablet,setTablet] =
-useState("");
-
+        const [solution,setSolution] =
+        useState(
+        patient.solution || ""
+        );
+        
+        const [tablet,setTablet] =
+        useState(
+        patient.tablet || ""
+        );
 const handleSave = () => {
 
 const updatedPatient = {

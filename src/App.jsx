@@ -35,6 +35,11 @@ import Login from "./pages/PatientLogin";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import MyProfile from "./pages/MyProfile";
+import MasterProfile from "./pages/MasterProfile";
+import AdminProfile from "./pages/AdminProfile";
+import StaffProfile from "./pages/StaffProfile";
+import DoctorProfilePage from "./pages/DoctorProfilePage";
+import PharmasiProfile from "./pages/PharmasiProfile";
 import MyAppointment from "./pages/MyAppointment";
 import Appointment from "./pages/Appointment";
 import Navbar from "./components/Navbar";
@@ -47,7 +52,7 @@ import AdminLogin from "./pages/AdminLogin.jsx";
 import Account from "./pages/Account.jsx";
 import StaffLogin from "./pages/StaffLogin";
 import DoctorProfile from "./pages/DoctorProfile";
-import StaffProfile from "./pages/StaffProfile";
+
 
 
 const App = () => {
@@ -137,6 +142,11 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/my-profile" element={<MyProfile />} />
+        <Route path="/master-profile" element={<MasterProfile />} />
+        <Route path="/admin-profile" element={<AdminProfile />} />
+        <Route path="/staff-profile" element={<StaffProfile />} />
+        <Route path="/doctor-profile-page" element={<DoctorProfilePage />} />
+        <Route path="/pharmasi-profile" element={<PharmasiProfile />} />
         <Route path="/my-appointment" element={<MyAppointment />} />
         <Route path="/appointment/:docId" element={<Appointment />} />
         <Route path="/master-login" element={<MasterLogin />} />
@@ -149,7 +159,6 @@ const App = () => {
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/account" element={<Account />} />
         <Route path="/doctor-profile" element={<DoctorProfile />} />
-        <Route path="/staff-profile" element={<StaffProfile />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {!hideLayout && location.pathname !== "/account" && <Footer />}
