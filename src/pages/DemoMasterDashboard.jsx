@@ -204,6 +204,20 @@ const [staffAccounts, setStaffAccounts] = useState([])
 const [patientAccounts, setPatientAccounts] = useState([])
 const [pharmasiAccounts, setPharmasiAccounts] = useState([])
 
+const handleMenuChange = (mainTab, child = "") => {
+
+  setTab(mainTab)
+
+  setSubMenu(child)
+
+  setSelected(null)
+
+  setIsViewMode(false)
+
+  setIsEditMode(false)
+
+}
+
 const handleCreateAdminFull = async () => {
   try {
 
@@ -438,21 +452,21 @@ useEffect(() => {
 
           <div className="space-y-6 text-lg">
             <p
-              onClick={()=>setTab("home")}
+              onClick={() => handleMenuChange("home")}
               className="cursor-pointer"
             >
               Home
             </p>
 
             <p
-              onClick={()=>setTab("subscription")}
+              onClick={() => handleMenuChange("subscription")}
               className="cursor-pointer"
             >
               Subscription
             </p>
 
             <p
-              onClick={()=>setTab("appointments")}
+              onClick={() => handleMenuChange("appointments")}
               className="cursor-pointer"
             >
               Appointments
@@ -460,7 +474,13 @@ useEffect(() => {
 
 
             <p
-  onClick={() => setAccountMenu(!accountMenu)}
+  onClick={() => {
+
+    setAccountMenu(!accountMenu)
+
+    handleMenuChange("account")
+
+  }}
   className="cursor-pointer"
 >
   Account Creation
@@ -469,11 +489,21 @@ useEffect(() => {
 {accountMenu && (
   <div className="ml-4 mt-2 space-y-2 text-sm">
 
-    <p onClick={() => setSubMenu("admins")}>Admins</p>
-    <p onClick={() => setSubMenu("doctors")}>Doctors</p>
-    <p onClick={() => setSubMenu("staff")}>Other Staffs</p>
-    <p onClick={() => setSubMenu("patients")}>Patients</p>
-    <p onClick={() => setSubMenu("pharmasi")}>Pharmasi</p>
+<p onClick={() => handleMenuChange("account", "admins")}>
+  Admins
+</p>
+<p onClick={() => handleMenuChange("account", "doctors")}>
+  Doctors
+</p>
+<p onClick={() => handleMenuChange("account", "staff")}>
+  Other Staffs
+</p>
+<p onClick={() => handleMenuChange("account", "patients")}>
+  Patients
+</p>
+<p onClick={() => handleMenuChange("account", "pharmasi")}>
+  Pharmasi
+</p>
 
   </div>
 )}
@@ -532,7 +562,7 @@ useEffect(() => {
         <div className="flex-1 p-6 md:p-10 pb-24">
 
           {/* HOME */}
-          {tab==="home" && subMenu === "" && (
+          {tab === "home" && subMenu === "" && (
             <div>
               <h1 className="text-4xl font-bold">
                 Welcome to DemoMaster Home
@@ -687,7 +717,7 @@ useEffect(() => {
 
 
           {/* APPOINTMENTS */}
-          {tab==="appointments" && (
+          {tab === "appointments" && subMenu === "" && (
             <div>
 
               <h1 className="text-4xl font-bold mb-8">
@@ -877,7 +907,17 @@ useEffect(() => {
                     />
                   </div>
 
-                  <div className="mt-6 flex justify-center md:justify-end gap-4">
+                  <div className="
+sticky
+bottom-0
+bg-white
+pt-6
+mt-auto
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
                     <button onClick={() => setAdminStep(1)} className="bg-gray-500 text-white px-6 py-2 rounded">Previous</button>
                     <button onClick={() => setAdminStep(3)} className="bg-blue-500 text-white px-6 py-2 rounded">Next</button>
                   </div>
@@ -1030,11 +1070,12 @@ useEffect(() => {
 
             <div className="
 w-full md:w-3/4
-p-3 md:p-6
+p-4 md:p-6
 relative
-overflow-y-auto
-min-h-[600px]
 bg-white
+flex
+flex-col
+min-h-[700px]
 ">
 
 
@@ -1480,7 +1521,17 @@ flex-wrap
 
         {subMenu === "staff" && (
 
-          <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[450px]">
+<div className="
+flex
+flex-col
+md:flex-row
+w-full
+max-w-7xl
+border
+rounded-lg
+overflow-hidden
+min-h-[700px]
+">
 
             <div className="w-1/4 p-4 space-y-3">
 
@@ -1899,7 +1950,17 @@ flex-wrap
 
         {subMenu === "patients" && (
 
-          <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[500px]">
+<div className="
+flex
+flex-col
+md:flex-row
+w-full
+max-w-7xl
+border
+rounded-lg
+overflow-hidden
+min-h-[750px]
+">
 
             <div className="w-1/4 p-4 space-y-3">
 
@@ -2834,96 +2895,152 @@ fetchPharmasi()
       )}
 
 {selected && (
-  <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
 
-    <div className="bg-white rounded-xl p-6 w-[350px] shadow-xl relative">
+<div className="
+fixed inset-0 z-50
+bg-black/40
+flex justify-center items-center
+p-4
+">
 
-      {/* CLOSE */}
-      <button 
-        onClick={() => setSelected(null)}
-        className="absolute top-2 right-3 text-xl"
-      >
-        ✖
-      </button>
+<div className="
+bg-white
+w-full max-w-3xl
+rounded-[35px]
+relative
+p-8 md:p-12
+shadow-2xl
+">
 
-      {/* DOCTOR */}
-      {selected.type === "doctor" && (
-        <div className="text-center">
+{/* CLOSE ICON */}
+<button
+  onClick={() => setSelected(null)}
+  className="
+  absolute
+  top-5
+  right-5
+  text-5xl
+  font-bold
+  leading-none
+  hover:scale-110
+  transition
+  "
+>
+  ×
+</button>
 
-          <img 
-            src={selected.image}
-            className="w-24 h-24 rounded-full mx-auto mb-4"
-          />
+<h1 className="
+text-4xl md:text-5xl
+font-black
+text-center
+mb-10
+">
+  Appointment Details
+</h1>
 
-          <h2 className="text-xl font-bold">
-            {selected.doctorBasicInfo?.name}
-          </h2>
+{/* IMAGES */}
+<div className="
+flex justify-center items-end
+gap-10
+mb-10
+">
 
-          <p>{selected.doctorDesignation?.designation}</p>
-          <p className="text-gray-500">
-            {selected.doctorBasicInfo?.email}
-          </p>
+  {/* PATIENT IMAGE */}
+  <div className="flex flex-col items-center">
 
-        </div>
-      )}
+    <img
+      src={selected.patientImg}
+      alt=""
+      className="
+      w-24 h-24
+      rounded-full
+      object-cover
+      border-4 border-gray-300
+      "
+    />
 
-      {/* PATIENT */}
-      {selected.type === "patient" && (
-        <div className="text-center">
+    <p className="mt-2 text-xl font-semibold">
+      {selected.patient}
+    </p>
 
-          <img 
-            src={selected.image}
-            className="w-24 h-24 rounded-full mx-auto mb-4"
-          />
+    <p className="text-gray-500 text-sm">
+      Patient
+    </p>
 
-          <h2 className="text-xl font-bold">
-            {selected.basicInfo?.name}
-          </h2>
-
-          <p>Age: {selected.basicInfo?.age}</p>
-          <p>{selected.basicInfo?.contact}</p>
-
-        </div>
-      )}
-
-      {/* APPOINTMENT */}
-      {selected.type === "appointment" && (
-        <div>
-
-          <div className="flex gap-4 items-center mb-4">
-
-            <img 
-              src={selected.patientImg}
-              className="w-16 h-16 rounded-full"
-            />
-
-            <div>
-              <p><b>Patient:</b> {selected.patient}</p>
-            </div>
-
-          </div>
-
-          <div className="flex gap-4 items-center mb-4">
-
-            <img 
-              src={selected.doctorImg}
-              className="w-16 h-16 rounded-full"
-            />
-
-            <div>
-              <p><b>Doctor:</b> {selected.doctor}</p>
-            </div>
-
-          </div>
-
-          <p><b>Date:</b> {selected.date}</p>
-          <p><b>Time:</b> {selected.time}</p>
-
-        </div>
-      )}
-
-    </div>
   </div>
+
+  {/* DOCTOR IMAGE */}
+  <div className="flex flex-col items-center">
+
+    <img
+      src={selected.doctorImg}
+      alt=""
+      className="
+      w-40 h-40
+      rounded-full
+      object-cover
+      border-4 border-blue-500
+      shadow-xl
+      "
+    />
+
+    <p className="mt-3 text-3xl font-bold text-blue-600">
+      Dr. {selected.doctor}
+    </p>
+
+    <p className="text-gray-500">
+      Doctor
+    </p>
+
+  </div>
+
+</div>
+
+{/* DETAILS */}
+<div className="
+space-y-4
+text-xl md:text-2xl
+">
+
+  <p>
+    <b>Patient:</b> {selected.patient}
+  </p>
+
+  <p>
+    <b>Doctor:</b> {selected.doctor}
+  </p>
+
+  <p>
+    <b>Date:</b> {selected.date}
+  </p>
+
+  <p>
+    <b>Time:</b> {selected.time}
+  </p>
+
+</div>
+
+<button
+  onClick={() => setSelected(null)}
+  className="
+  w-full
+  mt-10
+  bg-blue-700
+  hover:bg-blue-800
+  text-white
+  py-4
+  rounded-xl
+  text-2xl
+  font-semibold
+  "
+>
+  Close
+</button>
+
+</div>
+
+</div>
+
 )}
 
 

@@ -19,11 +19,6 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
     const [slots, setSlots] = useState([])
     const [selectedSlotDate, setSelectedSlotDate] = useState("")
 
-    const defaultSlots = [
-        { start:"10:00", end:"11:00" },
-        { start:"13:00", end:"14:00" },
-        { start:"17:00", end:"19:00" }
-       ];
     const today = new Date()
 
     const [currentMonth, setCurrentMonth] = useState(today)
@@ -141,9 +136,7 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
                                 const eventData = events[date] || events[`day-${dayOnly}`]
 
                                 const activeSlots =
-                                eventData?.slots?.filter(s=>!s.leave)?.length
-                                ? eventData.slots.filter(s=>!s.leave)
-                                : defaultSlots;
+eventData?.slots?.filter(s => !s.leave) || [];
                                 
                                 setSlots(activeSlots);
                                 setSelectedSlotDate(date);
@@ -195,9 +188,9 @@ ${type === "doctor"
 
                         <div className="bg-gradient-to-br from-blue-500 to-blue-700 p-5 rounded-xl w-[320px] text-white">
 
-                            <h2 className="font-bold mb-3">
-                                Slots - {selectedSlotDate}
-                            </h2>
+                        <h2 className="font-bold mb-3">
+    Appointments - {selectedSlotDate}
+</h2>
 
                             <div className="space-y-2">
                                 {slots.map((slot, i) => (
@@ -382,6 +375,62 @@ const categoryMap={
 };
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+
+        const handleBack = () => {
+      
+          const confirmLogout =
+            window.confirm(
+              "Are you sure you want to logout?"
+            );
+      
+          if (confirmLogout) {
+      
+            localStorage.clear();
+      
+            navigate("/select-hospital", {
+              replace: true
+            });
+      
+          }
+      
+          else {
+      
+            window.history.pushState(
+              null,
+              "",
+              window.location.href
+            );
+      
+          }
+      
+        };
+      
+        window.history.pushState(
+          null,
+          "",
+          window.location.href
+        );
+      
+        window.addEventListener(
+          "popstate",
+          handleBack
+        );
+      
+        return () => {
+      
+          window.removeEventListener(
+            "popstate",
+            handleBack
+          );
+      
+        };
+      
+      }, []);
+
+
+
     const location = useLocation();
 const isDemo = location.state?.demo === true;
 
@@ -647,7 +696,7 @@ useEffect(() => {
                 </p>
 
                 <p onClick={() => setPage("describe")}className="mb-3 cursor-pointer">
-                    Describe
+                    Prescribe
                 </p>
 
                 <p onClick={() => setPage("patients")}className="mb-3 cursor-pointer">
@@ -666,7 +715,7 @@ useEffect(() => {
                     <br />
 
                     <h2 className="text-lg font-semibold mb-3">
-                        Set Slot Timing
+                    Set Appointments
                     </h2>
 
                     <Calendar
@@ -887,15 +936,84 @@ patientsData={patientsData}
 
             {/* ================= HOME PAGE ================= */}
             {page === "home" && (
-                <>
+               <div className="flex-1 p-6 overflow-x-hidden">
 
 <h1 className="text-2xl font-bold mb-6 text-center md:text-left">
   Current Appointments
 </h1>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-20 md:pb-0 px-4 sm:px-6 md:px-0">
+<div className="
+grid
+grid-cols-1
+sm:grid-cols-2
+md:grid-cols-3
+lg:grid-cols-4
+xl:grid-cols-5
+2xl:grid-cols-6
+gap-4
+mt-10
+w-full
+">
 
-                        {appointments.map((item, index) => (
+                    {appointments
+.filter((item) => {
+
+  if (!item.date || !item.time)
+    return false
+
+  const now = new Date()
+
+  const endTime =
+    item.time.split("-")[1]?.trim()
+
+  if (!endTime)
+    return false
+
+  const match =
+    endTime.match(
+      /(\d+):(\d+)(am|pm)/i
+    )
+
+  if (!match)
+    return false
+
+  let hours =
+    parseInt(match[1])
+
+  const minutes =
+    parseInt(match[2])
+
+  const modifier =
+    match[3].toLowerCase()
+
+  if (
+    modifier === "pm" &&
+    hours !== 12
+  ) {
+    hours += 12
+  }
+
+  if (
+    modifier === "am" &&
+    hours === 12
+  ) {
+    hours = 0
+  }
+
+  const appointmentEnd =
+    new Date(item.date)
+
+  appointmentEnd.setHours(
+    hours,
+    minutes,
+    0,
+    0
+  )
+
+  return appointmentEnd >= now
+
+})
+.map((item, index) => (
 
                             <div
                                 key={index}
@@ -903,13 +1021,27 @@ patientsData={patientsData}
                                     setSelectedAppointment(item)
                                     setStep(1)
                                 }}
-                                className="bg-white shadow-md rounded-xl p-5 flex items-center gap-4 cursor-pointer hover:shadow-lg transition w-full"
+                                className="
+bg-white
+shadow-sm
+rounded-2xl
+p-3
+flex
+items-center
+gap-3
+cursor-pointer
+hover:shadow-md
+transition
+w-full
+min-w-0
+h-[90px]
+"
                             >
 
                                 {/* PATIENT IMAGE */}
                                 <img
                                     src={item.patientImage || assets.profile_pic}
-                                    className="w-16 h-16 rounded-full object-cover"
+                                    className="w-12 h-12 rounded-full object-cover"
                                 />
 
                                 {/* DETAILS */}
@@ -937,10 +1069,29 @@ patientsData={patientsData}
                     {selectedAppointment && (
                         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40">
 
-                            <div className="bg-white w-[95%] md:w-[900px] h-auto md:h-[520px] flex flex-col md:flex-row">
+<div className="
+bg-white
+w-[95%]
+md:w-[750px]
+max-h-[90vh]
+overflow-y-auto
+rounded-2xl
+shadow-2xl
+flex
+flex-col
+md:flex-row
+">
 
                                 {/* LEFT PANEL */}
-                                <div className="w-1/4 bg-gray-100 p-4 space-y-3">
+                                <div className="
+w-full
+md:w-1/4
+bg-gray-100
+p-4
+space-y-3
+rounded-t-2xl
+md:rounded-none
+">
 
                                     <h2 className="font-bold text-lg">Appointment Panel</h2>
 
@@ -968,7 +1119,16 @@ patientsData={patientsData}
                                 </div>
 
                                 {/* RIGHT CONTENT */}
-                                <div className="w-3/4 p-6 flex flex-col h-full justify-between relative">
+                                <div className="
+w-full
+md:w-3/4
+p-4
+md:p-6
+flex
+flex-col
+justify-between
+relative
+">
 
                                     <button
                                         onClick={() => setSelectedAppointment(null)}
@@ -1102,7 +1262,7 @@ patientsData={patientsData}
 
                         </div>
                     )}
-                </>
+                </div>
             )}
 
             {/* MOBILE BOTTOM NAV */}

@@ -226,7 +226,7 @@ localStorage.getItem("masterData")
 
 
 <img
-onClick={() => navigate("/home")}
+onClick={() => navigate("/select-hospital")}
 className="
 w-[120px]
 h-[60px]
@@ -330,7 +330,7 @@ setUserName("");
 
 // ✅ GO HOME
 setShowProfileMenu(false);
-navigate("select-hospital");
+navigate("/home");
 
 }}
                 className="px-4 py-2 bg-red-500 text-white rounded"

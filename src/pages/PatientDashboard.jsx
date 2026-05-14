@@ -20,6 +20,60 @@ const PatientDashboard = () => {
     const [duration, setDuration] = useState(0)
     const [checkedOut, setCheckedOut] = useState(false)
     const navigate = useNavigate();
+
+    useEffect(() => {
+
+      const handleBack = () => {
+    
+        const confirmLogout =
+          window.confirm(
+            "Are you sure you want to logout?"
+          );
+    
+        if (confirmLogout) {
+    
+          localStorage.clear();
+    
+          navigate("/select-hospital", {
+            replace: true
+          });
+    
+        } else {
+    
+          window.history.pushState(
+            null,
+            "",
+            window.location.href
+          );
+    
+        }
+    
+      };
+    
+      window.history.pushState(
+        null,
+        "",
+        window.location.href
+      );
+    
+      window.addEventListener(
+        "popstate",
+        handleBack
+      );
+    
+      return () => {
+    
+        window.removeEventListener(
+          "popstate",
+          handleBack
+        );
+    
+      };
+    
+    }, []);
+
+
+
     const [activeTab, setActiveTab] = useState("appointments")
 
     const savedUser = JSON.parse(
@@ -46,7 +100,8 @@ const PatientDashboard = () => {
                 if (
                   data?.patientEmail &&
                   userEmail &&
-                  data.patientEmail.toLowerCase() === userEmail.toLowerCase()
+                  String(data.patientEmail).trim().toLowerCase() ===
+String(userEmail).trim().toLowerCase()
                 ) {
                   list.push({
                     id: doc.id,

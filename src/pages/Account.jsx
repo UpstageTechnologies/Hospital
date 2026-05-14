@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { auth, db } from "../firebase"
 import { doc, setDoc, getDoc, deleteDoc, updateDoc } from "firebase/firestore"
-import { collection, getDocs } from "firebase/firestore"
+import {
+  collection,
+  getDocs,
+  onSnapshot
+} from "firebase/firestore"
 import { useNavigate } from "react-router-dom";
 import FloatingInput from "../components/FloatingInput"
 import { createUserWithEmailAndPassword } from "firebase/auth"
@@ -203,119 +207,120 @@ confirmPassword:""
   const today = new Date().toISOString().split("T")[0];
 
   const currentAppointments =
-patientAccounts.filter((p) => {
-
-  const historyAppointments =
-patientAccounts.filter((p) => {
-
-if (!p.date || !p.time)
-return false;
-
-const now = new Date();
-
-const endTime =
-p.time.split("-")[1]?.trim();
-
-if (!endTime) return false;
-
-const match =
-endTime.match(
-/(\d+):(\d+)(am|pm)/i
-);
-
-if (!match) return false;
-
-let hours =
-parseInt(match[1]);
-
-const minutes =
-parseInt(match[2]);
-
-const modifier =
-match[3].toLowerCase();
-
-if (
-modifier === "pm" &&
-hours !== 12
-) {
-hours += 12;
-}
-
-if (
-modifier === "am" &&
-hours === 12
-) {
-hours = 0;
-}
-
-const appointmentEnd =
-new Date(p.date);
-
-appointmentEnd.setHours(
-hours,
-minutes,
-0,
-0
-);
-
-return appointmentEnd < now;
-
-});
-
-  if (!p.date || !p.time)
-    return false;
-
-  const now = new Date();
-
-  const endTime =
-    p.time.split("-")[1]?.trim();
-
-  if (!endTime) return false;
-
-  const match =
-    endTime.match(
-      /(\d+):(\d+)(am|pm)/i
-    );
-
-  if (!match) return false;
-
-  let hours =
-    parseInt(match[1]);
-
-  const minutes =
-    parseInt(match[2]);
-
-  const modifier =
-    match[3].toLowerCase();
-
-  if (
-    modifier === "pm" &&
-    hours !== 12
-  ) {
-    hours += 12;
-  }
-
-  if (
-    modifier === "am" &&
-    hours === 12
-  ) {
-    hours = 0;
-  }
-
-  const appointmentEnd =
-    new Date(p.date);
-
-  appointmentEnd.setHours(
-    hours,
-    minutes,
-    0,
-    0
-  );
-
-  return appointmentEnd >= now;
-
-});
+  patientAccounts.filter((p) => {
   
+    if (!p.date || !p.time)
+      return false;
+  
+    const now = new Date();
+  
+    const endTime =
+      p.time.split("-")[1]?.trim();
+  
+    if (!endTime) return false;
+  
+    const match =
+      endTime.match(
+        /(\d+):(\d+)(am|pm)/i
+      );
+  
+    if (!match) return false;
+  
+    let hours =
+      parseInt(match[1]);
+  
+    const minutes =
+      parseInt(match[2]);
+  
+    const modifier =
+      match[3].toLowerCase();
+  
+    if (
+      modifier === "pm" &&
+      hours !== 12
+    ) {
+      hours += 12;
+    }
+  
+    if (
+      modifier === "am" &&
+      hours === 12
+    ) {
+      hours = 0;
+    }
+  
+    const appointmentEnd =
+      new Date(p.date);
+  
+    appointmentEnd.setHours(
+      hours,
+      minutes,
+      0,
+      0
+    );
+  
+    return appointmentEnd >= now;
+  
+  });
+  
+  
+  
+  const historyAppointments =
+  patientAccounts.filter((p) => {
+  
+    if (!p.date || !p.time)
+      return false;
+  
+    const now = new Date();
+  
+    const endTime =
+      p.time.split("-")[1]?.trim();
+  
+    if (!endTime) return false;
+  
+    const match =
+      endTime.match(
+        /(\d+):(\d+)(am|pm)/i
+      );
+  
+    if (!match) return false;
+  
+    let hours =
+      parseInt(match[1]);
+  
+    const minutes =
+      parseInt(match[2]);
+  
+    const modifier =
+      match[3].toLowerCase();
+  
+    if (
+      modifier === "pm" &&
+      hours !== 12
+    ) {
+      hours += 12;
+    }
+  
+    if (
+      modifier === "am" &&
+      hours === 12
+    ) {
+      hours = 0;
+    }
+  
+    const appointmentEnd =
+      new Date(p.date);
+  
+    appointmentEnd.setHours(
+      hours,
+      minutes,
+      0,
+      0
+    );
+  
+    return appointmentEnd < now;
+  
+  });  
 
 
   const [callData, setCallData] = useState(null)
@@ -541,9 +546,30 @@ return appointmentEnd < now;
     fetchStaffs()
     fetchDoctors()
     fetchAdmins()
-    fetchPatients()
     fetchPharmasi()
-
+  
+    const unsub = onSnapshot(
+      collection(db, "appointments"),
+      (snapshot) => {
+  
+        const patientList = []
+  
+        snapshot.forEach((doc) => {
+  
+          patientList.push({
+            id: doc.id,
+            ...doc.data()
+          })
+  
+        })
+  
+        setPatientAccounts(patientList)
+  
+      }
+    )
+  
+    return () => unsub()
+  
   }, [])
 
 
@@ -1274,144 +1300,6 @@ return appointmentEnd < now;
     <div className="flex flex-col md:flex-row min-h-screen w-full">
 
 
-{callData && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-
-    <div className="bg-white rounded-xl p-6 w-[600px]">
-
-      {/* ✅ PRINT AREA */}
-      <div id="print-section">
-
-<h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-  Patient Medical Report
-</h2>
-
-{/* Doctor Section */}
-<div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
-  <img
-    src={callData?.doctorImage || "/Doctors/doc1.png"}
-    style={{ width: "80px", height: "80px", borderRadius: "50%", marginRight: "20px" }}
-  />
-
-<div className="flex flex-col items-center mb-6">
-
-<label htmlFor="doctor-image">
-
-  <img
-    src={
-      doctorImage ||
-      "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-    }
-    alt="doctor"
-    className="w-28 h-28 rounded-full object-cover border-4 border-blue-500 cursor-pointer"
-  />
-
-</label>
-
-<input
-  type="file"
-  id="doctor-image"
-  hidden
-  accept="image/*"
-  onChange={(e) => {
-
-    const file = e.target.files[0]
-
-    if (file) {
-
-      setDoctorImage(
-        URL.createObjectURL(file)
-      )
-
-    }
-
-  }}
-/>
-
-<p className="text-sm text-gray-500 mt-2">
-  Click image to upload
-</p>
-
-</div>
-  <div>
-    <p><b>Doctor Name:</b> {callData?.doctorName || "Dr. Default"}</p>
-  </div>
-</div>
-
-{/* Patient Info */}
-<p><b>Patient Name:</b> {callData?.basicInfo?.name}</p>
-<p><b>Age:</b> {callData?.basicInfo?.age}</p>
-<p><b>Mobile:</b> {callData?.basicInfo?.contact}</p>
-<p><b>Address:</b> {callData?.basicInfo?.address}</p>
-<p><b>City:</b> {callData?.city || "N/A"}</p>
-
-{/* Appointment Info */}
-<hr style={{ margin: "15px 0" }} />
-
-<p><b>Appointment No:</b> {callData?.appointmentId || "APT001"}</p>
-<p><b>Date:</b> {callData?.date || "N/A"}</p>
-<p><b>Time:</b> {callData?.time || "N/A"}</p>
-
-{/* Medical Info */}
-<hr style={{ margin: "15px 0" }} />
-
-<p><b>Reason:</b> {callData?.reasonInfo?.visitReason}</p>
-
-{/* Fees */}
-<p><b>Fees:</b> ₹ {callData?.fees || 500}</p>
-
-{/* Tablet Details Table */}
-<h3 style={{ marginTop: "20px" }}>Tablet Details</h3>
-
-<table border="1" cellPadding="10" style={{ width: "100%", marginTop: "10px" }}>
-  <thead>
-    <tr>
-      <th>Tablet</th>
-      <th>Morning</th>
-      <th>Afternoon</th>
-      <th>Night</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Paracetamol</td>
-      <td>✔</td>
-      <td>✖</td>
-      <td>✔</td>
-    </tr>
-    <tr>
-      <td>Vitamin C</td>
-      <td>✔</td>
-      <td>✔</td>
-      <td>✖</td>
-    </tr>
-  </tbody>
-</table>
-
-</div>
-
-      {/* ✅ PRINT BUTTON */}
-      <div className="mt-4 text-center">
-        <button
-          onClick={handlePrint}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Print
-        </button>
-      </div>
-
-      {/* ❌ CLOSE */}
-      <button
-        onClick={() => setCallData(null)}
-        className="absolute top-2 right-2"
-      >
-        X
-      </button>
-
-    </div>
-  </div>
-)}
-
 <div className="hidden md:block w-64 bg-blue-600 text-white p-4 md:p-6 min-h-screen">
 
         <ul className="space-y-4">
@@ -1746,7 +1634,7 @@ Visit
         </h2>
 
         <a
-          href={`tel:${callData.basicInfo?.contact}`}
+          href={`tel:${callData.patientPhone || ""}`}
           className="bg-green-500 text-white px-6 py-3 rounded-xl mb-6"
         >
           📞 Call Patient
@@ -1755,16 +1643,43 @@ Visit
 
       <div className="grid grid-cols-2 gap-4">
 
-        <input value={callData.basicInfo?.name} disabled className="input-style"/>
-        <input value={callData.basicInfo?.contact} disabled className="input-style"/>
+<input
+  value={callData.patientName || ""}
+  disabled
+  className="border p-3 rounded-xl"
+/>
 
-        <input value={callData.basicInfo?.address} disabled className="input-style"/>
-        <input value="Doctor Name" disabled className="input-style"/>
+<input
+  value={callData.patientEmail || ""}
+  disabled
+  className="border p-3 rounded-xl"
+/>
 
-        <input value="Date" disabled className="input-style"/>
-        <input value="Time" disabled className="input-style"/>
+<input
+  value={callData.reason || ""}
+  disabled
+  className="border p-3 rounded-xl"
+/>
 
-      </div>
+<input
+  value={callData.doctorName || ""}
+  disabled
+  className="border p-3 rounded-xl"
+/>
+
+<input
+  value={callData.date || ""}
+  disabled
+  className="border p-3 rounded-xl"
+/>
+
+<input
+  value={callData.time || ""}
+  disabled
+  className="border p-3 rounded-xl"
+/>
+
+</div>
 
       <p className={`text-center mt-4 font-semibold ${
         callData.status === "completed"

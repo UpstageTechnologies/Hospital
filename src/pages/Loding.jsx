@@ -15,7 +15,38 @@ const Loding = () => {
 
     const navigate = useNavigate();
 
-    const roles = ["master", "admin", "doctor", "staff", "patient"];
+useEffect(() => {
+
+    const handleBackButton = () => {
+
+        const confirmLeave = window.confirm(
+            "Do you want to go back to Hospital Intro Page?"
+        );
+
+        if (confirmLeave) {
+
+            navigate("/hospitalintro", {
+                replace: true
+            });
+
+        } else {
+
+            window.history.pushState(null, "", window.location.href);
+
+        }
+    };
+
+    window.history.pushState(null, "", window.location.href);
+
+    window.addEventListener("popstate", handleBackButton);
+
+    return () => {
+        window.removeEventListener("popstate", handleBackButton);
+    };
+
+}, [navigate]);
+
+const roles = ["master", "admin", "doctor", "staff", "patient"];
 
 
     useEffect(() => {
@@ -135,7 +166,9 @@ localStorage.removeItem("adminData");
             }
 
             
-            navigate("/home");
+            navigate("/home", {
+                replace: true
+              });
 
         } catch (err) {
             console.log(err);

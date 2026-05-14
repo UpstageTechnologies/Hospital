@@ -123,8 +123,11 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
         {[...Array(daysInMonth)].map((_, i) => {
           const day = i + 1;
           const dateStr = format(day);
-          const dayOnly = dateStr.split("-")[2];
-          const event = events[dateStr] || events[`day-${dayOnly}`];
+          const weekDay = new Date(dateStr).getDay();
+
+const event =
+  events[dateStr] ||
+  events[`week-${weekDay}`];
           const dayIndex = new Date(dateStr).getDay();
           const isSunday = dayIndex === 0;
 
@@ -146,9 +149,12 @@ export default function Calendar({ adminId = "demoAdmin", enableSlots = false })
                 setType(event?.type || "working");
 
                 // ✅ STEP 5 CORRECT PLACE
-                const dayOnly = dateStr.split("-")[2];
-                const eventData = events[dateStr] || events[`day-${dayOnly}`];
+                const weekDay =
+  new Date(dateStr).getDay();
 
+const eventData =
+  events[dateStr] ||
+  events[`week-${weekDay}`];
                 if (enableSlots) {
                   const dateEvent = events[dateStr];
                   const dayEvent = events[`day-${dayOnly}`];
@@ -248,12 +254,23 @@ rounded-2xl text-center cursor-pointer ${color}`}
                         type: "working"
                       }, { merge: true });
 
-                      const dayOnly = selectedDate.split("-")[2];
+                      const weekDay =
+  new Date(selectedDate).getDay();
 
-                      await setDoc(doc(db, "users", adminId, "calendar", `day-${dayOnly}`), {
-                        slots,
-                        type: "working"
-                      }, { merge: true });
+await setDoc(
+  doc(
+    db,
+    "users",
+    adminId,
+    "calendar",
+    `week-${weekDay}`
+  ),
+  {
+    slots,
+    type: "working"
+  },
+  { merge: true }
+);
                     }
 
                     setPopup(false);
@@ -267,12 +284,22 @@ rounded-2xl text-center cursor-pointer ${color}`}
                   <button
                     onClick={async () => {
 
-                      const dayOnly = selectedDate.split("-")[2];
+                      const weekDay =
+  new Date(selectedDate).getDay();
 
-                      // 🔥 update common day
-                      await setDoc(doc(db, "users", adminId, "calendar", `day-${dayOnly}`), {
-                        slots
-                      }, { merge: true });
+await setDoc(
+  doc(
+    db,
+    "users",
+    adminId,
+    "calendar",
+    `week-${weekDay}`
+  ),
+  {
+    slots
+  },
+  { merge: true }
+);
 
                       setPopup(false);
                     }}
@@ -297,7 +324,7 @@ rounded-2xl text-center cursor-pointer ${color}`}
             <div className="bg-gradient-to-br from-blue-500 to-blue-700 p-6 rounded-2xl w-[350px] text-white shadow">
 
               <h2 className="text-lg font-bold mb-4">
-                Slots - {selectedDate}
+              Appointments - {selectedDate}
               </h2>
 
               {/* SLOT BUTTON */}
@@ -392,12 +419,22 @@ rounded-2xl text-center cursor-pointer ${color}`}
                         type: "working"
                       }, { merge: true });
 
-                      const dayOnly = selectedDate.split("-")[2];
+                      const weekDay =
+  new Date(selectedDate).getDay();
 
-                      await setDoc(doc(db, "users", adminId, "calendar", `day-${dayOnly}`), {
-                        slots,
-                        type: "working"
-                      }, { merge: true });
+await setDoc(
+  doc(
+    db,
+    "users",
+    adminId,
+    "calendar",
+    `week-${weekDay}`
+  ),
+  {
+    slots
+  },
+  { merge: true }
+);
                     }
 
                     setPopup(false);

@@ -513,6 +513,12 @@ Go to Dashboard
                               return alert("Fill all details ❌")
                             }
 
+                            const generatedNo = `API${Math.floor(
+                              100 + Math.random() * 900
+                            )}`
+                            
+                            setAppointmentNo(generatedNo)
+
                             const appointmentData = {
                               doctorId: decodedId,
                               doctorEmail: docInfo.email,
@@ -523,7 +529,7 @@ Go to Dashboard
                               date: selectedDate,
                               time: slotTime,
                               reason,
-                              appointmentNo,
+                              appointmentNo: generatedNo,
                               patientEmail: auth.currentUser?.email,  // 🔥 FINAL FIX
                               doctorImage:
   docInfo.image ||

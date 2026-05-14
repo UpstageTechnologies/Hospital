@@ -7,6 +7,60 @@ const StaffDashboard = () => {
 
   const navigate = useNavigate();
 
+
+  useEffect(() => {
+
+    const handleBack = () => {
+  
+      const confirmLogout =
+        window.confirm(
+          "Are you sure you want to logout?"
+        );
+  
+      if (confirmLogout) {
+  
+        localStorage.clear();
+  
+        navigate("/select-hospital", {
+          replace: true
+        });
+  
+      }
+  
+      else {
+  
+        window.history.pushState(
+          null,
+          "",
+          window.location.href
+        );
+  
+      }
+  
+    };
+  
+    window.history.pushState(
+      null,
+      "",
+      window.location.href
+    );
+  
+    window.addEventListener(
+      "popstate",
+      handleBack
+    );
+  
+    return () => {
+  
+      window.removeEventListener(
+        "popstate",
+        handleBack
+      );
+  
+    };
+  
+  }, []);
+
   const [staffData, setStaffData] = useState(null);
 
   useEffect(() => {
