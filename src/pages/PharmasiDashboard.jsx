@@ -592,7 +592,7 @@ border-t
 shadow-md
 ">
 
-<div className="grid grid-cols-3 py-3 text-black">
+<div className="grid grid-cols-4 py-3 text-black">
 
 <button
 onClick={()=>setMenu("home")}
