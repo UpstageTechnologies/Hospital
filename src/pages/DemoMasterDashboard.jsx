@@ -264,6 +264,23 @@ const handleCreateAdminFull = async () => {
   }
 }
 
+
+const [adminAccounts, setAdminAccounts] = useState([])
+
+const fetchAdmins = async () => {
+
+  const snapshot = await getDocs(
+    collection(db, "admins")
+  )
+
+  setAdminAccounts(
+    snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  )
+}
+
 const handleCreateDoctorFull = async () => {
   const id = doctorOfficial.doctorId
 
@@ -387,11 +404,59 @@ const fetchPharmasi = async () => {
 }
 
 useEffect(() => {
+
+  fetchAdmins()
+
   fetchDoctors()
+
   fetchStaffs()
+
   fetchPatients()
+
   fetchPharmasi()
+
 }, [])
+
+const handleUpdateAdmin = async () => {
+
+  try {
+
+    const docId = editData?.id
+
+    if (!docId) {
+      alert("Document ID Missing")
+      return
+    }
+
+    await updateDoc(
+      doc(db, "admins", docId),
+      {
+        adminBasicInfo,
+        adminDesignation,
+        adminOfficial,
+        adminAccount
+      }
+    )
+
+    alert("Admin Updated Successfully")
+
+    fetchAdmins()
+
+    setIsEditMode(false)
+
+    setIsViewMode(false)
+
+    setEditData(null)
+
+    setAdminStep(1)
+
+  } catch (err) {
+
+    console.log(err)
+
+  }
+
+}
 
   const appointments = [
     {
@@ -748,7 +813,7 @@ useEffect(() => {
             </div>
           )}
 
-{subMenu === "admins" && (
+{tab === "account" && subMenu === "admins" && (
 
 <div className="flex flex-col md:flex-row w-full max-w-7xl border rounded-lg overflow-hidden md:h-[450px] h-auto">
 
@@ -779,7 +844,7 @@ useEffect(() => {
 
 
 
-            <div className="w-full md:w-3/4 p-4 md:p-6 overflow-y-auto pb-24">
+            <div className="w-full md:w-3/4 p-4 md:p-6 relative min-h-[650px]">
 
 
 
@@ -872,7 +937,7 @@ useEffect(() => {
 
                   </div>
 
-                  <div className="mt-6 md:absolute md:bottom-4 md:right-6 flex justify-end gap-4">
+                  <div className="mt-auto pt-10 flex justify-end gap-4">
                     <button onClick={() => setAdminStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
                       Next
                     </button>
@@ -907,17 +972,7 @@ useEffect(() => {
                     />
                   </div>
 
-                  <div className="
-sticky
-bottom-0
-bg-white
-pt-6
-mt-auto
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
+                  <div className="mt-auto pt-10 flex justify-end gap-4">
                     <button onClick={() => setAdminStep(1)} className="bg-gray-500 text-white px-6 py-2 rounded">Previous</button>
                     <button onClick={() => setAdminStep(3)} className="bg-blue-500 text-white px-6 py-2 rounded">Next</button>
                   </div>
@@ -962,7 +1017,7 @@ flex-wrap
 
                   </div>
 
-                  <div className="mt-6 md:absolute md:bottom-4 md:right-6 flex justify-center md:justify-end gap-4">
+                  <div className="mt-auto pt-10 flex justify-end gap-4">
                     <button onClick={() => setAdminStep(2)} className="bg-gray-500 text-white px-6 py-2 rounded">Previous</button>
                     <button onClick={() => setAdminStep(4)} className="bg-blue-500 text-white px-6 py-2 rounded">Next</button>
                   </div>
@@ -1007,7 +1062,7 @@ flex-wrap
 
                   </div>
 
-                  <div className="mt-6 flex justify-center md:justify-end gap-4">
+                  <div className="mt-auto pt-10 flex justify-end gap-4">
 
                     <button
                       onClick={() => setAdminStep(3)}
@@ -1016,11 +1071,15 @@ flex-wrap
                     </button>
 
                     <button
-                      onClick={isEditMode ? handleUpdateAdmin : handleCreateAdminFull}
-                      className="bg-green-500 text-white px-6 py-2 rounded"
-                    >
-                      {isEditMode ? "Update Admin" : "Create Admin"}
-                    </button>
+  onClick={
+    isEditMode
+      ? handleUpdateAdmin
+      : handleCreateAdminFull
+  }
+  className="bg-green-500 text-white px-6 py-2 rounded"
+>
+  {isEditMode ? "Update Admin" : "Create Admin"}
+</button>
 
                   </div>
 
@@ -1033,1407 +1092,1522 @@ flex-wrap
 
         )}
 
+{subMenu === "admins" && (
 
+<div className="mt-10">
 
-        {subMenu === "doctors" && (
+  <h2 className="text-xl font-bold mb-4">
+    Created Admin Accounts
+  </h2>
 
-    <div className="flex flex-col md:flex-row w-full max-w-7xl border rounded-lg overflow-hidden mx-auto
-                      min-h-[auto] md:h-[450px]">
+  <table className="w-full border border-gray-300">
 
+    <thead className="bg-gray-200">
 
-    <div className=" w-full md:w-1/4  p-4 flex md:block gap-2 overflow-x-auto md:space-y-3">
+      <tr>
+        <th className="border p-2">Name</th>
+        <th className="border p-2">Designation</th>
+        <th className="border p-2">Address</th>
+        <th className="border p-2">Action</th>
+      </tr>
 
-              <h2 className="text-xl font-bold mb-4">Create Doctor Account</h2>
+    </thead>
 
-              <button onClick={() => setDoctorStep(1)}
-                className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Basic Info
-              </button>
+    <tbody>
 
-              <button onClick={() => setDoctorStep(2)}
-                className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Designation
-              </button>
+      {adminAccounts.map((admin, index) => (
 
-              <button onClick={() => setDoctorStep(3)}
-                className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Official Info
-              </button>
+        <tr key={index}>
 
-              <button onClick={() => setDoctorStep(4)}
-                className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Account
-              </button>
+          <td className="border p-2">
+            {admin.adminBasicInfo?.name}
+          </td>
 
-            </div>
+          <td className="border p-2">
+            {admin.adminDesignation?.designation}
+          </td>
 
+          <td className="border p-2">
+            {admin.adminBasicInfo?.address}
+          </td>
 
-            <div className="
-w-full md:w-3/4
-p-4 md:p-6
-relative
-bg-white
-flex
-flex-col
-min-h-[700px]
-">
+          <td className="border p-2 flex gap-2">
 
+            {/* VIEW */}
 
-              {doctorStep === 1 && (
+            <button
+              onClick={() => {
 
-                <div>
+                setAdminBasicInfo(admin.adminBasicInfo || {})
+                setAdminDesignation(admin.adminDesignation || {})
+                setAdminOfficial(admin.adminOfficial || {})
+                setAdminAccount(admin.adminAccount || {})
 
-                  <h3 className="text-lg font-bold mb-6">
-                    Basic Information
-                  </h3>
+                setIsViewMode(true)
+                setIsEditMode(false)
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                setAdminStep(1)
+              }}
+              className="bg-green-500 text-white px-2 py-1 rounded"
+            >
+              View
+            </button>
 
+            {/* EDIT */}
 
-                    <FloatingInput label="Name" required value={doctorBasicInfo.name} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorBasicInfo({ ...doctorBasicInfo, name: e.target.value })
-                      }
-                    />
+            <button
+              onClick={() => {
 
+                setAdminBasicInfo(admin.adminBasicInfo || {})
+                setAdminDesignation(admin.adminDesignation || {})
+                setAdminOfficial(admin.adminOfficial || {})
+                setAdminAccount(admin.adminAccount || {})
 
-                    <FloatingInput label="Age" required type="number" value={doctorBasicInfo.age} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorBasicInfo({ ...doctorBasicInfo, age: e.target.value })
-                      }
-                    />
+                setEditData(admin)
 
+                setIsViewMode(false)
+                setIsEditMode(true)
 
-                    <div className="relative">
-                      <select value={doctorBasicInfo.gender} disabled={isViewMode}
-                        onChange={(e) =>
-                          setDoctorBasicInfo({ ...doctorBasicInfo, gender: e.target.value })
-                        }
-                        className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
-                      >
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Others">Others</option>
-                      </select>
+                setAdminStep(1)
+              }}
+              className="bg-blue-500 text-white px-2 py-1 rounded"
+            >
+              Edit
+            </button>
 
-                      <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
-                        Gender <span className="text-red-500">*</span>
-                      </label>
-                    </div>
+            {/* DELETE */}
 
+            <button
+              onClick={async () => {
 
-                    <FloatingInput label="DOB" type="date" value={doctorBasicInfo.dob} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorBasicInfo({ ...doctorBasicInfo, dob: e.target.value })
-                      }
-                    />
+                await deleteDoc(
+                  doc(db, "admins", admin.id)
+                )
 
+                fetchAdmins()
+              }}
+              className="bg-red-500 text-white px-2 py-1 rounded"
+            >
+              Delete
+            </button>
 
-                    <FloatingInput label="Address" className="col-span-2" inputClassName="h-[120px] pt-6"
-                      value={doctorBasicInfo.address || ""} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorBasicInfo({ ...doctorBasicInfo, address: e.target.value })
-                      }
-                    />
+            {/* DISABLE */}
 
+            <button
+              onClick={async () => {
 
-                    <div className="col-span-2 flex flex-col gap-4">
+                await updateDoc(
+                  doc(db, "admins", admin.id),
+                  {
+                    isDisabled: !admin.isDisabled
+                  }
+                )
 
-                      <FloatingInput label="Contact Number" required value={doctorBasicInfo.contact} disabled={isViewMode}
-                        onChange={(e) =>
-                          setDoctorBasicInfo({ ...doctorBasicInfo, contact: e.target.value })
-                        }
-                      />
+                fetchAdmins()
+              }}
+              className={`px-2 py-1 rounded text-white ${
+                admin.isDisabled
+                  ? "bg-green-500"
+                  : "bg-gray-500"
+              }`}
+            >
+              {admin.isDisabled ? "Enable" : "Disable"}
+            </button>
 
-                      <FloatingInput label="EMR Contact" value={doctorBasicInfo.emrContact || ""} disabled={isViewMode}
-                        onChange={(e) =>
-                          setDoctorBasicInfo({ ...doctorBasicInfo, emrContact: e.target.value })
-                        }
-                      />
+          </td>
 
-                    </div>
+        </tr>
 
+      ))}
 
-                    <FloatingInput label="Email" className="col-span-2" value={doctorBasicInfo.email} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorBasicInfo({ ...doctorBasicInfo, email: e.target.value })
-                      }
-                    />
+    </tbody>
 
-
-                    <FloatingInput label="Occupation" className="col-span-2" value={doctorBasicInfo.occupation || ""} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorBasicInfo({ ...doctorBasicInfo, occupation: e.target.value })
-                      }
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-                    <button onClick={() => setDoctorStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
-                      Next
-                    </button>
-                  </div>
-
-                </div>
-              )}
-
-
-              {doctorStep === 2 && (
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Designation
-                  </h3>
-
-                  <div className="flex flex-col items-center mb-6">
-
-  <img
-    src={
-      doctorDesignation.doctorImage || defaultDoctorAvatar
-    }
-    alt="doctor"
-    className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
-  />
-
-  <input
-    type="file"
-    accept="image/*"
-    className="mt-4"
-    onChange={(e) => {
-      const file = e.target.files[0]
-
-      if (file) {
-        const imageUrl = URL.createObjectURL(file)
-
-        setDoctorDesignation({
-          ...doctorDesignation,
-          doctorImage: imageUrl
-        })
-      }
-    }}
-  />
+  </table>
 
 </div>
 
-                  <div className="grid grid-cols-2 gap-6 max-w-4xl">
+)}
 
-                    <FloatingInput label="Designation" value={doctorDesignation.designation} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorDesignation({
-                          ...doctorDesignation,
-                          designation: e.target.value
-                        })
-                      }
-                    />
 
-                    <FloatingInput label="Qualification" value={doctorDesignation.qualification} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorDesignation({
-                          ...doctorDesignation,
-                          qualification: e.target.value
-                        })
-                      }
-                    />
 
-                  </div>
+{tab === "account" && subMenu === "doctors" && (
 
-                  <div className="
+<div className="flex flex-col md:flex-row w-full max-w-7xl border rounded-lg overflow-hidden mx-auto
+                  min-h-[auto] md:h-[450px]">
+
+
+<div className=" w-full md:w-1/4  p-4 flex md:block gap-2 overflow-x-auto md:space-y-3">
+
+          <h2 className="text-xl font-bold mb-4">Create Doctor Account</h2>
+
+          <button onClick={() => setDoctorStep(1)}
+            className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
+            Basic Info
+          </button>
+
+          <button onClick={() => setDoctorStep(2)}
+            className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+            Designation
+          </button>
+
+          <button onClick={() => setDoctorStep(3)}
+            className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+            Official Info
+          </button>
+
+          <button onClick={() => setDoctorStep(4)}
+            className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
+            Account
+          </button>
+
+        </div>
+
+
+        <div className="
+w-full md:w-3/4
+p-3 md:p-6
+relative
+overflow-y-auto
+min-h-[600px]
+bg-white
+">
+
+
+          {doctorStep === 1 && (
+
+            <div>
+
+              <h3 className="text-lg font-bold mb-6">
+                Basic Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+
+                <FloatingInput label="Name" required value={doctorBasicInfo.name} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorBasicInfo({ ...doctorBasicInfo, name: e.target.value })
+                  }
+                />
+
+
+                <FloatingInput label="Age" required type="number" value={doctorBasicInfo.age} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorBasicInfo({ ...doctorBasicInfo, age: e.target.value })
+                  }
+                />
+
+
+                <div className="relative">
+                  <select value={doctorBasicInfo.gender} disabled={isViewMode}
+                    onChange={(e) =>
+                      setDoctorBasicInfo({ ...doctorBasicInfo, gender: e.target.value })
+                    }
+                    className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Others">Others</option>
+                  </select>
+
+                  <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
+                    Gender <span className="text-red-500">*</span>
+                  </label>
+                </div>
+
+
+                <FloatingInput label="DOB" type="date" value={doctorBasicInfo.dob} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorBasicInfo({ ...doctorBasicInfo, dob: e.target.value })
+                  }
+                />
+
+
+                <FloatingInput label="Address" className="col-span-2" inputClassName="h-[120px] pt-6"
+                  value={doctorBasicInfo.address || ""} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorBasicInfo({ ...doctorBasicInfo, address: e.target.value })
+                  }
+                />
+
+
+                <div className="col-span-2 flex flex-col gap-4">
+
+                  <FloatingInput label="Contact Number" required value={doctorBasicInfo.contact} disabled={isViewMode}
+                    onChange={(e) =>
+                      setDoctorBasicInfo({ ...doctorBasicInfo, contact: e.target.value })
+                    }
+                  />
+
+                  <FloatingInput label="EMR Contact" value={doctorBasicInfo.emrContact || ""} disabled={isViewMode}
+                    onChange={(e) =>
+                      setDoctorBasicInfo({ ...doctorBasicInfo, emrContact: e.target.value })
+                    }
+                  />
+
+                </div>
+
+
+                <FloatingInput label="Email" className="col-span-2" value={doctorBasicInfo.email} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorBasicInfo({ ...doctorBasicInfo, email: e.target.value })
+                  }
+                />
+
+
+                <FloatingInput label="Occupation" className="col-span-2" value={doctorBasicInfo.occupation || ""} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorBasicInfo({ ...doctorBasicInfo, occupation: e.target.value })
+                  }
+                />
+
+              </div>
+
+              <div className="
 mt-6
 flex
 justify-center md:justify-end
 gap-4
 flex-wrap
 ">
+                <button onClick={() => setDoctorStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
+                  Next
+                </button>
+              </div>
 
-                    <button onClick={() => setDoctorStep(1)} className="bg-gray-500 text-white px-8 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={() => setDoctorStep(3)} className="bg-blue-500 text-white px-8 py-2 rounded">
-                      Next
-                    </button>
-
-                  </div>
-
-                </div>
-              )}
-
-
-              {doctorStep === 3 && (
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Official Info
-                  </h3>
-
-                  <div className="flex flex-col gap-6 max-w-md">
-
-                    <FloatingInput label="Doctor ID" value={doctorOfficial.doctorId} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorOfficial({
-                          ...doctorOfficial,
-                          doctorId: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Joining Date" type="date" value={doctorOfficial.joiningDate} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorOfficial({
-                          ...doctorOfficial,
-                          joiningDate: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Relieving Date" type="date" value={doctorOfficial.relievingDate} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorOfficial({
-                          ...doctorOfficial,
-                          relievingDate: e.target.value
-                        })
-                      }
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-                    <button onClick={() => setDoctorStep(2)} className="bg-gray-500 text-white px-8 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={() => setDoctorStep(4)} className="bg-blue-500 text-white px-8 py-2 rounded">
-                      Next
-                    </button>
-                  </div>
-
-                </div>
-              )}
-
-
-              {doctorStep === 4 && (
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Create Account
-                  </h3>
-
-                  <div className="flex flex-col gap-6 max-w-md">
-
-                    <FloatingInput label="Doctor ID" value={doctorAccount.doctorId} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorAccount({
-                          ...doctorAccount,
-                          doctorId: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Password" type="password" value={doctorAccount.password} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorAccount({
-                          ...doctorAccount,
-                          password: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Confirm Password" type="password" value={doctorAccount.confirmPassword} disabled={isViewMode}
-                      onChange={(e) =>
-                        setDoctorAccount({
-                          ...doctorAccount,
-                          confirmPassword: e.target.value
-                        })
-                      }
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-
-                    <button onClick={() => setDoctorStep(3)} className="bg-gray-500 text-white px-8 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button
-                      onClick={isEditMode ? handleUpdateDoctor : handleCreateDoctorFull}
-                      className="bg-green-500 text-white px-8 py-2 rounded"
-                    >
-                      {isEditMode ? "Update Doctor" : "Create Doctor"}
-                    </button>
-
-                  </div>
-
-                </div>
-              )}
             </div>
-
-          </div>
-
-        )}
-
-        {subMenu === "doctors" && (
-
-          <div className="mt-10">
-
-            <h2 className="text-xl font-bold mb-4">Created Doctor Accounts</h2>
-
-            <table className="w-full border border-gray-300">
-
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="border p-2">Name</th>
-                  <th className="border p-2">Speciality</th>
-                  <th className="border p-2">address</th>
-
-                  <th className="border p-2">Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {doctorAccounts.map((docData, index) => (
-
-                    <tr key={index}>
-
-                      <td className="border p-2">
-                      {docData.doctorBasicInfo?.name}
-                      </td>
-
-                      <td className="border p-2">
-                      {docData.doctorDesignation?.designation}
-                      </td>
-
-                      <td className="border p-2">
-                      {docData.doctorBasicInfo?.address}
-                      </td>
-
-                      {/* <td className="border p-2">
-                      {docData.contact}
-                    </td> */}
-
-                      <td className="border p-2 flex gap-2">
+          )}
 
 
-                        <button
-                          onClick={() => {
+          {doctorStep === 2 && (
+            <div>
 
-                            setDoctorBasicInfo(docData.doctorBasicInfo || {})
-                            setDoctorDesignation(docData.doctorDesignation || {})
-                            setDoctorOfficial(docData.doctorOfficial || {})
-                            setDoctorAccount(docData.doctorAccount || {})
-
-                            setIsViewMode(true)
-                            setIsEditMode(false)
-                            setDoctorStep(1)
-                          }}
-                          className="bg-green-500 text-white px-2 py-1 rounded"
-                        >
-                          View
-                        </button>
-
-
-                        <button
-                          onClick={() => {
-
-                            setEditData(null)
-                            setViewData(null)
-
-                            // 🔥 full data load
-                            setDoctorBasicInfo(docData.doctorBasicInfo || {})
-                            setDoctorDesignation(docData.doctorDesignation || {})
-                            setDoctorOfficial(docData.doctorOfficial || {})
-                            setDoctorAccount(docData.doctorAccount || {})
-
-                            setEditData(docData)
-
-                            // 🔥 modes
-                            setIsViewMode(false)
-                            setIsEditMode(true)
-
-                            // 🔥 open form
-                            setDoctorStep(1)
-                          }}
-                          className="bg-blue-500 text-white px-2 py-1 rounded"
-                        >
-                          Edit
-                        </button>
-
-
-                        <button
-                          onClick={async () => {
-                            await deleteDoc(doc(db, "doctors", docData.id))
-                            fetchDoctors()
-                          }}
-                          className="bg-red-500 text-white px-2 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-
-
-                        <button
-                          onClick={async () => {
-                            await updateDoc(doc(db, "doctors", docData.id), {
-                              isDisabled: !docData.isDisabled
-                            })
-                            fetchDoctors()
-                          }}
-                          className={`px-2 py-1 rounded text-white ${docData.isDisabled ? "bg-green-500" : "bg-gray-500"
-                            }`}
-                        >
-                          {docData.isDisabled ? "Enable" : "Disable"}
-                        </button>
-
-                      </td>
-
-                    </tr>
-
-                  ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        )}
-
-
-        {subMenu === "staff" && (
-
-<div className="
-flex
-flex-col
-md:flex-row
-w-full
-max-w-7xl
-border
-rounded-lg
-overflow-hidden
-min-h-[700px]
-">
-
-            <div className="w-1/4 p-4 space-y-3">
-
-              <h2 className="text-xl font-bold mb-4">Create Staff Account</h2>
-
-              <button onClick={() => setStaffStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Basic Info
-              </button>
-
-              <button onClick={() => setStaffStep(2)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <h3 className="text-lg font-bold mb-6">
                 Designation
-              </button>
+              </h3>
 
-              <button onClick={() => setStaffStep(3)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <div className="flex flex-col items-center mb-6">
+
+<img
+src={
+  doctorDesignation.doctorImage || defaultDoctorAvatar
+}
+alt="doctor"
+className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
+/>
+
+<input
+type="file"
+accept="image/*"
+className="mt-4"
+onChange={(e) => {
+  const file = e.target.files[0]
+
+  if (file) {
+    const imageUrl = URL.createObjectURL(file)
+
+    setDoctorDesignation({
+      ...doctorDesignation,
+      doctorImage: imageUrl
+    })
+  }
+}}
+/>
+
+</div>
+
+              <div className="grid grid-cols-2 gap-6 max-w-4xl">
+
+                <FloatingInput label="Designation" value={doctorDesignation.designation} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorDesignation({
+                      ...doctorDesignation,
+                      designation: e.target.value
+                    })
+                  }
+                />
+
+                <FloatingInput label="Qualification" value={doctorDesignation.qualification} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorDesignation({
+                      ...doctorDesignation,
+                      qualification: e.target.value
+                    })
+                  }
+                />
+
+              </div>
+
+              <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+                <button onClick={() => setDoctorStep(1)} className="bg-gray-500 text-white px-8 py-2 rounded">
+                  Previous
+                </button>
+
+                <button onClick={() => setDoctorStep(3)} className="bg-blue-500 text-white px-8 py-2 rounded">
+                  Next
+                </button>
+
+              </div>
+
+            </div>
+          )}
+
+
+          {doctorStep === 3 && (
+            <div>
+
+              <h3 className="text-lg font-bold mb-6">
                 Official Info
-              </button>
+              </h3>
 
-              <button onClick={() => setStaffStep(4)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
-                create Account
-              </button>
+              <div className="flex flex-col gap-6 max-w-md">
+
+                <FloatingInput label="Doctor ID" value={doctorOfficial.doctorId} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorOfficial({
+                      ...doctorOfficial,
+                      doctorId: e.target.value
+                    })
+                  }
+                />
+
+                <FloatingInput label="Joining Date" type="date" value={doctorOfficial.joiningDate} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorOfficial({
+                      ...doctorOfficial,
+                      joiningDate: e.target.value
+                    })
+                  }
+                />
+
+                <FloatingInput label="Relieving Date" type="date" value={doctorOfficial.relievingDate} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorOfficial({
+                      ...doctorOfficial,
+                      relievingDate: e.target.value
+                    })
+                  }
+                />
+
+              </div>
+
+              <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+                <button onClick={() => setDoctorStep(2)} className="bg-gray-500 text-white px-8 py-2 rounded">
+                  Previous
+                </button>
+
+                <button onClick={() => setDoctorStep(4)} className="bg-blue-500 text-white px-8 py-2 rounded">
+                  Next
+                </button>
+              </div>
 
             </div>
+          )}
 
 
-            <div className="w-3/4 p-6 relative overflow-hidden h-[450px]">
+          {doctorStep === 4 && (
+            <div>
 
-
-              {staffStep === 1 && (
-
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Basic Information
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-
-                    <FloatingInput label="Name" required value={staffBasicInfo.name} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffBasicInfo({ ...staffBasicInfo, name: e.target.value })
-                      }
-                    />
-
-
-                    <FloatingInput label="Age" required type="number" value={staffBasicInfo.age} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffBasicInfo({ ...staffBasicInfo, age: e.target.value })
-                      }
-                    />
-
-
-                    <div className="relative">
-                      <select value={staffBasicInfo.gender} disabled={isViewMode}
-                        onChange={(e) =>
-                          setStaffBasicInfo({ ...staffBasicInfo, gender: e.target.value })
-                        }
-                        className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
-                      >
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Others">Others</option>
-                      </select>
-
-                      <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
-                        Gender <span className="text-red-500">*</span>
-                      </label>
-                    </div>
-
-
-                    <FloatingInput label="DOB" type="date" value={staffBasicInfo.dob} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffBasicInfo({ ...staffBasicInfo, dob: e.target.value })
-                      }
-                    />
-
-
-                    <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[120px] pt-6"
-                      value={staffBasicInfo.address || ""} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffBasicInfo({ ...staffBasicInfo, address: e.target.value })
-                      }
-                    />
-
-
-                    <div className="col-span-2 flex flex-col gap-4">
-
-                      <FloatingInput label="Contact Number" required value={staffBasicInfo.contact} disabled={isViewMode}
-                        onChange={(e) =>
-                          setStaffBasicInfo({ ...staffBasicInfo, contact: e.target.value })
-                        }
-                      />
-
-                      <FloatingInput label="EMR Contact" value={staffBasicInfo.emrContact || ""} disabled={isViewMode}
-                        onChange={(e) =>
-                          setStaffBasicInfo({ ...staffBasicInfo, emrContact: e.target.value })
-                        }
-                      />
-
-                    </div>
-
-
-                    <FloatingInput label="Email" className="col-span-2" value={staffBasicInfo.email} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffBasicInfo({ ...staffBasicInfo, email: e.target.value })
-                      }
-                    />
-
-
-                    <FloatingInput label="Occupation" className="col-span-2" value={staffBasicInfo.occupation || ""} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffBasicInfo({ ...staffBasicInfo, occupation: e.target.value })
-                      }
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-                    <button onClick={() => setStaffStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
-                      Next
-                    </button>
-                  </div>
-
-                </div>
-              )}
-
-
-              {staffStep === 2 && (
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Designation
-                  </h3>
-
-                  <div className="grid grid-cols-2 gap-6 max-w-4xl">
-
-                    <FloatingInput label="Designation" value={staffDesignation.designation} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffDesignation({
-                          ...staffDesignation,
-                          designation: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Qualification" value={staffDesignation.qualification} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffDesignation({
-                          ...staffDesignation,
-                          qualification: e.target.value
-                        })
-                      }
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-
-                    <button onClick={() => setStaffStep(1)} className="bg-gray-500 text-white px-8 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={() => setStaffStep(3)} className="bg-blue-500 text-white px-8 py-2 rounded">
-                      Next
-                    </button>
-
-                  </div>
-
-                </div>
-              )}
-
-
-              {staffStep === 3 && (
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Official Info
-                  </h3>
-
-                  <div className="flex flex-col gap-6 max-w-md">
-
-                    <FloatingInput label="Staff ID" value={staffOfficial.staffId} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffOfficial({
-                          ...staffOfficial,
-                          staffId: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Joining Date" type="date" value={staffOfficial.joiningDate} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffOfficial({
-                          ...staffOfficial,
-                          joiningDate: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Relieving Date" type="date" value={staffOfficial.relievingDate} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffOfficial({
-                          ...staffOfficial,
-                          relievingDate: e.target.value
-                        })
-                      }
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-                    <button onClick={() => setStaffStep(2)} className="bg-gray-500 text-white px-8 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={() => setStaffStep(4)} className="bg-blue-500 text-white px-8 py-2 rounded">
-                      Next
-                    </button>
-                  </div>
-
-                </div>
-              )}
-
-
-              {staffStep === 4 && (
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Create Account
-                  </h3>
-
-                  <div className="flex flex-col gap-6 max-w-md">
-
-                    <FloatingInput label="Staff ID" value={staffAccount.staffId} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffAccount({
-                          ...staffAccount,
-                          staffId: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Password" type="password" value={staffAccount.password} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffAccount({
-                          ...staffAccount,
-                          password: e.target.value
-                        })
-                      }
-                    />
-
-                    <FloatingInput label="Confirm Password" type="password" value={staffAccount.confirmPassword} disabled={isViewMode}
-                      onChange={(e) =>
-                        setStaffAccount({
-                          ...staffAccount,
-                          confirmPassword: e.target.value
-                        })
-                      }
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-
-                    <button onClick={() => setStaffStep(3)} className="bg-gray-500 text-white px-8 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={handleCreateStaffFull} className="bg-green-500 text-white px-8 py-2 rounded">
-                      Create Staff
-                    </button>
-
-                  </div>
-
-                </div>
-              )}
-            </div>
-
-          </div>
-        )}
-
-        {subMenu === "staff" && (
-
-          <div className="mt-10">
-
-            <h2 className="text-xl font-bold mb-4">Created Staff Accounts</h2>
-
-            <table className="w-full border border-gray-300">
-
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="border p-2">Name</th>
-                  <th className="border p-2">age</th>
-                  <th className="border p-2">address</th>
-                  <th className="border p-2">contact</th>
-                  <th className="border p-2">Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {staffAccounts.map((staff, index) => (
-
-                  <tr key={index}>
-
-                    <td className="border p-2">
-                      {staff.staffBasicInfo?.name}
-                    </td>
-
-                    <td className="border p-2">
-                      {staff.staffBasicInfo?.age}
-                    </td>
-
-                    <td className="border p-2">
-                      {staff.staffBasicInfo?.address}
-                    </td>
-
-                    <td className="border p-2">
-                      {staff.staffBasicInfo?.contact}
-                    </td>
-
-
-
-
-                    <td className="border p-2 flex gap-2">
-
-                      <button
-                        onClick={() => {
-                          setStaffBasicInfo(staff.staffBasicInfo)
-                          setStaffOfficial(staff.staffOfficial)
-                          setStaffAccount(staff.staffAccount)
-                          setIsViewMode(true)
-                          setStaffStep(1)
-                        }}
-                        className="bg-green-500 text-white px-2 py-1 rounded"
-                      >
-                        View
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setStaffBasicInfo(staff.staffBasicInfo)
-                          setStaffOfficial(staff.staffOfficial)
-                          setStaffAccount(staff.staffAccount)
-                          setIsViewMode(false)
-                          setStaffStep(1)
-                        }}
-                        className="bg-blue-500 text-white px-2 py-1 rounded"
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        onClick={async () => {
-                          await deleteDoc(doc(db, "staffs", staff.id))
-                          fetchStaffs()
-                        }}
-                        className="bg-red-500 text-white px-2 py-1 rounded"
-                      >
-                        Delete
-                      </button>
-
-                      <button
-                        onClick={async () => {
-                          await updateDoc(doc(db, "staffs", staff.id), {
-                            isDisabled: !staff.isDisabled
-                          })
-                          fetchStaffs()
-                        }}
-                        className={`px-2 py-1 rounded text-white ${staff.isDisabled ? "bg-green-500" : "bg-gray-500"
-                          }`}
-                      >
-                        {staff.isDisabled ? "Enable" : "Disable"}
-                      </button>
-
-                    </td>
-
-
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        )}
-
-        {subMenu === "patients" && (
-
-<div className="
-flex
-flex-col
-md:flex-row
-w-full
-max-w-7xl
-border
-rounded-lg
-overflow-hidden
-min-h-[750px]
-">
-
-            <div className="w-1/4 p-4 space-y-3">
-
-              <h2 className="text-xl font-bold mb-3">
-                Create Patient Account
-              </h2>
-
-              <button onClick={() => setStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Basic Info
-              </button>
-
-              <button onClick={() => setStep(2)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Insurance
-              </button>
-
-              <button onClick={() => setStep(3)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Medical History
-              </button>
-
-              <button onClick={() => setStep(4)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
-                Reason
-              </button>
-
-              <button onClick={() => setStep(5)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 5 ? "bg-blue-500" : "bg-gray-400"}`}>
+              <h3 className="text-lg font-bold mb-6">
                 Create Account
-              </button>
+              </h3>
+
+              <div className="flex flex-col gap-6 max-w-md">
+
+                <FloatingInput label="Doctor ID" value={doctorAccount.doctorId} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorAccount({
+                      ...doctorAccount,
+                      doctorId: e.target.value
+                    })
+                  }
+                />
+
+                <FloatingInput label="Password" type="password" value={doctorAccount.password} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorAccount({
+                      ...doctorAccount,
+                      password: e.target.value
+                    })
+                  }
+                />
+
+                <FloatingInput label="Confirm Password" type="password" value={doctorAccount.confirmPassword} disabled={isViewMode}
+                  onChange={(e) =>
+                    setDoctorAccount({
+                      ...doctorAccount,
+                      confirmPassword: e.target.value
+                    })
+                  }
+                />
+
+              </div>
+
+              <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+                <button onClick={() => setDoctorStep(3)} className="bg-gray-500 text-white px-8 py-2 rounded">
+                  Previous
+                </button>
+
+                <button
+                  onClick={isEditMode ? handleUpdateDoctor : handleCreateDoctorFull}
+                  className="bg-green-500 text-white px-8 py-2 rounded"
+                >
+                  {isEditMode ? "Update Doctor" : "Create Doctor"}
+                </button>
+
+              </div>
 
             </div>
+          )}
+        </div>
 
+      </div>
 
+    )}
 
+    {subMenu === "doctors" && (
 
-            <div className="w-3/4 p-6 relative overflow-hidden">
+      <div className="mt-10">
 
-              {step === 1 && (
+        <h2 className="text-xl font-bold mb-4">Created Doctor Accounts</h2>
 
-                <div>
+        <table className="w-full border border-gray-300">
 
-                  <h3 className="text-lg font-bold mb-6">
-                    Basic Information
-                  </h3>
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="border p-2">Name</th>
+              <th className="border p-2">Speciality</th>
+              <th className="border p-2">address</th>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <th className="border p-2">Action</th>
+            </tr>
+          </thead>
 
+          <tbody>
 
-                    <FloatingInput label="Name" required value={basicInfo.name} disabled={isViewMode}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
-                    />
+            {doctorAccounts.map((docData, index) => (
 
-                    <FloatingInput label="Age" required type="number" value={basicInfo.age} disabled={isViewMode}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, age: e.target.value })}
-                    />
+                <tr key={index}>
 
+                  <td className="border p-2">
+                  {docData.doctorBasicInfo?.name}
+                  </td>
 
-                    <div className="relative">
-                      <select value={basicInfo.gender} disabled={isViewMode}
-                        onChange={(e) => setBasicInfo({ ...basicInfo, gender: e.target.value })}
-                        className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
-                      >
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Others">Others</option>
-                      </select>
+                  <td className="border p-2">
+                  {docData.doctorDesignation?.designation}
+                  </td>
 
-                      <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
-                        Gender <span className="text-red-500">*</span>
-                      </label>
-                    </div>
+                  <td className="border p-2">
+                  {docData.doctorBasicInfo?.address}
+                  </td>
 
+                  {/* <td className="border p-2">
+                  {docData.contact}
+                </td> */}
 
-                    <FloatingInput label="DOB" type="date" className="w-full" inputClassName="h-[52px]" value={basicInfo.dob}
-                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, dob: e.target.value })}
-                    />
+                  <td className="border p-2 flex gap-2">
 
-
-                    <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[120px] pt-6" value={basicInfo.address}
-                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, address: e.target.value })}
-                    />
-
-                    <div className="col-span-2 flex flex-col gap-4">
-
-                      <FloatingInput label="Contact Number" required value={basicInfo.contact}
-                        disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, contact: e.target.value })}
-                      />
-
-                      <FloatingInput label="EMR Contact" value={basicInfo.emrContact} disabled={isViewMode}
-                        onChange={(e) => setBasicInfo({ ...basicInfo, emrContact: e.target.value })}
-                      />
-
-                    </div>
-
-
-                    <FloatingInput label="Email" className="col-span-2" value={basicInfo.email} disabled={isViewMode}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, email: e.target.value })}
-                    />
-
-                    <FloatingInput label="Occupation" className="col-span-2" value={basicInfo.occupation}
-                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, occupation: e.target.value })}
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-                    <button onClick={() => setStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
-                      Next
-                    </button>
-                  </div>
-
-                </div>
-
-              )}
-
-
-
-
-              {step === 2 && (
-
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Insurance
-                  </h3>
-
-                  <div className="grid grid-cols-2 gap-6 max-w-4xl">
-
-                    <FloatingInput label="Insurance Provider" value={insuranceInfo.provider} disabled={isViewMode}
-                      onChange={(e) => setInsuranceInfo({ ...insuranceInfo, provider: e.target.value })}
-                    />
-
-                    <FloatingInput label="Policy Number" value={insuranceInfo.policy} disabled={isViewMode}
-                      onChange={(e) => setInsuranceInfo({ ...insuranceInfo, policy: e.target.value })}
-                    />
-
-                    <FloatingInput label="Agent Name" value={insuranceInfo.agentName} disabled={isViewMode}
-                      onChange={(e) => setInsuranceInfo({ ...insuranceInfo, agentName: e.target.value })}
-                    />
-
-                    <FloatingInput label="Agent Number" value={insuranceInfo.agentNumber} disabled={isViewMode}
-                      onChange={(e) => setInsuranceInfo({ ...insuranceInfo, agentNumber: e.target.value })}
-                    />
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-
-                    <button onClick={() => setStep(1)} className="bg-gray-500 text-white px-6 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={() => setStep(3)} className="bg-blue-500 text-white px-6 py-2 rounded">
-                      Next
-                    </button>
-
-                  </div>
-
-                </div>
-
-              )}
-
-
-
-              {step === 3 && (
-
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6 ">
-                    Medical History
-                  </h3>
-
-
-
-                  <div className="grid grid-cols-3 gap-6 max-w-4xl">
-
-                    <FloatingInput label="Blood Group" value={medicalHistory.bloodGroup} disabled={isViewMode}
-                      onChange={(e) => setMedicalHistory({ ...medicalHistory, bloodGroup: e.target.value })}
-                    />
-
-                  </div>
-
-                  <p className="mt-6 mb-2 font-medium">
-                    Do you have any of the following condition?
-                  </p>
-
-                  <div className="flex flex-wrap gap-6">
-
-                    <label><input type="checkbox" /> Diabetes</label>
-                    <label><input type="checkbox" /> Hypertension</label>
-                    <label><input type="checkbox" /> Heart Disease</label>
-                    <label><input type="checkbox" /> Stroke</label>
-                    <label><input type="checkbox" /> Other</label>
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-
-                    <button onClick={() => setStep(2)} className="bg-gray-500 text-white px-6 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={() => setStep(4)} className="bg-blue-500 text-white px-6 py-2 rounded">
-                      Next
-                    </button>
-
-                  </div>
-
-                </div>
-
-              )}
-
-              {step === 4 && (
-
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Reason
-                  </h3>
-
-                  <div className="grid grid-cols-2 gap-6 max-w-4xl">
-
-                    <FloatingInput label="Current Condition" value={reasonInfo.condition} disabled={isViewMode}
-                      onChange={(e) => setReasonInfo({ ...reasonInfo, condition: e.target.value })}
-                    />
-
-                    <FloatingInput label="Reason For Visit" value={reasonInfo.visitReason} disabled={isViewMode}
-                      onChange={(e) => setReasonInfo({ ...reasonInfo, visitReason: e.target.value })}
-                    />
-
-                    <FloatingInput label="Primary Reason" value={reasonInfo.primaryReason} disabled={isViewMode}
-                      onChange={(e) => setReasonInfo({ ...reasonInfo, primaryReason: e.target.value })}
-                    />
-
-                    <FloatingInput label="Duration" value={reasonInfo.duration} disabled={isViewMode}
-                      onChange={(e) => setReasonInfo({ ...reasonInfo, duration: e.target.value })}
-                    />
-
-                    <div className="flex items-center gap-4 col-span-2">
-
-                      <p>Have you been treated for this before?</p>
-
-                      <label className="flex items-center gap-1">
-                        <input type="radio" name="treatedBefore"
-                          checked={reasonInfo.treatedBefore === "Yes"}
-                          onChange={() => setReasonInfo({ ...reasonInfo, treatedBefore: "Yes" })}
-                        />
-                        Yes
-                      </label>
-
-                      <label className="flex items-center gap-1">
-                        <input type="radio" name="treatedBefore"
-                          checked={reasonInfo.treatedBefore === "No"}
-                          onChange={() => setReasonInfo({ ...reasonInfo, treatedBefore: "No" })}
-                        />
-                        No
-                      </label>
-
-                    </div>
-
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-
-                    <button onClick={() => setStep(3)} className="bg-gray-500 text-white px-6 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={() => setStep(5)} className="bg-blue-500 text-white px-6 py-2 rounded">
-                      Next
-                    </button>
-
-
-                  </div>
-
-                </div>
-
-              )}
-
-              {step === 5 && (
-
-                <div>
-
-                  <h3 className="text-lg font-bold mb-6">
-                    Create Account
-                  </h3>
-
-                  <div className="flex flex-col gap-6 max-w-md">
-
-                    <FloatingInput label="Username" value={accountInfo.username}
-                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, username: e.target.value })}
-                    />
-
-                    <FloatingInput label="Password" type="password" value={accountInfo.password}
-                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, password: e.target.value })}
-                    />
-
-                    <FloatingInput label="Confirm Password" type="password" value={accountInfo.confirmPassword}
-                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, confirmPassword: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="
-mt-6
-flex
-justify-center md:justify-end
-gap-4
-flex-wrap
-">
-
-                    <button onClick={() => setStep(4)} className="bg-gray-500 text-white px-8 py-2 rounded">
-                      Previous
-                    </button>
-
-                    <button onClick={handleCreatePatient} className="bg-green-500 text-white px-8 py-2 rounded">
-                      Create Patient
-                    </button>
-
-                  </div>
-
-                </div>
-
-              )}
-
-            </div>
-
-          </div>
-
-        )}
-
-        {subMenu === "patients" && (
-
-          <div className="mt-10 max-h-[300px] overflow-y-auto">
-
-            <h2 className="text-xl font-bold mb-4">Created Patient Accounts</h2>
-
-            <table className="w-full border border-gray-300">
-
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="border p-2">Name</th>
-                  <th className="border p-2">Age</th>
-                  <th className="border p-2">Address</th>
-                  <th className="border p-2">Contact</th>
-                  <th className="border p-2">Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {patientAccounts.map((p, index) => (
-                  <tr key={index}>
-
-                    <td className={`border p-2 ${p.isDisabled ? "text-gray-400 line-through" : ""}`}>
-                      {p.basicInfo?.name || p.name}
-                    </td>
-                    <td className="border p-2">{p.basicInfo?.age || p.age}</td>
-                    <td className="border p-2">{p.basicInfo?.address || p.address}</td>
-                    <td className="border p-2">{p.basicInfo?.contact || p.contact}</td>
-
-                    <td className="border p-2 flex gap-2">
 
                     <button
-  onClick={() => setCallData(p)}
-  className="bg-purple-500 text-white px-2 py-1 rounded"
+                      onClick={() => {
+
+                        setDoctorBasicInfo(docData.doctorBasicInfo || {})
+                        setDoctorDesignation(docData.doctorDesignation || {})
+                        setDoctorOfficial(docData.doctorOfficial || {})
+                        setDoctorAccount(docData.doctorAccount || {})
+
+                        setIsViewMode(true)
+                        setIsEditMode(false)
+                        setDoctorStep(1)
+                      }}
+                      className="bg-green-500 text-white px-2 py-1 rounded"
+                    >
+                      View
+                    </button>
+
+
+                    <button
+                      onClick={() => {
+
+                        setEditData(null)
+                        setViewData(null)
+
+                        // 🔥 full data load
+                        setDoctorBasicInfo(docData.doctorBasicInfo || {})
+                        setDoctorDesignation(docData.doctorDesignation || {})
+                        setDoctorOfficial(docData.doctorOfficial || {})
+                        setDoctorAccount(docData.doctorAccount || {})
+
+                        setEditData(docData)
+
+                        // 🔥 modes
+                        setIsViewMode(false)
+                        setIsEditMode(true)
+
+                        // 🔥 open form
+                        setDoctorStep(1)
+                      }}
+                      className="bg-blue-500 text-white px-2 py-1 rounded"
+                    >
+                      Edit
+                    </button>
+
+
+                    <button
+                      onClick={async () => {
+                        await deleteDoc(doc(db, "doctors", docData.id))
+                        fetchDoctors()
+                      }}
+                      className="bg-red-500 text-white px-2 py-1 rounded"
+                    >
+                      Delete
+                    </button>
+
+
+                    <button
+                      onClick={async () => {
+                        await updateDoc(doc(db, "doctors", docData.id), {
+                          isDisabled: !docData.isDisabled
+                        })
+                        fetchDoctors()
+                      }}
+                      className={`px-2 py-1 rounded text-white ${docData.isDisabled ? "bg-green-500" : "bg-gray-500"
+                        }`}
+                    >
+                      {docData.isDisabled ? "Enable" : "Disable"}
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    )}
+
+
+{tab === "account" && subMenu === "staff" && (
+
+<div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[450px]">
+
+  <div className="w-1/4 p-4 space-y-3">
+
+    <h2 className="text-xl font-bold mb-4">Create Staff Account</h2>
+
+    <button onClick={() => setStaffStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
+      Basic Info
+    </button>
+
+    <button onClick={() => setStaffStep(2)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+      Designation
+    </button>
+
+    <button onClick={() => setStaffStep(3)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+      Official Info
+    </button>
+
+    <button onClick={() => setStaffStep(4)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
+      create Account
+    </button>
+
+  </div>
+
+
+  <div className="w-3/4 p-6 relative overflow-hidden h-[450px]">
+
+
+    {staffStep === 1 && (
+
+      <div>
+
+        <h3 className="text-lg font-bold mb-6">
+          Basic Information
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+
+          <FloatingInput label="Name" required value={staffBasicInfo.name} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffBasicInfo({ ...staffBasicInfo, name: e.target.value })
+            }
+          />
+
+
+          <FloatingInput label="Age" required type="number" value={staffBasicInfo.age} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffBasicInfo({ ...staffBasicInfo, age: e.target.value })
+            }
+          />
+
+
+          <div className="relative">
+            <select value={staffBasicInfo.gender} disabled={isViewMode}
+              onChange={(e) =>
+                setStaffBasicInfo({ ...staffBasicInfo, gender: e.target.value })
+              }
+              className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Others">Others</option>
+            </select>
+
+            <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
+              Gender <span className="text-red-500">*</span>
+            </label>
+          </div>
+
+
+          <FloatingInput label="DOB" type="date" value={staffBasicInfo.dob} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffBasicInfo({ ...staffBasicInfo, dob: e.target.value })
+            }
+          />
+
+
+          <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[120px] pt-6"
+            value={staffBasicInfo.address || ""} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffBasicInfo({ ...staffBasicInfo, address: e.target.value })
+            }
+          />
+
+
+          <div className="col-span-2 flex flex-col gap-4">
+
+            <FloatingInput label="Contact Number" required value={staffBasicInfo.contact} disabled={isViewMode}
+              onChange={(e) =>
+                setStaffBasicInfo({ ...staffBasicInfo, contact: e.target.value })
+              }
+            />
+
+            <FloatingInput label="EMR Contact" value={staffBasicInfo.emrContact || ""} disabled={isViewMode}
+              onChange={(e) =>
+                setStaffBasicInfo({ ...staffBasicInfo, emrContact: e.target.value })
+              }
+            />
+
+          </div>
+
+
+          <FloatingInput label="Email" className="col-span-2" value={staffBasicInfo.email} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffBasicInfo({ ...staffBasicInfo, email: e.target.value })
+            }
+          />
+
+
+          <FloatingInput label="Occupation" className="col-span-2" value={staffBasicInfo.occupation || ""} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffBasicInfo({ ...staffBasicInfo, occupation: e.target.value })
+            }
+          />
+
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+          <button onClick={() => setStaffStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
+            Next
+          </button>
+        </div>
+
+      </div>
+    )}
+
+
+    {staffStep === 2 && (
+      <div>
+
+        <h3 className="text-lg font-bold mb-6">
+          Designation
+        </h3>
+
+        <div className="grid grid-cols-2 gap-6 max-w-4xl">
+
+          <FloatingInput label="Designation" value={staffDesignation.designation} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffDesignation({
+                ...staffDesignation,
+                designation: e.target.value
+              })
+            }
+          />
+
+          <FloatingInput label="Qualification" value={staffDesignation.qualification} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffDesignation({
+                ...staffDesignation,
+                qualification: e.target.value
+              })
+            }
+          />
+
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+          <button onClick={() => setStaffStep(1)} className="bg-gray-500 text-white px-8 py-2 rounded">
+            Previous
+          </button>
+
+          <button onClick={() => setStaffStep(3)} className="bg-blue-500 text-white px-8 py-2 rounded">
+            Next
+          </button>
+
+        </div>
+
+      </div>
+    )}
+
+
+    {staffStep === 3 && (
+      <div>
+
+        <h3 className="text-lg font-bold mb-6">
+          Official Info
+        </h3>
+
+        <div className="flex flex-col gap-6 max-w-md">
+
+          <FloatingInput label="Staff ID" value={staffOfficial.staffId} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffOfficial({
+                ...staffOfficial,
+                staffId: e.target.value
+              })
+            }
+          />
+
+          <FloatingInput label="Joining Date" type="date" value={staffOfficial.joiningDate} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffOfficial({
+                ...staffOfficial,
+                joiningDate: e.target.value
+              })
+            }
+          />
+
+          <FloatingInput label="Relieving Date" type="date" value={staffOfficial.relievingDate} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffOfficial({
+                ...staffOfficial,
+                relievingDate: e.target.value
+              })
+            }
+          />
+
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+          <button onClick={() => setStaffStep(2)} className="bg-gray-500 text-white px-8 py-2 rounded">
+            Previous
+          </button>
+
+          <button onClick={() => setStaffStep(4)} className="bg-blue-500 text-white px-8 py-2 rounded">
+            Next
+          </button>
+        </div>
+
+      </div>
+    )}
+
+
+    {staffStep === 4 && (
+      <div>
+
+        <h3 className="text-lg font-bold mb-6">
+          Create Account
+        </h3>
+
+        <div className="flex flex-col gap-6 max-w-md">
+
+          <FloatingInput label="Staff ID" value={staffAccount.staffId} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffAccount({
+                ...staffAccount,
+                staffId: e.target.value
+              })
+            }
+          />
+
+          <FloatingInput label="Password" type="password" value={staffAccount.password} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffAccount({
+                ...staffAccount,
+                password: e.target.value
+              })
+            }
+          />
+
+          <FloatingInput label="Confirm Password" type="password" value={staffAccount.confirmPassword} disabled={isViewMode}
+            onChange={(e) =>
+              setStaffAccount({
+                ...staffAccount,
+                confirmPassword: e.target.value
+              })
+            }
+          />
+
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+          <button onClick={() => setStaffStep(3)} className="bg-gray-500 text-white px-8 py-2 rounded">
+            Previous
+          </button>
+
+          <button onClick={handleCreateStaffFull} className="bg-green-500 text-white px-8 py-2 rounded">
+            Create Staff
+          </button>
+
+        </div>
+
+      </div>
+    )}
+  </div>
+
+</div>
+)}
+
+{subMenu === "staff" && (
+
+<div className="mt-10">
+
+  <h2 className="text-xl font-bold mb-4">Created Staff Accounts</h2>
+
+  <table className="w-full border border-gray-300">
+
+    <thead className="bg-gray-200">
+      <tr>
+        <th className="border p-2">Name</th>
+        <th className="border p-2">age</th>
+        <th className="border p-2">address</th>
+        <th className="border p-2">contact</th>
+        <th className="border p-2">Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      {staffAccounts.map((staff, index) => (
+
+        <tr key={index}>
+
+          <td className="border p-2">
+            {staff.staffBasicInfo?.name}
+          </td>
+
+          <td className="border p-2">
+            {staff.staffBasicInfo?.age}
+          </td>
+
+          <td className="border p-2">
+            {staff.staffBasicInfo?.address}
+          </td>
+
+          <td className="border p-2">
+            {staff.staffBasicInfo?.contact}
+          </td>
+
+
+
+
+          <td className="border p-2 flex gap-2">
+
+            <button
+              onClick={() => {
+                setStaffBasicInfo(staff.staffBasicInfo)
+                setStaffOfficial(staff.staffOfficial)
+                setStaffAccount(staff.staffAccount)
+                setIsViewMode(true)
+                setStaffStep(1)
+              }}
+              className="bg-green-500 text-white px-2 py-1 rounded"
+            >
+              View
+            </button>
+
+            <button
+              onClick={() => {
+                setStaffBasicInfo(staff.staffBasicInfo)
+                setStaffOfficial(staff.staffOfficial)
+                setStaffAccount(staff.staffAccount)
+                setIsViewMode(false)
+                setStaffStep(1)
+              }}
+              className="bg-blue-500 text-white px-2 py-1 rounded"
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={async () => {
+                await deleteDoc(doc(db, "staffs", staff.id))
+                fetchStaffs()
+              }}
+              className="bg-red-500 text-white px-2 py-1 rounded"
+            >
+              Delete
+            </button>
+
+            <button
+              onClick={async () => {
+                await updateDoc(doc(db, "staffs", staff.id), {
+                  isDisabled: !staff.isDisabled
+                })
+                fetchStaffs()
+              }}
+              className={`px-2 py-1 rounded text-white ${staff.isDisabled ? "bg-green-500" : "bg-gray-500"
+                }`}
+            >
+              {staff.isDisabled ? "Enable" : "Disable"}
+            </button>
+
+          </td>
+
+
+
+        </tr>
+
+      ))}
+
+    </tbody>
+
+  </table>
+
+</div>
+
+)}
+
+{tab === "account" && subMenu === "patients" && (
+
+<div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[500px]">
+
+  <div className="w-1/4 p-4 space-y-3">
+
+    <h2 className="text-xl font-bold mb-3">
+      Create Patient Account
+    </h2>
+
+    <button onClick={() => setStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
+      Basic Info
+    </button>
+
+    <button onClick={() => setStep(2)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+      Insurance
+    </button>
+
+    <button onClick={() => setStep(3)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+      Medical History
+    </button>
+
+    <button onClick={() => setStep(4)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
+      Reason
+    </button>
+
+    <button onClick={() => setStep(5)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 5 ? "bg-blue-500" : "bg-gray-400"}`}>
+      Create Account
+    </button>
+
+  </div>
+
+
+
+
+  <div className="w-3/4 p-6 relative overflow-hidden">
+
+    {step === 1 && (
+
+      <div>
+
+        <h3 className="text-lg font-bold mb-6">
+          Basic Information
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+
+          <FloatingInput label="Name" required value={basicInfo.name} disabled={isViewMode}
+            onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
+          />
+
+          <FloatingInput label="Age" required type="number" value={basicInfo.age} disabled={isViewMode}
+            onChange={(e) => setBasicInfo({ ...basicInfo, age: e.target.value })}
+          />
+
+
+          <div className="relative">
+            <select value={basicInfo.gender} disabled={isViewMode}
+              onChange={(e) => setBasicInfo({ ...basicInfo, gender: e.target.value })}
+              className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Others">Others</option>
+            </select>
+
+            <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
+              Gender <span className="text-red-500">*</span>
+            </label>
+          </div>
+
+
+          <FloatingInput label="DOB" type="date" className="w-full" inputClassName="h-[52px]" value={basicInfo.dob}
+            disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, dob: e.target.value })}
+          />
+
+
+          <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[120px] pt-6" value={basicInfo.address}
+            disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, address: e.target.value })}
+          />
+
+          <div className="col-span-2 flex flex-col gap-4">
+
+            <FloatingInput label="Contact Number" required value={basicInfo.contact}
+              disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, contact: e.target.value })}
+            />
+
+            <FloatingInput label="EMR Contact" value={basicInfo.emrContact} disabled={isViewMode}
+              onChange={(e) => setBasicInfo({ ...basicInfo, emrContact: e.target.value })}
+            />
+
+          </div>
+
+
+          <FloatingInput label="Email" className="col-span-2" value={basicInfo.email} disabled={isViewMode}
+            onChange={(e) => setBasicInfo({ ...basicInfo, email: e.target.value })}
+          />
+
+          <FloatingInput label="Occupation" className="col-span-2" value={basicInfo.occupation}
+            disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, occupation: e.target.value })}
+          />
+
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+          <button onClick={() => setStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
+            Next
+          </button>
+        </div>
+
+      </div>
+
+    )}
+
+
+
+
+    {step === 2 && (
+
+      <div>
+
+        <h3 className="text-lg font-bold mb-6">
+          Insurance
+        </h3>
+
+        <div className="grid grid-cols-2 gap-6 max-w-4xl">
+
+          <FloatingInput label="Insurance Provider" value={insuranceInfo.provider} disabled={isViewMode}
+            onChange={(e) => setInsuranceInfo({ ...insuranceInfo, provider: e.target.value })}
+          />
+
+          <FloatingInput label="Policy Number" value={insuranceInfo.policy} disabled={isViewMode}
+            onChange={(e) => setInsuranceInfo({ ...insuranceInfo, policy: e.target.value })}
+          />
+
+          <FloatingInput label="Agent Name" value={insuranceInfo.agentName} disabled={isViewMode}
+            onChange={(e) => setInsuranceInfo({ ...insuranceInfo, agentName: e.target.value })}
+          />
+
+          <FloatingInput label="Agent Number" value={insuranceInfo.agentNumber} disabled={isViewMode}
+            onChange={(e) => setInsuranceInfo({ ...insuranceInfo, agentNumber: e.target.value })}
+          />
+
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+          <button onClick={() => setStep(1)} className="bg-gray-500 text-white px-6 py-2 rounded">
+            Previous
+          </button>
+
+          <button onClick={() => setStep(3)} className="bg-blue-500 text-white px-6 py-2 rounded">
+            Next
+          </button>
+
+        </div>
+
+      </div>
+
+    )}
+
+
+
+    {step === 3 && (
+
+      <div>
+
+        <h3 className="text-lg font-bold mb-6 ">
+          Medical History
+        </h3>
+
+
+
+        <div className="grid grid-cols-3 gap-6 max-w-4xl">
+
+          <FloatingInput label="Blood Group" value={medicalHistory.bloodGroup} disabled={isViewMode}
+            onChange={(e) => setMedicalHistory({ ...medicalHistory, bloodGroup: e.target.value })}
+          />
+
+        </div>
+
+        <p className="mt-6 mb-2 font-medium">
+          Do you have any of the following condition?
+        </p>
+
+        <div className="flex flex-wrap gap-6">
+
+          <label><input type="checkbox" /> Diabetes</label>
+          <label><input type="checkbox" /> Hypertension</label>
+          <label><input type="checkbox" /> Heart Disease</label>
+          <label><input type="checkbox" /> Stroke</label>
+          <label><input type="checkbox" /> Other</label>
+
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+          <button onClick={() => setStep(2)} className="bg-gray-500 text-white px-6 py-2 rounded">
+            Previous
+          </button>
+
+          <button onClick={() => setStep(4)} className="bg-blue-500 text-white px-6 py-2 rounded">
+            Next
+          </button>
+
+        </div>
+
+      </div>
+
+    )}
+
+    {step === 4 && (
+
+      <div>
+
+        <h3 className="text-lg font-bold mb-6">
+          Reason
+        </h3>
+
+        <div className="grid grid-cols-2 gap-6 max-w-4xl">
+
+          <FloatingInput label="Current Condition" value={reasonInfo.condition} disabled={isViewMode}
+            onChange={(e) => setReasonInfo({ ...reasonInfo, condition: e.target.value })}
+          />
+
+          <FloatingInput label="Reason For Visit" value={reasonInfo.visitReason} disabled={isViewMode}
+            onChange={(e) => setReasonInfo({ ...reasonInfo, visitReason: e.target.value })}
+          />
+
+          <FloatingInput label="Primary Reason" value={reasonInfo.primaryReason} disabled={isViewMode}
+            onChange={(e) => setReasonInfo({ ...reasonInfo, primaryReason: e.target.value })}
+          />
+
+          <FloatingInput label="Duration" value={reasonInfo.duration} disabled={isViewMode}
+            onChange={(e) => setReasonInfo({ ...reasonInfo, duration: e.target.value })}
+          />
+
+          <div className="flex items-center gap-4 col-span-2">
+
+            <p>Have you been treated for this before?</p>
+
+            <label className="flex items-center gap-1">
+              <input type="radio" name="treatedBefore"
+                checked={reasonInfo.treatedBefore === "Yes"}
+                onChange={() => setReasonInfo({ ...reasonInfo, treatedBefore: "Yes" })}
+              />
+              Yes
+            </label>
+
+            <label className="flex items-center gap-1">
+              <input type="radio" name="treatedBefore"
+                checked={reasonInfo.treatedBefore === "No"}
+                onChange={() => setReasonInfo({ ...reasonInfo, treatedBefore: "No" })}
+              />
+              No
+            </label>
+
+          </div>
+
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+          <button onClick={() => setStep(3)} className="bg-gray-500 text-white px-6 py-2 rounded">
+            Previous
+          </button>
+
+          <button onClick={() => setStep(5)} className="bg-blue-500 text-white px-6 py-2 rounded">
+            Next
+          </button>
+
+
+        </div>
+
+      </div>
+
+    )}
+
+    {step === 5 && (
+
+      <div>
+
+        <h3 className="text-lg font-bold mb-6">
+          Create Account
+        </h3>
+
+        <div className="flex flex-col gap-6 max-w-md">
+
+          <FloatingInput label="Username" value={accountInfo.username}
+            disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, username: e.target.value })}
+          />
+
+          <FloatingInput label="Password" type="password" value={accountInfo.password}
+            disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, password: e.target.value })}
+          />
+
+          <FloatingInput label="Confirm Password" type="password" value={accountInfo.confirmPassword}
+            disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, confirmPassword: e.target.value })}
+          />
+        </div>
+
+        <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+          <button onClick={() => setStep(4)} className="bg-gray-500 text-white px-8 py-2 rounded">
+            Previous
+          </button>
+
+          <button onClick={handleCreatePatient} className="bg-green-500 text-white px-8 py-2 rounded">
+            Create Patient
+          </button>
+
+        </div>
+
+      </div>
+
+    )}
+
+  </div>
+
+</div>
+
+)}
+
+{subMenu === "patients" && (
+
+<div className="mt-10 max-h-[300px] overflow-y-auto">
+
+  <h2 className="text-xl font-bold mb-4">Created Patient Accounts</h2>
+
+  <table className="w-full border border-gray-300">
+
+    <thead className="bg-gray-200">
+      <tr>
+        <th className="border p-2">Name</th>
+        <th className="border p-2">Age</th>
+        <th className="border p-2">Address</th>
+        <th className="border p-2">Contact</th>
+        <th className="border p-2">Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      {patientAccounts.map((p, index) => (
+        <tr key={index}>
+
+          <td className={`border p-2 ${p.isDisabled ? "text-gray-400 line-through" : ""}`}>
+            {p.basicInfo?.name || p.name}
+          </td>
+          <td className="border p-2">{p.basicInfo?.age || p.age}</td>
+          <td className="border p-2">{p.basicInfo?.address || p.address}</td>
+          <td className="border p-2">{p.basicInfo?.contact || p.contact}</td>
+
+          <td className="border p-2 flex gap-2">
+
+          <button
+onClick={() => setCallData(p)}
+className="bg-purple-500 text-white px-2 py-1 rounded"
 >
-  Print
+Print
 </button>
 
-                      <button
-                        onClick={() => {
+            <button
+              onClick={() => {
 
-                          setBasicInfo(p.basicInfo)
-                          setInsuranceInfo(p.insuranceInfo)
-                          setMedicalHistory(p.medicalHistory)
-                          setReasonInfo(p.reasonInfo)
+                setBasicInfo(p.basicInfo)
+                setInsuranceInfo(p.insuranceInfo)
+                setMedicalHistory(p.medicalHistory)
+                setReasonInfo(p.reasonInfo)
 
-                          setAccountInfo(p.accountInfo || {
-                            username: "",
-                            password: "",
-                            confirmPassword: ""
-                          })
-                          setIsViewMode(true)
-                          setStep(1)
+                setAccountInfo(p.accountInfo || {
+                  username: "",
+                  password: "",
+                  confirmPassword: ""
+                })
+                setIsViewMode(true)
+                setStep(1)
 
-                        }}
-                        className="bg-green-500 text-white px-2 py-1 rounded"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => {
+              }}
+              className="bg-green-500 text-white px-2 py-1 rounded"
+            >
+              View
+            </button>
+            <button
+              onClick={() => {
 
-                          setBasicInfo(p.basicInfo)
-                          setInsuranceInfo(p.insuranceInfo)
-                          setMedicalHistory(p.medicalHistory)
-                          setReasonInfo(p.reasonInfo)
+                setBasicInfo(p.basicInfo)
+                setInsuranceInfo(p.insuranceInfo)
+                setMedicalHistory(p.medicalHistory)
+                setReasonInfo(p.reasonInfo)
 
-                          setAccountInfo(p.accountInfo || {
-                            username: "",
-                            password: "",
-                            confirmPassword: ""
-                          })
-                          setIsViewMode(false)
-                          setEditIndex(index)
-                          setStep(1)
+                setAccountInfo(p.accountInfo || {
+                  username: "",
+                  password: "",
+                  confirmPassword: ""
+                })
+                setIsViewMode(false)
+                setEditIndex(index)
+                setStep(1)
 
-                        }}
-                        className="bg-blue-500 text-white px-2 py-1 rounded"
-                      >
-                        Edit
-                      </button>
+              }}
+              className="bg-blue-500 text-white px-2 py-1 rounded"
+            >
+              Edit
+            </button>
 
-                      <button
-                        onClick={async () => {
-                          await deleteDoc(doc(db, "patients", p.basicInfo.email))
-                          fetchPatients()
-                        }}
-                        className="bg-red-500 text-white px-2 py-1 rounded"
-                      >
-                        Delete
-                      </button>
+            <button
+              onClick={async () => {
+                await deleteDoc(doc(db, "patients", p.basicInfo.email))
+                fetchPatients()
+              }}
+              className="bg-red-500 text-white px-2 py-1 rounded"
+            >
+              Delete
+            </button>
 
-                      <button
-                        onClick={async () => {
-                          await updateDoc(doc(db, "patients", p.basicInfo.email), {
-                            isDisabled: !p.isDisabled
-                          })
-                          fetchPatients()
-                        }}
-                        className={`px-2 py-1 rounded text-white ${p.isDisabled ? "bg-green-500" : "bg-gray-500"
-                          }`}
-                      >
-                        {p.isDisabled ? "Enable" : "Disable"}
-                      </button>
+            <button
+              onClick={async () => {
+                await updateDoc(doc(db, "patients", p.basicInfo.email), {
+                  isDisabled: !p.isDisabled
+                })
+                fetchPatients()
+              }}
+              className={`px-2 py-1 rounded text-white ${p.isDisabled ? "bg-green-500" : "bg-gray-500"
+                }`}
+            >
+              {p.isDisabled ? "Enable" : "Disable"}
+            </button>
 
-                    </td>
+          </td>
 
-                  </tr>
-                ))}
+        </tr>
+      ))}
 
-              </tbody>
+    </tbody>
 
-            </table>
+  </table>
 
-          </div>
+</div>
 
-        )}
+)}
 
 
-{subMenu==="pharmasi" && (
+{tab === "account" && subMenu === "pharmasi" && (
 
 <div className="w-full max-w-7xl border rounded-xl overflow-hidden
 flex flex-col md:flex-row
@@ -2699,17 +2873,18 @@ Next
 
 ):(
 
-<button type="button" onClick={(e)=>{
+<button
+type="button"
+onClick={(e) => {
+
 e.preventDefault();
 e.stopPropagation();
 
-console.log("clicked");
-
-alert("Create button working");
-
 handleCreatePharmasiFull();
-}}className="bg-green-500 text-white px-8 py-2 rounded relative z-[9999] pointer-events-auto"
-style={{position:"relative"}}>
+
+}}
+className="bg-green-500 text-white px-8 py-3 rounded"
+>
 Create Pharmasi
 </button>
 )}
@@ -2840,7 +3015,6 @@ fetchPharmasi()
 </div>
 
 )}
-
 
         </div>
 

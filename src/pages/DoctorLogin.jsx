@@ -86,8 +86,7 @@ const DoctorLogin = () => {
         email
       );
     
-      window.location.href =
-        "/#/demodoctordashboard";
+      navigate("/demodoctordashboard");
     
       return;
     }
@@ -166,7 +165,7 @@ localStorage.setItem(
 );
 
 if(isDemo){
-window.location.href="/#/demodoctordashboard"
+  navigate("/demodoctordashboard")
 }else{
 navigate("/doctor-profile")
 }

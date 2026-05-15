@@ -1,6 +1,16 @@
 import React,{useState,useEffect} from "react";
+import { db } from "../firebase";
 
-const STORAGE_KEY = "pharmacyItems";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc
+} from "firebase/firestore";
+
+
 const PharmasiDashboard=()=>{
 
 const [menu,setMenu]=useState("inventory");
@@ -16,6 +26,8 @@ const [showTypeDropdown,setShowTypeDropdown]=useState(false);
 const [showMedicineDropdown,setShowMedicineDropdown]=useState(false);
 const [entryType,setEntryType] = useState("")
 const [showEntryDropdown,setShowEntryDropdown] = useState(false)
+const [purchaseItems,setPurchaseItems] = useState([]);
+const [salesItems,setSalesItems] = useState([]);
 
 const [typeOptions,setTypeOptions]=useState([
     "Tablet",
@@ -35,32 +47,34 @@ const [typeOptions,setTypeOptions]=useState([
     "Cetirizine"
     ]);
 
-    const [items, setItems] = useState(() => {
-        try {
-          const saved = localStorage.getItem(STORAGE_KEY);
-          return saved ? JSON.parse(saved) : [];
-        } catch {
-          return [];
-        }
-      });
+    const [items, setItems] = useState([]);
 
     const [entryItems,setEntryItems] = useState(()=>{
         const saved = localStorage.getItem("entryItems");
         return saved ? JSON.parse(saved) : [];
         });
 
+        
         useEffect(() => {
-            localStorage.setItem("pharmacyItems", JSON.stringify(items));
-            window.dispatchEvent(new Event("storage"));
-          
-          }, [items]);
 
-          useEffect(() => {
-            const stored = localStorage.getItem("pharmacyItems");
-            if (stored) {
-              setItems(JSON.parse(stored));
-            }
-          }, []);
+          const fetchItems = async () => {
+        
+            const querySnapshot = await getDocs(
+              collection(db, "inventory")
+            );
+        
+            const data = querySnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+        
+            setItems(data);
+          };
+        
+          fetchItems();
+        
+        }, []);
+          
 
         useEffect(()=>{
 
@@ -77,6 +91,110 @@ const [typeOptions,setTypeOptions]=useState([
                 setEntryItems(JSON.parse(stored));
               }
             }, []);
+
+            useEffect(() => {
+
+              const fetchPurchase = async () => {
+            
+                const querySnapshot = await getDocs(
+                  collection(db, "purchase")
+                );
+            
+                const data = querySnapshot.docs.map(doc => ({
+                  id: doc.id,
+                  ...doc.data()
+                }));
+            
+                setPurchaseItems(data);
+              };
+            
+              fetchPurchase();
+            
+            }, []);
+            const addPurchase = async () => {
+
+              if(!type || !medicine || !qty || !purchasePrice){
+              alert("Fill all fields");
+              return;
+              }
+              
+              const existingItem = purchaseItems.find(
+              item =>
+              item.type === type &&
+              item.medicine === medicine
+              );
+              
+              if(existingItem){
+              
+              const updatedQty =
+              Number(existingItem.qty)
+              +
+              Number(qty);
+              
+              await updateDoc(
+              
+              doc(db,"purchase",existingItem.id),
+              
+              {
+              qty: updatedQty,
+              purchasePrice:Number(purchasePrice)
+              }
+              
+              );
+              
+              setPurchaseItems(prev =>
+              prev.map(item =>
+              
+              item.id===existingItem.id
+              
+              ? {
+              ...item,
+              qty:updatedQty,
+              purchasePrice:Number(purchasePrice)
+              }
+              
+              : item
+              
+              )
+              );
+              
+              }else{
+              
+                const data = {
+                  type,
+                  medicine,
+                  qty:Number(qty),
+                  purchasePrice:Number(purchasePrice),
+                  
+                  date:new Date().toLocaleDateString(),
+                  
+                  time:new Date().toLocaleTimeString()
+                  
+                  };
+              
+              const docRef = await addDoc(
+              collection(db,"purchase"),
+              data
+              );
+              
+              setPurchaseItems(prev => [
+              ...prev,
+              {
+              id:docRef.id,
+              ...data
+              }
+              ]);
+              
+              }
+              
+              setType("");
+              setMedicine("");
+              setQty("");
+              setPurchasePrice("");
+              
+              };
+
+            
 
 const categoryMap={
 
@@ -145,41 +263,70 @@ MedicalConsumables:[
 };
 
 
-const addMedicine = () => {
+const addMedicine = async () => {
 
-    if(!type || !subCategory || !qty || !purchasePrice || !salesPrice){
-      alert("Fill all fields");
-      return;
-    }
-  
-    const data = {
-      id: Date.now(),
-      type,
-      subCategory,
-      medicine: medicine || subCategory,
-      qty,
-      entryType: "Purchase",
-      purchasePrice,
-      salesPrice
+  if(!type || !subCategory || !qty || !purchasePrice || !salesPrice){
+    alert("Fill all fields");
+    return;
+  }
+
+  const data = {
+    type,
+    medicine: subCategory,
+    qty: Number(qty),
+    purchasePrice: Number(purchasePrice),
+    salesPrice: Number(salesPrice),
+    
+    date:new Date().toLocaleDateString(),
+    
+    time:new Date().toLocaleTimeString()
+    
     };
-  
-    if(editIndex !== null){
-      const updated = [...items];
-      updated[editIndex] = data;
-      setItems(updated);
-      setEditIndex(null);
-    } else {
-      setItems(prev => [...prev, data]); // 🔥 IMPORTANT
+
+  const docRef = await addDoc(
+    collection(db,"inventory"),
+    data
+  );
+
+  setItems(prev => [
+    ...prev,
+    {
+      id: docRef.id,
+      ...data
     }
-  
-    setType("");
-    setSubCategory("");
-    setMedicine("");
-    setQty("");
-    setPurchasePrice("");
-    setSalesPrice("");
-    setEntryType("");
-  };
+  ]);
+
+  // 🔥 PURCHASE STOCK MINUS
+
+  const selectedPurchase = purchaseItems.find(
+    item =>
+      item.type === type &&
+      item.medicine === subCategory
+  );
+
+  if(selectedPurchase){
+
+    const remainingQty =
+      Number(selectedPurchase.qty)
+      - Number(qty);
+
+    // local update
+    setPurchaseItems(prev =>
+      prev.map(item =>
+        item.id === selectedPurchase.id
+        ? {...item, qty: remainingQty}
+        : item
+      )
+    );
+
+  }
+
+  setType("");
+  setSubCategory("");
+  setQty("");
+  setPurchasePrice("");
+  setSalesPrice("");
+};
 
   const addEntryPurchase = () => {
 
@@ -210,6 +357,80 @@ const addMedicine = () => {
     setPurchasePrice("");
     setSalesPrice("");
     setEntryType("");
+  };
+
+  const addSale = async () => {
+
+    if(!type || !medicine || !qty){
+      alert("Fill all fields");
+      return;
+    }
+  
+    const selectedItem = items.find(
+      item =>
+        item.type === type &&
+        item.medicine === medicine
+    );
+  
+    if(!selectedItem){
+      alert("Medicine not found");
+      return;
+    }
+  
+    const totalPurchase =
+      Number(selectedItem.purchasePrice)
+      * Number(qty);
+  
+    const totalSales =
+      Number(selectedItem.salesPrice)
+      * Number(qty);
+  
+      const data = {
+        type,
+        medicine,
+        qty: Number(qty),
+        purchasePrice: totalPurchase,
+        salesPrice: totalSales,
+        
+        date:new Date().toLocaleDateString(),
+        
+        time:new Date().toLocaleTimeString()
+        
+        };
+  
+    // FIREBASE SAVE
+    const docRef = await addDoc(
+      collection(db,"sales"),
+      data
+    );
+  
+    // TABLE SAVE
+    setEntryItems(prev => [
+      ...prev,
+      {
+        id: docRef.id,
+        ...data
+      }
+    ]);
+  
+    // INVENTORY STOCK MINUS
+    setItems(prev =>
+      prev.map(item =>
+        item.id === selectedItem.id
+        ? {
+            ...item,
+            qty:
+              Number(item.qty)
+              - Number(qty)
+          }
+        : item
+      )
+    );
+  
+    setType("");
+    setMedicine("");
+    setQty("");
+    setSalesPrice("");
   };
 
   const addEntrySale = () => {
@@ -296,8 +517,36 @@ const deleteEntryItem = (index) => {
         
         };
 
-        const deleteItem = (index) => {
-            setItems(prev => prev.filter((_, i) => i !== index));
+        const deleteItem = async (id) => {
+
+          await deleteDoc(doc(db, "inventory", id));
+        
+          setItems(prev =>
+            prev.filter(item => item.id !== id)
+          );
+        };
+
+        const editPurchaseItem = (item) => {
+
+          setType(item.type);
+          setMedicine(item.medicine);
+          setQty(item.qty);
+          setPurchasePrice(item.purchasePrice);
+          
+          setEditIndex(item.id);
+          
+          };
+          
+          const deletePurchaseItem = async (id) => {
+          
+          await deleteDoc(
+          doc(db,"purchase",id)
+          );
+          
+          setPurchaseItems(prev =>
+          prev.filter(item => item.id !== id)
+          );
+          
           };
 
 
@@ -318,10 +567,13 @@ Home
 Inventory
 </li>
 
-<li onClick={()=>setMenu("entries")} className="cursor-pointer">
-Entries
+<li onClick={()=>setMenu("purchase")} className="cursor-pointer">
+Purchase
 </li>
 
+<li onClick={()=>setMenu("sales")} className="cursor-pointer">
+Sales
+</li>
 </ul>
 
 </div>
@@ -363,12 +615,22 @@ Inventory
 </button>
 
 <button
-onClick={()=>setMenu("entries")}
+onClick={()=>setMenu("purchase")}
 className="flex flex-col items-center gap-2"
 >
-<span className="text-2xl">📝</span>
+<span className="text-2xl">📥</span>
 <span className="text-base font-medium">
-Entries
+Purchase
+</span>
+</button>
+
+<button
+onClick={()=>setMenu("sales")}
+className="flex flex-col items-center gap-2"
+>
+<span className="text-2xl">💰</span>
+<span className="text-base font-medium">
+Sales
 </span>
 </button>
 
@@ -464,10 +726,7 @@ w-full z-50 p-2
 max-h-60 overflow-y-auto
 ">
 
-{[
-"Tablet","Injection","Capsule","Syrup",
-"Drops","Ointment","Inhaler","Medical Consumables"
-]
+{typeOptions
 .filter(item=>
 item.toLowerCase().includes(type.toLowerCase())
 )
@@ -532,9 +791,8 @@ max-h-60 overflow-y-auto
 break-words
 ">
 
-{type &&
-categoryMap[type]
-?.filter(item=>
+{medicineOptions
+.filter(item=>
 item.toLowerCase().includes(
 subCategory.toLowerCase()
 )
@@ -575,7 +833,28 @@ cursor-pointer hover:bg-gray-100 rounded-lg">
 
 
 
-<input type="number"placeholder="Qty"value={qty}onChange={(e)=>setQty(e.target.value)}
+<input type="number"placeholder="Qty"value={qty}onChange={(e)=>{
+
+const enteredQty = e.target.value;
+
+setQty(enteredQty);
+
+const selectedItem = purchaseItems.find(
+  item =>
+    item.type === type &&
+    item.medicine === subCategory
+);
+
+if(selectedItem){
+
+  setPurchasePrice(
+    Number(selectedItem.purchasePrice)
+    * Number(enteredQty)
+  );
+
+}
+
+}}
 className="border p-3 rounded-xl"/>
 
 
@@ -647,6 +926,8 @@ ${activeCategory===cat
 
 <th>Sales</th>
 
+<th>Date</th>
+
 <th>Action</th>
 
 </tr>
@@ -666,10 +947,26 @@ activeCategory==="All"
 <tr key={item.id} className="border-b">
 
 <td>{item.type}</td>
+
 <td>{item.medicine || item.subCategory}</td>
+
 <td>{item.qty}</td>
+
 <td>₹{item.purchasePrice}</td>
+
 <td>₹{item.salesPrice}</td>
+
+<td>
+
+{item.date || new Date().toLocaleDateString()}
+
+<br/>
+
+<span className="text-sm text-gray-500">
+{item.time || new Date().toLocaleTimeString()}
+</span>
+
+</td>
 
 <td className="space-x-4">
 
@@ -677,7 +974,7 @@ activeCategory==="All"
 Edit
 </button>
 
-<button onClick={()=>deleteItem(index)}className="text-red-600 font-semibold">
+<button onClick={()=>deleteItem(item.id)}className="text-red-600 font-semibold">
 Delete
 </button>
 
@@ -696,6 +993,384 @@ Delete
 
 )}
 
+{menu==="purchase" &&(
+
+<div>
+
+<h2 className="text-4xl font-bold mb-6">
+Purchase
+</h2>
+
+{/* SUMMARY */}
+
+<div className="bg-white rounded-3xl shadow-md p-5 md:p-6 mb-8">
+
+<h3 className="text-2xl font-bold mb-4">
+Purchase Summary
+</h3>
+
+<p className="text-xl">
+
+Total Stock:
+{
+purchaseItems.reduce(
+(sum,item)=>
+sum + Number(item.qty || 0),
+0
+)
+}
+
+</p>
+
+</div>
+
+{/* ADD PURCHASE */}
+
+<div className="bg-white rounded-3xl shadow-md p-5 md:p-6 mb-8">
+
+<h3 className="text-2xl font-bold mb-6">
+Add Purchase
+</h3>
+
+<div className="grid md:grid-cols-4 gap-4">
+
+{/* TYPE */}
+
+<div className="relative">
+
+<input
+value={type}
+onChange={(e)=>{
+setType(e.target.value);
+setShowTypeDropdown(true);
+}}
+onClick={()=>setShowTypeDropdown(true)}
+placeholder="Select Type"
+className="border p-3 rounded-xl w-full"
+/>
+
+{showTypeDropdown && (
+
+<div className="
+absolute top-full left-0 mt-2
+bg-white shadow-lg rounded-xl
+w-full z-50
+max-h-60 overflow-y-auto
+">
+
+{typeOptions
+.filter(item =>
+item.toLowerCase().includes(type.toLowerCase())
+)
+.map((item,index)=>(
+
+<div
+key={index}
+onClick={()=>{
+setType(item);
+setShowTypeDropdown(false);
+}}
+className="px-4 py-3 cursor-pointer hover:bg-gray-100"
+>
+{item}
+</div>
+
+))}
+
+{/* ADD TYPE */}
+
+{type &&
+!typeOptions.includes(type) && (
+
+<div
+onClick={()=>{
+
+setTypeOptions(prev => [
+...prev,
+type
+]);
+
+// 🔥 NEW
+categoryMap[type] = [];
+
+setShowTypeDropdown(false);
+}}
+className="px-4 py-3 text-blue-600 font-semibold border-t cursor-pointer"
+>
++ Add "{type}"
+</div>
+
+)}
+
+</div>
+
+)}
+
+</div>
+
+{/* MEDICINE */}
+
+<div className="relative">
+
+<input
+value={medicine}
+onChange={(e)=>{
+setMedicine(e.target.value);
+setShowMedicineDropdown(true);
+}}
+onClick={()=>setShowMedicineDropdown(true)}
+placeholder="Medicine Name"
+className="border p-3 rounded-xl w-full"
+/>
+
+{showMedicineDropdown && (
+
+<div className="
+absolute top-full left-0 mt-2
+bg-white shadow-lg rounded-xl
+w-full z-50
+max-h-60 overflow-y-auto
+">
+
+{medicineOptions
+.filter(item =>
+item.toLowerCase().includes(
+medicine.toLowerCase()
+)
+)
+.map((item,index)=>(
+
+<div
+key={index}
+onClick={()=>{
+setMedicine(item);
+setShowMedicineDropdown(false);
+}}
+className="px-4 py-3 cursor-pointer hover:bg-gray-100"
+>
+{item}
+</div>
+
+))}
+
+{/* ADD MEDICINE */}
+
+{medicine &&
+!medicineOptions.includes(medicine) && (
+
+<div
+onClick={()=>{
+
+setMedicineOptions(prev => [
+...prev,
+medicine
+]);
+
+// 🔥 NEW
+if(!categoryMap[type]){
+categoryMap[type] = [];
+}
+
+categoryMap[type].push(medicine);
+
+setShowMedicineDropdown(false);
+}}
+className="px-4 py-3 text-blue-600 font-semibold border-t cursor-pointer"
+>
++ Add "{medicine}"
+</div>
+
+)}
+
+</div>
+
+)}
+
+</div>
+
+{/* QTY */}
+
+<input
+type="number"
+value={qty}
+onChange={(e)=>setQty(e.target.value)}
+placeholder="Qty"
+className="border p-3 rounded-xl"
+/>
+
+{/* PURCHASE PRICE */}
+
+<input
+type="number"
+value={purchasePrice}
+onChange={(e)=>setPurchasePrice(e.target.value)}
+placeholder="Purchase Price"
+className="border p-3 rounded-xl"
+/>
+
+</div>
+
+<button
+onClick={async ()=>{
+
+  if(editIndex){
+  
+  await updateDoc(
+  
+  doc(db,"purchase",editIndex),
+  
+  {
+  type,
+  medicine,
+  qty:Number(qty),
+  purchasePrice:Number(purchasePrice)
+  }
+  
+  );
+
+  setItems(prev =>
+    prev.map(item =>
+    
+    item.type===type &&
+    item.medicine===medicine
+    
+    ? {
+    ...item,
+    purchasePrice:Number(purchasePrice)
+    }
+    
+    : item
+    
+    )
+    );
+    
+    setEntryItems(prev =>
+    prev.map(item =>
+    
+    item.type===type &&
+    item.medicine===medicine
+    
+    ? {
+    ...item,
+    purchasePrice:
+    Number(purchasePrice)
+    *
+    Number(item.qty)
+    }
+    
+    : item
+    
+    )
+    );
+  
+  setPurchaseItems(prev =>
+  prev.map(item =>
+  item.id===editIndex
+  ? {
+  ...item,
+  type,
+  medicine,
+  qty:Number(qty),
+  purchasePrice:Number(purchasePrice)
+  }
+  : item
+  )
+  );
+  
+  setEditIndex(null);
+  
+  }else{
+  
+  addPurchase();
+  
+  }
+  
+  }}
+className="mt-6 bg-green-500 text-white px-8 py-3 rounded-xl"
+>
+Add Purchase
+</button>
+
+</div>
+
+{/* TABLE */}
+
+<div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
+
+<table className="w-full">
+
+<thead>
+
+<tr className="border-b text-left">
+
+<th>Type</th>
+<th>Medicine</th>
+<th>Qty</th>
+<th>Purchase Price</th>
+<th>Date</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{purchaseItems.map((item)=>(
+
+<tr key={item.id} className="border-b">
+
+<td>{item.type}</td>
+
+<td>{item.medicine}</td>
+
+<td>{item.qty}</td>
+
+<td>₹{item.purchasePrice}</td>
+<td>
+
+{item.date || new Date().toLocaleDateString()}
+
+<br/>
+
+<span className="text-sm text-gray-500">
+{item.time || new Date().toLocaleTimeString()}
+</span>
+
+</td>
+
+<td className="space-x-4">
+
+<button
+onClick={()=>editPurchaseItem(item)}
+className="text-blue-600 font-semibold"
+>
+Edit
+</button>
+
+<button
+onClick={()=>deletePurchaseItem(item.id)}
+className="text-red-600 font-semibold"
+>
+Delete
+</button>
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+)}
+
 
 {menu==="home" &&(
 <h2 className="text-3xl font-bold">
@@ -703,12 +1378,12 @@ Home
 </h2>
 )}
 
-{menu==="entries" &&(
+{menu==="sales" &&(
 
 <div>
 
 <h2 className="text-4xl font-bold mb-6">
-Entries
+Sales
 </h2>
 
 
@@ -733,12 +1408,10 @@ activeCategory==="All"
 : item.type===activeCategory
 )
 .reduce(
-(sum,item)=>
-sum +
-(Number(item.salesPrice||0) *
-Number(item.qty||0)),
-0
-)
+  (sum,item)=>
+  sum + Number(item.salesPrice||0),
+  0
+  )
 }
 </p>
 
@@ -852,25 +1525,28 @@ absolute top-16 left-0 w-full
 bg-white rounded-xl shadow z-50
 ">
 
-{type &&
-(categoryMap[type] || [])
+{purchaseItems
 .filter(item =>
- item.toLowerCase().includes(
-   medicine.toLowerCase()
- )
+item.type === type &&
+item.medicine
+.toLowerCase()
+.includes(medicine.toLowerCase())
 )
 .map((item,index)=>(
 
 <div
 key={index}
 onClick={()=>{
-setMedicine(item);
+setMedicine(item.medicine);
 setShowMedicineDropdown(false);
 }}
-className="px-4 py-3 text-sm cursor-pointer hover:bg-gray-100 break-words whitespace-normal"
-style={{ wordBreak: "break-word" }}
+className="
+px-4 py-3 text-sm
+cursor-pointer
+hover:bg-gray-100
+"
 >
-{item}
+{item.medicine}
 </div>
 
 ))}
@@ -934,57 +1610,13 @@ className="border p-3 rounded-xl bg-gray-100"
 
 </div>
 
-<div className="relative mt-6 w-full sm:w-[250px]">
 
-  <div
-    onClick={()=>setShowEntryDropdown(!showEntryDropdown)}
-    className="border-2 border-blue-400 rounded-2xl px-6 py-4 cursor-pointer flex justify-between items-center text-lg font-semibold"
-  >
-    {entryType || "Choose"}
-    <span>▼</span>
-  </div>
-
-  {showEntryDropdown && (
-    <div className="absolute top-full left-0 mt-3 w-full bg-white rounded-2xl shadow-lg z-50 p-3">
-      
-      <div
-        onClick={()=>{
-          setEntryType("Purchase")
-          setShowEntryDropdown(false)
-        }}
-        className="py-3 px-4 text-lg cursor-pointer hover:bg-gray-100 rounded-lg"
-      >
-        Purchase
-      </div>
-
-      <div
-        onClick={()=>{
-          setEntryType("Sales")
-          setShowEntryDropdown(false)
-        }}
-        className="py-3 px-4 text-lg cursor-pointer hover:bg-gray-100 rounded-lg"
-      >
-        Sales
-      </div>
-
-    </div>
-  )}
-
-</div>
 
 <button
-onClick={()=>{
-  if(entryType === "Purchase"){
-    addEntryPurchase();
-  } else if(entryType === "Sales"){
-    addEntrySale();
-  } else {
-    alert("Select Entry Type");
-  }
-}}
+onClick={addSale}
 className="mt-6 bg-green-500 text-white px-6 py-3 rounded-xl"
 >
-Save Entry
+Save
 </button>
 
 </div>
@@ -1036,8 +1668,8 @@ ${activeCategory===cat
 <th>Type</th>
 <th>Medicine</th>
 <th>Qty</th>
-<th>Purchase</th>
 <th>Sales</th>
+<th>Date</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -1062,9 +1694,19 @@ ${activeCategory===cat
 
 <td>{item.qty}</td>
 
-<td>₹{item.purchasePrice}</td>
-
 <td>₹{item.salesPrice}</td>
+
+<td>
+
+{item.date || new Date().toLocaleDateString()}
+
+<br/>
+
+<span className="text-sm text-gray-500">
+{item.time || new Date().toLocaleTimeString()}
+</span>
+
+</td>
 
 <td className="space-x-4">
 

@@ -40,7 +40,7 @@ const AdminLogin = () => {
             password === "demo001"
         ){
             localStorage.setItem("adminLogin", "true");
-
+        
             localStorage.setItem(
               "adminEmail",
               "demoadminid001"
@@ -50,10 +50,9 @@ const AdminLogin = () => {
               "adminName",
               "Demo Admin"
             );
-    
-    
-            navigate("/account");
-    
+        
+            navigate("/demoadmindashboard");
+        
             return;
         }
     
