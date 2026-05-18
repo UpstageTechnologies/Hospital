@@ -9,6 +9,7 @@ import { db } from "../firebase"   // 👈 correct path check panniko
 const DemoHome = () => {
 
     const navigate = useNavigate()
+    const [showExitPopup, setShowExitPopup] = useState(false)
    
     const [open, setOpen] = useState(false)
     const specialityData = [
@@ -31,6 +32,23 @@ const DemoHome = () => {
         }
 
         fetchDoctors()
+    }, [])
+
+    useEffect(() => {
+
+        window.history.pushState(null, "", window.location.href)
+    
+        const handleBackButton = () => {
+            setShowExitPopup(true)
+            window.history.pushState(null, "", window.location.href)
+        }
+    
+        window.addEventListener("popstate", handleBackButton)
+    
+        return () => {
+            window.removeEventListener("popstate", handleBackButton)
+        }
+    
     }, [])
 
 
@@ -215,6 +233,42 @@ const DemoHome = () => {
                 </div>
 
             </div>
+
+            {showExitPopup && (
+<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+    <div className="bg-white p-6 rounded-xl shadow-xl w-[320px] text-center">
+
+        <h2 className="text-xl font-semibold mb-3">
+            Exit Demo?
+        </h2>
+
+        <p className="text-gray-600 mb-5">
+            Do you want to go back to HospitalInfo?
+        </p>
+
+        <div className="flex justify-center gap-4">
+
+            <button
+                onClick={() => setShowExitPopup(false)}
+                className="px-5 py-2 bg-gray-300 rounded-lg"
+            >
+                Cancel
+            </button>
+
+            <button
+                onClick={() => navigate("/", { replace: true })}
+                className="px-5 py-2 bg-red-500 text-white rounded-lg"
+            >
+                OK
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+)}
 
             <div className='flex bg-blue-500 rounded-lg px-6 sm:px-10 md:px-14 lg:px-12 my-16 md:my-20 mx-4 md:mx-10'>
                 <div className='flex-1 py-8 sm:py-10 md:py-16 lg:py-24 lg:pl-5'>

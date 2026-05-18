@@ -166,10 +166,6 @@ className="cursor-pointer hover:text-blue-600"
 Settings
 </p>
 
-<p onClick={()=>navigate("/demomyappointment")}className="cursor-pointer hover:text-blue-600">
-My Appointment
-</p>
-
 <p onClick={()=>setShowLogoutPopup(true)} className="cursor-pointer hover:text-red-600">
 Logout
 </p>
@@ -241,12 +237,6 @@ className="cursor-pointer hover:text-blue-600"
 Settings
 </p>
 
-<p
-onClick={()=>navigate("/demomyappointment")}
-className="cursor-pointer hover:text-blue-600"
->
-My Appointment
-</p>
 
 <p
 onClick={()=>setShowLogoutPopup(true)}
@@ -409,10 +399,10 @@ Cancel
 
 <button
 onClick={()=>{
-auth.signOut();
-localStorage.clear();
-navigate("/");
-}}
+  auth.signOut();
+  localStorage.clear();
+  navigate("/demohome", { replace: true });
+  }}
 className="px-4 py-2 bg-red-500 text-white rounded"
 >
 Logout

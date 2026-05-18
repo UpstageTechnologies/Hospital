@@ -702,6 +702,11 @@ useEffect(() => {
                 <p onClick={() => setPage("patients")}className="mb-3 cursor-pointer">
                     Patients
                 </p>
+
+                <p onClick={() => setPage("appointmentHistory")}className="mb-3 cursor-pointer">
+                    Appointment History
+                </p>
+
             </div>
 
             {/* ================= APPOINTMENTS PAGE ================= */}
@@ -934,6 +939,154 @@ patientsData={patientsData}
 
 )}
 
+{/* APPOINTMENT HISTORY */}
+{page === "appointmentHistory" && (
+
+<div className="flex-1 p-3 sm:p-5 md:p-6 pb-28">
+
+<h1 className="text-2xl font-bold mb-6 text-center md:text-left">
+Appointment History
+</h1>
+
+<div className="
+bg-white
+rounded-2xl
+shadow
+overflow-x-auto
+">
+
+<table className="w-full min-w-[750px]">
+
+<thead className="bg-blue-600 text-white">
+
+<tr>
+
+<th className="p-4 text-left whitespace-nowrap">
+Patient
+</th>
+
+<th className="p-4 text-left whitespace-nowrap">
+Doctor
+</th>
+
+<th className="p-4 text-left whitespace-nowrap">
+Date
+</th>
+
+<th className="p-4 text-left whitespace-nowrap">
+Time
+</th>
+
+<th className="p-4 text-left whitespace-nowrap">
+Reason
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{appointments
+.filter((item) => {
+
+if (!item.date || !item.time)
+return false
+
+const now = new Date()
+
+const endTime =
+item.time.split("-")[1]?.trim()
+
+if (!endTime)
+return false
+
+const match =
+endTime.match(/(\d+):(\d+)(am|pm)/i)
+
+if (!match)
+return false
+
+let hours =
+parseInt(match[1])
+
+const minutes =
+parseInt(match[2])
+
+const modifier =
+match[3].toLowerCase()
+
+if (
+modifier === "pm" &&
+hours !== 12
+) {
+hours += 12
+}
+
+if (
+modifier === "am" &&
+hours === 12
+) {
+hours = 0
+}
+
+const appointmentEnd =
+new Date(item.date)
+
+appointmentEnd.setHours(
+hours,
+minutes,
+0,
+0
+)
+
+return appointmentEnd < now
+
+})
+
+.map((item, index) => (
+
+<tr
+key={index}
+className="border-b hover:bg-gray-50"
+>
+
+<td className="p-4 whitespace-nowrap">
+{item.patientName}
+</td>
+
+<td className="p-4 whitespace-nowrap">
+{item.doctorName}
+</td>
+
+<td className="p-4 whitespace-nowrap">
+{item.date}
+</td>
+
+<td className="p-4 whitespace-nowrap">
+{item.time}
+</td>
+
+<td className="p-4 whitespace-nowrap">
+{item.reason ||
+item.problem ||
+"No Reason"}
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+)}
+
             {/* ================= HOME PAGE ================= */}
             {page === "home" && (
                <div className="flex-1 p-6 overflow-x-hidden">
@@ -1082,8 +1235,8 @@ flex-col
 md:flex-row
 ">
 
-                                {/* LEFT PANEL */}
-                                <div className="
+ {/* LEFT PANEL */}
+<div className="
 w-full
 md:w-1/4
 bg-gray-100
@@ -1093,30 +1246,59 @@ rounded-t-2xl
 md:rounded-none
 ">
 
-                                    <h2 className="font-bold text-lg">Appointment Panel</h2>
+    <h2 className="font-bold text-lg">Appointment Panel</h2>
 
-                                    <button
-                                        onClick={() => setStep(1)}
-                                        className={`w-full p-2 rounded text-white ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}
-                                    >
-                                        Patient Details
-                                    </button>
+    {/* STEP 1 */}
+    <button
+        onClick={() => setStep(1)}
+        className={`w-full p-2 rounded text-white ${
+            step === 1 ? "bg-blue-500" : "bg-gray-400"
+        }`}
+    >
+        Patient Details
+    </button>
 
-                                    <button
-                                        onClick={() => setStep(2)}
-                                        className={`w-full p-2 rounded text-white ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}
-                                    >
-                                        Check-In
-                                    </button>
+    {/* STEP 2 */}
+    <button
+        onClick={() => setStep(2)}
+        className={`w-full p-2 rounded text-white ${
+            step === 2 ? "bg-blue-500" : "bg-gray-400"
+        }`}
+    >
+        Check-In
+    </button>
 
-                                    <button
-                                        onClick={() => setStep(3)}
-                                        className={`w-full p-2 rounded text-white ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}
-                                    >
-                                        Pay
-                                    </button>
+    {/* NEW STEP 3 */}
+    <button
+        onClick={() => setStep(3)}
+        className={`w-full p-2 rounded text-white ${
+            step === 3 ? "bg-blue-500" : "bg-gray-400"
+        }`}
+    >
+        Prescribe
+    </button>
 
-                                </div>
+    {/* STEP 4 */}
+    <button
+        onClick={() => setStep(4)}
+        className={`w-full p-2 rounded text-white ${
+            step === 4 ? "bg-blue-500" : "bg-gray-400"
+        }`}
+    >
+        Payment
+    </button>
+
+    {/* STEP 5 */}
+    <button
+        onClick={() => setStep(5)}
+        className={`w-full p-2 rounded text-white ${
+            step === 5 ? "bg-blue-500" : "bg-gray-400"
+        }`}
+    >
+        Check-Out
+    </button>
+
+</div>
 
                                 {/* RIGHT CONTENT */}
                                 <div className="
@@ -1156,6 +1338,7 @@ relative
 
                                                 <div className="space-y-4">
                                                     <input value={selectedAppointment.patientName} disabled className="w-full border p-3 rounded-xl" />
+                                                    <input value={selectedAppointment.reason || ""} disabled className="w-full border p-3 rounded-xl" />
                                                     <input value={selectedAppointment.phone || ""} disabled className="w-full border p-3 rounded-xl" />
                                                     <input value={selectedAppointment.address || ""} disabled className="w-full border p-3 rounded-xl" />
                                                     <input value={selectedAppointment.doctorName} disabled className="w-full border p-3 rounded-xl" />
@@ -1199,9 +1382,12 @@ relative
 
                                                 <div className="text-3xl mb-6">⏱ 1s</div>
 
-                                                <button className="bg-red-500 text-white px-8 py-3 rounded-lg text-lg">
-                                                    Check-Out
-                                                </button>
+                                                <button
+    onClick={() => setStep(3)}
+    className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg"
+>
+    Check-In
+</button>
 
                                             </div>
 
@@ -1225,8 +1411,44 @@ relative
                                         </div>
                                     )}
 
+                                    {/* STEP 3 PRESCRIBE */}
+{step === 3 && (
+    <div className="flex flex-col h-full justify-between">
+
+        <div>
+            <h3 className="text-xl font-bold mb-6">
+                Prescribe
+            </h3>
+
+            <textarea
+                placeholder="Enter Prescription..."
+                className="w-full border p-4 rounded-xl h-40"
+            />
+        </div>
+
+        <div className="flex justify-end gap-4 mt-6">
+
+            <button
+                onClick={() => setStep(2)}
+                className="bg-gray-400 text-white px-6 py-2 rounded"
+            >
+                Previous
+            </button>
+
+            <button
+                onClick={() => setStep(4)}
+                className="bg-blue-600 text-white px-6 py-2 rounded"
+            >
+                Next
+            </button>
+
+        </div>
+
+    </div>
+)}
+
                                     {/* STEP 3 PAYMENT */}
-                                    {step === 3 && (
+                                    {step === 4 && (
                                         <div className="flex flex-col h-full justify-between">
 
                                             <div>
@@ -1244,17 +1466,54 @@ relative
                                             </div>
 
                                             {/* FIXED BUTTON */}
-                                            <div className="mt-6">
-                                                <button
-                                                    onClick={() => setStep(2)}
-                                                    className="bg-gray-400 text-white px-6 py-2 rounded"
-                                                >
-                                                    Previous
-                                                </button>
+                                            <div className="flex justify-end gap-4 mt-6">
+                                            <button
+    onClick={() => setStep(3)}
+    className="bg-gray-400 text-white px-6 py-2 rounded"
+>
+    Previous
+</button>
+
+<button
+    onClick={() => setStep(5)}
+    className="bg-blue-600 text-white px-6 py-2 rounded ml-3"
+>
+    Next
+</button>
                                             </div>
 
                                         </div>
                                     )}
+
+                                    {/* STEP 5 CHECKOUT */}
+{step === 5 && (
+    <div className="flex flex-col h-full justify-between">
+
+        <div className="flex flex-col items-center justify-center h-full">
+
+            <h3 className="text-2xl font-bold mb-6">
+                Appointment Completed
+            </h3>
+
+            <button className="bg-green-600 text-white px-8 py-3 rounded-xl">
+                Confirm Check-Out
+            </button>
+
+        </div>
+
+        <div className="flex justify-end gap-4 mt-6">
+
+            <button
+                onClick={() => setStep(4)}
+                className="bg-gray-400 text-white px-6 py-2 rounded"
+            >
+                Previous
+            </button>
+
+        </div>
+
+    </div>
+)}
 
                                 </div>
 
@@ -1266,7 +1525,7 @@ relative
             )}
 
             {/* MOBILE BOTTOM NAV */}
-<div className="fixed bottom-0 left-0 w-full bg-white border-t shadow md:hidden flex justify-around items-center py-2 z-50">
+<div className="fixed bottom-0 left-0 w-full bg-white border-t shadow md:hidden flex justify-around items-center py-3 px-2 gap-2 z-50">
 
 <button onClick={() => setPage("home")} className="flex flex-col items-center text-sm">
     🏠
@@ -1276,6 +1535,11 @@ relative
 <button onClick={() => setPage("appointments")} className="flex flex-col items-center text-sm">
     📅
     <span>Appointments</span>
+</button>
+
+<button onClick={() => setPage("appointmentHistory")}className="flex flex-col items-center text-sm">
+    📜
+    <span>History</span>
 </button>
 
 <button

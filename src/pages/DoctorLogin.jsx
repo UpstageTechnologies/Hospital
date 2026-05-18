@@ -6,7 +6,15 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword
   } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+  import {
+    collection,
+    getDocs,
+    query,
+    where,
+    doc,
+    setDoc,
+    getDoc
+    } from "firebase/firestore";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 
@@ -114,15 +122,19 @@ const DoctorLogin = () => {
 
       } else {
 
-        const doctorRef = doc(db, "doctors", email)
-        const doctorSnap = await getDoc(doctorRef)
-
-        if (!doctorSnap.exists()) {
-          alert("Doctor not found ")
-          return
-        }
-
-        const data = doctorSnap.data()
+        const q = query(
+          collection(db, "doctors"),
+          where("doctorAccount.doctorId", "==", email)
+          );
+          
+          const querySnapshot = await getDocs(q);
+          
+          if (querySnapshot.empty) {
+            alert("Doctor not found");
+            return;
+          }
+          
+          const data = querySnapshot.docs[0].data();
 
         if (data.isDisabled) {
           alert("Your account is disabled ")

@@ -203,6 +203,7 @@ const [doctorAccounts, setDoctorAccounts] = useState([])
 const [staffAccounts, setStaffAccounts] = useState([])
 const [patientAccounts, setPatientAccounts] = useState([])
 const [pharmasiAccounts, setPharmasiAccounts] = useState([])
+const [appointments, setAppointments] = useState([])
 
 const handleMenuChange = (mainTab, child = "") => {
 
@@ -455,52 +456,30 @@ const handleUpdateAdmin = async () => {
     console.log(err)
 
   }
-
 }
 
-  const appointments = [
-    {
-      patient:"Uma",
-      doctor:"Ashok",
-      date:"Apr 01 2026",
-      time:"8.00pm-9.00pm",
-      patientImg:"https://randomuser.me/api/portraits/women/44.jpg",
-      doctorImg:"https://randomuser.me/api/portraits/men/32.jpg"
-    },
-    {
-      patient:"Sundar",
-      doctor:"Samaya Pandi",
-      date:"Apr 04 2026",
-      time:"5.00pm-6.00pm",
-      patientImg:"https://randomuser.me/api/portraits/men/46.jpg",
-      doctorImg:"https://randomuser.me/api/portraits/women/50.jpg"
-    },
-    {
-      patient:"Remo",
-      doctor:"Naveen",
-      date:"Apr 10 2026",
-      time:"7.00am-8.00am",
-      patientImg:"https://randomuser.me/api/portraits/men/55.jpg",
-      doctorImg:"https://randomuser.me/api/portraits/men/70.jpg"
-    },
-    {
-      patient:"Rajkumar",
-      doctor:"Rishi",
-      date:"Apr 08 2026",
-      time:"5.19pm-5.20pm",
-      patientImg:"https://randomuser.me/api/portraits/men/60.jpg",
-      doctorImg:"https://randomuser.me/api/portraits/men/71.jpg"
-    },
-    {
-      patient:"Vinith",
-      doctor:"Ashok",
-      date:"Apr 12 2026",
-      time:"11.00am-12.00pm",
-      patientImg:"https://randomuser.me/api/portraits/men/61.jpg",
-      doctorImg:"https://randomuser.me/api/portraits/men/72.jpg"
-    }
-  ]
+useEffect(() => {
 
+  const fetchAppointments = async () => {
+  
+  const snapshot =
+  await getDocs(
+  collection(db, "appointments")
+  )
+  
+  const list =
+  snapshot.docs.map(doc => ({
+  id: doc.id,
+  ...doc.data()
+  }))
+  
+  setAppointments(list)
+  
+  }
+  
+  fetchAppointments()
+  
+  }, [])
 
   return (
     <div className="min-h-screen bg-white">
@@ -535,6 +514,10 @@ const handleUpdateAdmin = async () => {
               className="cursor-pointer"
             >
               Appointments
+            </p>
+
+            <p onClick={() => handleMenuChange("history")}className="cursor-pointer">
+              Appointment History
             </p>
 
 
@@ -684,7 +667,7 @@ const handleUpdateAdmin = async () => {
   onClick={() => setSelected({
     ...doc,
     type: "doctor",
-    image: "https://randomuser.me/api/portraits/men/" + (i+10) + ".jpg"
+    
   })}
   className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
 >
@@ -710,7 +693,7 @@ const handleUpdateAdmin = async () => {
   onClick={() => setSelected({
     ...p,
     type: "patient",
-    image: "https://randomuser.me/api/portraits/women/" + (i+20) + ".jpg"
+    
   })}
   className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
 >
@@ -739,8 +722,8 @@ const handleUpdateAdmin = async () => {
   })}
   className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
 >
-          <p><b>Patient:</b> {item.patient}</p>
-          <p><b>Doctor:</b> {item.doctor}</p>
+<p><b>Patient:</b> {item.patientName}</p>
+<p><b>Doctor:</b> {item.doctorName}</p>
           <p><b>Date:</b> {item.date}</p>
           <p><b>Time:</b> {item.time}</p>
 
@@ -781,37 +764,262 @@ const handleUpdateAdmin = async () => {
           )}
 
 
-          {/* APPOINTMENTS */}
-          {tab === "appointments" && subMenu === "" && (
-            <div>
+{tab === "appointments" && subMenu === "" && (
 
-              <h1 className="text-4xl font-bold mb-8">
-                All Appointments
-              </h1>
+<div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+<h1 className="text-4xl font-bold mb-8">
+Current Appointments
+</h1>
 
-                {appointments.map((item,i)=>(
+<div className="
+grid
+grid-cols-1
+md:grid-cols-2
+xl:grid-cols-3
+gap-6
+">
 
-                  <div
-                    key={i}
-                    onClick={()=>setSelected(item)}
-                    className="border rounded-xl p-6 shadow cursor-pointer hover:scale-105 transition"
-                  >
+{appointments
 
-                    <p><b>Patient:</b> {item.patient}</p>
-                    <p><b>Doctor:</b> {item.doctor}</p>
-                    <p><b>Date:</b> {item.date}</p>
-                    <p><b>Time:</b> {item.time}</p>
+.filter((item) => {
 
-                  </div>
+if (!item.date || !item.time)
+return false
 
-                ))}
+const now = new Date()
 
-              </div>
+const appointmentDate =
+new Date(item.date + "T00:00:00")
+return appointmentDate >=
+new Date(
+now.getFullYear(),
+now.getMonth(),
+now.getDate()
+)
 
-            </div>
-          )}
+})
+
+.map((item, i) => (
+
+<div
+key={i}
+onClick={() =>
+setSelected({
+...item,
+type:"appointment"
+})
+}
+className="
+border
+rounded-2xl
+p-5
+shadow
+cursor-pointer
+hover:scale-[1.02]
+transition
+bg-white
+"
+>
+
+<div className="flex items-center gap-4 mb-4">
+
+<img
+src={
+item.patientImage ||
+"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+}
+className="
+w-14
+h-14
+rounded-full
+object-cover
+border
+"
+/>
+
+<div>
+
+<p className="font-bold text-lg">
+{item.patientName}
+</p>
+
+<p className="text-gray-500">
+Patient
+</p>
+
+</div>
+
+</div>
+
+<div className="flex items-center gap-4 mb-4">
+
+<img
+src={
+item.doctorImage ||
+"https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+}
+className="
+w-14
+h-14
+rounded-full
+object-cover
+border
+"
+/>
+
+<div>
+
+<p className="font-bold text-lg">
+{item.doctorName}
+</p>
+
+<p className="text-gray-500">
+Doctor
+</p>
+
+</div>
+
+</div>
+
+<p>
+<b>Date:</b> {item.date}
+</p>
+
+<p>
+<b>Time:</b> {item.time}
+</p>
+
+<p>
+<b>Reason:</b>
+{" "}
+{item.reason}
+</p>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+{tab === "history" && (
+
+<div className="w-full overflow-hidden pb-28">
+
+<h1 className="
+text-2xl
+md:text-4xl
+font-bold
+mb-6
+">
+Appointment History
+</h1>
+
+<div className="
+w-full
+max-w-full
+overflow-x-scroll
+touch-pan-x
+rounded-2xl
+shadow
+bg-white
+">
+
+<table className="min-w-[950px]">
+
+<thead className="bg-blue-600 text-white">
+
+<tr>
+
+<th className="p-4 text-left whitespace-nowrap">
+Patient
+</th>
+
+<th className="p-4 text-left whitespace-nowrap">
+Doctor
+</th>
+
+<th className="p-4 text-left whitespace-nowrap">
+Date
+</th>
+
+<th className="p-4 text-left whitespace-nowrap">
+Time
+</th>
+
+<th className="p-4 text-left whitespace-nowrap">
+Reason
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{appointments
+.filter((item) => {
+
+if (!item.date) return false
+
+const now = new Date()
+
+const appointmentDate =
+new Date(item.date)
+
+return appointmentDate <
+new Date(
+now.getFullYear(),
+now.getMonth(),
+now.getDate()
+)
+
+})
+
+.map((item, i) => (
+
+<tr
+key={i}
+className="border-b"
+>
+
+<td className="p-4 whitespace-nowrap">
+{item.patientName}
+</td>
+
+<td className="p-4 whitespace-nowrap">
+{item.doctorName}
+</td>
+
+<td className="p-4 whitespace-nowrap">
+{item.date}
+</td>
+
+<td className="p-4 whitespace-nowrap">
+{item.time}
+</td>
+
+<td className="p-4 whitespace-nowrap">
+{item.reason}
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+)}
 
 {tab === "account" && subMenu === "admins" && (
 
@@ -3022,53 +3230,7 @@ fetchPharmasi()
 
 
       {/* POPUP */}
-      {selected && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-
-          <div className="bg-white p-8 rounded-xl w-[95%] md:w-[420px]">
-
-            <h2 className="text-2xl font-bold mb-6 text-center">
-              Appointment Details
-            </h2>
-
-            <div className="flex justify-center gap-8 mb-6">
-
-              <div className="text-center">
-                <img
-                  src={selected.patientImg}
-                  className="w-20 h-20 rounded-full mx-auto"
-                />
-                <p>{selected.patient}</p>
-              </div>
-
-              <div className="text-center">
-                <img
-                  src={selected.doctorImg}
-                  className="w-20 h-20 rounded-full mx-auto"
-                />
-                <p>{selected.doctor}</p>
-              </div>
-
-            </div>
-
-            <p><b>Patient:</b> {selected.patient}</p>
-            <p><b>Doctor:</b> {selected.doctor}</p>
-            <p><b>Date:</b> {selected.date}</p>
-            <p><b>Time:</b> {selected.time}</p>
-
-            <button
-              onClick={()=>setSelected(null)}
-              className="bg-blue-600 text-white px-6 py-3 rounded mt-6 w-full"
-            >
-              Close
-            </button>
-
-          </div>
-
-        </div>
-      )}
-
-{selected && (
+      {selected?.type === "appointment" && (
 
 <div className="
 fixed inset-0 z-50
@@ -3079,136 +3241,165 @@ p-4
 
 <div className="
 bg-white
-w-full max-w-3xl
-rounded-[35px]
+w-full
+max-w-5xl
+rounded-[40px]
+p-6 md:p-10
 relative
-p-8 md:p-12
-shadow-2xl
+max-h-[95vh]
+overflow-y-auto
 ">
 
-{/* CLOSE ICON */}
 <button
-  onClick={() => setSelected(null)}
-  className="
-  absolute
-  top-5
-  right-5
-  text-5xl
-  font-bold
-  leading-none
-  hover:scale-110
-  transition
-  "
+onClick={() => setSelected(null)}
+className="
+absolute top-5 right-5
+text-4xl font-bold
+"
 >
-  ×
+×
 </button>
 
 <h1 className="
-text-4xl md:text-5xl
+text-4xl md:text-6xl
 font-black
 text-center
 mb-10
 ">
-  Appointment Details
+Appointment Details
 </h1>
 
-{/* IMAGES */}
 <div className="
-flex justify-center items-end
+flex flex-col md:flex-row
+justify-center items-center
 gap-10
 mb-10
 ">
 
-  {/* PATIENT IMAGE */}
-  <div className="flex flex-col items-center">
+{/* PATIENT */}
 
-    <img
-      src={selected.patientImg}
-      alt=""
-      className="
-      w-24 h-24
-      rounded-full
-      object-cover
-      border-4 border-gray-300
-      "
-    />
+<div className="flex flex-col items-center min-w-[65px] text-[11px]">
 
-    <p className="mt-2 text-xl font-semibold">
-      {selected.patient}
-    </p>
+<img
+src={
+selected.patientImage ||
+"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+}
+alt="patient"
+className="
+w-36 h-36
+rounded-full
+object-cover
+border-[6px]
+border-gray-300
+shadow-xl
+"
+/>
 
-    <p className="text-gray-500 text-sm">
-      Patient
-    </p>
+<h2 className="
+mt-4
+text-2xl
+font-bold
+">
+{selected.patientName || "No Patient"}
+</h2>
 
-  </div>
-
-  {/* DOCTOR IMAGE */}
-  <div className="flex flex-col items-center">
-
-    <img
-      src={selected.doctorImg}
-      alt=""
-      className="
-      w-40 h-40
-      rounded-full
-      object-cover
-      border-4 border-blue-500
-      shadow-xl
-      "
-    />
-
-    <p className="mt-3 text-3xl font-bold text-blue-600">
-      Dr. {selected.doctor}
-    </p>
-
-    <p className="text-gray-500">
-      Doctor
-    </p>
-
-  </div>
+<p className="text-gray-500">
+Patient
+</p>
 
 </div>
 
-{/* DETAILS */}
+{/* DOCTOR */}
+
+<div className="flex flex-col items-center">
+
+<img
+src={
+selected.doctorImage ||
+"https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+}
+alt="doctor"
+className="
+w-36 h-36
+rounded-full
+object-cover
+border-[6px]
+border-blue-500
+shadow-xl
+"
+/>
+
+<h2 className="
+mt-4
+text-2xl
+font-bold
+text-blue-600
+">
+Dr. {selected.doctorName || "No Doctor"}
+</h2>
+
+<p className="text-gray-500">
+Doctor
+</p>
+
+</div>
+
+</div>
+
 <div className="
-space-y-4
-text-xl md:text-2xl
+space-y-5
+text-xl
+md:text-2xl
+font-semibold
 ">
 
-  <p>
-    <b>Patient:</b> {selected.patient}
-  </p>
+<p>
+<b>Patient:</b>
+{" "}
+{selected.patientName}
+</p>
 
-  <p>
-    <b>Doctor:</b> {selected.doctor}
-  </p>
+<p>
+<b>Doctor:</b>
+{" "}
+Dr. {selected.doctorName}
+</p>
 
-  <p>
-    <b>Date:</b> {selected.date}
-  </p>
+<p>
+<b>Date:</b>
+{" "}
+{selected.date}
+</p>
 
-  <p>
-    <b>Time:</b> {selected.time}
-  </p>
+<p>
+<b>Time:</b>
+{" "}
+{selected.time}
+</p>
+
+<p>
+<b>Reason:</b>
+{" "}
+{selected.reason || "No Reason"}
+</p>
 
 </div>
 
 <button
-  onClick={() => setSelected(null)}
-  className="
-  w-full
-  mt-10
-  bg-blue-700
-  hover:bg-blue-800
-  text-white
-  py-4
-  rounded-xl
-  text-2xl
-  font-semibold
-  "
+onClick={() => setSelected(null)}
+className="
+w-full
+mt-10
+bg-blue-600
+text-white
+py-4
+rounded-2xl
+text-2xl
+font-bold
+"
 >
-  Close
+Close
 </button>
 
 </div>
@@ -3218,8 +3409,9 @@ text-xl md:text-2xl
 )}
 
 
+
       {/* MOBILE + TAB BOTTOM MENU */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t flex justify-around py-3">
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow md:hidden flex justify-around items-center py-3 px-2 gap-2 z-50">
 
         <button onClick={()=>setTab("home")}>
           🏠
@@ -3234,6 +3426,11 @@ text-xl md:text-2xl
         <button onClick={()=>setTab("appointments")}>
           📅
           <p>Appointments</p>
+        </button>
+
+        <button onClick={()=>setTab("history")}>
+        📜
+        <p>History</p>
         </button>
  
 

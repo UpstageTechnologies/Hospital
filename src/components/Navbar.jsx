@@ -14,6 +14,7 @@ import {
     getDocs
     } from "firebase/firestore";
 import { useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 
 const Navbar = () => {
@@ -57,6 +58,7 @@ const hospitalLogos = {
 
     const [showProfileMenu, setShowProfileMenu] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
+    const [showMobileNav, setShowMobileNav] = useState(false)
     const [isMaster, setIsMaster] = useState(false)
     const [userImage, setUserImage] = useState(assets.profile_pic)
     const [user, setUser] = useState(false);
@@ -303,44 +305,56 @@ alt="logo"
                 Cancel
             </button>
 
-            <button onClick={() => {
+            <button
+  onClick={() => {
 
-auth.signOut();
+    auth.signOut();
 
-// ✅ CLEAR ALL LOGIN DATA
-localStorage.removeItem("masterLogin");
-localStorage.removeItem("adminLogin");
-localStorage.removeItem("adminEmail");
-localStorage.removeItem("adminName");
-localStorage.removeItem("adminData");
-localStorage.removeItem("doctorName");
-localStorage.removeItem("doctorData");
-localStorage.removeItem("doctorLogin");
-localStorage.removeItem("patientEmail");
-localStorage.removeItem("staffId");
-localStorage.removeItem("staffName");
-localStorage.removeItem("staffData");
-localStorage.removeItem("staffLogin");
+    // ✅ CLEAR ALL LOGIN DATA
+    localStorage.removeItem("masterLogin");
+    localStorage.removeItem("masterData");
 
-setShowLogoutPopup(false);
+    localStorage.removeItem("adminLogin");
+    localStorage.removeItem("adminEmail");
+    localStorage.removeItem("adminName");
+    localStorage.removeItem("adminData");
 
-// ✅ RESET UI
-setUser(false);
-setUserName("");
+    localStorage.removeItem("doctorLogin");
+    localStorage.removeItem("doctorEmail");
+    localStorage.removeItem("doctorName");
+    localStorage.removeItem("doctorData");
 
-// ✅ GO HOME
-setShowProfileMenu(false);
+    localStorage.removeItem("patientLogin");
+    localStorage.removeItem("patientEmail");
+    localStorage.removeItem("patientData");
 
-window.location.replace("/home#home");
+    localStorage.removeItem("staffLogin");
+    localStorage.removeItem("staffId");
+    localStorage.removeItem("staffName");
+    localStorage.removeItem("staffData");
+
+    localStorage.removeItem("pharmasiLogin");
+    localStorage.removeItem("pharmasiData");
+
+    // ✅ RESET STATE
+    setUser(false);
+    setUserName("");
+    setUserRole("");
+    setShowProfileMenu(false);
+    setShowLogoutPopup(false);
+
+    
+    setUserImage(assets.login1_icon);
 
 
+window.history.pushState(null, "", "/");
+navigate("/home#home", { replace: true });
 
-}}
-                className="px-4 py-2 bg-red-500 text-white rounded"
-            >
-                Logout
-            </button>
-
+  }}
+  className="px-4 py-2 bg-red-500 text-white rounded"
+>
+  Logout
+</button>
         </div>
 
     </div>
@@ -350,6 +364,27 @@ window.location.replace("/home#home");
 )}
 
 <div className='flex items-center gap-4 relative'>
+
+{
+location.pathname === "/home" && (
+
+<button
+onClick={() => setShowMobileNav(!showMobileNav)}
+className="md:hidden"
+>
+
+{
+showMobileNav ? (
+<X className="w-7 h-7" />
+) : (
+<Menu className="w-7 h-7" />
+)
+}
+
+</button>
+
+)
+}
 
                 {
                     user ? <div onClick={() => setShowProfileMenu(!showProfileMenu)} className='flex items-center gap-2 relative z-50'>
@@ -503,6 +538,60 @@ My Profile
 
                         </div>
                 }
+
+{
+showMobileNav && location.pathname === "/home" && (
+
+<div className="absolute top-20 right-5 bg-white shadow-xl rounded-xl p-5 z-50 w-52 md:hidden">
+
+<div className="flex flex-col gap-4 text-lg font-medium">
+
+<p
+onClick={()=>{
+navigate("/home")
+setShowMobileNav(false)
+}}
+className="cursor-pointer hover:text-blue-600"
+>
+Home
+</p>
+
+<p
+onClick={()=>{
+navigate("/doctor")
+setShowMobileNav(false)
+}}
+className="cursor-pointer hover:text-blue-600"
+>
+All Doctors
+</p>
+
+<p
+onClick={()=>{
+navigate("/about")
+setShowMobileNav(false)
+}}
+className="cursor-pointer hover:text-blue-600"
+>
+About
+</p>
+
+<p
+onClick={()=>{
+navigate("/contact")
+setShowMobileNav(false)
+}}
+className="cursor-pointer hover:text-blue-600"
+>
+Contact
+</p>
+
+</div>
+
+</div>
+
+)
+}
 
                
 
