@@ -395,246 +395,392 @@ String(userEmail).trim().toLowerCase()
       <h1 className="text-3xl font-bold">
         Appointment History
       </h1>
-
     </div>
 
-    <div className="w-full overflow-x-scroll scrollbar-thin pb-24">
+    {Object.entries(
 
-    <table className="min-w-[1400px] border border-gray-300 text-sm md:text-base bg-white">
+      currentAppointments.reduce((acc, item) => {
 
-        <thead className="bg-blue-600 text-white">
+        if (!acc[item.doctorName]) {
+          acc[item.doctorName] = []
+        }
 
-          <tr>
+        acc[item.doctorName].push(item)
 
-            <th className="border p-3">Date</th>
+        return acc
 
-            <th className="border p-3">Doctor</th>
+      }, {})
 
-            <th className="border p-3">Time</th>
+    ).map(([doctorName, doctorAppointments], index) => (
 
-            <th className="border p-3">Reason</th>
+      <div
+        key={index}
+        className="mb-10 bg-white rounded-xl shadow-lg overflow-hidden"
+      >
 
-            <th className="border p-3">Injection</th>
+        {/* DOCTOR TITLE */}
+        <div className="bg-blue-600 text-white px-6 py-4">
+          <h2 className="text-2xl font-bold">
+            Dr. {doctorName} Appointments
+          </h2>
+        </div>
 
-            <th className="border p-3">Tablet</th>
+        {/* TABLE */}
+        <div className="
+  w-full
+  overflow-x-auto
+  md:overflow-x-auto
+  lg:overflow-visible
+  pb-4
+">
 
-            <th className="border p-3">Doctor Notes</th>
+  <div className="
+    min-w-[950px]
+    md:min-w-[1100px]
+    lg:min-w-full
+  ">
 
-            <th className="border p-3">Appointment No</th>
+<table className="
+  w-full
+  border
+  border-gray-300
+  bg-white
+  text-xs
+  sm:text-sm
+  md:text-base
+">
 
-            <th className="border p-4 min-w-[180px]">Actions</th>
+            <thead className="bg-gray-100">
 
-          </tr>
+              <tr>
 
-        </thead>
+                <th className="border p-3">Date</th>
 
-        <tbody>
+                <th className="border p-3">Time</th>
 
-        {historyAppointments.map((item, i) => {
+                <th className="border p-3">Reason</th>
 
-const medical = getMedicalData(item.reason)
+                <th className="border p-3">Injection</th>
 
-return (
+                <th className="border p-3">Tablet</th>
 
-            <tr key={i} className="text-center">
+                <th className="border p-3">Doctor Notes</th>
 
-              {/* DATE */}
-              <td className="border p-3">
-                {item.date}
-              </td>
+                <th className="border p-3">Appointment No</th>
 
-              {/* DOCTOR */}
-              <td className="border p-3">
-                {item.doctorName}
-              </td>
+                <th className="border p-3">Actions</th>
 
-              {/* TIME */}
-              <td className="border p-3">
-                {item.time}
-              </td>
+              </tr>
 
-              {/* REASON */}
-              <td className="border p-3">
-                <textarea
-                  defaultValue={item.reason || ""}
-                  className="border p-2 rounded w-full"
-                />
-              </td>
+            </thead>
 
-              {/* INJECTION */}
-              <td className="border p-3">
-                <input
-                  type="text"
-                  value={medical.injection}
-readOnly
-                  placeholder="Injection"
-                  className="border p-2 rounded w-full"
-                />
-              </td>
+            <tbody>
 
-              {/* TABLET */}
-              <td className="border p-3">
-                <input
-                  type="text"
-                  value={medical.tablet}
-readOnly
-                  placeholder="Tablet"
-                  className="border p-2 rounded w-full"
-                />
-              </td>
+              {doctorAppointments.map((item, i) => {
 
-              {/* NOTES */}
-              <td className="border p-3">
-                <textarea
-                  value={medical.notes}
-                  readOnly
-                  placeholder="Doctor Notes"
-                  className="border p-2 rounded w-full"
-                />
-              </td>
+                const medical = getMedicalData(item.reason)
 
-              {/* APPOINTMENT NO */}
-              <td className="border p-3 font-bold">
-                {item.appointmentNo}
-              </td>
+                return (
 
-              {/* ACTIONS */}
-              <td className="border p-3">
+                  <tr key={i} className="text-center">
 
-              <div className="flex flex-col gap-3 min-w-[120px]">
+                    {/* DATE */}
+                    <td className="border p-3">
+                      {item.date}
+                    </td>
 
-                  <button
-                    className="bg-green-600 text-white px-4 py-2 rounded"
-                    onClick={() => alert("Updated Successfully ✅")}
-                  >
-                    Save
-                  </button>
+                    {/* TIME */}
+                    <td className="border p-3">
+                      {item.time}
+                    </td>
 
-                  <button
-                    onClick={() => handlePrint(item)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded"
-                  >
-                    Print
-                  </button>
+                    {/* REASON */}
+                    <td className="border p-3">
+                      <textarea
+                        defaultValue={item.reason || ""}
+                        className="border p-2 rounded w-full"
+                      />
+                    </td>
 
-                </div>
+                    {/* INJECTION */}
+                    <td className="border p-3">
+                      <input
+                        type="text"
+                        value={medical.injection}
+                        readOnly
+                        className="border p-2 rounded w-full"
+                      />
+                    </td>
 
-              </td>
+                    {/* TABLET */}
+                    <td className="border p-3">
+                      <input
+                        type="text"
+                        value={medical.tablet}
+                        readOnly
+                        className="border p-2 rounded w-full"
+                      />
+                    </td>
 
-            </tr>
+                    {/* NOTES */}
+                    <td className="border p-3">
+                      <textarea
+                        value={medical.notes}
+                        readOnly
+                        className="border p-2 rounded w-full"
+                      />
+                    </td>
 
-)
-})}
+                    {/* APPOINTMENT NO */}
+                    <td className="border p-3 font-bold">
+                      {item.appointmentNo}
+                    </td>
 
-        </tbody>
+                    {/* ACTIONS */}
+                    <td className="border p-3">
 
-      </table>
+                      <div className="flex flex-col gap-3 min-w-[120px]">
 
-    </div>
+                        <button
+                          className="bg-green-600 text-white px-4 py-2 rounded"
+                          onClick={() =>
+                            alert("Updated Successfully ✅")
+                          }
+                        >
+                          Save
+                        </button>
+
+                        <button
+                          onClick={() => handlePrint(item)}
+                          className="bg-blue-600 text-white px-4 py-2 rounded"
+                        >
+                          Print
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                )
+
+              })}
+
+            </tbody>
+
+          </table>
+          </div>
+
+        </div>
+
+      </div>
+
+    ))}
+
   </>
 )}
             </div>
 
-            {/* ================= POPUP ================= */}
-            {selected && (
-<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+{/* ================= POPUP ================= */}
+{selected && (
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-3 md:p-6">
 
-<div className="bg-white w-[95%] md:w-[650px] max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-4 md:p-8 relative">
+    <div className="
+      bg-white 
+      w-full 
+      max-w-3xl
+      max-h-[92vh] 
+      overflow-y-auto 
+      rounded-3xl 
+      shadow-2xl 
+      relative
+      animate-fadeIn
+    ">
 
-{/* CLOSE */}
-<button
-onClick={()=>setSelected(null)}
-className="absolute top-4 right-5 text-2xl font-bold"
->
-✖
-</button>
+      {/* CLOSE BUTTON */}
+      <button
+        onClick={() => setSelected(null)}
+        className="
+          absolute 
+          top-4 right-4 
+          bg-gray-100
+          hover:bg-red-500
+          hover:text-white
+          w-10 h-10
+          rounded-full
+          text-lg
+          font-bold
+          transition
+        "
+      >
+        ✕
+      </button>
 
-{/* Doctor Image */}
-<div className="flex flex-col items-center mb-8">
+      {/* HEADER */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-3xl px-6 py-8 text-white">
 
-<img
-src={selected.doctorImage}
-alt=""
-className="w-24 h-24 md:w-28 md:h-28 rounded-full border object-cover"
-/>
+        <div className="flex flex-col items-center">
 
-<h2 className="text-xl md:text-3xl font-bold mt-4 text-center">
-Dr. {selected.doctorName}
-</h2>
+          <img
+            src={selected.doctorImage}
+            alt=""
+            className="
+              w-24 h-24 
+              md:w-28 md:h-28
+              rounded-full 
+              border-4 border-white
+              object-cover
+              shadow-lg
+            "
+          />
 
-<p className="text-gray-500">
-Consulting Doctor
-</p>
+          <h2 className="text-2xl md:text-3xl font-bold mt-4 text-center">
+            Dr. {selected.doctorName}
+          </h2>
 
-</div>
+          <p className="text-blue-100 text-sm md:text-base mt-1">
+            Consulting Doctor
+          </p>
 
+        </div>
 
-<h3 className="text-2xl font-bold mb-6">
-Patient Full Details
-</h3>
+      </div>
 
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* BODY */}
+      <div className="p-5 md:p-8">
 
-<div className="border rounded-xl p-4">
-<b>Patient Name:</b><br/>
-{selected.patientName}
-</div>
+        <h3 className="text-2xl font-bold mb-6 text-gray-800">
+          Patient Details
+        </h3>
 
-<div className="border rounded-xl p-4">
-<b>Phone:</b><br/>
-{selected.phone}
-</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-<div className="border rounded-xl p-4">
-<b>Address:</b><br/>
-{selected.address}
-</div>
+          {/* CARD */}
+          <div className="bg-gray-50 border rounded-2xl p-4">
+            <p className="text-sm text-gray-500 mb-1">
+              Patient Name
+            </p>
 
-<div className="border rounded-xl p-4">
-<b>Appointment No:</b><br/>
-{selected.appointmentNo}
-</div>
+            <h4 className="font-semibold text-lg">
+              {selected.patientName}
+            </h4>
+          </div>
 
-<div className="border rounded-xl p-4">
-<b>Date:</b><br/>
-{selected.date}
-</div>
+          <div className="bg-gray-50 border rounded-2xl p-4">
+            <p className="text-sm text-gray-500 mb-1">
+              Phone
+            </p>
 
-<div className="border rounded-xl p-4">
-<b>Time:</b><br/>
-{selected.time}
-</div>
+            <h4 className="font-semibold text-lg">
+              {selected.phone}
+            </h4>
+          </div>
 
-</div>
+          <div className="bg-gray-50 border rounded-2xl p-4">
+            <p className="text-sm text-gray-500 mb-1">
+              Reason
+            </p>
 
+            <h4 className="font-semibold text-lg">
+              {selected.reason}
+            </h4>
+          </div>
 
-<div className="flex justify-end mt-8">
+          <div className="bg-gray-50 border rounded-2xl p-4">
+            <p className="text-sm text-gray-500 mb-1">
+              Address
+            </p>
 
-<div className="flex flex-col md:flex-row justify-end gap-4 mt-8">
+            <h4 className="font-semibold text-lg">
+              {selected.address}
+            </h4>
+          </div>
 
-<button
-  onClick={() =>
-    handleCancelAppointment(selected.id)
-  }
-  className="bg-red-600 text-white px-6 py-3 rounded-lg"
->
-  Cancel Appointment
-</button>
+          <div className="bg-gray-50 border rounded-2xl p-4">
+            <p className="text-sm text-gray-500 mb-1">
+              Appointment No
+            </p>
 
-<button
-onClick={()=>setSelected(null)}
-className="bg-blue-600 text-white px-8 py-3 rounded-lg"
->
-Close
-</button>
+            <h4 className="font-semibold text-lg">
+              {selected.appointmentNo}
+            </h4>
+          </div>
 
-</div>
+          <div className="bg-gray-50 border rounded-2xl p-4">
+            <p className="text-sm text-gray-500 mb-1">
+              Date
+            </p>
 
-</div>
+            <h4 className="font-semibold text-lg">
+              {selected.date}
+            </h4>
+          </div>
 
-</div>
+          <div className="bg-gray-50 border rounded-2xl p-4 md:col-span-2">
+            <p className="text-sm text-gray-500 mb-1">
+              Time
+            </p>
 
-</div>
+            <h4 className="font-semibold text-lg">
+              {selected.time}
+            </h4>
+          </div>
+
+        </div>
+
+        {/* BUTTONS */}
+        <div className="
+          flex 
+          flex-col 
+          sm:flex-row 
+          gap-4 
+          justify-end 
+          mt-8
+          pb-4
+        ">
+
+          <button
+            onClick={() =>
+              handleCancelAppointment(selected.id)
+            }
+            className="
+              bg-red-600 
+              hover:bg-red-700
+              text-white 
+              px-6 py-3 
+              rounded-xl 
+              font-semibold
+              transition
+              w-full sm:w-auto
+            "
+          >
+            Cancel Appointment
+          </button>
+
+          <button
+            onClick={() => setSelected(null)}
+            className="
+              bg-blue-600 
+              hover:bg-blue-700
+              text-white 
+              px-8 py-3 
+              rounded-xl 
+              font-semibold
+              transition
+              w-full sm:w-auto
+            "
+          >
+            Close
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
 )}
 
             {/* MOBILE BOTTOM NAV */}

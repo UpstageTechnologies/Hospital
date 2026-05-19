@@ -919,17 +919,24 @@ mb-6
 Appointment History
 </h1>
 
-<div className="
+<div
+className="
 w-full
 max-w-full
-overflow-x-scroll
-touch-pan-x
+overflow-x-auto
+md:overflow-x-auto
+overflow-y-auto
+max-h-[500px]
 rounded-2xl
 shadow
 bg-white
-">
+border
+"
+>
 
-<table className="min-w-[950px]">
+<div className="min-w-[950px]">
+
+<table className="min-w-[1400px]">
 
 <thead className="bg-blue-600 text-white">
 
@@ -1017,6 +1024,7 @@ className="border-b"
 
 </div>
 
+</div>
 </div>
 
 )}

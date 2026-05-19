@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react"
 import { doc, getDoc, updateDoc } from "firebase/firestore"
 import { db } from "../firebase"
-import { collection, getDocs } from "firebase/firestore"
+import {
+    collection,
+    getDocs,
+    addDoc,
+    serverTimestamp
+    } from "firebase/firestore"
 import { onSnapshot } from "firebase/firestore"
 import AdminCalendar from "../components/Calendar"
 import { setDoc } from "firebase/firestore"
@@ -313,6 +318,26 @@ const [visitForm, setVisitForm] = useState({
 });
     const [selectedPatient, setSelectedPatient] = useState(null)
     const [step, setStep] = useState(1)
+
+    const [checkInTime, setCheckInTime] = useState(null);
+const [checkOutTime, setCheckOutTime] = useState(null);
+const [consultationSeconds, setConsultationSeconds] = useState(0);
+
+const [selectedMedicine, setSelectedMedicine] = useState("");
+const [
+    showMedicineDropdown,
+    setShowMedicineDropdown
+    ] = useState(false);
+const [prescriptionText, setPrescriptionText] = useState("");
+
+const [prescriptionList, setPrescriptionList] = useState([]);
+const [totalAmount, setTotalAmount] = useState(0);
+
+const [doseMorning, setDoseMorning] = useState("");
+const [doseAfternoon, setDoseAfternoon] = useState("");
+const [doseNight, setDoseNight] = useState("");
+const [doseDays, setDoseDays] = useState("");
+
     const [patientTab, setPatientTab] = useState("current")
     const [doctorEvents, setDoctorEvents] = useState({})
     const [appointmentEvents, setAppointmentEvents] = useState({})
@@ -325,41 +350,52 @@ const [sales,setSales] = useState("");
 const [search,setSearch] = useState("");
 const [describeItems,setDescribeItems] = useState([]);
 
-const syncPharmacyItems = () => {
+const syncPharmacyItems = async () => {
 
-    const saved =
-    JSON.parse(
-    localStorage.getItem("pharmacyItems")
-    ) || [];
-    
-    const fixedItems = saved.map(item=>({
-    id: item.id || Date.now(),
-    
-    type: item.type || "",
-    
-    medicine:
-    item.medicine ||
-    item.subCategory ||
-    "",
-    
-    qty: Number(item.qty || 0),
-    
-    purchasePrice: Number(
-    item.purchasePrice ||
-    item.purchase ||
-    0
-    ),
-    
-    salesPrice: Number(
-    item.salesPrice ||
-    item.sales ||
-    0
-    )
-    }));
-    
-    setDescribeItems(fixedItems);
-    
-    };
+    try {
+
+        const snap = await getDocs(
+            collection(db, "inventory")
+        );
+
+        let items = [];
+
+        snap.forEach((doc) => {
+
+            const data = doc.data();
+
+            items.push({
+
+                id: doc.id,
+
+                type: data.type || "",
+
+                medicine:
+                    data.medicine ||
+                    data.subCategory ||
+                    "",
+
+                qty: Number(data.qty || 0),
+
+                purchasePrice:
+                    Number(data.purchasePrice || 0),
+
+                salesPrice:
+                    Number(data.salesPrice || 0)
+
+            });
+
+        });
+
+        setDescribeItems(items);
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+};
 
 const [activeDescribeCategory,setActiveDescribeCategory]=
 useState("All");
@@ -655,23 +691,114 @@ useEffect(() => {
         
         },[]);
 
-    useEffect(()=>{
+        useEffect(() => {
 
-        syncPharmacyItems();
+            let interval = null;
         
-        window.addEventListener(
-        "storage",
-        syncPharmacyItems
-        );
-    
-        return ()=>{
-            window.removeEventListener(
-            "storage",
-            syncPharmacyItems
+            if (checkInTime && !checkOutTime) {
+        
+                interval = setInterval(() => {
+        
+                    const diff =
+                        Math.floor(
+                            (new Date() - new Date(checkInTime)) / 1000
+                        );
+        
+                    setConsultationSeconds(diff);
+        
+                }, 1000);
+        
+            }
+        
+            return () => clearInterval(interval);
+        
+        }, [checkInTime, checkOutTime]);
+
+        useEffect(() => {
+
+            syncPharmacyItems();
+        
+        }, []);
+
+    const formatConsultationTime = (seconds) => {
+
+        const savePrescriptionToFirebase = async () => {
+
+            try {
+            
+            await addDoc(
+            collection(db, "prescriptions"),
+            {
+            
+            patientName:
+            selectedAppointment?.patientName || "",
+            
+            patientId:
+            selectedAppointment?.patientId || "",
+            
+            doctorName:
+            doctorData?.name || "",
+            
+            doctorEmail:
+            doctorData?.email || "",
+            
+            appointmentNo:
+            selectedAppointment?.appointmentNo || "",
+            
+            reason:
+            selectedAppointment?.reason ||
+            selectedAppointment?.problem ||
+            "",
+            
+            prescriptionText,
+            
+            medicines: prescriptionList,
+            
+            consultationTime:
+            formatConsultationTime(consultationSeconds),
+            
+            checkInTime:
+            checkInTime
+            ? new Date(checkInTime).toISOString()
+            : "",
+            
+            checkOutTime:
+            checkOutTime
+            ? new Date(checkOutTime).toISOString()
+            : "",
+            
+            date:
+            new Date().toLocaleDateString(),
+            
+            createdAt:
+            serverTimestamp()
+            
+            }
             );
-        };
+            
+            alert("Prescription Saved ✅");
+            
+            } catch (err) {
+            
+            console.log(err);
+            
+            alert("Firebase Save Failed ❌");
+            
+            }
+            
+            };
+
+        const hrs =
+            String(Math.floor(seconds / 3600)).padStart(2, "0");
     
-    },[]);
+        const mins =
+            String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    
+        const secs =
+            String(seconds % 60).padStart(2, "0");
+    
+        return `${hrs}:${mins}:${secs}`;
+    };
     console.log("doctorData", doctorData);
         if(!doctorData){
         return <p className="p-10">Loading...</p>
@@ -948,12 +1075,7 @@ patientsData={patientsData}
 Appointment History
 </h1>
 
-<div className="
-bg-white
-rounded-2xl
-shadow
-overflow-x-auto
-">
+<div className="bg-white rounded-2xl shadow overflow-x-auto">
 
 <table className="w-full min-w-[750px]">
 
@@ -1224,16 +1346,19 @@ h-[90px]
 
 <div className="
 bg-white
-w-[95%]
-md:w-[750px]
-max-h-[90vh]
+w-[98%]
+sm:w-[95%]
+md:w-[90%]
+lg:w-[1100px]
+max-h-[95vh]
 overflow-y-auto
 rounded-2xl
 shadow-2xl
 flex
 flex-col
 md:flex-row
-">
+"
+>
 
  {/* LEFT PANEL */}
 <div className="
@@ -1304,6 +1429,8 @@ md:rounded-none
                                 <div className="
 w-full
 md:w-3/4
+overflow-y-auto
+max-h-[90vh]
 p-4
 md:p-6
 flex
@@ -1373,146 +1500,667 @@ relative
                                             </div>
                                         </div>
                                     )}
-                                    {step === 2 && (
-                                        <div className="flex flex-col h-full justify-between">
+                            {step === 2 && (
 
-                                            <div className="flex flex-col items-center">
+<div className="flex flex-col h-full justify-between">
 
-                                                <h3 className="text-xl font-bold mb-6">Consultation</h3>
+<div className="flex flex-col items-center">
 
-                                                <div className="text-3xl mb-6">⏱ 1s</div>
+<h3 className="text-2xl font-bold mb-6">
+Consultation
+</h3>
 
-                                                <button
-    onClick={() => setStep(3)}
-    className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg"
+<div className="text-5xl font-bold text-blue-600 mb-8">
+{formatConsultationTime(consultationSeconds)}
+</div>
+
+<button
+
+onClick={() => {
+
+setCheckInTime(new Date());
+
+setCheckOutTime(null);
+
+setConsultationSeconds(0);
+
+setStep(3);
+
+}}
+
+className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl text-xl"
+
 >
-    Check-In
+
+Check-In
+
 </button>
 
-                                            </div>
+</div>
 
-                                            {/* FIXED BUTTONS */}
-                                            <div className="flex justify-end gap-4 mt-6">
-                                                <button
-                                                    onClick={() => setStep(1)}
-                                                    className="bg-gray-400 text-white px-6 py-2 rounded"
-                                                >
-                                                    Previous
-                                                </button>
+<div className="flex justify-end gap-4 mt-6">
 
-                                                <button
-                                                    onClick={() => setStep(3)}
-                                                    className="bg-blue-600 text-white px-6 py-2 rounded"
-                                                >
-                                                    Next
-                                                </button>
-                                            </div>
-
-                                        </div>
-                                    )}
-
-                                    {/* STEP 3 PRESCRIBE */}
-{step === 3 && (
-    <div className="flex flex-col h-full justify-between">
-
-        <div>
-            <h3 className="text-xl font-bold mb-6">
-                Prescribe
-            </h3>
-
-            <textarea
-                placeholder="Enter Prescription..."
-                className="w-full border p-4 rounded-xl h-40"
-            />
-        </div>
-
-        <div className="flex justify-end gap-4 mt-6">
-
-            <button
-                onClick={() => setStep(2)}
-                className="bg-gray-400 text-white px-6 py-2 rounded"
-            >
-                Previous
-            </button>
-
-            <button
-                onClick={() => setStep(4)}
-                className="bg-blue-600 text-white px-6 py-2 rounded"
-            >
-                Next
-            </button>
-
-        </div>
-
-    </div>
-)}
-
-                                    {/* STEP 3 PAYMENT */}
-                                    {step === 4 && (
-                                        <div className="flex flex-col h-full justify-between">
-
-                                            <div>
-                                                <h3 className="text-xl font-bold mb-6">Payment</h3>
-
-                                                <div className="space-y-4 max-w-md">
-
-                                                    <input
-                                                        value={`Paid Amount - ₹${selectedAppointment.paidAmount || 600}`}
-                                                        disabled
-                                                        className="w-full border p-4 rounded-xl text-lg"
-                                                    />
-
-                                                </div>
-                                            </div>
-
-                                            {/* FIXED BUTTON */}
-                                            <div className="flex justify-end gap-4 mt-6">
-                                            <button
-    onClick={() => setStep(3)}
-    className="bg-gray-400 text-white px-6 py-2 rounded"
+<button
+onClick={() => setStep(1)}
+className="bg-gray-400 text-white px-6 py-2 rounded"
 >
-    Previous
+Previous
 </button>
 
 <button
-    onClick={() => setStep(5)}
-    className="bg-blue-600 text-white px-6 py-2 rounded ml-3"
+onClick={() => setStep(3)}
+className="bg-blue-600 text-white px-6 py-2 rounded"
 >
-    Next
+Next
 </button>
-                                            </div>
 
-                                        </div>
-                                    )}
+</div>
+
+</div>
+
+)}
+
+                                    {/* STEP 3 PRESCRIBE */}
+                                    {step === 3 && (
+
+<div className="flex flex-col h-full justify-between">
+
+<div>
+
+<h3 className="text-2xl font-bold mb-5">
+Prescribe
+</h3>
+
+{/* PATIENT REASON */}
+
+<div className="bg-red-100 border border-red-300 rounded-xl p-4 mb-5">
+
+<p className="font-bold text-red-700 text-lg">
+Patient Reason
+</p>
+
+<p className="text-lg mt-2">
+{selectedAppointment?.reason ||
+selectedAppointment?.problem ||
+"No Reason"}
+</p>
+
+</div>
+
+{/* TEXT AREA */}
+
+<textarea
+
+value={prescriptionText}
+
+onChange={(e)=>
+setPrescriptionText(e.target.value)
+}
+
+placeholder="Enter Prescription..."
+
+className="w-full border p-4 rounded-xl h-36"
+
+/>
+
+{/* MEDICINE SECTION */}
+
+<div className="mt-6">
+
+<h4 className="font-bold text-lg mb-4">
+Available Medicines
+</h4>
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-2
+gap-3
+">
+
+<div className="relative">
+
+<input
+value={selectedMedicine}
+onChange={(e)=>{
+setSelectedMedicine(e.target.value);
+}}
+onFocus={()=>setShowMedicineDropdown(true)}
+placeholder="Search Medicine"
+className="border p-3 rounded-xl w-full"
+/>
+
+<button
+type="button"
+onClick={()=>
+setShowMedicineDropdown(
+!showMedicineDropdown
+)
+}
+className="absolute right-4 top-3"
+>
+⌄
+</button>
+
+{showMedicineDropdown && (
+
+<div className="
+absolute
+top-16
+left-0
+w-full
+bg-white
+rounded-xl
+shadow-lg
+z-50
+max-h-60
+overflow-y-auto
+border
+">
+
+{describeItems
+
+.filter(item =>
+
+item.medicine
+.toLowerCase()
+.includes(
+selectedMedicine.toLowerCase()
+)
+
+)
+
+.map((item,index)=>(
+
+<div
+
+key={index}
+
+onClick={()=>{
+
+setSelectedMedicine(item.medicine);
+
+setShowMedicineDropdown(false);
+
+}}
+
+className="
+px-4
+py-3
+cursor-pointer
+hover:bg-blue-100
+border-b
+"
+
+>
+
+<div className="font-semibold">
+{item.medicine}
+</div>
+
+<div className="
+text-sm
+text-gray-500
+flex
+justify-between
+">
+
+<span>
+Stock: {item.qty}
+</span>
+
+<span>
+₹{item.salesPrice}
+</span>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+)}
+
+</div>
+
+<input
+type="number"
+placeholder="Morning"
+value={doseMorning}
+onChange={(e)=>setDoseMorning(e.target.value)}
+className="border p-3 rounded-xl"
+/>
+
+<input
+type="number"
+placeholder="Afternoon"
+value={doseAfternoon}
+onChange={(e)=>setDoseAfternoon(e.target.value)}
+className="border p-3 rounded-xl"
+/>
+
+<input
+type="number"
+placeholder="Night"
+value={doseNight}
+onChange={(e)=>setDoseNight(e.target.value)}
+className="border p-3 rounded-xl"
+/>
+
+<input
+type="number"
+placeholder="Days"
+value={doseDays}
+onChange={(e)=>setDoseDays(e.target.value)}
+className="border p-3 rounded-xl"
+/>
+
+<button
+
+onClick={() => {
+
+if(!selectedMedicine) return;
+
+const selectedMedData =
+describeItems.find(
+med => med.medicine === selectedMedicine
+);
+
+const quantity =
+
+Number(doseMorning || 0)
++
+Number(doseAfternoon || 0)
++
+Number(doseNight || 0);
+
+const totalTablets =
+quantity * Number(doseDays || 0);
+
+const medicinePrice =
+Number(selectedMedData?.salesPrice || 0);
+
+const medicineTotal =
+medicinePrice * totalTablets;
+
+const newItem = {
+
+medicine: selectedMedicine,
+
+morning: doseMorning,
+
+afternoon: doseAfternoon,
+
+night: doseNight,
+
+days: doseDays,
+
+price: medicinePrice,
+
+total: medicineTotal
+
+};
+
+setPrescriptionList(prev => [
+...prev,
+newItem
+]);
+
+
+
+setSelectedMedicine("");
+setDoseMorning("");
+setDoseAfternoon("");
+setDoseNight("");
+setDoseDays("");
+
+}}
+
+className="bg-green-600 text-white rounded-xl px-4 py-3"
+
+>
+
+Add
+
+</button>
+
+</div>
+
+</div>
+
+{/* TABLE */}
+
+<div className="mt-6 overflow-x-auto">
+
+<table className="w-full border">
+
+<thead className="bg-blue-600 text-white">
+
+<tr>
+
+<th className="p-2">Medicine</th>
+<th className="p-2">Morning</th>
+<th className="p-2">Afternoon</th>
+<th className="p-2">Night</th>
+<th className="p-2">Days</th>
+<th className="p-2">Price</th>
+<th className="p-2">Total</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{prescriptionList.map((item,index)=>(
+
+<tr
+key={index}
+className="border-b text-center"
+>
+
+<td className="p-2">
+{item.medicine}
+</td>
+
+<td>{item.morning}</td>
+
+<td>{item.afternoon}</td>
+
+<td>{item.night}</td>
+
+<td>{item.days}</td>
+
+<td>₹{item.price}</td>
+
+<td className="font-bold text-green-600">
+₹{item.total}
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div className="flex justify-end gap-4 mt-6">
+
+<button
+onClick={() => setStep(2)}
+className="bg-gray-400 text-white px-6 py-2 rounded"
+>
+Previous
+</button>
+
+<button
+onClick={() => setStep(4)}
+className="bg-blue-600 text-white px-6 py-2 rounded"
+>
+Next
+</button>
+
+</div>
+
+</div>
+
+)}
+
+{step === 4 && (
+
+<div className="flex flex-col h-full justify-between">
+
+<div>
+
+<h3 className="text-2xl font-bold mb-6">
+Payment
+</h3>
+
+<div className="space-y-5">
+
+<div className="
+bg-green-100
+border
+border-green-300
+p-4
+rounded-xl
+">
+
+<p className="text-lg font-semibold">
+Consultation Fee
+</p>
+
+<p className="text-3xl font-bold text-green-700 mt-2">
+₹600
+</p>
+
+</div>
+
+<div className="
+bg-blue-100
+border
+border-blue-300
+p-4
+rounded-xl
+">
+
+<p className="text-lg font-semibold">
+Medicine Amount
+</p>
+
+<p className="text-3xl font-bold text-blue-700 mt-2">
+₹{totalAmount}
+</p>
+
+</div>
+
+<div className="
+bg-yellow-100
+border
+border-yellow-300
+p-4
+rounded-xl
+">
+
+<p className="text-lg font-semibold">
+Total Payment
+</p>
+
+<p className="text-4xl font-bold text-yellow-700 mt-2">
+
+₹{
+Number(600)
++
+Number(totalAmount || 0)
+}
+
+</p>
+
+</div>
+
+<button
+
+onClick={() => {
+
+window.location.href =
+`https://rzp.io/l/testPayment`;
+
+}}
+
+className="
+w-full
+bg-blue-600
+hover:bg-blue-700
+text-white
+py-4
+rounded-xl
+text-xl
+font-bold
+"
+
+>
+
+Pay Now
+
+</button>
+
+</div>
+
+</div>
+
+<div className="flex justify-end gap-4 mt-6">
+
+<button
+onClick={() => setStep(3)}
+className="bg-gray-400 text-white px-6 py-2 rounded"
+>
+Previous
+</button>
+
+<button
+onClick={() => setStep(5)}
+className="bg-blue-600 text-white px-6 py-2 rounded"
+>
+Next
+</button>
+
+</div>
+
+</div>
+
+)}
 
                                     {/* STEP 5 CHECKOUT */}
-{step === 5 && (
-    <div className="flex flex-col h-full justify-between">
+                                    {step === 5 && (
 
-        <div className="flex flex-col items-center justify-center h-full">
+<div className="flex flex-col h-full justify-between">
 
-            <h3 className="text-2xl font-bold mb-6">
-                Appointment Completed
-            </h3>
+<div className="flex flex-col items-center justify-center h-full">
 
-            <button className="bg-green-600 text-white px-8 py-3 rounded-xl">
-                Confirm Check-Out
-            </button>
+<h3 className="text-3xl font-bold mb-6 text-green-700">
+Appointment Completed
+</h3>
 
-        </div>
+<div className="bg-gray-100 p-6 rounded-2xl w-full max-w-md text-center mb-6">
 
-        <div className="flex justify-end gap-4 mt-6">
+<p className="text-lg font-semibold mb-3">
+Total Consultation Time
+</p>
 
-            <button
-                onClick={() => setStep(4)}
-                className="bg-gray-400 text-white px-6 py-2 rounded"
-            >
-                Previous
-            </button>
+<p className="text-4xl font-bold text-blue-600">
+{formatConsultationTime(consultationSeconds)}
+</p>
 
-        </div>
+</div>
 
-    </div>
+<button
+
+onClick={async () => {
+
+try {
+
+const outTime = new Date();
+
+setCheckOutTime(outTime);
+
+await addDoc(
+collection(db, "prescriptions"),
+{
+
+patientName:
+selectedAppointment?.patientName || "",
+
+patientPhone:
+selectedAppointment?.phone || "",
+
+doctorName:
+doctorData?.name || "",
+
+doctorEmail:
+doctorData?.email || "",
+
+appointmentNo:
+selectedAppointment?.appointmentNo || "",
+
+reason:
+selectedAppointment?.reason ||
+selectedAppointment?.problem ||
+"",
+
+prescriptionText,
+
+medicines: prescriptionList,
+
+consultationTime:
+formatConsultationTime(consultationSeconds),
+
+checkInTime:
+checkInTime
+? new Date(checkInTime).toISOString()
+: "",
+
+checkOutTime:
+outTime.toISOString(),
+
+payment:
+selectedAppointment?.paidAmount || 600,
+
+date:
+selectedAppointment?.date || "",
+
+time:
+selectedAppointment?.time || "",
+
+createdAt:
+serverTimestamp()
+
+}
+);
+
+alert("Patient Check-Out Completed ✅");
+
+setSelectedAppointment(null);
+
+} catch (err) {
+
+console.log(err);
+
+alert("Firebase Save Failed ❌");
+
+}
+
+}}
+
+className="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-xl text-xl"
+
+>
+
+Confirm Check-Out
+
+</button>
+
+</div>
+
+<div className="flex justify-end gap-4 mt-6">
+
+<button
+onClick={() => setStep(4)}
+className="bg-gray-400 text-white px-6 py-2 rounded"
+>
+Previous
+</button>
+
+</div>
+
+</div>
+
 )}
 
                                 </div>
