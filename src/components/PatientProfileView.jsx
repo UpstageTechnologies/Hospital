@@ -1,12 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { motion, AnimatePresence } from "framer-motion";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 const PatientProfileView = ({
     patient,
     onSave,
     onClose
     }) => {
+
+        const [showMedicineDropdown, setShowMedicineDropdown] = useState(false);
+
+        const [selectedMedicine, setSelectedMedicine] = useState(
+            patient.tablet || ""
+            );
+
+const [describeItems, setDescribeItems] = useState([]);
+
+useEffect(() => {
+
+    const syncPharmacyItems = async () => {
+    
+    const snap = await getDocs(
+    collection(db, "inventory")
+    );
+    
+    let items = [];
+    
+    snap.forEach((doc) => {
+    
+    const data = doc.data();
+    
+    items.push({
+    
+    id: doc.id,
+    
+    medicine:
+    data.medicine ||
+    data.subCategory ||
+    "",
+    
+    qty: Number(data.qty || 0),
+    
+    salesPrice:
+    Number(data.salesPrice || 0)
+    
+    });
+    
+    });
+    
+    setDescribeItems(items);
+    
+    };
+    
+    syncPharmacyItems();
+    
+    }, []);
 
         const [solution,setSolution] =
         useState(
@@ -40,7 +90,46 @@ JSON.parse(
 localStorage.getItem("patientsData")
 ) || [];
 
+const updatedPatients =
+oldPatients.map((item)=>{
+
+if(
+item.appointmentNo ===
+patient.appointmentNo
+){
+
+return updatedPatient;
+
+}
+
+return item;
+
+});
+
+const patientExists =
+oldPatients.some(
+(item)=>
+item.appointmentNo ===
+patient.appointmentNo
+);
+
+if(patientExists){
+
+localStorage.setItem(
+"patientsData",
+JSON.stringify(updatedPatients)
+);
+
+}else{
+
 oldPatients.push(updatedPatient);
+
+localStorage.setItem(
+"patientsData",
+JSON.stringify(oldPatients)
+);
+
+}
 
 localStorage.setItem(
 "patientsData",
@@ -371,6 +460,9 @@ border
 rounded-3xl
 shadow-md
 p-3
+relative
+mb-32
+z-50
 ">
 
 <h2 className="
@@ -382,27 +474,159 @@ text-[#0F4C5C]
 Tablet / Medicine
 </h2>
 
-<textarea
-value={tablet}
-onChange={(e)=>
-setTablet(e.target.value)
+<input
+type="text"
+value={selectedMedicine}
+onChange={(e) => {
+
+setSelectedMedicine(e.target.value);
+setTablet(e.target.value);
+setShowMedicineDropdown(true);
+
+}}
+onFocus={() =>
+setShowMedicineDropdown(true)
 }
-placeholder="
-Enter tablet details...
-"
+placeholder="Enter tablet details..."
 className="
 w-full
 border
 rounded-2xl
 p-4
 outline-none
-min-h-[130px]
-resize-none
 "
 />
 
+<button
+type="button"
+onClick={() =>
+setShowMedicineDropdown(
+!showMedicineDropdown
+)
+}
+className="
+absolute
+right-8
+top-[78px]
+text-xl
+"
+>
+⌄
+</button>
+
+{/* DROPDOWN */}
+
+{showMedicineDropdown && (
+
+<div className="
+absolute
+top-[85px]
+left-0
+w-full
+bg-white
+border
+rounded-2xl
+shadow-2xl
+z-[9999]
+max-h-64
+overflow-y-auto
+">
+
+{describeItems
+
+.filter((item)=>
+
+item.medicine
+?.toLowerCase()
+.includes(
+selectedMedicine.toLowerCase()
+)
+
+)
+
+.map((item,index)=>(
+
+<div
+
+key={index}
+
+onClick={() => {
+
+setSelectedMedicine(
+item.medicine
+);
+
+setTablet(
+item.medicine
+);
+
+setShowMedicineDropdown(false);
+
+}}
+
+className="
+p-4
+cursor-pointer
+hover:bg-blue-100
+border-b
+transition
+"
+
+>
+
+<div className="font-semibold">
+{item.medicine}
 </div>
 
+<div className="
+flex
+justify-between
+text-sm
+text-gray-500
+mt-1
+">
+
+<span>
+Stock : {item.qty}
+</span>
+
+<span>
+₹{item.salesPrice}
+</span>
+
+</div>
+
+</div>
+
+))}
+
+{describeItems.filter((item)=>
+
+item.medicine
+?.toLowerCase()
+.includes(
+selectedMedicine.toLowerCase()
+)
+
+).length === 0 && (
+
+<div className="
+p-4
+text-center
+text-gray-400
+">
+No Medicine Found
+</div>
+
+)}
+
+</div>
+
+)}
+
+</div>
+
+<div className="h-20"></div>
 {/* SAVE BUTTON */}
 <button
 onClick={handleSave}

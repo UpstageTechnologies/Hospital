@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import PatientProfileView from "./PatientProfileView";
 
 
+
 const TodayVisitors = ({ appointments }) => {
 
 const [startDate,setStartDate] =

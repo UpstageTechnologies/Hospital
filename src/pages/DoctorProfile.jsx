@@ -5,7 +5,10 @@ import {
     collection,
     getDocs,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
+    deleteDoc,
+    query,
+    where
     } from "firebase/firestore"
 import { onSnapshot } from "firebase/firestore"
 import AdminCalendar from "../components/Calendar"
@@ -18,7 +21,13 @@ import PatientsTable from "../components/PatientsTable";
 
 
 
-const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type = "doctor" }) => {
+const Calendar = ({
+    onSelect = () => {},
+    selectedDate = null,
+    events = {},
+    type = "doctor",
+    appointments = []
+    }) => {
 
     const [popup, setPopup] = useState(false)   
     const [slots, setSlots] = useState([])
@@ -116,6 +125,29 @@ const Calendar = ({ onSelect = () => { }, selectedDate = null, events = {}, type
             <div className="grid grid-cols-7 gap-2 sm:gap-3 md:gap-4">
 
                 {dates.map((date, i) => {
+
+const appointmentCount =
+appointments.filter((item) => {
+
+try {
+
+if (!item.date)
+return false;
+
+const bookingDate =
+new Date(item.date)
+.toISOString()
+.split("T")[0];
+
+return bookingDate === date;
+
+} catch {
+
+return false;
+
+}
+
+}).length;
                     if (!date) return (
                         <div key={i} className="aspect-square"></div>
                       )
@@ -177,11 +209,24 @@ ${type === "doctor"
     </p>
 )}
 
-                            {eventData && eventData.slots && (
-                                <p className="text-[8px] sm:text-xs text-blue-500 mt-1 leading-none text-center px-1">
-{eventData.slots.filter(s => !s.leave).length} Appointments
-                                </p>
-                            )}
+{appointmentCount > 0 && (
+
+<p className="
+text-[9px]
+sm:text-xs
+text-blue-600
+mt-1
+leading-none
+text-center
+font-semibold
+">
+
+{appointmentCount} Appointment
+{appointmentCount > 1 ? "s" : ""}
+
+</p>
+
+)}
 
                         </button>
 
@@ -305,6 +350,10 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [newSlot, setNewSlot] = useState("")
     const [doctorImage, setDoctorImage] = useState("")
     const [appointments, setAppointments] = useState([])
+    const [
+        appointmentHistory,
+        setAppointmentHistory
+        ] = useState([]);
     const [patientsData,setPatientsData] = useState([]);
     const [page, setPage] = useState("appointments")
     const [selected, setSelected] = useState(null)
@@ -316,6 +365,13 @@ const [visitForm, setVisitForm] = useState({
   solution: "",
   tablet: ""
 });
+    
+const [showTabletDropdown,setShowTabletDropdown] =
+useState(false);
+
+const [tabletSearch,setTabletSearch] =
+useState("");
+
     const [selectedPatient, setSelectedPatient] = useState(null)
     const [step, setStep] = useState(1)
 
@@ -554,7 +610,11 @@ const isDemo = location.state?.demo === true;
             console.log("LOGIN EMAIL:", email);
             console.log("DOCTOR DATA:", doctorData);
             
-            list.push(data);
+            if(data.status !== "Completed"){
+
+                list.push(data);
+                
+                }
             
             });
 
@@ -720,6 +780,33 @@ useEffect(() => {
         
         }, []);
 
+        useEffect(() => {
+
+            const fetchHistory = async () => {
+            
+            const snap = await getDocs(
+            collection(db, "appointmentHistory")
+            );
+            
+            let list = [];
+            
+            snap.forEach((doc)=>{
+            
+            list.push({
+            id: doc.id,
+            ...doc.data()
+            });
+            
+            });
+            
+            setAppointmentHistory(list);
+            
+            };
+            
+            fetchHistory();
+            
+            }, []);
+
     const formatConsultationTime = (seconds) => {
 
         const savePrescriptionToFirebase = async () => {
@@ -737,10 +824,10 @@ useEffect(() => {
             selectedAppointment?.patientId || "",
             
             doctorName:
-            doctorData?.name || "",
+selectedAppointment?.doctorName || "",
             
-            doctorEmail:
-            doctorData?.email || "",
+doctorEmail:
+selectedAppointment?.doctorEmail || "",
             
             appointmentNo:
             selectedAppointment?.appointmentNo || "",
@@ -851,11 +938,12 @@ useEffect(() => {
                     </h2>
 
                     <Calendar
-                        onSelect={handleDateSelect}
-                        selectedDate={selectedDate}
-                        events={appointmentEvents}
-                        type="appointment"
-                    />
+    onSelect={handleDateSelect}
+    selectedDate={selectedDate}
+    events={appointmentEvents}
+    type="appointment"
+    appointments={appointments}
+/>
 
                     {selectedDate && (
                         <div className="mt-6 bg-white p-6 rounded-xl shadow">
@@ -873,114 +961,74 @@ useEffect(() => {
 
                                     const timeLabel =
                                         `${hour > 12 ? hour - 12 : hour}:${min === 0 ? "00" : min} ${hour >= 12 ? "PM" : "AM"}`
-
                                         const bookings = appointments.filter((a) => {
 
                                             try {
                                             
-                                            if (!a) return false;
-                                            
-                                            if (!a.date) return false;
-                                            
-                                            if (!a.time) return false;
-                                            const formatDate = (value) => {
-
-                                                try {
-                                                
-                                                if (!value) return "";
-                                                
-                                                const d = new Date(value);
-                                                
-                                                if (isNaN(d.getTime()))
-                                                return "";
-                                                
-                                                return d.toISOString().split("T")[0];
-                                                
-                                                } catch {
-                                                return "";
-                                                }
-                                                
-                                                };
-                                                
-                                                const bookingDate =
-                                                formatDate(a.date);
-                                                
-                                                const currentSelected =
-                                                formatDate(selectedDate);
-                                                
-                                                if (!bookingDate || !currentSelected)
-                                                return false;
-                                            
-                                            if (bookingDate !== currentSelected)
+                                            if (!a.date || !a.time)
                                             return false;
                                             
-                                            const doctorEmail =
-                                            String(a.doctorEmail || "").trim();
+                                            const bookingDate =
+                                            new Date(a.date)
+                                            .toISOString()
+                                            .split("T")[0];
                                             
-                                            const doctorName =
-                                            String(a.doctorName || "").trim();
+                                            const selected =
+                                            new Date(selectedDate)
+                                            .toISOString()
+                                            .split("T")[0];
                                             
-                                            const currentDoctorEmail =
-                                            String(doctorData?.email || "").trim();
-                                            
-                                            const currentDoctorName =
-                                            String(doctorData?.name || "").trim();
-                                            const isDoctorMatch =
-doctorEmail === currentDoctorEmail ||
-doctorName === currentDoctorName ||
-String(a.doctorId || "").trim() === currentDoctorEmail;
-                                            if (!isDoctorMatch)
+                                            if (bookingDate !== selected)
                                             return false;
                                             
-                                            const clean = (t) =>
-                                            String(t)
-                                            .toLowerCase()
-                                            .replace(/\s/g, "")
-                                            .trim();
+                                            const startTime =
+                                            a.time.split("-")[0]?.trim();
                                             
-                                            const convert = (time) => {
-                                            
-                                            const value = clean(time);
+                                            if (!startTime)
+                                            return false;
                                             
                                             const match =
-                                            value.match(/(\d+):(\d+)(am|pm)/);
+                                            startTime.match(
+                                            /(\d+):(\d+)(am|pm)/i
+                                            );
                                             
-                                            if (!match) return 0;
-                                            
-                                            let h = parseInt(match[1]);
-                                            let m = parseInt(match[2]);
-                                            let ap = match[3];
-                                            
-                                            if (ap === "pm" && h !== 12)
-                                            h += 12;
-                                            
-                                            if (ap === "am" && h === 12)
-                                            h = 0;
-                                            
-                                            return h * 60 + m;
-                                            };
-                                            
-                                            const splitTime =
-                                            a.time.split("-");
-                                            
-                                            if (splitTime.length < 2)
+                                            if (!match)
                                             return false;
                                             
-                                            const start =
-                                            convert(splitTime[0]);
+                                            let hours =
+                                            parseInt(match[1]);
                                             
-                                            const end =
-                                            convert(splitTime[1]);
+                                            const mins =
+                                            parseInt(match[2]);
                                             
-                                            return minutes >= start && minutes < end;
+                                            const modifier =
+                                            match[3].toLowerCase();
                                             
-                                            } catch(err) {
+                                            if (
+                                            modifier === "pm" &&
+                                            hours !== 12
+                                            ) {
+                                            hours += 12;
+                                            }
                                             
-                                            console.log("BOOKING ERROR", err);
+                                            if (
+                                            modifier === "am" &&
+                                            hours === 12
+                                            ) {
+                                            hours = 0;
+                                            }
+                                            
+                                            const appointmentMinutes =
+                                            (hours * 60) + mins;
+                                            
+                                            return appointmentMinutes === minutes;
+                                            
+                                            } catch {
                                             
                                             return false;
                                             
                                             }
+                                            
                                             });
                                     const current = new Date()
                                     const currentMinutes = current.getHours() * 60 + current.getMinutes()
@@ -1109,64 +1157,21 @@ Reason
 
 <tbody>
 
-{appointments
-.filter((item) => {
+{[...appointmentHistory]
 
-if (!item.date || !item.time)
-return false
+.sort((a,b)=>{
 
-const now = new Date()
+const aTime =
+a.createdAt?.seconds || 0;
 
-const endTime =
-item.time.split("-")[1]?.trim()
+const bTime =
+b.createdAt?.seconds || 0;
 
-if (!endTime)
-return false
-
-const match =
-endTime.match(/(\d+):(\d+)(am|pm)/i)
-
-if (!match)
-return false
-
-let hours =
-parseInt(match[1])
-
-const minutes =
-parseInt(match[2])
-
-const modifier =
-match[3].toLowerCase()
-
-if (
-modifier === "pm" &&
-hours !== 12
-) {
-hours += 12
-}
-
-if (
-modifier === "am" &&
-hours === 12
-) {
-hours = 0
-}
-
-const appointmentEnd =
-new Date(item.date)
-
-appointmentEnd.setHours(
-hours,
-minutes,
-0,
-0
-)
-
-return appointmentEnd < now
+return bTime - aTime;
 
 })
 
-.map((item, index) => (
+.map((item,index)=>(
 
 <tr
 key={index}
@@ -1808,6 +1813,12 @@ setPrescriptionList(prev => [
 newItem
 ]);
 
+setTotalAmount(prev =>
+
+    prev + medicineTotal
+    
+    );
+
 
 
 setSelectedMedicine("");
@@ -2070,60 +2081,119 @@ const outTime = new Date();
 
 setCheckOutTime(outTime);
 
-await addDoc(
-collection(db, "prescriptions"),
-{
+const historyData = {
 
-patientName:
-selectedAppointment?.patientName || "",
-
-patientPhone:
-selectedAppointment?.phone || "",
-
-doctorName:
-doctorData?.name || "",
+    patientName:
+    selectedAppointment?.patientName || "",
+    
+    patientPhone:
+    selectedAppointment?.phone || "",
+    
+    doctorName:
+selectedAppointment?.doctorName || "",
 
 doctorEmail:
-doctorData?.email || "",
+selectedAppointment?.doctorEmail || "",
+    
+    appointmentNo:
+    selectedAppointment?.appointmentNo || "",
+    
+    reason:
+    selectedAppointment?.reason ||
+    selectedAppointment?.problem ||
+    "",
+    
+    prescriptionText,
+    
+    medicines: prescriptionList,
+    
+    consultationTime:
+    formatConsultationTime(
+    consultationSeconds
+    ),
+    
+    checkInTime:
+    checkInTime
+    ? new Date(checkInTime).toISOString()
+    : "",
+    
+    checkOutTime:
+    outTime.toISOString(),
+    
+    doctorFee: 600,
+    
+    medicineFee:
+    Number(totalAmount || 0),
+    
+    payment:
+    Number(600) +
+    Number(totalAmount || 0),
+    
+    date:
+    selectedAppointment?.date || "",
+    
+    time:
+    selectedAppointment?.time || "",
+    
+    status: "Completed",
+    
+    createdAt:
+    serverTimestamp()
+    
+    };
+    
+    await addDoc(
+    collection(db, "appointmentHistory"),
+    historyData
+    );
 
-appointmentNo:
-selectedAppointment?.appointmentNo || "",
+    const appointmentQuery = query(
 
-reason:
-selectedAppointment?.reason ||
-selectedAppointment?.problem ||
-"",
+        collection(db, "appointments"),
+        
+        where(
+        "appointmentNo",
+        "==",
+        selectedAppointment.appointmentNo
+        )
+        
+        );
+        
+        const appointmentSnap =
+        await getDocs(appointmentQuery);
+        
+        appointmentSnap.forEach(async(docItem)=>{
+        
+        await deleteDoc(
+        
+        doc(
+        db,
+        "appointments",
+        docItem.id
+        )
+        
+        );
+        
+        });
 
-prescriptionText,
+    setAppointmentHistory(prev => [
 
-medicines: prescriptionList,
+        historyData,
+        
+        ...prev
+        
+        ]);
 
-consultationTime:
-formatConsultationTime(consultationSeconds),
+        const updatedAppointments = appointments.filter(
 
-checkInTime:
-checkInTime
-? new Date(checkInTime).toISOString()
-: "",
-
-checkOutTime:
-outTime.toISOString(),
-
-payment:
-selectedAppointment?.paidAmount || 600,
-
-date:
-selectedAppointment?.date || "",
-
-time:
-selectedAppointment?.time || "",
-
-createdAt:
-serverTimestamp()
-
-}
-);
-
+            item =>
+            
+            item.appointmentNo !==
+            selectedAppointment.appointmentNo
+            
+            );
+            
+            setAppointments(updatedAppointments);
 alert("Patient Check-Out Completed ✅");
 
 setSelectedAppointment(null);
