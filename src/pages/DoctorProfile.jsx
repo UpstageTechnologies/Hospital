@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { doc, getDoc, updateDoc } from "firebase/firestore"
-import { db } from "../firebase"
+import { auth, db } from "../firebase"
 import {
     collection,
     getDocs,
@@ -455,6 +455,55 @@ const syncPharmacyItems = async () => {
 
 const [activeDescribeCategory,setActiveDescribeCategory]=
 useState("All");
+
+// ✅ OPEN RAZORPAY
+const openRazorpay = (amount) => {
+
+    if (!window.Razorpay) {
+
+        alert("Razorpay SDK Failed To Load");
+
+        return;
+    }
+
+    const options = {
+
+        key: "rzp_test_RqckwEGqKZFqMk",
+
+        amount: amount * 100,
+
+        currency: "INR",
+
+        name: "Hospital Management",
+
+        description: "Appointment Payment",
+
+        handler: function (response) {
+
+            console.log(response);
+
+            alert("Payment Successful ✅");
+
+            setStep(5);
+        },
+
+        prefill: {
+
+            email: selectedAppointment?.email || "",
+
+            contact: selectedAppointment?.phone || "",
+        },
+
+        theme: {
+
+            color: "#2563eb",
+        },
+    };
+
+    const razorpay = new window.Razorpay(options);
+
+    razorpay.open();
+};
 
 const categoryMap={
  Tablet:["Paracetamol","Dolo"],
@@ -2000,10 +2049,11 @@ Number(totalAmount || 0)
 
 onClick={() => {
 
-window.location.href =
-`https://rzp.io/l/testPayment`;
-
-}}
+    openRazorpay(
+        Number(600) + Number(totalAmount || 0)
+    );
+    
+    }}
 
 className="
 w-full
