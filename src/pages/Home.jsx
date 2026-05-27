@@ -13,42 +13,48 @@ const Home = () => {
   const hospital =
     localStorage.getItem("selectedHospital") || "";
 
-  // ✅ BLOCK BACK BUTTON
-  useEffect(() => {
+    useEffect(() => {
 
-    const handleBackButton = () => {
-  
-      setShowExitPopup(true);
-  
+      const handleBackButton = () => {
+    
+        const logoutStatus =
+          localStorage.getItem("logout");
+    
+        if (logoutStatus === "true") {
+    
+          setShowExitPopup(true);
+    
+          window.history.pushState(
+            null,
+            "",
+            window.location.href
+          );
+    
+        }
+    
+      };
+    
       window.history.pushState(
         null,
         "",
         window.location.href
       );
-  
-    };
-  
-    window.history.pushState(
-      null,
-      "",
-      window.location.href
-    );
-  
-    window.addEventListener(
-      "popstate",
-      handleBackButton
-    );
-  
-    return () => {
-  
-      window.removeEventListener(
+    
+      window.addEventListener(
         "popstate",
         handleBackButton
       );
-  
-    };
-  
-  }, []);
+    
+      return () => {
+    
+        window.removeEventListener(
+          "popstate",
+          handleBackButton
+        );
+    
+      };
+    
+    }, []);
 
   return (
     <div>
@@ -62,13 +68,13 @@ const Home = () => {
 
   <div className="bg-white p-6 rounded-xl shadow-xl w-[320px] text-center">
 
-    <h2 className="text-xl font-semibold mb-3">
-      Exit HospitalInfo?
-    </h2>
+  <h2 className="text-xl font-semibold mb-3">
+  Sign In Required
+</h2>
 
-    <p className="text-gray-600 mb-5">
-      Do you want to leave this page?
-    </p>
+<p className="text-gray-600 mb-5">
+  Please sign in again to continue accessing the dashboard.
+</p>
 
     <div className="flex justify-center gap-4">
 
@@ -80,11 +86,42 @@ const Home = () => {
       </button>
 
       <button
-        onClick={() => navigate("/select-hospital")}
-        className="px-5 py-2 bg-red-500 text-white rounded-lg"
-      >
-        OK
-      </button>
+onClick={() => {
+
+const role =
+localStorage.getItem("loginRole");
+
+localStorage.removeItem("logout");
+
+if (role === "master") {
+  navigate("/master-login");
+}
+
+else if (role === "admin") {
+  navigate("/admin-login");
+}
+
+else if (role === "doctor") {
+  navigate("/doctor-login");
+}
+
+else if (role === "patient") {
+  navigate("/patient-login");
+}
+
+else if (role === "staff") {
+  navigate("/staff-login");
+}
+
+else if (role === "pharmasi") {
+  navigate("/pharmasi-login");
+}
+
+}}
+className="px-5 py-2 bg-red-500 text-white rounded-lg"
+>
+Sign In
+</button>
 
     </div>
 

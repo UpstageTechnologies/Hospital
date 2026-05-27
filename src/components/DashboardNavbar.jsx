@@ -46,14 +46,6 @@ return(
 
 <div className="absolute left-0 flex items-center gap-4">
 
-  <button
-    onClick={() => navigate("/master-login",{state:{demo:true}})}
-    className="!w-9 !h-9 rounded-full bg-blue-600 flex items-center justify-center shadow-md"
-  >
-    <span className="text-white text-lg relative -top-[2px]">
-      ←
-    </span>
-  </button>
 
   <p
     onClick={() => navigate("/master-login",{state:{demo:true}})}
@@ -191,13 +183,6 @@ Logout
 
 <div className="flex items-center gap-4">
 
-
-<button onClick={() => navigate("/master-login",{state:{demo:true}})}
-className="!w-9 !h-9 sm:!w-10 sm:!h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md ">
-<span className="text-white text-lg sm:text-xl md:text-2xl relative -top-[2px]">
-  ←
-</span>
-</button>
 <p  onClick={() => navigate("/master-login",{state:{demo:true}})} className="text-xl font-semibold cursor-pointer" >
 Demo
 </p>
@@ -398,11 +383,39 @@ Cancel
 </button>
 
 <button
-onClick={()=>{
+onClick={() => {
+
+  if (isLogged("master")) {
+    localStorage.setItem("demoRole", "master");
+  }
+
+  else if (isLogged("admin")) {
+    localStorage.setItem("demoRole", "admin");
+  }
+
+  else if (isLogged("doctor")) {
+    localStorage.setItem("demoRole", "doctor");
+  }
+
+  else if (isLogged("patient")) {
+    localStorage.setItem("demoRole", "patient");
+  }
+
+  else if (isLogged("staff")) {
+    localStorage.setItem("demoRole", "staff");
+  }
+
+  else if (isLogged("pharmasi")) {
+    localStorage.setItem("demoRole", "pharmasi");
+  }
+
   auth.signOut();
-  localStorage.clear();
+
+  localStorage.setItem("demoLogout", "true");
+
   navigate("/demohome", { replace: true });
-  }}
+
+}}
 className="px-4 py-2 bg-red-500 text-white rounded"
 >
 Logout

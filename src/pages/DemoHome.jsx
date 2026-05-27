@@ -36,20 +36,46 @@ const DemoHome = () => {
 
     useEffect(() => {
 
-        window.history.pushState(null, "", window.location.href)
+        window.history.pushState(
+          null,
+          "",
+          window.location.href
+        );
     
         const handleBackButton = () => {
-            setShowExitPopup(true)
-            window.history.pushState(null, "", window.location.href)
-        }
     
-        window.addEventListener("popstate", handleBackButton)
+            const logoutStatus =
+            localStorage.getItem("demoLogout");
+    
+            if (logoutStatus === "true") {
+    
+                setShowExitPopup(true);
+    
+                window.history.pushState(
+                  null,
+                  "",
+                  window.location.href
+                );
+    
+            }
+    
+        };
+    
+        window.addEventListener(
+          "popstate",
+          handleBackButton
+        );
     
         return () => {
-            window.removeEventListener("popstate", handleBackButton)
-        }
     
-    }, [])
+            window.removeEventListener(
+              "popstate",
+              handleBackButton
+            );
+    
+        };
+    
+    }, []);
 
 
     return (
@@ -239,13 +265,13 @@ const DemoHome = () => {
 
     <div className="bg-white p-6 rounded-xl shadow-xl w-[320px] text-center">
 
-        <h2 className="text-xl font-semibold mb-3">
-            Exit Demo?
-        </h2>
+    <h2 className="text-xl font-semibold mb-3">
+  Sign In Required
+</h2>
 
-        <p className="text-gray-600 mb-5">
-            Do you want to go back to HospitalInfo?
-        </p>
+<p className="text-gray-600 mb-5">
+  Please sign in again to continue accessing the dashboard.
+</p>
 
         <div className="flex justify-center gap-4">
 
@@ -257,12 +283,52 @@ const DemoHome = () => {
             </button>
 
             <button
-                onClick={() => navigate("/", { replace: true })}
-                className="px-5 py-2 bg-red-500 text-white rounded-lg"
-            >
-                OK
-            </button>
+onClick={() => {
 
+const role = localStorage.getItem("demoRole");
+
+localStorage.removeItem("demoLogout");
+
+if (role === "master") {
+  navigate("/master-login", {
+    state: { demo: true }
+  });
+}
+
+else if (role === "admin") {
+  navigate("/admin-login", {
+    state: { demo: true }
+  });
+}
+
+else if (role === "doctor") {
+  navigate("/doctor-login", {
+    state: { demo: true }
+  });
+}
+
+else if (role === "patient") {
+  navigate("/patient-login", {
+    state: { demo: true }
+  });
+}
+
+else if (role === "staff") {
+  navigate("/staff-login", {
+    state: { demo: true }
+  });
+}
+
+else if (role === "pharmasi") {
+  navigate("/pharmasi-login", {
+    state: { demo: true }
+  });
+}
+}}
+className="px-5 py-2 bg-red-500 text-white rounded-lg"
+>
+Sign In
+</button>
         </div>
 
     </div>

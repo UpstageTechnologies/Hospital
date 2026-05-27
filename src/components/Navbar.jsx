@@ -347,6 +347,31 @@ alt="logo"
     setUserImage(assets.login1_icon);
 
 
+    if (userRole === "master") {
+      localStorage.setItem("loginRole", "master");
+    }
+    
+    else if (userRole === "admins") {
+      localStorage.setItem("loginRole", "admin");
+    }
+    
+    else if (userRole === "doctors") {
+      localStorage.setItem("loginRole", "doctor");
+    }
+    
+    else if (userRole === "patients") {
+      localStorage.setItem("loginRole", "patient");
+    }
+    
+    else if (userRole === "staffs") {
+      localStorage.setItem("loginRole", "staff");
+    }
+    
+    else if (userRole === "pharmasi") {
+      localStorage.setItem("loginRole", "pharmasi");
+    }
+    
+    localStorage.setItem("logout", "true");
 window.history.pushState(null, "", "/");
 navigate("/home#home", { replace: true });
 
