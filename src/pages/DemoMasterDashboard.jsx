@@ -607,7 +607,7 @@ useEffect(() => {
 </div>
 )}
 
-<div className="flex-1 p-3 md:p-10 pb-24 overflow-hidden">
+        <div className="flex-1 p-3 md:p-10 pb-24 overflow-hidden">
 
           {/* HOME */}
           {tab === "home" && subMenu === "" && (
@@ -1545,7 +1545,19 @@ md:flex-col
                   min-h-[auto] md:h-[450px]">
 
 
-<div className=" w-full md:w-1/4  p-4 flex md:block gap-2 overflow-x-auto md:space-y-3">
+<div
+className="
+w-full
+md:w-1/4
+p-3
+grid
+grid-cols-2
+sm:grid-cols-2
+gap-2
+md:flex
+md:flex-col
+"
+>
 
           <h2 className="text-xl font-bold mb-4">Create Doctor Account</h2>
 
@@ -1572,14 +1584,15 @@ md:flex-col
         </div>
 
 
-        <div className="
-w-full md:w-3/4
-p-3 md:p-6
+     <div
+className="
+w-full
+md:w-3/4
+p-4 md:p-6
 relative
-overflow-y-auto
-min-h-[600px]
-bg-white
-">
+min-h-[650px]
+"
+>
 
 
           {doctorStep === 1 && (
@@ -1590,14 +1603,23 @@ bg-white
                 Basic Information
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
 
-                <FloatingInput label="Name" required value={doctorBasicInfo.name} disabled={isViewMode}
-                  onChange={(e) =>
-                    setDoctorBasicInfo({ ...doctorBasicInfo, name: e.target.value })
-                  }
-                />
+              <div className="col-span-1 md:col-span-1 lg:col-span-1 min-w-0">
+  <FloatingInput
+    label="Name"
+    required
+    value={doctorBasicInfo.name}
+    disabled={isViewMode}
+    onChange={(e) =>
+      setDoctorBasicInfo({
+        ...doctorBasicInfo,
+        name: e.target.value
+      })
+    }
+  />
+</div>
 
 
                 <FloatingInput label="Age" required type="number" value={doctorBasicInfo.age} disabled={isViewMode}
@@ -1607,7 +1629,7 @@ bg-white
                 />
 
 
-                <div className="relative">
+<div className="relative col-span-1 md:col-span-1 lg:col-span-1 min-w-0">
                   <select value={doctorBasicInfo.gender} disabled={isViewMode}
                     onChange={(e) =>
                       setDoctorBasicInfo({ ...doctorBasicInfo, gender: e.target.value })
@@ -2036,14 +2058,19 @@ md:h-[450px]
 h-auto
 ">
 
-<div className="
-w-full md:w-1/4
-p-4
-flex md:block
+<div
+className="
+w-full
+md:w-1/4
+p-3
+grid
+grid-cols-2
+sm:grid-cols-2
 gap-2
-overflow-x-auto
-md:space-y-3
-">
+md:flex
+md:flex-col
+"
+>
 
     <h2 className="text-xl font-bold mb-4">Create Staff Account</h2>
 
@@ -2084,14 +2111,23 @@ bg-white
           Basic Information
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
 
-          <FloatingInput label="Name" required value={staffBasicInfo.name} disabled={isViewMode}
-            onChange={(e) =>
-              setStaffBasicInfo({ ...staffBasicInfo, name: e.target.value })
-            }
-          />
+        <div className="col-span-1 md:col-span-1 lg:col-span-1 min-w-0">
+  <FloatingInput
+    label="Name"
+    required
+    value={staffBasicInfo.name}
+    disabled={isViewMode}
+    onChange={(e) =>
+      setStaffBasicInfo({
+        ...staffBasicInfo,
+        name: e.target.value
+      })
+    }
+  />
+</div>
 
 
           <FloatingInput label="Age" required type="number" value={staffBasicInfo.age} disabled={isViewMode}
@@ -2101,7 +2137,7 @@ bg-white
           />
 
 
-          <div className="relative">
+<div className="relative col-span-1 md:col-span-1 lg:col-span-1 min-w-0">
             <select value={staffBasicInfo.gender} disabled={isViewMode}
               onChange={(e) =>
                 setStaffBasicInfo({ ...staffBasicInfo, gender: e.target.value })
@@ -2471,16 +2507,29 @@ flex-wrap
 
 {tab === "account" && subMenu === "patients" && (
 
-<div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[500px]">
+<div
+  className="
+  flex flex-col md:flex-row
+  w-full max-w-7xl
+  border rounded-lg overflow-hidden
+  md:h-[450px]
+  h-auto
+"
+>
 
-<div className="
-w-full md:w-1/4
-p-4
-flex md:block
+<div
+className="
+w-full
+md:w-1/4
+p-3
+grid
+grid-cols-2
+sm:grid-cols-2
 gap-2
-overflow-x-auto
-md:space-y-3
-">
+md:flex
+md:flex-col
+"
+>
 
     <h2 className="text-xl font-bold mb-3">
       Create Patient Account
@@ -2511,7 +2560,16 @@ md:space-y-3
 
 
 
-  <div className="w-3/4 p-6 relative overflow-hidden">
+  <div
+className="
+w-full md:w-3/4
+p-3 md:p-6
+relative
+overflow-y-auto
+min-h-[600px]
+bg-white
+"
+>
 
     {step === 1 && (
 
@@ -2521,19 +2579,30 @@ md:space-y-3
           Basic Information
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
 
-          <FloatingInput label="Name" required value={basicInfo.name} disabled={isViewMode}
-            onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
-          />
+        <div className="col-span-1 md:col-span-1 lg:col-span-1 min-w-0">
+  <FloatingInput
+    label="Name"
+    required
+    value={basicInfo.name}
+    disabled={isViewMode}
+    onChange={(e) =>
+      setBasicInfo({
+        ...basicInfo,
+        name: e.target.value
+      })
+    }
+  />
+</div>
 
           <FloatingInput label="Age" required type="number" value={basicInfo.age} disabled={isViewMode}
             onChange={(e) => setBasicInfo({ ...basicInfo, age: e.target.value })}
           />
 
 
-          <div className="relative">
+<div className="relative col-span-1 md:col-span-1 lg:col-span-1 min-w-0">
             <select value={basicInfo.gender} disabled={isViewMode}
               onChange={(e) => setBasicInfo({ ...basicInfo, gender: e.target.value })}
               className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
@@ -2961,46 +3030,89 @@ Print
 flex flex-col md:flex-row
 min-h-[760px] md:min-h-[620px]">
 
-<div className="w-full md:w-1/4 p-4 flex md:block gap-2 md:space-y-4">
+<div
+className="
+w-full
+md:w-1/4
+p-4
+grid
+grid-cols-2
+gap-2
+md:block
+md:space-y-4
+"
+>
 
 <h2 className="hidden md:block text-2xl font-bold">
 Create Pharmasi Account
 </h2>
 
-<button onClick={()=>{setIsViewMode(false);
-  setPharmasiStep(1);
+<button
+  onClick={() => {
+    setIsViewMode(false);
+    setPharmasiStep(1);
   }}
-className={`w-full p-3 rounded text-white ${
-pharmasiStep===1?"bg-blue-500":"bg-gray-400"
-}`}>
-Basic Info
+  className={`
+    min-w-[140px]
+    md:w-full
+    p-3
+    rounded
+    text-white
+    ${pharmasiStep === 1 ? "bg-blue-500" : "bg-gray-400"}
+  `}
+>
+  Basic Info
 </button>
 
-<button onClick={()=>{ setIsViewMode(false);
-  setPharmasiStep(2);
+<button
+  onClick={() => {
+    setIsViewMode(false);
+    setPharmasiStep(2);
   }}
-className={`w-full p-3 rounded text-white ${
-pharmasiStep===2?"bg-blue-500":"bg-gray-400"
-}`}>
-Designation
+  className={`
+    min-w-[140px]
+    md:w-full
+    p-3
+    rounded
+    text-white
+    ${pharmasiStep === 2 ? "bg-blue-500" : "bg-gray-400"}
+  `}
+>
+  Designation
 </button>
 
-<button onClick={()=>{ setIsViewMode(false);
-  setPharmasiStep(3);
+<button
+  onClick={() => {
+    setIsViewMode(false);
+    setPharmasiStep(3);
   }}
-className={`w-full p-3 rounded text-white ${
-pharmasiStep===3?"bg-blue-500":"bg-gray-400"
-}`}>
-Official Info
+  className={`
+    min-w-[140px]
+    md:w-full
+    p-3
+    rounded
+    text-white
+    ${pharmasiStep === 3 ? "bg-blue-500" : "bg-gray-400"}
+  `}
+>
+  Official Info
 </button>
 
-<button onClick={()=>{ setIsViewMode(false);
-  setPharmasiStep(4);
+<button
+  onClick={() => {
+    setIsViewMode(false);
+    setPharmasiStep(4);
   }}
-className={`w-full p-3 rounded text-white ${
-pharmasiStep===4?"bg-blue-500":"bg-gray-400"
-}`}>
-Account
+  className={`
+    min-w-[140px]
+    md:w-full
+    p-3
+    rounded
+    text-white
+    ${pharmasiStep === 4 ? "bg-blue-500" : "bg-gray-400"}
+  `}
+>
+  Account
 </button>
 
 </div>
@@ -3014,7 +3126,7 @@ Account
 Basic Information
 </h3>
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
 <FloatingInput label="Name" type="name" value={pharmasiBasicInfo.name}
 onChange={(e)=> 
@@ -3031,18 +3143,45 @@ setPharmasiBasicInfo({
   age:e.target.value
 })}/>
 
-<select value={pharmasiBasicInfo.gender}
-onChange={(e)=>
-setPharmasiBasicInfo({
-...pharmasiBasicInfo,
-gender:e.target.value
-})
-}
->
-<option value="">Select Gender</option>
-<option value="Male">Male</option>
-<option value="Female">Female</option>
-</select>
+<div className="relative">
+
+  <select
+    value={pharmasiBasicInfo.gender}
+    onChange={(e) =>
+      setPharmasiBasicInfo({
+        ...pharmasiBasicInfo,
+        gender: e.target.value
+      })
+    }
+    className="
+      w-full
+      border
+      rounded-xl
+      px-4
+      py-3
+      outline-none
+      bg-white
+    "
+  >
+    <option value="">Select Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Others">Others</option>
+  </select>
+
+  <label className="
+    absolute
+    left-3
+    -top-2
+    bg-white
+    px-1
+    text-sm
+    text-gray-500
+  ">
+    Gender <span className="text-red-500">*</span>
+  </label>
+
+</div>
 
 <FloatingInput label="DOB" type="date" value={pharmasiBasicInfo.dob}
 onChange={(e)=>
@@ -3062,7 +3201,7 @@ address:e.target.value
 }
 />
 
-<div className="md:col-span-2 flex flex-col gap-4">
+<div className="col-span-2 flex flex-col gap-4">
 <FloatingInput label="Contact Number" value={pharmasiBasicInfo.contact}
 onChange={(e)=>
 setPharmasiBasicInfo({
@@ -3205,7 +3344,17 @@ confirmPassword:e.target.value
 
 
 {/* FIXED BUTTONS */}
-<div className="absolute bottom-6 right-6 flex gap-4">
+<div className="
+absolute
+bottom-6
+left-0
+right-0
+flex
+justify-center md:justify-end
+gap-4
+px-6
+flex-wrap
+">
 
 {pharmasiStep>1 && (
 <button onClick={()=>setPharmasiStep(pharmasiStep-1)} className="bg-gray-500 text-white px-8 py-3 rounded">
