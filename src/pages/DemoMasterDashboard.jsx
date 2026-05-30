@@ -607,7 +607,7 @@ useEffect(() => {
 </div>
 )}
 
-        <div className="flex-1 p-6 md:p-10 pb-24">
+<div className="flex-1 p-3 md:p-10 pb-24 overflow-hidden">
 
           {/* HOME */}
           {tab === "home" && subMenu === "" && (
@@ -908,123 +908,202 @@ Doctor
 
 {tab === "history" && (
 
-<div className="w-full overflow-hidden pb-28">
+<div className="w-full pb-28">
 
-<h1 className="
-text-2xl
-md:text-4xl
-font-bold
-mb-6
-">
-Appointment History
-</h1>
+  <h1 className="text-2xl md:text-4xl font-bold mb-6">
+    Appointment History
+  </h1>
 
-<div
-className="
-w-full
-max-w-full
-overflow-x-auto
-md:overflow-x-auto
-overflow-y-auto
-max-h-[500px]
-rounded-2xl
-shadow
-bg-white
-border
-"
->
+  {/* MOBILE + TABLET */}
 
-<div className="min-w-[950px]">
+  <div className="block lg:hidden space-y-4">
 
-<table className="min-w-[1400px]">
+    {appointments
+      .filter((item) => {
 
-<thead className="bg-blue-600 text-white">
+        if (!item.date) return false
 
-<tr>
+        const now = new Date()
 
-<th className="p-4 text-left whitespace-nowrap">
-Patient
-</th>
+        const appointmentDate =
+          new Date(item.date)
 
-<th className="p-4 text-left whitespace-nowrap">
-Doctor
-</th>
+        return (
+          appointmentDate <
+          new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+          )
+        )
 
-<th className="p-4 text-left whitespace-nowrap">
-Date
-</th>
+      })
+      .map((item, i) => (
 
-<th className="p-4 text-left whitespace-nowrap">
-Time
-</th>
+        <div
+          key={i}
+          className="
+          bg-white
+          border
+          rounded-2xl
+          p-4
+          shadow
+          "
+        >
 
-<th className="p-4 text-left whitespace-nowrap">
-Reason
-</th>
+          <div className="space-y-3">
 
-</tr>
+            <div className="flex justify-between">
+              <span className="font-semibold text-gray-500">
+                Patient
+              </span>
 
-</thead>
+              <span className="font-bold text-right">
+                {item.patientName}
+              </span>
+            </div>
 
-<tbody>
+            <div className="flex justify-between">
+              <span className="font-semibold text-gray-500">
+                Doctor
+              </span>
 
-{appointments
-.filter((item) => {
+              <span className="font-bold text-right">
+                {item.doctorName}
+              </span>
+            </div>
 
-if (!item.date) return false
+            <div className="flex justify-between">
+              <span className="font-semibold text-gray-500">
+                Date
+              </span>
 
-const now = new Date()
+              <span className="text-right">
+                {item.date}
+              </span>
+            </div>
 
-const appointmentDate =
-new Date(item.date)
+            <div className="flex justify-between">
+              <span className="font-semibold text-gray-500">
+                Time
+              </span>
 
-return appointmentDate <
-new Date(
-now.getFullYear(),
-now.getMonth(),
-now.getDate()
-)
+              <span className="text-right">
+                {item.time}
+              </span>
+            </div>
 
-})
+            <div>
+              <p className="font-semibold text-gray-500 mb-1">
+                Reason
+              </p>
 
-.map((item, i) => (
+              <p className="break-words">
+                {item.reason}
+              </p>
+            </div>
 
-<tr
-key={i}
-className="border-b"
->
+          </div>
 
-<td className="p-4 whitespace-nowrap">
-{item.patientName}
-</td>
+        </div>
 
-<td className="p-4 whitespace-nowrap">
-{item.doctorName}
-</td>
+      ))}
 
-<td className="p-4 whitespace-nowrap">
-{item.date}
-</td>
+  </div>
 
-<td className="p-4 whitespace-nowrap">
-{item.time}
-</td>
+  {/* DESKTOP */}
 
-<td className="p-4 whitespace-nowrap">
-{item.reason}
-</td>
+  <div className="hidden lg:block overflow-x-auto rounded-2xl shadow border bg-white">
 
-</tr>
+    <table className="w-full">
 
-))}
+      <thead className="bg-blue-600 text-white">
 
-</tbody>
+        <tr>
 
-</table>
+          <th className="p-4 text-left">
+            Patient
+          </th>
 
-</div>
+          <th className="p-4 text-left">
+            Doctor
+          </th>
 
-</div>
+          <th className="p-4 text-left">
+            Date
+          </th>
+
+          <th className="p-4 text-left">
+            Time
+          </th>
+
+          <th className="p-4 text-left">
+            Reason
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        {appointments
+          .filter((item) => {
+
+            if (!item.date) return false
+
+            const now = new Date()
+
+            const appointmentDate =
+              new Date(item.date)
+
+            return (
+              appointmentDate <
+              new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate()
+              )
+            )
+
+          })
+          .map((item, i) => (
+
+            <tr
+              key={i}
+              className="border-b"
+            >
+
+              <td className="p-4">
+                {item.patientName}
+              </td>
+
+              <td className="p-4">
+                {item.doctorName}
+              </td>
+
+              <td className="p-4">
+                {item.date}
+              </td>
+
+              <td className="p-4">
+                {item.time}
+              </td>
+
+              <td className="p-4 break-words max-w-[250px]">
+                {item.reason}
+              </td>
+
+            </tr>
+
+          ))}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
 </div>
 
 )}
@@ -1033,7 +1112,17 @@ className="border-b"
 
 <div className="flex flex-col md:flex-row w-full max-w-7xl border rounded-lg overflow-hidden md:h-[450px] h-auto">
 
-<div className="w-full md:w-1/4 p-3 flex md:flex-col gap-3 overflow-x-auto md:overflow-visible scrollbar-hide">
+<div className="
+w-full
+md:w-1/4
+p-3
+grid
+grid-cols-2
+sm:grid-cols-2
+gap-2
+md:flex
+md:flex-col
+">
 <h2 className="hidden md:block text-xl font-bold">Create Admin Account</h2>
 
               <button onClick={() => setAdminStep(1)}
@@ -1310,23 +1399,23 @@ className="border-b"
 
 {subMenu === "admins" && (
 
-<div className="mt-10">
+<div className="mt-10 w-full overflow-hidden">
 
-  <h2 className="text-xl font-bold mb-4">
-    Created Admin Accounts
-  </h2>
+<h2 className="text-xl font-bold mb-4">
+  Created Admin Accounts
+</h2>
 
-  <table className="w-full border border-gray-300">
+<div className="w-full overflow-x-auto rounded-lg border">
+
+  <table className="w-full md:min-w-[900px] min-w-[600px] text-xs md:text-sm">
 
     <thead className="bg-gray-200">
-
       <tr>
-        <th className="border p-2">Name</th>
-        <th className="border p-2">Designation</th>
-        <th className="border p-2">Address</th>
-        <th className="border p-2">Action</th>
+        <th className="border p-2 whitespace-nowrap">Name</th>
+        <th className="border p-2 whitespace-nowrap">Designation</th>
+        <th className="border p-2 whitespace-nowrap">Address</th>
+        <th className="border p-2 whitespace-nowrap">Action</th>
       </tr>
-
     </thead>
 
     <tbody>
@@ -1347,7 +1436,8 @@ className="border-b"
             {admin.adminBasicInfo?.address}
           </td>
 
-          <td className="border p-2 flex gap-2">
+          <td className="border p-2">
+  <div className="flex flex-wrap gap-2">
 
             {/* VIEW */}
 
@@ -1430,6 +1520,8 @@ className="border-b"
               {admin.isDisabled ? "Enable" : "Disable"}
             </button>
 
+
+              </div>
           </td>
 
         </tr>
@@ -1439,6 +1531,7 @@ className="border-b"
     </tbody>
 
   </table>
+  </div>
 
 </div>
 
@@ -1808,7 +1901,8 @@ flex-wrap
 
         <h2 className="text-xl font-bold mb-4">Created Doctor Accounts</h2>
 
-        <table className="w-full border border-gray-300">
+        <div className="w-full overflow-x-auto">
+        <table className="w-full min-w-[600px] md:min-w-[900px] border border-gray-300 text-xs md:text-sm">
 
           <thead className="bg-gray-200">
             <tr>
@@ -1842,7 +1936,8 @@ flex-wrap
                   {docData.contact}
                 </td> */}
 
-                  <td className="border p-2 flex gap-2">
+<td className="border p-2">
+  <div className="flex flex-wrap gap-2">
 
 
                     <button
@@ -1914,6 +2009,7 @@ flex-wrap
                       {docData.isDisabled ? "Enable" : "Disable"}
                     </button>
 
+                        </div>
                   </td>
 
                 </tr>
@@ -1923,6 +2019,7 @@ flex-wrap
           </tbody>
 
         </table>
+        </div>
 
       </div>
 
@@ -1931,9 +2028,22 @@ flex-wrap
 
 {tab === "account" && subMenu === "staff" && (
 
-<div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[450px]">
+<div className="
+flex flex-col md:flex-row
+w-full max-w-7xl
+border rounded-lg overflow-hidden
+md:h-[450px]
+h-auto
+">
 
-  <div className="w-1/4 p-4 space-y-3">
+<div className="
+w-full md:w-1/4
+p-4
+flex md:block
+gap-2
+overflow-x-auto
+md:space-y-3
+">
 
     <h2 className="text-xl font-bold mb-4">Create Staff Account</h2>
 
@@ -1956,7 +2066,14 @@ flex-wrap
   </div>
 
 
-  <div className="w-3/4 p-6 relative overflow-hidden h-[450px]">
+  <div className="
+w-full md:w-3/4
+p-3 md:p-6
+relative
+overflow-y-auto
+min-h-[600px]
+bg-white
+">
 
 
     {staffStep === 1 && (
@@ -2244,7 +2361,8 @@ flex-wrap
 
   <h2 className="text-xl font-bold mb-4">Created Staff Accounts</h2>
 
-  <table className="w-full border border-gray-300">
+  <div className="w-full overflow-x-auto">
+  <table className="w-full min-w-[600px] md:min-w-[900px] border border-gray-300 text-xs md:text-sm">
 
     <thead className="bg-gray-200">
       <tr>
@@ -2281,7 +2399,8 @@ flex-wrap
 
 
 
-          <td className="border p-2 flex gap-2">
+          <td className="border p-2">
+  <div className="flex flex-wrap gap-2">
 
             <button
               onClick={() => {
@@ -2332,6 +2451,7 @@ flex-wrap
               {staff.isDisabled ? "Enable" : "Disable"}
             </button>
 
+                </div>
           </td>
 
 
@@ -2343,6 +2463,7 @@ flex-wrap
     </tbody>
 
   </table>
+  </div>
 
 </div>
 
@@ -2352,7 +2473,14 @@ flex-wrap
 
 <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[500px]">
 
-  <div className="w-1/4 p-4 space-y-3">
+<div className="
+w-full md:w-1/4
+p-4
+flex md:block
+gap-2
+overflow-x-auto
+md:space-y-3
+">
 
     <h2 className="text-xl font-bold mb-3">
       Create Patient Account
@@ -2709,7 +2837,8 @@ flex-wrap
 
   <h2 className="text-xl font-bold mb-4">Created Patient Accounts</h2>
 
-  <table className="w-full border border-gray-300">
+  <div className="w-full overflow-x-auto">
+  <table className="w-full min-w-[700px] md:min-w-[900px] border border-gray-300 text-xs md:text-sm">
 
     <thead className="bg-gray-200">
       <tr>
@@ -2733,7 +2862,8 @@ flex-wrap
           <td className="border p-2">{p.basicInfo?.address || p.address}</td>
           <td className="border p-2">{p.basicInfo?.contact || p.contact}</td>
 
-          <td className="border p-2 flex gap-2">
+          <td className="border p-2">
+  <div className="flex flex-wrap gap-2">
 
           <button
 onClick={() => setCallData(p)}
@@ -2809,6 +2939,7 @@ Print
               {p.isDisabled ? "Enable" : "Disable"}
             </button>
 
+                </div>
           </td>
 
         </tr>
@@ -2817,6 +2948,7 @@ Print
     </tbody>
 
   </table>
+  </div>
 
 </div>
 
@@ -3121,7 +3253,8 @@ Create Pharmasi
 Created Pharmasi Accounts
 </h2>
 
-<table className="w-full border border-gray-300">
+<div className="w-full overflow-x-auto">
+<table className="w-full min-w-[700px] md:min-w-[900px] border border-gray-300 text-xs md:text-sm">
 
 <thead className="bg-gray-200">
 <tr>
@@ -3160,7 +3293,8 @@ Created Pharmasi Accounts
 {item.pharmasiDesignation?.designation}
 </td>
 
-<td className="border p-2 flex gap-2">
+<td className="border p-2">
+  <div className="flex flex-wrap gap-2">
 
 <button
 onClick={()=>{
@@ -3219,6 +3353,7 @@ fetchPharmasi()
 {item.isDisabled ? "Enable":"Disable"}
 </button>
 
+</div>
 </td>
 
 </tr>
@@ -3227,6 +3362,7 @@ fetchPharmasi()
 
 </tbody>
 </table>
+</div>
 
 </div>
 
