@@ -215,14 +215,18 @@ const [pharmasiSearch, setPharmasiSearch] = useState("")
 const handleMenuChange = (mainTab, child = "") => {
 
   setTab(mainTab)
-
   setSubMenu(child)
 
   setSelected(null)
 
   setIsViewMode(false)
-
   setIsEditMode(false)
+
+  setAdminStep(1)
+  setDoctorStep(1)
+  setStaffStep(1)
+  setPharmasiStep(1)
+  setStep(1)
 
 }
 
@@ -556,7 +560,18 @@ useEffect(() => {
 <p onClick={() => handleMenuChange("account", "patients")}>
   Patients
 </p>
-<p onClick={() => handleMenuChange("account", "pharmasi")}>
+<p
+  onClick={() => {
+
+    setIsViewMode(false)
+    setIsEditMode(false)
+
+    setPharmasiStep(1)
+
+    handleMenuChange("account", "pharmasi")
+
+  }}
+>
   Pharmasi
 </p>
 
@@ -4119,7 +4134,7 @@ Create Pharmasi
 
 )}
 
-{subMenu==="pharmasi" && (
+{tab === "account" && subMenu === "pharmasi" && (
 
 <div className="mt-10">
 
