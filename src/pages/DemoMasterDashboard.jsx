@@ -195,6 +195,7 @@ const [accountInfo, setAccountInfo] = useState({
   confirmPassword: ""
 })
 const [editData, setEditData] = useState(null)
+const [showViewPopup, setShowViewPopup] = useState(false)
 const [viewData, setViewData] = useState(null)
 const [callData, setCallData] = useState(null)
 const [editIndex, setEditIndex] = useState(null)
@@ -211,6 +212,12 @@ const [doctorSearch, setDoctorSearch] = useState("")
 const [staffSearch, setStaffSearch] = useState("")
 const [patientSearch, setPatientSearch] = useState("")
 const [pharmasiSearch, setPharmasiSearch] = useState("")
+
+const [showAdminPopup, setShowAdminPopup] = useState(false);
+const [showDoctorPopup, setShowDoctorPopup] = useState(false);
+const [showStaffPopup, setShowStaffPopup] = useState(false);
+const [showPatientPopup, setShowPatientPopup] = useState(false);
+const [showPharmasiPopup, setShowPharmasiPopup] = useState(false);
 
 const handleMenuChange = (mainTab, child = "") => {
 
@@ -1172,6 +1179,251 @@ Doctor
 
 )}
 
+{showAdminPopup && (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+
+      <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+
+        <h2 className="text-2xl font-bold mb-4">
+          Admin Details
+        </h2>
+
+        <p><b>Name :</b> {viewData?.adminBasicInfo?.name}</p>
+        <p><b>Age :</b> {viewData?.adminBasicInfo?.age}</p>
+        <p><b>Gender :</b> {viewData?.adminBasicInfo?.gender}</p>
+        <p><b>Date Of Birth :</b> {viewData?.adminBasicInfo?.dob}</p>
+        <p><b>Contact :</b> {viewData?.adminBasicInfo?.contact}</p>
+        <p><b>Email :</b> {viewData?.adminBasicInfo?.email}</p>
+        <p><b>Address :</b> {viewData?.adminBasicInfo?.address}</p>
+
+        <p><b>Designation :</b> {viewData?.adminDesignation?.designation}</p>
+        <p><b>Qualification :</b> {viewData?.adminDesignation?.qualification}</p>
+
+        <p><b>Employee ID :</b> {viewData?.adminOfficial?.employeeId}</p>
+        <p><b>Joining Date :</b> {viewData?.adminOfficial?.joiningDate}</p>
+
+        <p><b>Username :</b> {viewData?.adminAccount?.username}</p>
+
+        <button
+          onClick={() => setShowAdminPopup(false)}
+          className="mt-5 bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+  )}
+
+{showDoctorPopup && (
+
+<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+
+  <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+
+    <h2 className="text-2xl font-bold mb-4">
+      Doctor Details
+    </h2>
+
+    <p><b>Name :</b> {viewData?.doctorBasicInfo?.name}</p>
+
+    <p><b>Age :</b> {viewData?.doctorBasicInfo?.age}</p>
+
+    <p><b>Gender :</b> {viewData?.doctorBasicInfo?.gender}</p>
+
+    <p><b>Date Of Birth :</b> {viewData?.doctorBasicInfo?.dob}</p>
+
+    <p><b>Contact :</b> {viewData?.doctorBasicInfo?.contact}</p>
+
+    <p><b>Emergency Contact :</b> {viewData?.doctorBasicInfo?.emrContact}</p>
+
+    <p><b>Email :</b> {viewData?.doctorBasicInfo?.email}</p>
+
+    <p><b>Address :</b> {viewData?.doctorBasicInfo?.address}</p>
+
+    <p><b>Qualification :</b> {viewData?.doctorDesignation?.qualification}</p>
+
+    <p><b>Department :</b> {viewData?.doctorDesignation?.department}</p>
+
+    <p><b>Speciality :</b> {viewData?.speciality}</p>
+
+    <p><b>Available Slots :</b></p>
+
+    <ul className="list-disc ml-6">
+      {viewData?.slots?.map((slot, i) => (
+        <li key={i}>{slot}</li>
+      ))}
+    </ul>
+
+    <button
+      onClick={() => setShowDoctorPopup(false)}
+      className="mt-5 bg-red-500 text-white px-4 py-2 rounded"
+    >
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+)}
+
+{showStaffPopup && (
+
+<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+
+  <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+
+    <h2 className="text-2xl font-bold mb-4">
+      Staff Details
+    </h2>
+
+    <p><b>Name :</b> {viewData?.staffBasicInfo?.name}</p>
+
+    <p><b>Age :</b> {viewData?.staffBasicInfo?.age}</p>
+
+    <p><b>Gender :</b> {viewData?.staffBasicInfo?.gender}</p>
+
+    <p><b>Date Of Birth :</b> {viewData?.staffBasicInfo?.dob}</p>
+
+    <p><b>Contact :</b> {viewData?.staffBasicInfo?.contact}</p>
+
+    <p><b>Email :</b> {viewData?.staffBasicInfo?.email}</p>
+
+    <p><b>Address :</b> {viewData?.staffBasicInfo?.address}</p>
+
+    <p><b>Designation :</b> {viewData?.staffDesignation?.designation}</p>
+
+    <p><b>Qualification :</b> {viewData?.staffDesignation?.qualification}</p>
+
+    <p><b>Staff ID :</b> {viewData?.staffOfficial?.staffId}</p>
+
+    <p><b>Joining Date :</b> {viewData?.staffOfficial?.joiningDate}</p>
+
+    <button
+      onClick={() => setShowStaffPopup(false)}
+      className="mt-5 bg-red-500 text-white px-4 py-2 rounded"
+    >
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+)}
+
+{showPatientPopup && (
+
+<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+
+  <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+
+    <h2 className="text-2xl font-bold mb-4">
+      Patient Details
+    </h2>
+
+    <p><b>Name :</b> {viewData?.basicInfo?.name}</p>
+
+    <p><b>Age :</b> {viewData?.basicInfo?.age}</p>
+
+    <p><b>Gender :</b> {viewData?.basicInfo?.gender}</p>
+
+    <p><b>Date Of Birth :</b> {viewData?.basicInfo?.dob}</p>
+
+    <p><b>Contact :</b> {viewData?.basicInfo?.contact}</p>
+
+    <p><b>Emergency Contact :</b> {viewData?.basicInfo?.emrContact}</p>
+
+    <p><b>Email :</b> {viewData?.basicInfo?.email}</p>
+
+    <p><b>Address :</b> {viewData?.basicInfo?.address}</p>
+
+    <hr className="my-3"/>
+
+    <p><b>Insurance Provider :</b> {viewData?.insuranceInfo?.provider}</p>
+
+    <p><b>Policy Number :</b> {viewData?.insuranceInfo?.policy}</p>
+
+    <p><b>Agent Name :</b> {viewData?.insuranceInfo?.agentName}</p>
+
+    <p><b>Agent Number :</b> {viewData?.insuranceInfo?.agentNumber}</p>
+
+    <hr className="my-3"/>
+
+    <p><b>Blood Group :</b> {viewData?.medicalHistory?.bloodGroup}</p>
+
+    <p><b>Condition :</b> {viewData?.reasonInfo?.condition}</p>
+
+    <p><b>Visit Reason :</b> {viewData?.reasonInfo?.visitReason}</p>
+
+    <p><b>Primary Reason :</b> {viewData?.reasonInfo?.primaryReason}</p>
+
+    <p><b>Duration :</b> {viewData?.reasonInfo?.duration}</p>
+
+    <p><b>Treated Before :</b> {viewData?.reasonInfo?.treatedBefore}</p>
+
+    <hr className="my-3"/>
+
+    <p><b>Username :</b> {viewData?.accountInfo?.username}</p>
+
+    <button
+      onClick={() => setShowPatientPopup(false)}
+      className="mt-5 bg-red-500 text-white px-4 py-2 rounded"
+    >
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+)}
+
+{showPharmasiPopup && (
+
+<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+
+  <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+
+    <h2 className="text-2xl font-bold mb-4">
+      Pharmasi Details
+    </h2>
+
+    <p><b>Name :</b> {viewData?.pharmasiBasicInfo?.name}</p>
+
+    <p><b>Age :</b> {viewData?.pharmasiBasicInfo?.age}</p>
+
+    <p><b>Gender :</b> {viewData?.pharmasiBasicInfo?.gender}</p>
+
+    <p><b>Date Of Birth :</b> {viewData?.pharmasiBasicInfo?.dob}</p>
+
+    <p><b>Contact :</b> {viewData?.pharmasiBasicInfo?.contact}</p>
+
+    <p><b>Email :</b> {viewData?.pharmasiBasicInfo?.email}</p>
+
+    <p><b>Address :</b> {viewData?.pharmasiBasicInfo?.address}</p>
+
+    <p><b>Designation :</b> {viewData?.pharmasiDesignation?.designation}</p>
+
+    <p><b>Pharmasi ID :</b> {viewData?.pharmasiOfficial?.pharmasiId}</p>
+
+    <p><b>Joining Date :</b> {viewData?.pharmasiOfficial?.joiningDate}</p>
+
+    <button
+      onClick={() => setShowPharmasiPopup(false)}
+      className="mt-5 bg-red-500 text-white px-4 py-2 rounded"
+    >
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+)}
+
 {tab === "account" && subMenu === "admins" && (
 
 <div className="flex flex-col md:flex-row w-full max-w-7xl border rounded-lg overflow-hidden md:h-[450px] h-auto">
@@ -1540,24 +1792,15 @@ adminSearch.toLowerCase().trim()
 
       <div className="flex flex-wrap gap-2">
 
-        <button
-          className="bg-green-500 text-white px-3 py-2 rounded"
-          onClick={() => {
-
-            setAdminBasicInfo(admin.adminBasicInfo || {})
-            setAdminDesignation(admin.adminDesignation || {})
-            setAdminOfficial(admin.adminOfficial || {})
-            setAdminAccount(admin.adminAccount || {})
-
-            setIsViewMode(true)
-            setIsEditMode(false)
-
-            setAdminStep(1)
-
-          }}
-        >
-          View
-        </button>
+      <button
+  className="bg-green-500 text-white px-3 py-2 rounded"
+  onClick={() => {
+    setViewData(admin);
+    setShowAdminPopup(true);
+  }}
+>
+  View
+</button>
 
         <button
           className="bg-blue-500 text-white px-3 py-2 rounded"
@@ -1670,22 +1913,23 @@ adminSearch.toLowerCase().trim()
             {/* VIEW */}
 
             <button
-              onClick={() => {
+  onClick={() => {
 
-                setAdminBasicInfo(admin.adminBasicInfo || {})
-                setAdminDesignation(admin.adminDesignation || {})
-                setAdminOfficial(admin.adminOfficial || {})
-                setAdminAccount(admin.adminAccount || {})
+    setAdminBasicInfo(admin.adminBasicInfo || {})
+    setAdminDesignation(admin.adminDesignation || {})
+    setAdminOfficial(admin.adminOfficial || {})
+    setAdminAccount(admin.adminAccount || {})
 
-                setIsViewMode(true)
-                setIsEditMode(false)
+    setIsViewMode(true)
+    setIsEditMode(false)
 
-                setAdminStep(1)
-              }}
-              className="bg-green-500 text-white px-2 py-1 rounded"
-            >
-              View
-            </button>
+    setAdminStep(1)
+
+  }}
+  className="bg-green-500 text-white px-2 py-1 rounded"
+>
+  View
+</button>
 
             {/* EDIT */}
 
@@ -2220,16 +2464,9 @@ Speciality
 <div className="flex flex-wrap gap-2">
 
 <button
-onClick={()=>{
-setDoctorBasicInfo(docData.doctorBasicInfo||{})
-setDoctorDesignation(docData.doctorDesignation||{})
-setDoctorOfficial(docData.doctorOfficial||{})
-setDoctorAccount(docData.doctorAccount||{})
-
-setIsViewMode(true)
-setIsEditMode(false)
-
-setDoctorStep(1)
+onClick={() => {
+  setViewData(docData);
+  setShowDoctorPopup(true);
 }}
 className="bg-green-500 text-white px-3 py-2 rounded"
 >
@@ -2341,22 +2578,24 @@ docData.isDisabled
   <div className="flex flex-wrap gap-2">
 
 
-                    <button
-                      onClick={() => {
+  <button
+  onClick={() => {
 
-                        setDoctorBasicInfo(docData.doctorBasicInfo || {})
-                        setDoctorDesignation(docData.doctorDesignation || {})
-                        setDoctorOfficial(docData.doctorOfficial || {})
-                        setDoctorAccount(docData.doctorAccount || {})
+    setDoctorBasicInfo(docData.doctorBasicInfo || {})
+    setDoctorDesignation(docData.doctorDesignation || {})
+    setDoctorOfficial(docData.doctorOfficial || {})
+    setDoctorAccount(docData.doctorAccount || {})
 
-                        setIsViewMode(true)
-                        setIsEditMode(false)
-                        setDoctorStep(1)
-                      }}
-                      className="bg-green-500 text-white px-2 py-1 rounded"
-                    >
-                      View
-                    </button>
+    setIsViewMode(true)
+    setIsEditMode(false)
+
+    setDoctorStep(1)
+
+  }}
+  className="bg-green-500 text-white px-2 py-1 rounded"
+>
+  View
+</button>
 
 
                     <button
@@ -2857,22 +3096,13 @@ Contact
 {/* VIEW */}
 
 <button
-onClick={() => {
-
-setStaffBasicInfo(staff.staffBasicInfo || {})
-setStaffDesignation(staff.staffDesignation || {})
-setStaffOfficial(staff.staffOfficial || {})
-setStaffAccount(staff.staffAccount || {})
-
-setIsViewMode(true)
-setIsEditMode(false)
-
-setStaffStep(1)
-
-}}
-className="bg-green-500 text-white px-3 py-2 rounded"
+  onClick={() => {
+    setViewData(staff)
+    setShowStaffPopup(true)
+  }}
+  className="bg-green-500 text-white px-3 py-2 rounded"
 >
-View
+  View
 </button>
 
 {/* EDIT */}
@@ -2996,18 +3226,24 @@ staff.isDisabled
           <td className="border p-2">
   <div className="flex flex-wrap gap-2">
 
-            <button
-              onClick={() => {
-                setStaffBasicInfo(staff.staffBasicInfo)
-                setStaffOfficial(staff.staffOfficial)
-                setStaffAccount(staff.staffAccount)
-                setIsViewMode(true)
-                setStaffStep(1)
-              }}
-              className="bg-green-500 text-white px-2 py-1 rounded"
-            >
-              View
-            </button>
+  <button
+  onClick={() => {
+
+    setStaffBasicInfo(staff.staffBasicInfo || {})
+    setStaffDesignation(staff.staffDesignation || {})
+    setStaffOfficial(staff.staffOfficial || {})
+    setStaffAccount(staff.staffAccount || {})
+
+    setIsViewMode(true)
+    setIsEditMode(false)
+
+    setStaffStep(1)
+
+  }}
+  className="bg-green-500 text-white px-2 py-1 rounded"
+>
+  View
+</button>
 
             <button
               onClick={() => {
@@ -3547,19 +3783,12 @@ Contact
 <button
 onClick={() => {
 
-setBasicInfo(patient.basicInfo || {})
-setInsuranceInfo(patient.insuranceInfo || {})
-setMedicalHistory(patient.medicalHistory || {})
-setReasonInfo(patient.reasonInfo || {})
-setAccountInfo(patient.accountInfo || {})
+  setViewData(patient)
 
-setIsViewMode(true)
-setIsEditMode(false)
-
-setStep(1)
+  setShowPatientPopup(true)
 
 }}
-className="bg-green-500 text-white px-3 py-2 rounded"
+className="bg-green-500 text-white px-2 py-1 rounded"
 >
 View
 </button>
@@ -4235,17 +4464,8 @@ Designation
 
 <button
 onClick={() => {
-
-setPharmasiBasicInfo(pharmasi.pharmasiBasicInfo || {})
-setPharmasiDesignation(pharmasi.pharmasiDesignation || {})
-setPharmasiOfficial(pharmasi.pharmasiOfficial || {})
-setPharmasiAccount(pharmasi.pharmasiAccount || {})
-
-setIsViewMode(true)
-setIsEditMode(false)
-
-setPharmasiStep(1)
-
+  setViewData(pharmasi)
+  setShowPharmasiPopup(true)
 }}
 className="bg-green-500 text-white px-3 py-2 rounded"
 >
@@ -4376,17 +4596,22 @@ pharmasi.isDisabled
 <td className="border p-2">
   <div className="flex flex-wrap gap-2">
 
-<button
-onClick={()=>{
-setPharmasiBasicInfo(item.pharmasiBasicInfo)
-setPharmasiDesignation(item.pharmasiDesignation)
-setPharmasiOfficial(item.pharmasiOfficial)
-setPharmasiAccount(item.pharmasiAccount)
+  <button
+onClick={() => {
 
-setIsViewMode(true)
-setPharmasiStep(1)
+  setPharmasiBasicInfo(item.pharmasiBasicInfo || {})
+  setPharmasiDesignation(item.pharmasiDesignation || {})
+  setPharmasiOfficial(item.pharmasiOfficial || {})
+  setPharmasiAccount(item.pharmasiAccount || {})
 
-}}className="bg-green-500 text-white px-2 py-1 rounded">
+  setIsViewMode(true)
+  setIsEditMode(false)
+
+  setPharmasiStep(1)
+
+}}
+className="bg-green-500 text-white px-3 py-2 rounded"
+>
 View
 </button>
 
@@ -4632,36 +4857,91 @@ Close
 
 )}
 
+{showViewPopup && (
+
+<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+
+  <div className="bg-white rounded-xl p-6 w-full max-w-lg">
+
+    <h2 className="text-xl font-bold mb-4">
+      Details
+    </h2>
+
+    <div className="space-y-2 text-sm">
+
+<p><b>Name :</b> {viewData?.doctorBasicInfo?.name}</p>
+
+<p><b>Age :</b> {viewData?.doctorBasicInfo?.age}</p>
+
+<p><b>Gender :</b> {viewData?.doctorBasicInfo?.gender}</p>
+
+<p><b>Date Of Birth :</b> {viewData?.doctorBasicInfo?.dob}</p>
+
+<p><b>Contact :</b> {viewData?.doctorBasicInfo?.contact}</p>
+
+<p><b>Email :</b> {viewData?.doctorBasicInfo?.email}</p>
+
+<p><b>Address :</b> {viewData?.doctorBasicInfo?.address}</p>
+
+<p><b>Qualification :</b> {viewData?.doctorDesignation?.qualification}</p>
+
+<p><b>Department :</b> {viewData?.doctorDesignation?.department}</p>
+
+<p><b>Employee ID :</b> {viewData?.doctorOfficial?.employeeId}</p>
+
+<p><b>Joining Date :</b> {viewData?.doctorOfficial?.joiningDate}</p>
+
+<p><b>Username :</b> {viewData?.doctorAccount?.username}</p>
+
+</div>
+
+    <div className="mt-4">
+
+      <button
+        onClick={() => setShowViewPopup(false)}
+        className="bg-red-500 text-white px-4 py-2 rounded"
+      >
+        Close
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+)}
 
 
       {/* MOBILE + TAB BOTTOM MENU */}
       <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow md:hidden flex justify-around items-center py-3 px-2 gap-2 z-50">
 
-        <button onClick={()=>setTab("home")}>
+      <button onClick={()=>handleMenuChange("home")}>
           🏠
           <p>Home</p>
         </button>
 
-        <button onClick={()=>setTab("subscription")}>
+        <button onClick={()=>handleMenuChange("subscription")}>
           💳
           <p>Subscription</p>
         </button>
 
-        <button onClick={()=>setTab("appointments")}>
+        <button onClick={()=>handleMenuChange("appointments")}>
           📅
           <p>Appointments</p>
         </button>
 
-        <button onClick={()=>setTab("history")}>
+        <button onClick={()=>handleMenuChange("history")}>
         📜
         <p>History</p>
         </button>
  
 
-        <button onClick={() => {
-  setTab("account")
-  setSubMenu("")
-}}className="flex flex-col items-center text-black">
+        <button
+onClick={() => {
+  handleMenuChange("account")
+}}
+className="flex flex-col items-center text-black">
        <span className="text-2xl">👨‍⚕️</span>
        <p className="text-sm">Accounts</p>
         </button>

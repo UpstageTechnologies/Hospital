@@ -29,6 +29,76 @@ const [showEntryDropdown,setShowEntryDropdown] = useState(false)
 const [purchaseItems,setPurchaseItems] = useState([]);
 const [salesItems,setSalesItems] = useState([]);
 
+
+const printRow = (item, type) => {
+
+  const win = window.open("", "", "width=800,height=600");
+  
+  win.document.write(`
+  <html>
+  <head>
+  <title>${type} Bill</title>
+  <style>
+  body{
+  font-family:Arial;
+  padding:20px;
+  }
+  table{
+  width:100%;
+  border-collapse:collapse;
+  }
+  td,th{
+  border:1px solid #000;
+  padding:10px;
+  }
+  </style>
+  </head>
+  <body>
+  
+  <h2>${type} Details</h2>
+  
+  <table>
+  <tr>
+  <th>Type</th>
+  <td>${item.type}</td>
+  </tr>
+  
+  <tr>
+  <th>Medicine</th>
+  <td>${item.medicine}</td>
+  </tr>
+  
+  <tr>
+  <th>Qty</th>
+  <td>${item.qty}</td>
+  </tr>
+  
+  <tr>
+  <th>Amount</th>
+  <td>₹${item.purchasePrice || item.salesPrice}</td>
+  </tr>
+  
+  <tr>
+  <th>Date</th>
+  <td>${item.date}</td>
+  </tr>
+  
+  <tr>
+  <th>Time</th>
+  <td>${item.time}</td>
+  </tr>
+  
+  </table>
+  
+  </body>
+  </html>
+  `);
+  
+  win.document.close();
+  win.print();
+  
+  };
+
 const [typeOptions,setTypeOptions]=useState([
     "Tablet",
     "Injection",
@@ -1355,6 +1425,13 @@ className="text-red-600 font-semibold"
 Delete
 </button>
 
+<button
+onClick={() => printRow(item,"Purchase")}
+className="text-purple-600 font-semibold"
+>
+Print
+</button>
+
 </td>
 
 </tr>
@@ -1722,6 +1799,13 @@ onClick={()=>deleteEntryItem(index)}
 className="text-red-600 font-semibold"
 >
 Delete
+</button>
+
+<button
+onClick={() => printRow(item,"Sales")}
+className="text-purple-600 font-semibold"
+>
+Print
 </button>
 
 </td>

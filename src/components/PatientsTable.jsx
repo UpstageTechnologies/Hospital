@@ -4,6 +4,71 @@ import PatientProfileView from "./PatientProfileView";
 
 const PatientsTable = ({ patientsData }) => {
 
+    const printPatient = (item) => {
+
+        const win = window.open("", "", "width=900,height=700");
+        
+        win.document.write(`
+        <html>
+        <head>
+        <title>Patient Prescription</title>
+        <style>
+        body{
+        font-family:Arial;
+        padding:20px;
+        }
+        table{
+        width:100%;
+        border-collapse:collapse;
+        }
+        td,th{
+        border:1px solid #000;
+        padding:10px;
+        }
+        </style>
+        </head>
+        <body>
+        
+        <h2>Patient Visit Report</h2>
+        
+        <table>
+        
+        <tr>
+        <th>Patient</th>
+        <td>${item.patientName}</td>
+        </tr>
+        
+        <tr>
+        <th>Doctor</th>
+        <td>${item.doctorName}</td>
+        </tr>
+        
+        <tr>
+        <th>Reason</th>
+        <td>${item.reason}</td>
+        </tr>
+        
+        <tr>
+        <th>Solution</th>
+        <td>${item.solution}</td>
+        </tr>
+        
+        <tr>
+        <th>Tablet</th>
+        <td>${item.tablet}</td>
+        </tr>
+        
+        </table>
+        
+        </body>
+        </html>
+        `);
+        
+        win.document.close();
+        win.print();
+        
+        };
+
     const [selectedPatient,setSelectedPatient] =
 useState(null);
 
@@ -98,6 +163,13 @@ rounded-xl
 "
 >
 Visit
+</button>
+
+<button
+onClick={() => printPatient(item)}
+className="bg-purple-500 text-white px-3 py-2 rounded ml-2"
+>
+Print
 </button>
 
 </td>

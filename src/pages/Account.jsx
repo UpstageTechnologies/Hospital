@@ -1293,6 +1293,85 @@ confirmPassword:""
     win.print();
   };
 
+  const handlePatientPrint = (item) => {
+
+    const win = window.open("", "", "width=900,height=700");
+  
+    win.document.write(`
+      <html>
+        <head>
+          <title>Patient Prescription</title>
+          <style>
+            body{
+              font-family: Arial;
+              padding:20px;
+            }
+  
+            h2{
+              text-align:center;
+            }
+  
+            table{
+              width:100%;
+              border-collapse:collapse;
+              margin-top:20px;
+            }
+  
+            th,td{
+              border:1px solid #000;
+              padding:10px;
+              text-align:left;
+            }
+          </style>
+        </head>
+  
+        <body>
+  
+          <h2>Patient Prescription</h2>
+  
+          <table>
+  
+            <tr>
+              <th>Patient</th>
+              <td>${item.patientName}</td>
+            </tr>
+  
+            <tr>
+              <th>Doctor</th>
+              <td>${item.doctorName}</td>
+            </tr>
+  
+            <tr>
+              <th>Reason</th>
+              <td>${item.reasonNotes}</td>
+            </tr>
+  
+            <tr>
+              <th>Solution</th>
+              <td>${item.solution}</td>
+            </tr>
+  
+            <tr>
+              <th>Tablet</th>
+              <td>${item.tablet}</td>
+            </tr>
+  
+            <tr>
+              <th>Date</th>
+              <td>${new Date().toLocaleDateString()}</td>
+            </tr>
+  
+          </table>
+  
+        </body>
+      </html>
+    `);
+  
+    win.document.close();
+    win.focus();
+    win.print();
+  };
+
   return (
 
     
@@ -1480,6 +1559,7 @@ className="border-b"
 </td>
 
 <td className="p-4">
+  <div className="flex items-center gap-3">
 
 <button
 
@@ -1502,6 +1582,21 @@ Visit
 
 </button>
 
+<button
+  onClick={() => handlePatientPrint(item)}
+  className="
+  bg-purple-600
+  hover:bg-purple-700
+  text-white
+  px-4
+  py-2
+  rounded-xl
+  "
+>
+  Print
+</button>
+
+</div>
 </td>
 
 </tr>
