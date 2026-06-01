@@ -204,6 +204,13 @@ const [staffAccounts, setStaffAccounts] = useState([])
 const [patientAccounts, setPatientAccounts] = useState([])
 const [pharmasiAccounts, setPharmasiAccounts] = useState([])
 const [appointments, setAppointments] = useState([])
+const [historySearch, setHistorySearch] = useState("")
+
+const [adminSearch, setAdminSearch] = useState("")
+const [doctorSearch, setDoctorSearch] = useState("")
+const [staffSearch, setStaffSearch] = useState("")
+const [patientSearch, setPatientSearch] = useState("")
+const [pharmasiSearch, setPharmasiSearch] = useState("")
 
 const handleMenuChange = (mainTab, child = "") => {
 
@@ -914,30 +921,61 @@ Doctor
     Appointment History
   </h1>
 
+  <div className="mb-6">
+  <input
+    type="text"
+    placeholder="Search Patient Name..."
+    value={historySearch}
+    onChange={(e) => setHistorySearch(e.target.value)}
+    className="
+      w-full
+      md:w-[400px]
+      border
+      rounded-xl
+      px-4
+      py-3
+      outline-none
+      focus:border-blue-500
+    "
+  />
+</div>
+
   {/* MOBILE + TABLET */}
 
   <div className="block lg:hidden space-y-4">
 
-    {appointments
-      .filter((item) => {
+  {appointments
+  .filter((item) => {
 
-        if (!item.date) return false
+    const patientName =
+      (item.patientName || "")
+        .toLowerCase()
 
-        const now = new Date()
+        const matchesSearch =
+        historySearch === ""
+          ? true
+          : patientName.trim() ===
+            historySearch.toLowerCase().trim()
+      
 
-        const appointmentDate =
-          new Date(item.date)
+    if (!item.date) return false
 
-        return (
-          appointmentDate <
-          new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate()
-          )
-        )
+    const now = new Date()
 
-      })
+    const appointmentDate =
+      new Date(item.date)
+
+    const isHistory =
+      appointmentDate <
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+      )
+
+    return isHistory && matchesSearch
+
+  })
       .map((item, i) => (
 
         <div
@@ -993,15 +1031,15 @@ Doctor
               </span>
             </div>
 
-            <div>
-              <p className="font-semibold text-gray-500 mb-1">
-                Reason
-              </p>
+            <div className="flex justify-between mb-4">
+  <span className="font-semibold text-gray-500">
+    Reason
+  </span>
 
-              <p className="break-words">
-                {item.reason}
-              </p>
-            </div>
+  <span className="text-right break-words max-w-[60%]">
+    {item.reason}
+  </span>
+</div>
 
           </div>
 
@@ -1047,26 +1085,37 @@ Doctor
 
       <tbody>
 
-        {appointments
-          .filter((item) => {
+      {appointments
+  .filter((item) => {
 
-            if (!item.date) return false
+    const patientName =
+      (item.patientName || "")
+        .toLowerCase()
 
-            const now = new Date()
+        const matchesSearch =
+        historySearch === ""
+          ? true
+          : patientName.trim() ===
+            historySearch.toLowerCase().trim()
 
-            const appointmentDate =
-              new Date(item.date)
+    if (!item.date) return false
 
-            return (
-              appointmentDate <
-              new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate()
-              )
-            )
+    const now = new Date()
 
-          })
+    const appointmentDate =
+      new Date(item.date)
+
+    const isHistory =
+      appointmentDate <
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+      )
+
+    return isHistory && matchesSearch
+
+  })
           .map((item, i) => (
 
             <tr
@@ -1397,7 +1446,7 @@ md:flex-col
 
         )}
 
-{subMenu === "admins" && (
+{tab === "account" && subMenu === "admins" && (
 
 <div className="mt-10 w-full overflow-hidden">
 
@@ -1405,7 +1454,163 @@ md:flex-col
   Created Admin Accounts
 </h2>
 
-<div className="w-full overflow-x-auto rounded-lg border">
+<div className="mb-8 mt-8">
+  <input
+    type="text"
+    placeholder="Search Admin Name..."
+    value={adminSearch}
+    onChange={(e) =>
+      setAdminSearch(e.target.value)
+    }
+    className="
+      w-full
+      md:w-[400px]
+      border
+      rounded-xl
+      px-4
+      py-3
+      outline-none
+      focus:border-blue-500
+    "
+  />
+</div>
+
+<div className="block lg:hidden space-y-4">
+
+{adminAccounts
+.filter((admin)=>
+adminSearch === ""
+? true
+: (admin.adminBasicInfo?.name || "")
+.toLowerCase()
+.trim() ===
+adminSearch.toLowerCase().trim()
+)
+.map((admin,index)=>(
+
+    <div
+      key={index}
+      className="bg-white border rounded-2xl p-4 shadow"
+    >
+
+      <div className="flex justify-between mb-3">
+        <span className="font-semibold text-gray-500">
+          Name
+        </span>
+
+        <span className="font-bold">
+          {admin.adminBasicInfo?.name}
+        </span>
+      </div>
+
+      <div className="flex justify-between mb-3">
+        <span className="font-semibold text-gray-500">
+          Designation
+        </span>
+
+        <span>
+          {admin.adminDesignation?.designation}
+        </span>
+      </div>
+
+      <div className="flex justify-between mb-4">
+  <span className="font-semibold text-gray-500">
+    Address
+  </span>
+
+  <span className="text-right break-words max-w-[60%]">
+    {admin.adminBasicInfo?.address}
+  </span>
+</div>
+
+      <div className="flex flex-wrap gap-2">
+
+        <button
+          className="bg-green-500 text-white px-3 py-2 rounded"
+          onClick={() => {
+
+            setAdminBasicInfo(admin.adminBasicInfo || {})
+            setAdminDesignation(admin.adminDesignation || {})
+            setAdminOfficial(admin.adminOfficial || {})
+            setAdminAccount(admin.adminAccount || {})
+
+            setIsViewMode(true)
+            setIsEditMode(false)
+
+            setAdminStep(1)
+
+          }}
+        >
+          View
+        </button>
+
+        <button
+          className="bg-blue-500 text-white px-3 py-2 rounded"
+          onClick={() => {
+
+            setAdminBasicInfo(admin.adminBasicInfo || {})
+            setAdminDesignation(admin.adminDesignation || {})
+            setAdminOfficial(admin.adminOfficial || {})
+            setAdminAccount(admin.adminAccount || {})
+
+            setEditData(admin)
+
+            setIsViewMode(false)
+            setIsEditMode(true)
+
+            setAdminStep(1)
+
+          }}
+        >
+          Edit
+        </button>
+
+        <button
+          className="bg-red-500 text-white px-3 py-2 rounded"
+          onClick={async () => {
+
+            await deleteDoc(
+              doc(db,"admins",admin.id)
+            )
+
+            fetchAdmins()
+
+          }}
+        >
+          Delete
+        </button>
+
+        <button
+          className={`px-3 py-2 rounded text-white ${
+            admin.isDisabled
+              ? "bg-green-500"
+              : "bg-gray-500"
+          }`}
+          onClick={async () => {
+
+            await updateDoc(
+              doc(db,"admins",admin.id),
+              {
+                isDisabled: !admin.isDisabled
+              }
+            )
+
+            fetchAdmins()
+
+          }}
+        >
+          {admin.isDisabled ? "Enable" : "Disable"}
+        </button>
+
+      </div>
+
+    </div>
+
+  ))}
+
+</div>
+
+<div className="hidden lg:block w-full overflow-x-auto rounded-lg border">
 
   <table className="w-full md:min-w-[900px] min-w-[600px] text-xs md:text-sm">
 
@@ -1420,7 +1625,15 @@ md:flex-col
 
     <tbody>
 
-      {adminAccounts.map((admin, index) => (
+    {adminAccounts
+.filter((admin) =>
+  adminSearch === ""
+    ? true
+    : (admin.adminBasicInfo?.name || "")
+        .toLowerCase()
+        .includes(adminSearch.toLowerCase())
+)
+.map((admin, index) => (
 
         <tr key={index}>
 
@@ -1917,13 +2130,156 @@ flex-wrap
 
     )}
 
-    {subMenu === "doctors" && (
+{tab === "account" && subMenu === "doctors" && (
 
       <div className="mt-10">
 
         <h2 className="text-xl font-bold mb-4">Created Doctor Accounts</h2>
 
-        <div className="w-full overflow-x-auto">
+        <div className="mb-6 mt-4">
+  <input
+    type="text"
+    placeholder="Search Doctor Name..."
+    value={doctorSearch}
+    onChange={(e) => setDoctorSearch(e.target.value)}
+    className="
+      w-full
+      md:w-[400px]
+      border
+      rounded-xl
+      px-4
+      py-3
+      outline-none
+      focus:border-blue-500
+    "
+  />
+</div>
+
+        <div className="block lg:hidden space-y-4">
+
+        {doctorAccounts
+.filter((docData)=>
+  doctorSearch === ""
+    ? true
+    : (docData.doctorBasicInfo?.name || "")
+        .toLowerCase()
+        .includes(doctorSearch.toLowerCase())
+)
+.map((docData,index)=>(
+
+<div
+key={index}
+className="bg-white border rounded-2xl p-4 shadow"
+>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Name
+</span>
+
+<span className="font-bold">
+{docData.doctorBasicInfo?.name}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Speciality
+</span>
+
+<span>
+{docData.doctorDesignation?.designation}
+</span>
+</div>
+
+<div className="flex justify-between mb-4">
+  <span className="font-semibold text-gray-500">
+    Address
+  </span>
+
+  <span className="text-right break-words max-w-[60%]">
+    {docData.doctorBasicInfo?.address}
+  </span>
+</div>
+
+<div className="flex flex-wrap gap-2">
+
+<button
+onClick={()=>{
+setDoctorBasicInfo(docData.doctorBasicInfo||{})
+setDoctorDesignation(docData.doctorDesignation||{})
+setDoctorOfficial(docData.doctorOfficial||{})
+setDoctorAccount(docData.doctorAccount||{})
+
+setIsViewMode(true)
+setIsEditMode(false)
+
+setDoctorStep(1)
+}}
+className="bg-green-500 text-white px-3 py-2 rounded"
+>
+View
+</button>
+
+<button
+onClick={()=>{
+setDoctorBasicInfo(docData.doctorBasicInfo||{})
+setDoctorDesignation(docData.doctorDesignation||{})
+setDoctorOfficial(docData.doctorOfficial||{})
+setDoctorAccount(docData.doctorAccount||{})
+
+setEditData(docData)
+
+setIsViewMode(false)
+setIsEditMode(true)
+
+setDoctorStep(1)
+}}
+className="bg-blue-500 text-white px-3 py-2 rounded"
+>
+Edit
+</button>
+
+<button
+onClick={async()=>{
+await deleteDoc(
+doc(db,"doctors",docData.id)
+)
+fetchDoctors()
+}}
+className="bg-red-500 text-white px-3 py-2 rounded"
+>
+Delete
+</button>
+
+<button
+onClick={async()=>{
+await updateDoc(
+doc(db,"doctors",docData.id),
+{
+isDisabled: !docData.isDisabled
+}
+)
+fetchDoctors()
+}}
+className={`px-3 py-2 rounded text-white ${
+docData.isDisabled
+? "bg-green-500"
+: "bg-gray-500"
+}`}
+>
+{docData.isDisabled ? "Enable" : "Disable"}
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+        <div className="hidden lg:block w-full overflow-x-auto rounded-lg border">
         <table className="w-full min-w-[600px] md:min-w-[900px] border border-gray-300 text-xs md:text-sm">
 
           <thead className="bg-gray-200">
@@ -1938,7 +2294,15 @@ flex-wrap
 
           <tbody>
 
-            {doctorAccounts.map((docData, index) => (
+          {doctorAccounts
+.filter((docData)=>
+  doctorSearch === ""
+    ? true
+    : (docData.doctorBasicInfo?.name || "")
+        .toLowerCase()
+        .includes(doctorSearch.toLowerCase())
+)
+.map((docData, index) => (
 
                 <tr key={index}>
 
@@ -2391,13 +2755,184 @@ flex-wrap
 </div>
 )}
 
-{subMenu === "staff" && (
+{tab === "account" && subMenu === "staff" && (
 
 <div className="mt-10">
 
   <h2 className="text-xl font-bold mb-4">Created Staff Accounts</h2>
 
-  <div className="w-full overflow-x-auto">
+  <div className="mb-6 mt-4">
+  <input
+    type="text"
+    placeholder="Search Staff Name..."
+    value={staffSearch}
+    onChange={(e) => setStaffSearch(e.target.value)}
+    className="
+      w-full
+      md:w-[400px]
+      border
+      rounded-xl
+      px-4
+      py-3
+      outline-none
+      focus:border-blue-500
+    "
+  />
+</div>
+
+  <div className="block lg:hidden space-y-4">
+
+  {staffAccounts
+.filter((staff)=>
+  staffSearch === ""
+    ? true
+    : (staff.staffBasicInfo?.name || "")
+        .toLowerCase()
+        .includes(staffSearch.toLowerCase())
+)
+.map((staff,index)=>(
+
+<div
+key={index}
+className="bg-white border rounded-2xl p-4 shadow"
+>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Name
+</span>
+
+<span className="font-bold">
+{staff.staffBasicInfo?.name}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Age
+</span>
+
+<span>
+{staff.staffBasicInfo?.age}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Contact
+</span>
+
+<span>
+{staff.staffBasicInfo?.contact}
+</span>
+</div>
+
+<div className="flex justify-between mb-4">
+  <span className="font-semibold text-gray-500">
+    Address
+  </span>
+
+  <span className="text-right break-words max-w-[60%]">
+    {staff.staffBasicInfo?.address}
+  </span>
+</div>
+
+<div className="flex flex-wrap gap-2">
+
+{/* VIEW */}
+
+<button
+onClick={() => {
+
+setStaffBasicInfo(staff.staffBasicInfo || {})
+setStaffDesignation(staff.staffDesignation || {})
+setStaffOfficial(staff.staffOfficial || {})
+setStaffAccount(staff.staffAccount || {})
+
+setIsViewMode(true)
+setIsEditMode(false)
+
+setStaffStep(1)
+
+}}
+className="bg-green-500 text-white px-3 py-2 rounded"
+>
+View
+</button>
+
+{/* EDIT */}
+
+<button
+onClick={() => {
+
+setStaffBasicInfo(staff.staffBasicInfo || {})
+setStaffDesignation(staff.staffDesignation || {})
+setStaffOfficial(staff.staffOfficial || {})
+setStaffAccount(staff.staffAccount || {})
+
+setEditData(staff)
+
+setIsViewMode(false)
+setIsEditMode(true)
+
+setStaffStep(1)
+
+}}
+className="bg-blue-500 text-white px-3 py-2 rounded"
+>
+Edit
+</button>
+
+{/* DELETE */}
+
+<button
+onClick={async () => {
+
+await deleteDoc(
+doc(db,"staffs",staff.id)
+)
+
+fetchStaffs()
+
+}}
+className="bg-red-500 text-white px-3 py-2 rounded"
+>
+Delete
+</button>
+
+{/* ENABLE / DISABLE */}
+
+<button
+onClick={async () => {
+
+await updateDoc(
+doc(db,"staffs",staff.id),
+{
+isDisabled: !staff.isDisabled
+}
+)
+
+fetchStaffs()
+
+}}
+className={`px-3 py-2 rounded text-white ${
+staff.isDisabled
+? "bg-green-500"
+: "bg-gray-500"
+}`}
+>
+{staff.isDisabled ? "Enable" : "Disable"}
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+  <div className="hidden lg:block w-full overflow-x-auto rounded-lg border">
   <table className="w-full min-w-[600px] md:min-w-[900px] border border-gray-300 text-xs md:text-sm">
 
     <thead className="bg-gray-200">
@@ -2412,7 +2947,15 @@ flex-wrap
 
     <tbody>
 
-      {staffAccounts.map((staff, index) => (
+    {staffAccounts
+.filter((staff)=>
+  staffSearch === ""
+    ? true
+    : (staff.staffBasicInfo?.name || "")
+        .toLowerCase()
+        .includes(staffSearch.toLowerCase())
+)
+.map((staff, index) => (
 
         <tr key={index}>
 
@@ -2900,13 +3443,186 @@ flex-wrap
 
 )}
 
-{subMenu === "patients" && (
+{tab === "account" && subMenu === "patients" && (
 
 <div className="mt-10 max-h-[300px] overflow-y-auto">
 
   <h2 className="text-xl font-bold mb-4">Created Patient Accounts</h2>
 
-  <div className="w-full overflow-x-auto">
+  <div className="mb-6 mt-4">
+  <input
+    type="text"
+    placeholder="Search Patient Name..."
+    value={patientSearch}
+    onChange={(e) => setPatientSearch(e.target.value)}
+    className="
+      w-full
+      md:w-[400px]
+      border
+      rounded-xl
+      px-4
+      py-3
+      outline-none
+      focus:border-blue-500
+    "
+  />
+</div>
+
+  <div className="block lg:hidden space-y-4">
+
+{patientAccounts
+.filter((patient)=>
+  patientSearch === ""
+    ? true
+    : (patient.basicInfo?.name || "")
+        .toLowerCase()
+        .includes(patientSearch.toLowerCase())
+)
+.map((patient,index)=>(
+
+<div
+key={index}
+className="bg-white border rounded-2xl p-4 shadow"
+>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Name
+</span>
+
+<span className="font-bold">
+{patient.basicInfo?.name}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Age
+</span>
+
+<span>
+{patient.basicInfo?.age}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Contact
+</span>
+
+<span>
+{patient.basicInfo?.contact}
+</span>
+</div>
+
+<div className="flex justify-between mb-4">
+  <span className="font-semibold text-gray-500">
+    Address
+  </span>
+
+  <span className="text-right break-words max-w-[60%]">
+    {patient.basicInfo?.address}
+  </span>
+</div>
+
+<div className="flex flex-wrap gap-2">
+
+{/* VIEW */}
+
+<button
+onClick={() => {
+
+setBasicInfo(patient.basicInfo || {})
+setInsuranceInfo(patient.insuranceInfo || {})
+setMedicalHistory(patient.medicalHistory || {})
+setReasonInfo(patient.reasonInfo || {})
+setAccountInfo(patient.accountInfo || {})
+
+setIsViewMode(true)
+setIsEditMode(false)
+
+setStep(1)
+
+}}
+className="bg-green-500 text-white px-3 py-2 rounded"
+>
+View
+</button>
+
+{/* EDIT */}
+
+<button
+onClick={() => {
+
+setBasicInfo(patient.basicInfo || {})
+setInsuranceInfo(patient.insuranceInfo || {})
+setMedicalHistory(patient.medicalHistory || {})
+setReasonInfo(patient.reasonInfo || {})
+setAccountInfo(patient.accountInfo || {})
+
+setEditData(patient)
+
+setIsViewMode(false)
+setIsEditMode(true)
+
+setStep(1)
+
+}}
+className="bg-blue-500 text-white px-3 py-2 rounded"
+>
+Edit
+</button>
+
+{/* DELETE */}
+
+<button
+onClick={async () => {
+
+await deleteDoc(
+doc(db,"patients",patient.id)
+)
+
+fetchPatients()
+
+}}
+className="bg-red-500 text-white px-3 py-2 rounded"
+>
+Delete
+</button>
+
+{/* ENABLE / DISABLE */}
+
+<button
+onClick={async () => {
+
+await updateDoc(
+doc(db,"patients",patient.id),
+{
+isDisabled: !patient.isDisabled
+}
+)
+
+fetchPatients()
+
+}}
+className={`px-3 py-2 rounded text-white ${
+patient.isDisabled
+? "bg-green-500"
+: "bg-gray-500"
+}`}
+>
+{patient.isDisabled ? "Enable" : "Disable"}
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+  <div className="hidden lg:block w-full overflow-x-auto rounded-lg border">
   <table className="w-full min-w-[700px] md:min-w-[900px] border border-gray-300 text-xs md:text-sm">
 
     <thead className="bg-gray-200">
@@ -2921,7 +3637,16 @@ flex-wrap
 
     <tbody>
 
-      {patientAccounts.map((p, index) => (
+    {patientAccounts
+  .filter((p) =>
+    patientSearch === ""
+      ? true
+      : (p.basicInfo?.name || "")
+          .toLowerCase()
+          .trim() ===
+        patientSearch.toLowerCase().trim()
+  )
+  .map((p, index) => (
         <tr key={index}>
 
           <td className={`border p-2 ${p.isDisabled ? "text-gray-400 line-through" : ""}`}>
@@ -3402,7 +4127,189 @@ Create Pharmasi
 Created Pharmasi Accounts
 </h2>
 
-<div className="w-full overflow-x-auto">
+<div className="mb-6 mt-4">
+  <input
+    type="text"
+    placeholder="Search Pharmasi Name..."
+    value={pharmasiSearch}
+    onChange={(e) => setPharmasiSearch(e.target.value)}
+    className="
+      w-full
+      md:w-[400px]
+      border
+      rounded-xl
+      px-4
+      py-3
+      outline-none
+      focus:border-blue-500
+    "
+  />
+</div>
+
+<div className="block lg:hidden space-y-4">
+
+{pharmasiAccounts
+.filter((pharmasi)=>
+  pharmasiSearch === ""
+    ? true
+    : (pharmasi.pharmasiBasicInfo?.name || "")
+        .toLowerCase()
+        .trim() ===
+      pharmasiSearch.toLowerCase().trim()
+)
+.map((pharmasi,index)=>(
+
+<div
+key={index}
+className="bg-white border rounded-2xl p-4 shadow"
+>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Name
+</span>
+
+<span className="font-bold">
+{pharmasi.pharmasiBasicInfo?.name}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Age
+</span>
+
+<span>
+{pharmasi.pharmasiBasicInfo?.age}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Contact
+</span>
+
+<span>
+{pharmasi.pharmasiBasicInfo?.contact}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Designation
+</span>
+
+<span>
+{pharmasi.pharmasiDesignation?.designation}
+</span>
+</div>
+
+<div className="flex justify-between mb-4">
+  <span className="font-semibold text-gray-500">
+    Address
+  </span>
+
+  <span className="text-right break-words max-w-[60%]">
+    {pharmasi.pharmasiBasicInfo?.address}
+  </span>
+</div>
+
+<div className="flex flex-wrap gap-2">
+
+{/* VIEW */}
+
+<button
+onClick={() => {
+
+setPharmasiBasicInfo(pharmasi.pharmasiBasicInfo || {})
+setPharmasiDesignation(pharmasi.pharmasiDesignation || {})
+setPharmasiOfficial(pharmasi.pharmasiOfficial || {})
+setPharmasiAccount(pharmasi.pharmasiAccount || {})
+
+setIsViewMode(true)
+setIsEditMode(false)
+
+setPharmasiStep(1)
+
+}}
+className="bg-green-500 text-white px-3 py-2 rounded"
+>
+View
+</button>
+
+{/* EDIT */}
+
+<button
+onClick={() => {
+
+setPharmasiBasicInfo(pharmasi.pharmasiBasicInfo || {})
+setPharmasiDesignation(pharmasi.pharmasiDesignation || {})
+setPharmasiOfficial(pharmasi.pharmasiOfficial || {})
+setPharmasiAccount(pharmasi.pharmasiAccount || {})
+
+setEditData(pharmasi)
+
+setIsViewMode(false)
+setIsEditMode(true)
+
+setPharmasiStep(1)
+
+}}
+className="bg-blue-500 text-white px-3 py-2 rounded"
+>
+Edit
+</button>
+
+{/* DELETE */}
+
+<button
+onClick={async () => {
+
+await deleteDoc(
+doc(db,"pharmasi",pharmasi.id)
+)
+
+fetchPharmasi()
+
+}}
+className="bg-red-500 text-white px-3 py-2 rounded"
+>
+Delete
+</button>
+
+{/* ENABLE / DISABLE */}
+
+<button
+onClick={async () => {
+
+await updateDoc(
+doc(db,"pharmasi",pharmasi.id),
+{
+isDisabled: !pharmasi.isDisabled
+}
+)
+
+fetchPharmasi()
+
+}}
+className={`px-3 py-2 rounded text-white ${
+pharmasi.isDisabled
+? "bg-green-500"
+: "bg-gray-500"
+}`}
+>
+{pharmasi.isDisabled ? "Enable" : "Disable"}
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+<div className="hidden lg:block w-full overflow-x-auto rounded-lg border">
 <table className="w-full min-w-[700px] md:min-w-[900px] border border-gray-300 text-xs md:text-sm">
 
 <thead className="bg-gray-200">
@@ -3418,7 +4325,16 @@ Created Pharmasi Accounts
 
 <tbody>
 
-{pharmasiAccounts.map((item,index)=>(
+{pharmasiAccounts
+.filter((item)=>
+  pharmasiSearch === ""
+    ? true
+    : (item.pharmasiBasicInfo?.name || "")
+        .toLowerCase()
+        .trim() ===
+      pharmasiSearch.toLowerCase().trim()
+)
+.map((item,index)=>(
 
 <tr key={index}>
 
