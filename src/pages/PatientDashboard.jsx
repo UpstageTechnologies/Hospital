@@ -384,7 +384,150 @@ String(userEmail).trim().toLowerCase()
             <p className="text-gray-600">{item.time}</p>
           </div>
         ))}
+
+</div>    
+
+{/* Health Overview */}
+
+<div className="mt-10">
+
+  <h2 className="text-2xl font-bold mb-5">
+    Health Overview
+  </h2>
+
+  <div
+    className="
+    grid
+    grid-cols-2
+    lg:grid-cols-4
+    gap-4
+    "
+  >
+
+    <div className="bg-blue-600 text-white rounded-2xl p-5 shadow">
+      <p className="text-sm">
+        Upcoming Appointments
+      </p>
+
+      <p className="text-3xl font-bold mt-2">
+        {currentAppointments.length}
+      </p>
     </div>
+
+    <div className="bg-green-600 text-white rounded-2xl p-5 shadow">
+      <p className="text-sm">
+        Appointment History
+      </p>
+
+      <p className="text-3xl font-bold mt-2">
+        {historyAppointments.length}
+      </p>
+    </div>
+
+    <div className="bg-purple-600 text-white rounded-2xl p-5 shadow">
+      <p className="text-sm">
+        Doctors Consulted
+      </p>
+
+      <p className="text-3xl font-bold mt-2">
+        {
+          new Set(
+            appointments.map(
+              item => item.doctorName
+            )
+          ).size
+        }
+      </p>
+    </div>
+
+    <div className="bg-orange-500 text-white rounded-2xl p-5 shadow">
+      <p className="text-sm">
+        Health Status
+      </p>
+
+      <p className="text-3xl font-bold mt-2">
+        Active
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+{/* Patient Summary */}
+
+<div
+  className="
+  mt-8
+  bg-white
+  rounded-2xl
+  shadow
+  p-6
+  "
+>
+
+  <h2
+    className="
+    text-2xl
+    font-bold
+    mb-6
+    "
+  >
+    Patient Summary
+  </h2>
+
+  <div
+    className="
+    grid
+    grid-cols-1
+    md:grid-cols-2
+    gap-6
+    "
+  >
+
+    <div
+      className="
+      border
+      rounded-xl
+      p-5
+      "
+    >
+      <h3 className="font-bold text-xl mb-4">
+        🏥 Hospital Services
+      </h3>
+
+      <ul className="space-y-3 text-lg">
+        <li>Doctor Consultation</li>
+        <li>Lab Test Booking</li>
+        <li>Emergency Care</li>
+        <li>Pharmacy Support</li>
+      </ul>
+    </div>
+
+    <div
+      className="
+      border
+      rounded-xl
+      p-5
+      "
+    >
+      <h3 className="font-bold text-xl mb-4">
+        📋 Health Tips
+      </h3>
+
+      <ul className="space-y-3 text-lg">
+        <li>Drink 3L Water Daily</li>
+        <li>Sleep 8 Hours</li>
+        <li>Exercise 30 Minutes</li>
+        <li>Regular Health Checkup</li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+    
   </>
 )}
 

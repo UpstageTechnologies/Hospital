@@ -24,16 +24,31 @@ const Account = () => {
   const [inventoryItems,setInventoryItems]=useState([]);
   const [patientsData,setPatientsData] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    const storedPatients =
-    JSON.parse(
-    localStorage.getItem("patientsData")
-    ) || [];
-    
-    setPatientsData(storedPatients);
-    
-    },[]);
+    const unsub = onSnapshot(
+      collection(db, "prescriptions"),
+      (snapshot) => {
+   
+        const list = [];
+   
+        snapshot.forEach((doc) => {
+   
+          list.push({
+            id: doc.id,
+            ...doc.data()
+          });
+   
+        });
+   
+        setPatientsData(list);
+   
+      }
+    );
+   
+    return () => unsub();
+   
+   }, []);
 
 const [qty,setQty] = useState("");
 const [purchase,setPurchase] = useState("");
@@ -1421,7 +1436,133 @@ historyAppointments.filter((item) =>
       <div className="flex-1 p-4 md:p-6 pb-20 md:pb-6 overflow-auto">
 
 
+      {menu === "home" && (
 
+<div className="space-y-6">
+
+  <h1 className="text-4xl font-bold">
+    Hospital Dashboard
+  </h1>
+
+  {/* Stats Cards */}
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+    <div className="bg-white rounded-2xl shadow p-6">
+      <h3 className="text-gray-500">
+        Total Appointments
+      </h3>
+      <p className="text-4xl font-bold text-blue-600">
+        {patientAccounts.length}
+      </p>
+    </div>
+
+    <div className="bg-white rounded-2xl shadow p-6">
+      <h3 className="text-gray-500">
+        Today's Appointments
+      </h3>
+      <p className="text-4xl font-bold text-green-600">
+        {currentAppointments.length}
+      </p>
+    </div>
+
+    <div className="bg-white rounded-2xl shadow p-6">
+      <h3 className="text-gray-500">
+        Doctors
+      </h3>
+      <p className="text-4xl font-bold text-purple-600">
+        {doctorAccounts.length}
+      </p>
+    </div>
+
+    <div className="bg-white rounded-2xl shadow p-6">
+      <h3 className="text-gray-500">
+        Staffs
+      </h3>
+      <p className="text-4xl font-bold text-red-600">
+        {staffAccounts.length}
+      </p>
+    </div>
+
+  </div>
+
+  {/* Quick Actions */}
+  <div className="bg-white rounded-2xl shadow p-6">
+
+    <h2 className="text-2xl font-bold mb-4">
+      Quick Actions
+    </h2>
+
+    <div className="flex flex-wrap gap-4">
+
+      <button
+        onClick={() => setMenu("appointments")}
+        className="bg-blue-600 text-white px-6 py-3 rounded-xl"
+      >
+        View Appointments
+      </button>
+
+      <button
+        onClick={() => setMenu("describe")}
+        className="bg-green-600 text-white px-6 py-3 rounded-xl"
+      >
+        Prescribe Patient
+      </button>
+
+      <button
+        onClick={() => setMenu("history")}
+        className="bg-purple-600 text-white px-6 py-3 rounded-xl"
+      >
+        Appointment History
+      </button>
+
+    </div>
+
+  </div>
+
+  {/* Recent Appointments */}
+  <div className="bg-white rounded-2xl shadow p-6">
+
+    <h2 className="text-2xl font-bold mb-4">
+      Recent Appointments
+    </h2>
+
+    <div className="space-y-3">
+
+      {patientAccounts.slice(0,5).map((item,index)=>(
+        <div
+          key={index}
+          className="
+          border
+          rounded-xl
+          p-4
+          flex
+          justify-between
+          items-center
+          "
+        >
+          <div>
+            <p className="font-bold">
+              {item.patientName}
+            </p>
+
+            <p className="text-gray-500">
+              {item.doctorName}
+            </p>
+          </div>
+
+          <div>
+            {item.date}
+          </div>
+        </div>
+      ))}
+
+    </div>
+
+  </div>
+
+</div>
+
+)}
 
 
 
@@ -1504,11 +1645,11 @@ Reason
 </th>
 
 <th className="p-4 text-left whitespace-nowrap">
-Solution
+Date
 </th>
 
 <th className="p-4 text-left whitespace-nowrap">
-Tablet
+Time
 </th>
 
 <th className="p-4 text-left whitespace-nowrap">
@@ -1554,15 +1695,15 @@ className="border-b"
 </td>
 
 <td className="p-4 whitespace-nowrap">
-{item.reasonNotes}
+{item.reasonNotes || item.reason}
 </td>
 
 <td className="p-4 whitespace-nowrap">
-{item.solution || "Not Updated"}
+{item.date}
 </td>
 
 <td className="p-4 whitespace-nowrap">
-{item.tablet || "Not Updated"}
+{item.time}
 </td>
 
 <td className="p-4 whitespace-nowrap">
@@ -1636,7 +1777,7 @@ className="border-b"
 
         <div className="space-y-4">
 
-<div className="flex items-start">
+        <div className="flex items-start">
   <span className="w-24 font-semibold text-gray-600">
     Patient
   </span>
@@ -1659,25 +1800,25 @@ className="border-b"
     Reason
   </span>
   <span className="font-bold break-words">
-    : {item.reasonNotes}
+    : {item.reasonNotes || item.reason}
   </span>
 </div>
 
 <div className="flex items-start">
   <span className="w-24 font-semibold text-gray-600">
-    Solution
+    Date
   </span>
   <span className="font-bold break-words">
-    : {item.solution || "Not Updated"}
+    : {item.date}
   </span>
 </div>
 
 <div className="flex items-start">
   <span className="w-24 font-semibold text-gray-600">
-    Tablet
+    Time
   </span>
   <span className="font-bold break-words">
-    : {item.tablet || "Not Updated"}
+    : {item.time}
   </span>
 </div>
 
@@ -2089,6 +2230,8 @@ className="border-b"
     <span className="text-xl">🏠</span>
     <span className="mt-1">Home</span>
   </button>
+
+
 
   {/* DESCRIBE */}
   <button

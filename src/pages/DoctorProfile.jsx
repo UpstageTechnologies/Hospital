@@ -790,16 +790,31 @@ useEffect(() => {
 
     }, [])
 
-    useEffect(()=>{
+    useEffect(() => {
 
-        const savedPatients =
-        JSON.parse(
-        localStorage.getItem("patientsData")
-        ) || [];
-        
-        setPatientsData(savedPatients);
-        
-        },[]);
+        const unsub = onSnapshot(
+          collection(db, "appointmentHistory"),
+          (snapshot) => {
+       
+            const list = [];
+       
+            snapshot.forEach((doc) => {
+       
+              list.push({
+                id: doc.id,
+                ...doc.data()
+              });
+       
+            });
+       
+            setPatientsData(list);
+       
+          }
+        );
+       
+        return () => unsub();
+       
+       }, []);
 
         useEffect(() => {
 
@@ -1237,25 +1252,14 @@ overflow-x-auto
 
 <tr>
 
-<th className="p-4 text-left">
-Patient
-</th>
-
-<th className="p-4 text-left">
-Doctor
-</th>
-
-<th className="p-4 text-left">
-Date
-</th>
-
-<th className="p-4 text-left">
-Time
-</th>
-
-<th className="p-4 text-left">
-Reason
-</th>
+<th className="p-4 text-left">Patient</th>
+<th className="p-4 text-left">Doctor</th>
+<th className="p-4 text-left">Address</th>
+<th className="p-4 text-left">Reason</th>
+<th className="p-4 text-left">Solution</th>
+<th className="p-4 text-left">Date</th>
+<th className="p-4 text-left">Age</th>
+<th className="p-4 text-left">Contact</th>
 
 </tr>
 
@@ -1279,17 +1283,27 @@ className="border-b hover:bg-gray-50"
 </td>
 
 <td className="p-4">
-{item.date}
+{item.address || "-"}
 </td>
 
 <td className="p-4">
-{item.time}
+{item.reason || item.problem || "-"}
 </td>
 
 <td className="p-4">
-{item.reason ||
-item.problem ||
-"No Reason"}
+{item.solution || "-"}
+</td>
+
+<td className="p-4">
+{item.date || "-"}
+</td>
+
+<td className="p-4">
+{item.age || "-"}
+</td>
+
+<td className="p-4">
+{item.patientPhone || item.phone || "-"}
 </td>
 
 </tr>
@@ -1510,6 +1524,94 @@ h-[90px]
                         ))}
 
                     </div>
+
+                    {/* Hospital Dashboard */}
+
+<div className="mt-10">
+
+<h2 className="text-2xl font-bold mb-5">
+Hospital Overview
+</h2>
+
+<div className="
+grid
+grid-cols-2
+md:grid-cols-2
+lg:grid-cols-4
+gap-4
+">
+
+<div className="bg-blue-500 text-white rounded-2xl p-5 shadow">
+<p className="text-sm">Total Patients</p>
+<p className="text-3xl font-bold mt-2">
+{patientsData.length}
+</p>
+</div>
+
+<div className="bg-green-500 text-white rounded-2xl p-5 shadow">
+<p className="text-sm">Today's Appointments</p>
+<p className="text-3xl font-bold mt-2">
+{
+appointments.filter(
+a =>
+a.date ===
+new Date()
+.toISOString()
+.split("T")[0]
+).length
+}
+</p>
+</div>
+
+<div className="bg-purple-500 text-white rounded-2xl p-5 shadow">
+<p className="text-sm">Upcoming Appointments</p>
+<p className="text-3xl font-bold mt-2">
+{appointments.length}
+</p>
+</div>
+
+<div className="bg-orange-500 text-white rounded-2xl p-5 shadow">
+<p className="text-sm">Available Slots</p>
+<p className="text-3xl font-bold mt-2">
+27
+</p>
+</div>
+
+</div>
+
+</div>
+
+<div className="mt-8 bg-white border rounded-2xl p-5 shadow">
+
+<h2 className="text-xl font-bold mb-4">
+Today's Summary
+</h2>
+
+<div className="space-y-3">
+
+<p>
+🏥 Total Patients :
+<b> {patientsData.length}</b>
+</p>
+
+<p>
+📅 Appointments :
+<b> {appointments.length}</b>
+</p>
+
+<p>
+👨‍⚕️ Doctor :
+<b> {doctorData?.name}</b>
+</p>
+
+<p>
+🕒 Consultation Hours :     
+<b> 09:00 AM - 08:00 PM</b>
+</p>
+
+</div>
+
+</div>
 
                     {/* 🔥 👉 இதே இடத்துல தான் popup போடணும் */}
                     {selectedAppointment && (
@@ -2257,52 +2359,24 @@ const historyData = {
     selectedAppointment?.phone || "",
     
     doctorName:
-selectedAppointment?.doctorName || "",
-
-doctorEmail:
-selectedAppointment?.doctorEmail || "",
+    selectedAppointment?.doctorName || "",
     
-    appointmentNo:
-    selectedAppointment?.appointmentNo || "",
+    address:
+    selectedAppointment?.address || "",
+    
+    age:
+    selectedAppointment?.age || "",
     
     reason:
     selectedAppointment?.reason ||
     selectedAppointment?.problem ||
     "",
     
-    prescriptionText,
-    
-    medicines: prescriptionList,
-    
-    consultationTime:
-    formatConsultationTime(
-    consultationSeconds
-    ),
-    
-    checkInTime:
-    checkInTime
-    ? new Date(checkInTime).toISOString()
-    : "",
-    
-    checkOutTime:
-    outTime.toISOString(),
-    
-    doctorFee: 600,
-    
-    medicineFee:
-    Number(totalAmount || 0),
-    
-    payment:
-    Number(600) +
-    Number(totalAmount || 0),
+    solution:
+    prescriptionText || "",
     
     date:
     selectedAppointment?.date || "",
-    
-    time:
-    selectedAppointment?.time || "",
-    
-    status: "Completed",
     
     createdAt:
     serverTimestamp()

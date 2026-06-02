@@ -131,22 +131,30 @@ const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
         }
     
         const appointmentData = {
-            patientName: currentUser.name,
-            patientEmail: currentUser.email,
-            address: currentUser.address,
-            phone: currentUser.phone,
-            gender: currentUser.gender,
-            doctorName: doctor.name,
-doctorEmail: doctor.email,
-doctorImage: doctor.image,
-speciality: doctor.speciality,
-            time: slotTime,
-            date: (date || new Date()).toISOString().split("T")[0],
-            reason: reason,
-            appointmentNo: "API" + Math.floor(Math.random()*900+100),
-
-            isDemo: doctor.demo === true,
-        };
+          patientName: currentUser.name,
+          patientEmail: currentUser.email,
+      
+          address: currentUser.address,
+          phone: currentUser.phone,
+          gender: currentUser.gender,
+      
+          age: currentUser.age || "",
+          dob: currentUser.dob || "",
+          emrContact: currentUser.emrContact || "",
+      
+          doctorName: doctor.name,
+          doctorEmail: doctor.email,
+          doctorImage: doctor.image,
+          speciality: doctor.speciality,
+      
+          time: slotTime,
+          date: (date || new Date()).toISOString().split("T")[0],
+      
+          reason: reason,
+          appointmentNo: "API" + Math.floor(Math.random()*900+100),
+      
+          isDemo: doctor.demo === true,
+      };
     
         // 🔥 IMPORTANT FIX
         await addDoc(

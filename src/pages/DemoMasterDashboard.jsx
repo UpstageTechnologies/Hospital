@@ -205,6 +205,57 @@ const [staffAccounts, setStaffAccounts] = useState([])
 const [patientAccounts, setPatientAccounts] = useState([])
 const [pharmasiAccounts, setPharmasiAccounts] = useState([])
 const [appointments, setAppointments] = useState([])
+
+const doctorWisePatients = {};
+
+appointments.forEach((appt) => {
+
+  if (!appt.doctorName) return;
+
+  if (!doctorWisePatients[appt.doctorName]) {
+    doctorWisePatients[appt.doctorName] = [];
+  }
+
+  console.log(
+    "Appointment Patient :",
+    appt.patientName
+  );
+  
+  console.log(
+    "All Patients :",
+    patientAccounts
+  );
+  
+  const fullPatient = patientAccounts.find((p) => {
+
+    const dbEmail =
+      (p?.basicInfo?.email || "")
+        .trim()
+        .toLowerCase();
+  
+    const appointmentEmail =
+      (appt?.patientEmail || "")
+        .trim()
+        .toLowerCase();
+  
+    return dbEmail === appointmentEmail;
+  
+  }) || null;
+    
+  
+  
+  console.log(
+    "Matched Patient :",
+    fullPatient
+  );
+
+  doctorWisePatients[appt.doctorName].push({
+    ...appt,
+    patientData: fullPatient
+  });
+
+});
+
 const [historySearch, setHistorySearch] = useState("")
 
 const [adminSearch, setAdminSearch] = useState("")
@@ -287,6 +338,13 @@ const handleCreateAdminFull = async () => {
 const [adminAccounts, setAdminAccounts] = useState([])
 
 const fetchAdmins = async () => {
+
+  console.log(
+    snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  )
 
   const snapshot = await getDocs(
     collection(db, "admins")
@@ -690,14 +748,18 @@ useEffect(() => {
     <h1 className="text-3xl font-bold mb-6">Doctors</h1>
 
     <div className="grid md:grid-cols-3 gap-4">
-      {doctorAccounts.slice(0,10).map((doc, i) => (
+    {doctorAccounts
+.filter(doc =>
+doc?.doctorBasicInfo?.name?.trim()
+)
+.slice(0,10)
+.map((doc, i) => (
         <div 
   key={i} 
-  onClick={() => setSelected({
-    ...doc,
-    type: "doctor",
-    
-  })}
+  onClick={() => {
+    setViewData(doc)
+    setShowDoctorPopup(true)
+  }}
   className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
 >
 
@@ -712,52 +774,178 @@ useEffect(() => {
 )}
 
 {tab === "patientsList" && (
-  <div>
-    <h1 className="text-3xl font-bold mb-6">Patients</h1>
 
-    <div className="grid md:grid-cols-3 gap-4">
-      {patientAccounts.slice(0,20).map((p, i) => (
-        <div 
-  key={i}
-  onClick={() => setSelected({
-    ...p,
-    type: "patient",
-    
-  })}
-  className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
+<div>
+
+<h1 className="text-3xl font-bold mb-6">
+Doctor Wise Patients
+</h1>
+
+<div className="space-y-6">
+
+{Object.entries(doctorWisePatients).map(
+([doctorName, patients], index) => (
+
+<div
+key={index}
+className="
+bg-white
+border
+rounded-2xl
+shadow
+p-5
+"
 >
 
-          <p className="font-bold">{p.basicInfo?.name}</p>
-          <p>{p.basicInfo?.age} yrs</p>
-          <p className="text-gray-500">{p.basicInfo?.contact}</p>
+<div className="mb-4">
 
-        </div>
-      ))}
-    </div>
-  </div>
+<h2 className="text-xl font-bold text-blue-600">
+Dr. {doctorName}
+</h2>
+
+<p className="text-gray-500">
+Total Patients : {patients.length}
+</p>
+
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+
+{patients.map((patient, i) => (
+
+<div
+key={i}
+onClick={() => {
+
+  console.log("PATIENT =", patient);
+  console.log("PATIENT DATA =", patient.patientData);
+  
+  if (!patient.patientData) {
+
+    console.log(patient);
+    
+    setViewData({
+      basicInfo:{
+        name: patient.patientName,
+        age: patient.age,
+        gender: patient.gender,
+        dob: patient.dob,
+        contact: patient.contact,
+        emrContact: patient.emrContact,
+        email: patient.email,
+        address: patient.address
+      },
+    
+      insuranceInfo:{
+        provider: patient.provider,
+        policyNo: patient.policyNo,
+        agentName: patient.agentName,
+        agentNumber: patient.agentNumber
+      },
+    
+      medicalInfo:{
+        bloodGroup: patient.bloodGroup,
+        condition: patient.condition,
+        visitReason: patient.visitReason,
+        primaryReason: patient.primaryReason,
+        duration: patient.duration,
+        treatedBefore: patient.treatedBefore
+      },
+    
+      accountInfo:{
+        username: patient.username
+      }
+    });
+    
+    setShowPatientPopup(true);
+    
+    return;
+    }
+  
+  setViewData(patient.patientData);
+  
+  setShowPatientPopup(true);
+  
+  }}
+className="
+border
+rounded-xl
+p-4
+cursor-pointer
+hover:bg-gray-50
+hover:shadow
+transition
+"
+>
+
+<p className="font-bold">
+{patient.patientName}
+</p>
+
+<p className="text-sm text-gray-500">
+{patient.date}
+</p>
+
+<p className="text-sm text-gray-500">
+{patient.time}
+</p>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)
+
+)}
+
+</div>
+
+</div>
+
 )}
 
 {tab === "appointmentsList" && (
   <div>
-    <h1 className="text-3xl font-bold mb-6">Appointments</h1>
+    <h1 className="text-3xl font-bold mb-6">
+      Doctor Wise Appointments
+    </h1>
 
-    <div className="grid md:grid-cols-2 gap-4">
-      {appointments.map((item, i) => (
-        <div 
-  key={i}
-  onClick={() => setSelected({
-    ...item,
-    type: "appointment"
-  })}
-  className="border p-4 rounded-xl shadow cursor-pointer hover:scale-105"
->
-<p><b>Patient:</b> {item.patientName}</p>
-<p><b>Doctor:</b> {item.doctorName}</p>
-          <p><b>Date:</b> {item.date}</p>
-          <p><b>Time:</b> {item.time}</p>
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-        </div>
-      ))}
+      {Object.entries(doctorWisePatients).map(
+        ([doctorName, patients], i) => (
+
+          <div
+            key={i}
+            className="
+            border
+            rounded-2xl
+            p-5
+            shadow
+            bg-white
+            "
+          >
+
+            <h2 className="text-xl font-bold text-blue-600">
+              Dr. {doctorName}
+            </h2>
+
+            <p className="mt-3 text-lg">
+              Total Appointments :
+              <span className="font-bold ml-2">
+                {patients.length}
+              </span>
+            </p>
+
+          </div>
+
+        )
+      )}
+
     </div>
   </div>
 )}
@@ -930,6 +1118,7 @@ Doctor
 ))}
 
 </div>
+
 
 </div>
 
@@ -1225,6 +1414,34 @@ Doctor
     <h2 className="text-2xl font-bold mb-4">
       Doctor Details
     </h2>
+
+    <div className="flex flex-col items-center mb-5">
+
+<img
+src={
+viewData?.doctorDesignation?.doctorImage ||
+defaultDoctorAvatar
+}
+alt="doctor"
+className="
+w-28
+h-28
+rounded-full
+object-cover
+border-4
+border-blue-500
+"
+/>
+
+<h3 className="mt-3 text-xl font-bold">
+{viewData?.doctorBasicInfo?.name}
+</h3>
+
+<p className="text-gray-500">
+{viewData?.doctorDesignation?.designation}
+</p>
+
+</div>
 
     <p><b>Name :</b> {viewData?.doctorBasicInfo?.name}</p>
 

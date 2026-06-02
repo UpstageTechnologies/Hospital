@@ -135,8 +135,8 @@ focus:ring-blue-500
 <th className="p-4 text-left">Patient</th>
 <th className="p-4 text-left">Doctor</th>
 <th className="p-4 text-left">Reason</th>
-<th className="p-4 text-left">Solution</th>
-<th className="p-4 text-left">Tablet</th>
+<th className="p-4 text-left">Date</th>
+<th className="p-4 text-left">Time</th>
 <th className="p-4 text-left">Action</th>
 
 </tr>
@@ -161,15 +161,15 @@ className="border-b"
 </td>
 
 <td className="p-4">
-{item.reasonNotes}
+{item.reasonNotes || item.reason || "-"}
 </td>
 
 <td className="p-4">
-{item.solution || "Not Updated"}
+{item.date || "-"}
 </td>
 
 <td className="p-4">
-{item.tablet || "Not Updated"}
+{item.time || "-"}
 </td>
 
 <td className="p-4">
@@ -252,19 +252,19 @@ Reason
 
 <div className="flex">
 <span className="w-24 font-semibold text-gray-600">
-Solution
+Date
 </span>
-<span className="font-bold break-words">
-: {item.solution || "Not Updated"}
+<span className="font-bold">
+: {item.date || "-"}
 </span>
 </div>
 
 <div className="flex">
 <span className="w-24 font-semibold text-gray-600">
-Tablet
+Time
 </span>
-<span className="font-bold break-words">
-: {item.tablet || "Not Updated"}
+<span className="font-bold">
+: {item.time || "-"}
 </span>
 </div>
 
