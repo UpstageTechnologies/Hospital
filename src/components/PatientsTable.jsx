@@ -69,11 +69,9 @@ const PatientsTable = ({ patientsData }) => {
         
         };
 
-    const [selectedPatient,setSelectedPatient] =
-useState(null);
-
-const [patients,setPatients] =
-useState([]);
+    const [selectedPatient,setSelectedPatient] =useState(null);
+    const [patients,setPatients] =useState([]);
+    const [search,setSearch] = useState("");
 
 useEffect(()=>{
 
@@ -86,6 +84,14 @@ setPatients(storedPatients);
 
 },[patientsData]);
 
+const filteredPatients = patients.filter((item)=>
+
+(item.patientName || "")
+.toLowerCase()
+.includes(search.toLowerCase())
+
+);
+
 return (
 
 <div className="p-6 w-full">
@@ -94,7 +100,31 @@ return (
 Patients
 </h1>
 
-<div className="overflow-x-auto bg-white rounded-2xl shadow">
+{/* Search */}
+
+<div className="mb-5">
+
+<input
+type="text"
+placeholder="Search Patient Name..."
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+className="
+w-full
+border
+rounded-xl
+p-3
+outline-none
+focus:ring-2
+focus:ring-blue-500
+"
+/>
+
+</div>
+
+{/* Desktop Table */}
+
+<div className="hidden lg:block overflow-x-auto bg-white rounded-2xl shadow">
 
 <table className="w-full">
 
@@ -103,15 +133,10 @@ Patients
 <tr>
 
 <th className="p-4 text-left">Patient</th>
-
 <th className="p-4 text-left">Doctor</th>
-
 <th className="p-4 text-left">Reason</th>
-
 <th className="p-4 text-left">Solution</th>
-
 <th className="p-4 text-left">Tablet</th>
-
 <th className="p-4 text-left">Action</th>
 
 </tr>
@@ -120,7 +145,7 @@ Patients
 
 <tbody>
 
-{patients.map((item,index)=>(
+{filteredPatients.map((item,index)=>(
 
 <tr
 key={index}
@@ -149,28 +174,23 @@ className="border-b"
 
 <td className="p-4">
 
+<div className="flex gap-2">
+
 <button
-onClick={()=>
-setSelectedPatient(item)
-}
-className="
-bg-green-500
-hover:bg-green-600
-text-white
-px-4
-py-2
-rounded-xl
-"
+onClick={() => setSelectedPatient(item)}
+className="bg-green-500 text-white px-3 py-2 rounded-xl"
 >
 Visit
 </button>
 
 <button
 onClick={() => printPatient(item)}
-className="bg-purple-500 text-white px-3 py-2 rounded ml-2"
+className="bg-purple-600 text-white px-3 py-2 rounded-xl"
 >
 Print
 </button>
+
+</div>
 
 </td>
 
@@ -181,6 +201,108 @@ Print
 </tbody>
 
 </table>
+
+</div>
+
+{/* Mobile + Tablet Card View */}
+
+<div className="block lg:hidden space-y-4">
+
+{filteredPatients.map((item,index)=>(
+
+<div
+key={index}
+className="
+bg-white
+rounded-2xl
+shadow
+border
+p-4
+"
+>
+
+<div className="space-y-3">
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Patient
+</span>
+<span className="font-bold">
+: {item.patientName}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Doctor
+</span>
+<span className="font-bold">
+: {item.doctorName}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Reason
+</span>
+<span className="font-bold break-words">
+: {item.reasonNotes}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Solution
+</span>
+<span className="font-bold break-words">
+: {item.solution || "Not Updated"}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Tablet
+</span>
+<span className="font-bold break-words">
+: {item.tablet || "Not Updated"}
+</span>
+</div>
+
+</div>
+
+<div className="flex flex-col sm:flex-row gap-2 mt-4">
+
+<button
+onClick={() => setSelectedPatient(item)}
+className="
+bg-green-500
+text-white
+py-2
+rounded-xl
+flex-1
+"
+>
+Visit
+</button>
+
+<button
+onClick={() => printPatient(item)}
+className="
+bg-purple-600
+text-white
+py-2
+rounded-xl
+flex-1
+"
+>
+Print
+</button>
+
+</div>
+
+</div>
+
+))}
 
 </div>
 

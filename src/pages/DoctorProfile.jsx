@@ -404,6 +404,7 @@ const [qty,setQty] = useState("");
 const [purchase,setPurchase] = useState("");
 const [sales,setSales] = useState("");
 const [search,setSearch] = useState("");
+const [historySearch,setHistorySearch] =useState("");
 const [describeItems,setDescribeItems] = useState([]);
 
 const syncPharmacyItems = async () => {
@@ -856,6 +857,30 @@ useEffect(() => {
             
             }, []);
 
+            const filteredHistory = [...appointmentHistory]
+
+.filter((item)=>
+
+(item.patientName || "")
+.toLowerCase()
+.includes(
+historySearch.toLowerCase()
+)
+
+)
+
+.sort((a,b)=>{
+
+const aTime =
+a.createdAt?.seconds || 0;
+
+const bTime =
+b.createdAt?.seconds || 0;
+
+return bTime - aTime;
+
+});
+
     const formatConsultationTime = (seconds) => {
 
         const savePrescriptionToFirebase = async () => {
@@ -1163,7 +1188,6 @@ patientsData={patientsData}
 
 )}
 
-{/* APPOINTMENT HISTORY */}
 {page === "appointmentHistory" && (
 
 <div className="flex-1 p-3 sm:p-5 md:p-6 pb-28">
@@ -1172,31 +1196,64 @@ patientsData={patientsData}
 Appointment History
 </h1>
 
-<div className="bg-white rounded-2xl shadow overflow-x-auto">
+{/* SEARCH */}
 
-<table className="w-full min-w-[750px]">
+<div className="mb-5">
+
+<input
+type="text"
+placeholder="Search Patient Name..."
+value={historySearch}
+onChange={(e)=>
+setHistorySearch(e.target.value)
+}
+className="
+w-full
+border
+rounded-xl
+p-3
+outline-none
+focus:ring-2
+focus:ring-blue-500
+"
+/>
+
+</div>
+
+{/* DESKTOP TABLE */}
+
+<div className="
+hidden
+lg:block
+bg-white
+rounded-2xl
+shadow
+overflow-x-auto
+">
+
+<table className="w-full">
 
 <thead className="bg-blue-600 text-white">
 
 <tr>
 
-<th className="p-4 text-left whitespace-nowrap">
+<th className="p-4 text-left">
 Patient
 </th>
 
-<th className="p-4 text-left whitespace-nowrap">
+<th className="p-4 text-left">
 Doctor
 </th>
 
-<th className="p-4 text-left whitespace-nowrap">
+<th className="p-4 text-left">
 Date
 </th>
 
-<th className="p-4 text-left whitespace-nowrap">
+<th className="p-4 text-left">
 Time
 </th>
 
-<th className="p-4 text-left whitespace-nowrap">
+<th className="p-4 text-left">
 Reason
 </th>
 
@@ -1206,44 +1263,30 @@ Reason
 
 <tbody>
 
-{[...appointmentHistory]
-
-.sort((a,b)=>{
-
-const aTime =
-a.createdAt?.seconds || 0;
-
-const bTime =
-b.createdAt?.seconds || 0;
-
-return bTime - aTime;
-
-})
-
-.map((item,index)=>(
+{filteredHistory.map((item,index)=>(
 
 <tr
 key={index}
 className="border-b hover:bg-gray-50"
 >
 
-<td className="p-4 whitespace-nowrap">
+<td className="p-4">
 {item.patientName}
 </td>
 
-<td className="p-4 whitespace-nowrap">
+<td className="p-4">
 {item.doctorName}
 </td>
 
-<td className="p-4 whitespace-nowrap">
+<td className="p-4">
 {item.date}
 </td>
 
-<td className="p-4 whitespace-nowrap">
+<td className="p-4">
 {item.time}
 </td>
 
-<td className="p-4 whitespace-nowrap">
+<td className="p-4">
 {item.reason ||
 item.problem ||
 "No Reason"}
@@ -1256,6 +1299,80 @@ item.problem ||
 </tbody>
 
 </table>
+
+</div>
+
+{/* MOBILE + TABLET CARD VIEW */}
+
+<div className="block lg:hidden space-y-4">
+
+{filteredHistory.map((item,index)=>(
+
+<div
+key={index}
+className="
+bg-white
+rounded-2xl
+shadow
+border
+p-4
+"
+>
+
+<div className="space-y-3">
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Patient
+</span>
+<span className="font-bold break-words">
+: {item.patientName}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Doctor
+</span>
+<span className="font-bold break-words">
+: {item.doctorName}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Date
+</span>
+<span className="font-bold">
+: {item.date}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Time
+</span>
+<span className="font-bold">
+: {item.time}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-24 font-semibold text-gray-600">
+Reason
+</span>
+<span className="font-bold break-words">
+: {item.reason ||
+item.problem ||
+"No Reason"}
+</span>
+</div>
+
+</div>
+
+</div>
+
+))}
 
 </div>
 

@@ -979,7 +979,7 @@ ${activeCategory===cat
 
 
 {/* Table */}
-<div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
+<div className="hidden lg:block bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
 
 <table className="w-full">
 
@@ -1056,6 +1056,127 @@ Delete
 
 </tbody>
 </table>
+
+</div>
+
+{/* Mobile + Tablet Card View */}
+
+<div className="block lg:hidden space-y-4">
+
+{items
+.filter(item=>
+
+activeCategory==="All"
+? true
+: item.type===activeCategory
+
+)
+.map((item,index)=>(
+
+<div
+key={item.id}
+className="
+bg-white
+rounded-2xl
+shadow
+border
+p-4
+"
+>
+
+<div className="space-y-3">
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Type
+</span>
+<span className="font-medium">
+: {item.type}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Medicine
+</span>
+<span className="font-medium break-words">
+: {item.medicine || item.subCategory}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Qty
+</span>
+<span className="font-medium">
+: {item.qty}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Purchase
+</span>
+<span className="font-medium">
+: ₹{item.purchasePrice}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Sales
+</span>
+<span className="font-medium">
+: ₹{item.salesPrice}
+</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Date
+</span>
+
+<span className="font-medium">
+: {item.date}
+<br />
+{item.time}
+</span>
+
+</div>
+
+</div>
+
+<div className="grid grid-cols-2 gap-2 mt-4">
+
+<button
+onClick={()=>editItem(index)}
+className="
+bg-blue-500
+text-white
+py-2
+rounded-xl
+"
+>
+Edit
+</button>
+
+<button
+onClick={()=>deleteItem(item.id)}
+className="
+bg-red-500
+text-white
+py-2
+rounded-xl
+"
+>
+Delete
+</button>
+
+</div>
+
+</div>
+
+))}
 
 </div>
 
@@ -1365,7 +1486,7 @@ Add Purchase
 
 {/* TABLE */}
 
-<div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
+<div className="hidden lg:block bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
 
 <table className="w-full">
 
@@ -1441,6 +1562,90 @@ Print
 </tbody>
 
 </table>
+
+</div>
+
+{/* Mobile + Tablet Card View */}
+<div className="block lg:hidden space-y-4">
+
+{purchaseItems.map((item)=>(
+
+<div
+key={item.id}
+className="bg-white rounded-2xl shadow border p-4"
+>
+
+<div className="space-y-3">
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Type
+</span>
+<span>: {item.type}</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Medicine
+</span>
+<span>: {item.medicine}</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Qty
+</span>
+<span>: {item.qty}</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Purchase
+</span>
+<span>: ₹{item.purchasePrice}</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Date
+</span>
+<span>
+: {item.date}
+<br/>
+{item.time}
+</span>
+</div>
+
+</div>
+
+<div className="grid grid-cols-3 gap-2 mt-4">
+
+<button
+onClick={()=>editPurchaseItem(item)}
+className="bg-blue-500 text-white py-2 rounded-xl"
+>
+Edit
+</button>
+
+<button
+onClick={()=>deletePurchaseItem(item.id)}
+className="bg-red-500 text-white py-2 rounded-xl"
+>
+Delete
+</button>
+
+<button
+onClick={()=>printRow(item,"Purchase")}
+className="bg-purple-600 text-white py-2 rounded-xl"
+>
+Print
+</button>
+
+</div>
+
+</div>
+
+))}
 
 </div>
 
@@ -1736,7 +1941,7 @@ ${activeCategory===cat
 
 
 {/* Full Table */}
-<div className="bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
+<div className="hidden lg:block bg-white rounded-2xl shadow p-4 md:p-6 overflow-x-auto">
 
 <table className="w-full">
 
@@ -1817,6 +2022,98 @@ Print
 </tbody>
 
 </table>
+
+</div>
+
+{/* Mobile + Tablet Card View */}
+<div className="block lg:hidden space-y-4">
+
+{entryItems
+.filter(item=>
+
+activeCategory==="All"
+? true
+: item.type===activeCategory
+
+)
+.map((item,index)=>(
+
+<div
+key={item.id}
+className="bg-white rounded-2xl shadow border p-4"
+>
+
+<div className="space-y-3">
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Type
+</span>
+<span>: {item.type}</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Medicine
+</span>
+<span>: {item.medicine}</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Qty
+</span>
+<span>: {item.qty}</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Sales
+</span>
+<span>: ₹{item.salesPrice}</span>
+</div>
+
+<div className="flex">
+<span className="w-28 font-semibold text-gray-600">
+Date
+</span>
+<span>
+: {item.date}
+<br/>
+{item.time}
+</span>
+</div>
+
+</div>
+
+<div className="grid grid-cols-3 gap-2 mt-4">
+
+<button
+onClick={()=>editEntryItem(index)}
+className="bg-blue-500 text-white py-2 rounded-xl"
+>
+Edit
+</button>
+
+<button
+onClick={()=>deleteEntryItem(index)}
+className="bg-red-500 text-white py-2 rounded-xl"
+>
+Delete
+</button>
+
+<button
+onClick={() => printRow(item,"Sales")}
+className="bg-purple-600 text-white py-2 rounded-xl"
+>
+Print
+</button>
+
+</div>
+
+</div>
+
+))}
 
 </div>
 

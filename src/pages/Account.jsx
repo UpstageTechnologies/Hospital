@@ -38,6 +38,7 @@ const Account = () => {
 const [qty,setQty] = useState("");
 const [purchase,setPurchase] = useState("");
 const [sales,setSales] = useState("");
+const [historySearch, setHistorySearch] = useState("");
 
 const [activeDescribeCategory,setActiveDescribeCategory] =
 useState("All");
@@ -321,6 +322,13 @@ confirmPassword:""
     return appointmentEnd < now;
   
   });  
+
+  const filteredHistoryAppointments =
+historyAppointments.filter((item) =>
+(item.patientName || "")
+.toLowerCase()
+.includes(historySearch.toLowerCase())
+);
 
 
   const [callData, setCallData] = useState(null)
@@ -1470,41 +1478,40 @@ confirmPassword:""
 
 {menu==="describe" && (
 
-<div className="p-6 w-full">
+<div className="w-full px-2 md:px-6 overflow-hidden">
 
-<h1 className="text-5xl font-bold mb-8">
+<h1 className="text-3xl md:text-5xl font-bold mb-6">
 Prescribe
 </h1>
+<div className="hidden lg:block bg-white rounded-2xl shadow overflow-x-auto">
 
-<div className="overflow-x-auto bg-white rounded-2xl shadow">
-
-<table className="w-full">
+<table className="w-full md:min-w-[900px]">
 
 <thead className="bg-blue-600 text-white">
 
 <tr>
 
-<th className="p-4 text-left">
+<th className="p-4 text-left whitespace-nowrap">
 Patient
 </th>
 
-<th className="p-4 text-left">
+<th className="p-4 text-left whitespace-nowrap">
 Doctor
 </th>
 
-<th className="p-4 text-left">
+<th className="p-4 text-left whitespace-nowrap">
 Reason
 </th>
 
-<th className="p-4 text-left">
+<th className="p-4 text-left whitespace-nowrap">
 Solution
 </th>
 
-<th className="p-4 text-left">
+<th className="p-4 text-left whitespace-nowrap">
 Tablet
 </th>
 
-<th className="p-4 text-left">
+<th className="p-4 text-left whitespace-nowrap">
 Action
 </th>
 
@@ -1538,66 +1545,62 @@ key={index}
 className="border-b"
 >
 
-<td className="p-4">
+<td className="p-4 whitespace-nowrap">
 {item.patientName}
 </td>
 
-<td className="p-4">
+<td className="p-4 whitespace-nowrap">
 {item.doctorName}
 </td>
 
-<td className="p-4">
+<td className="p-4 whitespace-nowrap">
 {item.reasonNotes}
 </td>
 
-<td className="p-4">
+<td className="p-4 whitespace-nowrap">
 {item.solution || "Not Updated"}
 </td>
 
-<td className="p-4">
+<td className="p-4 whitespace-nowrap">
 {item.tablet || "Not Updated"}
 </td>
 
-<td className="p-4">
-  <div className="flex items-center gap-3">
+<td className="p-4 whitespace-nowrap">
 
-<button
+  <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
+    
+    <button
+      className="
+      bg-green-500
+      text-white
+      px-3
+      py-2
+      rounded-xl
+      w-full
+      md:w-auto
+      "
+    >
+      Visit
+    </button>
 
-onClick={()=>
-setSelectedPatient(item)
-}
+    <button
+      onClick={() => handlePatientPrint(item)}
+      className="
+      bg-purple-600
+      text-white
+      px-3
+      py-2
+      rounded-xl
+      w-full
+      md:w-auto
+      "
+    >
+      Print
+    </button>
 
-className="
-bg-green-500
-hover:bg-green-600
-text-white
-px-4
-py-2
-rounded-xl
-"
-
->
-
-Visit
-
-</button>
-
-<button
-  onClick={() => handlePatientPrint(item)}
-  className="
-  bg-purple-600
-  hover:bg-purple-700
-  text-white
-  px-4
-  py-2
-  rounded-xl
-  "
->
-  Print
-</button>
-
-</div>
+  </div>
 </td>
+
 
 </tr>
 
@@ -1608,6 +1611,116 @@ Visit
 </tbody>
 
 </table>
+
+</div>
+
+{/* Mobile + Tablet Card View */}
+<div className="block lg:hidden space-y-4">
+
+  {patientsData.length === 0 ? (
+
+    <div className="bg-white rounded-2xl shadow p-6 text-center">
+      No Patients Found
+    </div>
+
+  ) : (
+
+    patientsData.map((item, index) => (
+
+      <div
+        key={index}
+        className="bg-white rounded-2xl shadow p-4 border"
+      >
+
+        <div className="space-y-3">
+
+        <div className="space-y-4">
+
+<div className="flex items-start">
+  <span className="w-24 font-semibold text-gray-600">
+    Patient
+  </span>
+  <span className="font-bold break-words">
+    : {item.patientName}
+  </span>
+</div>
+
+<div className="flex items-start">
+  <span className="w-24 font-semibold text-gray-600">
+    Doctor
+  </span>
+  <span className="font-bold break-words">
+    : {item.doctorName}
+  </span>
+</div>
+
+<div className="flex items-start">
+  <span className="w-24 font-semibold text-gray-600">
+    Reason
+  </span>
+  <span className="font-bold break-words">
+    : {item.reasonNotes}
+  </span>
+</div>
+
+<div className="flex items-start">
+  <span className="w-24 font-semibold text-gray-600">
+    Solution
+  </span>
+  <span className="font-bold break-words">
+    : {item.solution || "Not Updated"}
+  </span>
+</div>
+
+<div className="flex items-start">
+  <span className="w-24 font-semibold text-gray-600">
+    Tablet
+  </span>
+  <span className="font-bold break-words">
+    : {item.tablet || "Not Updated"}
+  </span>
+</div>
+
+</div>
+
+          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+
+            <button
+              className="
+              bg-green-500
+              text-white
+              py-2
+              px-4
+              rounded-xl
+              flex-1
+              "
+            >
+              Visit
+            </button>
+
+            <button
+              onClick={() => handlePatientPrint(item)}
+              className="
+              bg-purple-600
+              text-white
+              py-2
+              px-4
+              rounded-xl
+              flex-1
+              "
+            >
+              Print
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    ))
+
+  )}
 
 </div>
 
@@ -1623,43 +1736,63 @@ Visit
     Appointment History
   </h1>
 
-  <div className="overflow-x-auto bg-white rounded-xl shadow">
+  {/* Search */}
+  <div className="mb-4">
+
+    <input
+      type="text"
+      placeholder="Search Patient Name..."
+      value={historySearch}
+      onChange={(e) =>
+        setHistorySearch(e.target.value)
+      }
+      className="
+      w-full
+      border
+      rounded-xl
+      p-3
+      outline-none
+      focus:ring-2
+      focus:ring-blue-500
+      "
+    />
+
+  </div>
+
+  {/* Desktop Table */}
+  <div className="hidden lg:block overflow-x-auto bg-white rounded-xl shadow">
 
     <table className="w-full">
 
       <thead className="bg-blue-600 text-white">
 
         <tr>
-
           <th className="p-3 text-left">Patient</th>
-
           <th className="p-3 text-left">Email</th>
-
           <th className="p-3 text-left">Reason</th>
-
           <th className="p-3 text-left">Condition</th>
-
           <th className="p-3 text-left">Date</th>
-
           <th className="p-3 text-left">Time</th>
-
         </tr>
 
       </thead>
 
       <tbody>
 
-        {historyAppointments.length === 0 ? (
+        {filteredHistoryAppointments.length === 0 ? (
 
           <tr>
-            <td colSpan="6" className="p-4 text-center">
+            <td
+              colSpan="6"
+              className="p-4 text-center"
+            >
               No History Found
             </td>
           </tr>
 
         ) : (
 
-          historyAppointments.map((p, index) => (
+          filteredHistoryAppointments.map((p,index)=>(
 
             <tr
               key={index}
@@ -1667,19 +1800,19 @@ Visit
             >
 
               <td className="p-3">
-              {p.patientName}
+                {p.patientName}
               </td>
 
               <td className="p-3">
-              {p.patientEmail}
+                {p.patientEmail}
               </td>
 
               <td className="p-3">
-              {p.reason}
+                {p.reason}
               </td>
 
               <td className="p-3">
-              General Checkup
+                General Checkup
               </td>
 
               <td className="p-3">
@@ -1699,6 +1832,97 @@ Visit
       </tbody>
 
     </table>
+
+  </div>
+
+  {/* Mobile + Tablet Card View */}
+
+  <div className="block lg:hidden space-y-4">
+
+    {filteredHistoryAppointments.length === 0 ? (
+
+      <div className="bg-white rounded-xl shadow p-6 text-center">
+        No History Found
+      </div>
+
+    ) : (
+
+      filteredHistoryAppointments.map((p,index)=>(
+
+        <div
+          key={index}
+          className="
+          bg-white
+          rounded-2xl
+          shadow
+          border
+          p-4
+          "
+        >
+
+          <div className="space-y-3">
+
+            <div className="flex">
+              <span className="w-24 font-semibold text-gray-600">
+                Patient
+              </span>
+              <span className="font-bold break-words">
+                : {p.patientName}
+              </span>
+            </div>
+
+            <div className="flex">
+              <span className="w-24 font-semibold text-gray-600">
+                Email
+              </span>
+              <span className="font-bold break-all">
+                : {p.patientEmail}
+              </span>
+            </div>
+
+            <div className="flex">
+              <span className="w-24 font-semibold text-gray-600">
+                Reason
+              </span>
+              <span className="font-bold break-words">
+                : {p.reason}
+              </span>
+            </div>
+
+            <div className="flex">
+              <span className="w-24 font-semibold text-gray-600">
+                Condition
+              </span>
+              <span className="font-bold">
+                : General Checkup
+              </span>
+            </div>
+
+            <div className="flex">
+              <span className="w-24 font-semibold text-gray-600">
+                Date
+              </span>
+              <span className="font-bold">
+                : {p.date}
+              </span>
+            </div>
+
+            <div className="flex">
+              <span className="w-24 font-semibold text-gray-600">
+                Time
+              </span>
+              <span className="font-bold">
+                : {p.time}
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      ))
+
+    )}
 
   </div>
 
