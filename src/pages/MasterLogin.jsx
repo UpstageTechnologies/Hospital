@@ -242,7 +242,7 @@ PatientLogin
     navigate("/pharmasi-login",{state:{demo:true}})
   }
 }}>
-PharmasiLogin
+PharmacyLogin
 </li>
 </ul>
 
@@ -360,7 +360,7 @@ onClick={()=>{
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
 >
-PharmasiLogin
+PharmacyLogin
 </div>
 
 </div>

@@ -133,7 +133,7 @@ onClick={()=>{
   }
 }}
 >
-PharmasiLogin
+PharmacyLogin
 </button>
 
 <div onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -355,7 +355,7 @@ onClick={()=>{
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
 >
-PharmasiLogin
+PharmacyLogin
 </div>
 
 </div>

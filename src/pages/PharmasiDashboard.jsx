@@ -1659,7 +1659,7 @@ Print
 <div className="space-y-6">
 
 <h1 className="text-4xl font-bold">
-🏥 Pharmacy Dashboard
+ Pharmacy Dashboard
 </h1>
 
 {/* Stats */}
@@ -1800,7 +1800,7 @@ Sales
 <div className="bg-white rounded-2xl shadow p-6">
 
 <h2 className="text-2xl font-bold mb-4">
-⚠ Low Stock Medicines
+ Low Stock Medicines
 </h2>
 
 <div className="space-y-3">

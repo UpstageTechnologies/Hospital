@@ -135,7 +135,7 @@ Demo
 <li onClick={()=>navigate("/doctor-login",{state:{demo:true}})}>DoctorLogin</li>
 <li onClick={()=>navigate("/staff-login",{state:{demo:true}})}>StaffLogin</li>
 <li onClick={()=>navigate("/patient-login",{state:{demo:true}})}>PatientLogin</li>
-<li onClick={()=>navigate("/pharmasi-login",{state:{demo:true}})}>PharmasiLogin</li>
+<li onClick={()=>navigate("/pharmasi-login",{state:{demo:true}})}>PharmacyLogin</li>
 </ul>
 
 
@@ -249,7 +249,7 @@ setOpenMenu(false);
 }}
 className="text-[32px] font-semibold leading-none cursor-pointer"
 >
-PharmasiLogin
+PharmacyLogin
 </div>
 
 </div>
