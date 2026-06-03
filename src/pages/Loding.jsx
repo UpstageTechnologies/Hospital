@@ -15,36 +15,7 @@ const Loding = () => {
 
     const navigate = useNavigate();
 
-useEffect(() => {
 
-    const handleBackButton = () => {
-
-        const confirmLeave = window.confirm(
-            "Do you want to go back to Hospital Intro Page?"
-        );
-
-        if (confirmLeave) {
-
-            navigate("/hospitalintro", {
-                replace: true
-            });
-
-        } else {
-
-            window.history.pushState(null, "", window.location.href);
-
-        }
-    };
-
-    window.history.pushState(null, "", window.location.href);
-
-    window.addEventListener("popstate", handleBackButton);
-
-    return () => {
-        window.removeEventListener("popstate", handleBackButton);
-    };
-
-}, [navigate]);
 
 const roles = ["master", "admin", "doctor", "staff", "patient"];
 
@@ -175,7 +146,28 @@ localStorage.removeItem("adminData");
         }
     };
     return (
+
+        
         <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-6 md:px-28 lg:px-40 py-10 bg-gradient-to-br from-gray-100 to-gray-200 gap-10">
+            <button
+onClick={() => navigate("/hospitalintro")}
+className="
+fixed
+top-5
+left-5
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-5
+py-2
+rounded-xl
+font-semibold
+shadow-lg
+z-50
+"
+>
+← Back
+</button>
            <div className="max-w-xl mt-10 md:mt-16 order-1 md:order-1">
 
                 <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-4">

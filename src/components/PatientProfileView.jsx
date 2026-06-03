@@ -3,6 +3,7 @@ import { assets } from "../assets/assets";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import { doc, updateDoc } from "firebase/firestore";
 
 const PatientProfileView = ({
     patient,
@@ -67,7 +68,7 @@ useEffect(() => {
         useState(
         patient.tablet || ""
         );
-const handleSave = () => {
+        const handleSave = async () => {
 
 const updatedPatient = {
 
@@ -136,7 +137,22 @@ localStorage.setItem(
 JSON.stringify(oldPatients)
 );
 
-alert("Saved Successfully");
+try {
+
+    await updateDoc(
+      doc(db, "appointments", patient.id),
+      {
+        solution: solution,
+        tablet: tablet,
+        reasonNotes: patient.reason
+      }
+    );
+  
+  } catch (error) {
+    console.log(error);
+  }
+  
+alert("Updated Successfully");
 onSave && onSave();
 
 };
@@ -292,73 +308,53 @@ Patient Profile
 
 </div>
 
-<div className="
-bg-[#145E73]
-p-5
-text-white
-space-y-4
-">
+<div className="bg-[#145E73] p-5 text-white space-y-4">
 
-<div className="
-flex
-justify-between
-gap-4
-">
+<div className="flex justify-between gap-4">
+<span className="font-semibold">Appointment No</span>
+<span>{patient.appointmentNo || "-"}</span>
+</div>
+
+<div className="flex justify-between gap-4">
+<span className="font-semibold">Age</span>
+<span>{patient.age || "-"}</span>
+</div>
+
+<div className="flex justify-between gap-4">
+<span className="font-semibold">Doctor</span>
+<span>{patient.doctorName || "-"}</span>
+</div>
+
+<div className="flex justify-between gap-4">
+<span className="font-semibold">Phone</span>
+<span>{patient.phone || patient.patientPhone || "-"}</span>
+</div>
+
+<div className="flex justify-between gap-4">
+<span className="font-semibold">Time</span>
+<span>{patient.time || "-"}</span>
+</div>
+
+<div className="flex justify-between gap-4">
 
 <span className="font-semibold">
-Appointment No
+Address
 </span>
 
-<span>
-{patient.appointmentNo}
+<span className="text-right max-w-[180px] break-words">
+{patient.address || "-"}
 </span>
 
 </div>
 
-<div className="
-flex
-justify-between
-gap-4
-">
+<div className="flex justify-between gap-4">
 
 <span className="font-semibold">
-Doctor
+Reason
 </span>
 
-<span>
-{patient.doctorName}
-</span>
-
-</div>
-
-<div className="
-flex
-justify-between
-gap-4
-">
-
-<span className="font-semibold">
-Phone
-</span>
-
-<span>
-{patient.phone}
-</span>
-
-</div>
-
-<div className="
-flex
-justify-between
-gap-4
-">
-
-<span className="font-semibold">
-Time
-</span>
-
-<span>
-{patient.time}
+<span className="text-right max-w-[180px] break-words">
+{patient.reasonNotes || patient.reason || "-"}
 </span>
 
 </div>
@@ -396,7 +392,7 @@ Patient Reason
 </h2>
 
 <textarea
-value={patient.reason || ""}
+value={patient.reasonNotes || patient.reason || "-"}
 readOnly
 className="
 w-full
@@ -643,7 +639,7 @@ transition
 shadow-lg
 "
 >
-Save
+Update
 </button>
 
 </div>

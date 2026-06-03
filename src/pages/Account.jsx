@@ -13,6 +13,8 @@ import { createUserWithEmailAndPassword } from "firebase/auth"
 import { useLocation } from "react-router-dom";
 import Calendar from "../components/Calendar";
 import PatientProfileView from "../components/PatientProfileView";
+import PatientsTable from "../components/PatientsTable";
+
 
 
 
@@ -1485,39 +1487,6 @@ historyAppointments.filter((item) =>
 
   </div>
 
-  {/* Quick Actions */}
-  <div className="bg-white rounded-2xl shadow p-6">
-
-    <h2 className="text-2xl font-bold mb-4">
-      Quick Actions
-    </h2>
-
-    <div className="flex flex-wrap gap-4">
-
-      <button
-        onClick={() => setMenu("appointments")}
-        className="bg-blue-600 text-white px-6 py-3 rounded-xl"
-      >
-        View Appointments
-      </button>
-
-      <button
-        onClick={() => setMenu("describe")}
-        className="bg-green-600 text-white px-6 py-3 rounded-xl"
-      >
-        Prescribe Patient
-      </button>
-
-      <button
-        onClick={() => setMenu("history")}
-        className="bg-purple-600 text-white px-6 py-3 rounded-xl"
-      >
-        Appointment History
-      </button>
-
-    </div>
-
-  </div>
 
   {/* Recent Appointments */}
   <div className="bg-white rounded-2xl shadow p-6">
@@ -1617,257 +1586,15 @@ historyAppointments.filter((item) =>
   </div>
 )}
 
-{menu==="describe" && (
+{menu === "describe" && (
 
-<div className="w-full px-2 md:px-6 overflow-hidden">
-
-<h1 className="text-3xl md:text-5xl font-bold mb-6">
-Prescribe
-</h1>
-<div className="hidden lg:block bg-white rounded-2xl shadow overflow-x-auto">
-
-<table className="w-full md:min-w-[900px]">
-
-<thead className="bg-blue-600 text-white">
-
-<tr>
-
-<th className="p-4 text-left whitespace-nowrap">
-Patient
-</th>
-
-<th className="p-4 text-left whitespace-nowrap">
-Doctor
-</th>
-
-<th className="p-4 text-left whitespace-nowrap">
-Reason
-</th>
-
-<th className="p-4 text-left whitespace-nowrap">
-Date
-</th>
-
-<th className="p-4 text-left whitespace-nowrap">
-Time
-</th>
-
-<th className="p-4 text-left whitespace-nowrap">
-Action
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{patientsData.length === 0 ? (
-
-<tr>
-
-<td
-colSpan="6"
-className="text-center p-6"
->
-
-No Patients Found
-
-</td>
-
-</tr>
-
-) : (
-
-patientsData.map((item,index)=>(
-
-<tr
-key={index}
-className="border-b"
->
-
-<td className="p-4 whitespace-nowrap">
-{item.patientName}
-</td>
-
-<td className="p-4 whitespace-nowrap">
-{item.doctorName}
-</td>
-
-<td className="p-4 whitespace-nowrap">
-{item.reasonNotes || item.reason}
-</td>
-
-<td className="p-4 whitespace-nowrap">
-{item.date}
-</td>
-
-<td className="p-4 whitespace-nowrap">
-{item.time}
-</td>
-
-<td className="p-4 whitespace-nowrap">
-
-  <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
-    
-    <button
-      className="
-      bg-green-500
-      text-white
-      px-3
-      py-2
-      rounded-xl
-      w-full
-      md:w-auto
-      "
-    >
-      Visit
-    </button>
-
-    <button
-      onClick={() => handlePatientPrint(item)}
-      className="
-      bg-purple-600
-      text-white
-      px-3
-      py-2
-      rounded-xl
-      w-full
-      md:w-auto
-      "
-    >
-      Print
-    </button>
-
-  </div>
-</td>
-
-
-</tr>
-
-))
+<PatientsTable
+  patientsData={patientsData}
+/>
 
 )}
 
-</tbody>
 
-</table>
-
-</div>
-
-{/* Mobile + Tablet Card View */}
-<div className="block lg:hidden space-y-4">
-
-  {patientsData.length === 0 ? (
-
-    <div className="bg-white rounded-2xl shadow p-6 text-center">
-      No Patients Found
-    </div>
-
-  ) : (
-
-    patientsData.map((item, index) => (
-
-      <div
-        key={index}
-        className="bg-white rounded-2xl shadow p-4 border"
-      >
-
-        <div className="space-y-3">
-
-        <div className="space-y-4">
-
-        <div className="flex items-start">
-  <span className="w-24 font-semibold text-gray-600">
-    Patient
-  </span>
-  <span className="font-bold break-words">
-    : {item.patientName}
-  </span>
-</div>
-
-<div className="flex items-start">
-  <span className="w-24 font-semibold text-gray-600">
-    Doctor
-  </span>
-  <span className="font-bold break-words">
-    : {item.doctorName}
-  </span>
-</div>
-
-<div className="flex items-start">
-  <span className="w-24 font-semibold text-gray-600">
-    Reason
-  </span>
-  <span className="font-bold break-words">
-    : {item.reasonNotes || item.reason}
-  </span>
-</div>
-
-<div className="flex items-start">
-  <span className="w-24 font-semibold text-gray-600">
-    Date
-  </span>
-  <span className="font-bold break-words">
-    : {item.date}
-  </span>
-</div>
-
-<div className="flex items-start">
-  <span className="w-24 font-semibold text-gray-600">
-    Time
-  </span>
-  <span className="font-bold break-words">
-    : {item.time}
-  </span>
-</div>
-
-</div>
-
-          <div className="flex flex-col sm:flex-row gap-2 pt-2">
-
-            <button
-              className="
-              bg-green-500
-              text-white
-              py-2
-              px-4
-              rounded-xl
-              flex-1
-              "
-            >
-              Visit
-            </button>
-
-            <button
-              onClick={() => handlePatientPrint(item)}
-              className="
-              bg-purple-600
-              text-white
-              py-2
-              px-4
-              rounded-xl
-              flex-1
-              "
-            >
-              Print
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    ))
-
-  )}
-
-</div>
-
-</div>
-
-)}
 
 {menu === "history" && (
 
@@ -1908,12 +1635,15 @@ className="border-b"
       <thead className="bg-blue-600 text-white">
 
         <tr>
-          <th className="p-3 text-left">Patient</th>
-          <th className="p-3 text-left">Email</th>
-          <th className="p-3 text-left">Reason</th>
-          <th className="p-3 text-left">Condition</th>
-          <th className="p-3 text-left">Date</th>
-          <th className="p-3 text-left">Time</th>
+        <th className="p-3 text-left">Patient</th>
+        <th className="p-3 text-left">Doctor</th>
+        <th className="p-3 text-left">Address</th>
+        <th className="p-3 text-left">Contact</th>
+        <th className="p-3 text-left">Reason</th>
+        <th className="p-3 text-left">Solution</th>
+        <th className="p-3 text-left">Date</th>
+        <th className="p-3 text-left">Time</th>
+        <th className="p-3 text-left">Action</th>
         </tr>
 
       </thead>
@@ -1935,36 +1665,73 @@ className="border-b"
 
           filteredHistoryAppointments.map((p,index)=>(
 
-            <tr
-              key={index}
-              className="border-b"
-            >
+<tr
+  key={index}
+  className="border-b"
+>
 
-              <td className="p-3">
-                {p.patientName}
-              </td>
+  <td className="p-3">
+    {p.patientName || "-"}
+  </td>
 
-              <td className="p-3">
-                {p.patientEmail}
-              </td>
+  <td className="p-3">
+    {p.doctorName || "-"}
+  </td>
 
-              <td className="p-3">
-                {p.reason}
-              </td>
+  <td className="p-3">
+    {p.address || p.patientAddress || "-"}
+  </td>
 
-              <td className="p-3">
-                General Checkup
-              </td>
+  <td className="p-3">
+  {p.phone || "-"}
+  </td>
 
-              <td className="p-3">
-                {p.date}
-              </td>
+  <td className="p-3">
+    {p.reason || "-"}
+  </td>
 
-              <td className="p-3">
-                {p.time}
-              </td>
+  <td className="p-3">
+    {p.solution || p.notes || "-"}
+  </td>
 
-            </tr>
+  <td className="p-3">
+    {p.date}
+  </td>
+
+  <td className="p-3">
+    {p.time}
+  </td>
+
+  <td className="p-3">
+    <div className="flex gap-2">
+
+      <button
+        onClick={() => setSelectedPatient(p)}
+        className="bg-yellow-500 text-white px-3 py-2 rounded-lg"
+      >
+        Follow Up
+      </button>
+
+      <button
+        onClick={() => setCallData(p)}
+        className="bg-green-600 text-white px-3 py-2 rounded-lg"
+      >
+        Treated
+      </button>
+
+      <button
+        onClick={() => handlePatientPrint(p)}
+        className="bg-purple-600 text-white px-3 py-2 rounded-lg"
+      >
+        Print
+      </button>
+
+    </div>
+  </td>
+
+</tr>
+
+            
 
           ))
 
@@ -2001,63 +1768,127 @@ className="border-b"
           "
         >
 
-          <div className="space-y-3">
+<div className="space-y-3">
 
-            <div className="flex">
-              <span className="w-24 font-semibold text-gray-600">
-                Patient
-              </span>
-              <span className="font-bold break-words">
-                : {p.patientName}
-              </span>
-            </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-500">
+      Patient
+    </span>
+    <span className="font-bold text-right">
+      {p.patientName || "-"}
+    </span>
+  </div>
 
-            <div className="flex">
-              <span className="w-24 font-semibold text-gray-600">
-                Email
-              </span>
-              <span className="font-bold break-all">
-                : {p.patientEmail}
-              </span>
-            </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-500">
+      Doctor
+    </span>
+    <span className="font-bold text-right">
+      {p.doctorName || "-"}
+    </span>
+  </div>
 
-            <div className="flex">
-              <span className="w-24 font-semibold text-gray-600">
-                Reason
-              </span>
-              <span className="font-bold break-words">
-                : {p.reason}
-              </span>
-            </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-500">
+      Contact
+    </span>
+    <span className="font-bold text-right">
+      {p.phone || p.contact || p.patientPhone || "-"}
+    </span>
+  </div>
 
-            <div className="flex">
-              <span className="w-24 font-semibold text-gray-600">
-                Condition
-              </span>
-              <span className="font-bold">
-                : General Checkup
-              </span>
-            </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-500">
+      Address
+    </span>
+    <span className="font-bold text-right break-words max-w-[60%]">
+      {p.address || p.patientAddress || "-"}
+    </span>
+  </div>
 
-            <div className="flex">
-              <span className="w-24 font-semibold text-gray-600">
-                Date
-              </span>
-              <span className="font-bold">
-                : {p.date}
-              </span>
-            </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-500">
+      Reason
+    </span>
+    <span className="font-bold text-right break-words max-w-[60%]">
+      {p.reason || "-"}
+    </span>
+  </div>
 
-            <div className="flex">
-              <span className="w-24 font-semibold text-gray-600">
-                Time
-              </span>
-              <span className="font-bold">
-                : {p.time}
-              </span>
-            </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-500">
+      Solution
+    </span>
+    <span className="font-bold text-right break-words max-w-[60%]">
+      {p.solution || p.notes || "-"}
+    </span>
+  </div>
 
-          </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-500">
+      Date
+    </span>
+    <span className="font-bold text-right">
+      {p.date}
+    </span>
+  </div>
+
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-500">
+      Time
+    </span>
+    <span className="font-bold text-right">
+      {p.time}
+    </span>
+  </div>
+
+  <div className="flex flex-wrap justify-center gap-4 mt-6">
+
+    <button
+      onClick={() => setSelectedPatient(p)}
+      className="
+      bg-yellow-500
+      text-white
+      px-5
+      py-3
+      rounded-xl
+      min-w-[110px]
+      "
+    >
+      Follow Up
+    </button>
+
+    <button
+      onClick={() => setCallData(p)}
+      className="
+      bg-green-600
+      text-white
+      px-5
+      py-3
+      rounded-xl
+      min-w-[110px]
+      "
+    >
+      Treated
+    </button>
+
+    <button
+      onClick={() => handlePatientPrint(p)}
+      className="
+      bg-purple-600
+      text-white
+      px-5
+      py-3
+      rounded-xl
+      min-w-[110px]
+      "
+    >
+      Print
+    </button>
+
+  </div>
+
+</div>
 
         </div>
 

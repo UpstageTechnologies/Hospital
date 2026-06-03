@@ -84,13 +84,26 @@ setPatients(storedPatients);
 
 },[patientsData]);
 
-const filteredPatients = patients.filter((item)=>
+const filteredPatients = patients.filter((item) => {
 
-(item.patientName || "")
-.toLowerCase()
-.includes(search.toLowerCase())
-
-);
+    const searchText =
+    search.toLowerCase();
+    
+    return (
+    
+    (item.patientName || "")
+    .toLowerCase()
+    .includes(searchText)
+    
+    ||
+    
+    (item.doctorName || "")
+    .toLowerCase()
+    .includes(searchText)
+    
+    );
+    
+    });
 
 return (
 
@@ -106,7 +119,7 @@ Patients
 
 <input
 type="text"
-placeholder="Search Patient Name..."
+placeholder="Search Patient / Doctor Name..."
 value={search}
 onChange={(e)=>setSearch(e.target.value)}
 className="
@@ -180,7 +193,7 @@ className="border-b"
 onClick={() => setSelectedPatient(item)}
 className="bg-green-500 text-white px-3 py-2 rounded-xl"
 >
-Visit
+Details
 </button>
 
 <button
@@ -282,7 +295,7 @@ rounded-xl
 flex-1
 "
 >
-Visit
+Details
 </button>
 
 <button

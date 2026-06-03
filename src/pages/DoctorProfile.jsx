@@ -454,6 +454,35 @@ const syncPharmacyItems = async () => {
 
 };
 
+const printHistory = (item) => {
+
+    const printWindow =
+    window.open("", "_blank");
+    
+    printWindow.document.write(`
+    
+    <h2>Patient Report</h2>
+    
+    <p><b>Patient :</b> ${item.patientName}</p>
+    
+    <p><b>Doctor :</b> ${item.doctorName}</p>
+    
+    <p><b>Reason :</b> ${item.reason}</p>
+    
+    <p><b>Solution :</b> ${item.solution}</p>
+    
+    <p><b>Date :</b> ${item.date}</p>
+    
+    <p><b>Contact :</b> ${item.patientPhone}</p>
+    
+    `);
+    
+    printWindow.document.close();
+    
+    printWindow.print();
+    
+    };
+
 const [activeDescribeCategory,setActiveDescribeCategory]=
 useState("All");
 
@@ -874,27 +903,38 @@ useEffect(() => {
 
             const filteredHistory = [...appointmentHistory]
 
-.filter((item)=>
-
-(item.patientName || "")
-.toLowerCase()
-.includes(
-historySearch.toLowerCase()
-)
-
-)
-
-.sort((a,b)=>{
-
-const aTime =
-a.createdAt?.seconds || 0;
-
-const bTime =
-b.createdAt?.seconds || 0;
-
-return bTime - aTime;
-
-});
+            .filter((item) => {
+            
+            const searchText =
+            historySearch.toLowerCase();
+            
+            return (
+            
+            (item.patientName || "")
+            .toLowerCase()
+            .includes(searchText)
+            
+            ||
+            
+            (item.doctorName || "")
+            .toLowerCase()
+            .includes(searchText)
+            
+            );
+            
+            })
+            
+            .sort((a,b)=>{
+            
+            const aTime =
+            a.createdAt?.seconds || 0;
+            
+            const bTime =
+            b.createdAt?.seconds || 0;
+            
+            return bTime - aTime;
+            
+            });
 
     const formatConsultationTime = (seconds) => {
 
@@ -1217,7 +1257,7 @@ Appointment History
 
 <input
 type="text"
-placeholder="Search Patient Name..."
+placeholder="Search Patient / Doctor Name..."
 value={historySearch}
 onChange={(e)=>
 setHistorySearch(e.target.value)
@@ -1258,8 +1298,11 @@ overflow-x-auto
 <th className="p-4 text-left">Reason</th>
 <th className="p-4 text-left">Solution</th>
 <th className="p-4 text-left">Date</th>
-<th className="p-4 text-left">Age</th>
 <th className="p-4 text-left">Contact</th>
+<th className="p-4 text-left">Check-In</th>
+<th className="p-4 text-left">Check-Out</th>
+<th className="p-4 text-left">Duration</th>
+<th className="p-4 text-left">Action</th>
 
 </tr>
 
@@ -1299,11 +1342,84 @@ className="border-b hover:bg-gray-50"
 </td>
 
 <td className="p-4">
-{item.age || "-"}
+{item.patientPhone || "-"}
 </td>
 
 <td className="p-4">
-{item.patientPhone || item.phone || "-"}
+{
+item.checkInTime
+? new Date(item.checkInTime).toLocaleTimeString()
+: "-"
+}
+</td>
+
+<td className="p-4">
+{
+item.checkOutTime
+? new Date(item.checkOutTime).toLocaleTimeString()
+: "-"
+}
+</td>
+
+<td className="p-4">
+{item.consultationTime || "-"}
+</td>
+
+<td className="p-4">
+<div className="flex gap-2">
+
+<button
+className="
+bg-yellow-500
+hover:bg-yellow-600
+text-white
+px-3
+py-1
+rounded-lg
+text-sm
+"
+onClick={()=>{
+alert(`Follow Up Scheduled for ${item.patientName}`);
+}}
+>
+Follow Up
+</button>
+
+<button
+className="
+bg-green-600
+hover:bg-green-700
+text-white
+px-3
+py-1
+rounded-lg
+text-sm
+"
+onClick={()=>{
+alert(`${item.patientName} Treated Successfully`);
+}}
+>
+Treated
+</button>
+
+<button
+className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-3
+py-1
+rounded-lg
+text-sm
+"
+onClick={()=>{
+window.print();
+}}
+>
+Print
+</button>
+
+</div>
 </td>
 
 </tr>
@@ -1335,51 +1451,148 @@ p-4
 
 <div className="space-y-3">
 
-<div className="flex">
-<span className="w-24 font-semibold text-gray-600">
-Patient
-</span>
-<span className="font-bold break-words">
-: {item.patientName}
-</span>
+<div className="block xl:hidden space-y-4">
+
+{filteredHistory.map((item,index)=>(
+
+<div
+key={index}
+className="
+bg-white
+rounded-2xl
+shadow-md
+border
+p-4
+"
+>
+
+<div className="flex justify-between items-start mb-4">
+
+<div>
+<h2 className="font-bold text-lg">
+{item.patientName}
+</h2>
+
+<p className="text-sm text-gray-500">
+{item.date}
+</p>
 </div>
 
-<div className="flex">
-<span className="w-24 font-semibold text-gray-600">
-Doctor
+<span className="
+bg-green-100
+text-green-700
+px-3
+py-1
+rounded-full
+text-xs
+font-semibold
+">
+{item.status || "Treated"}
 </span>
-<span className="font-bold break-words">
-: {item.doctorName}
-</span>
+
 </div>
 
-<div className="flex">
-<span className="w-24 font-semibold text-gray-600">
-Date
-</span>
-<span className="font-bold">
-: {item.date}
-</span>
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+<div><b>Doctor :</b> {item.doctorName}</div>
+
+<div><b>Phone :</b> {item.patientPhone}</div>
+
+
+<div className="sm:col-span-2">
+<b>Reason :</b> {item.reason}
 </div>
 
-<div className="flex">
-<span className="w-24 font-semibold text-gray-600">
-Time
-</span>
-<span className="font-bold">
-: {item.time}
-</span>
+<div className="sm:col-span-2">
+<b>Solution :</b> {item.solution}
 </div>
 
-<div className="flex">
-<span className="w-24 font-semibold text-gray-600">
-Reason
-</span>
-<span className="font-bold break-words">
-: {item.reason ||
-item.problem ||
-"No Reason"}
-</span>
+<div>
+<b>Check In :</b>
+<br />
+{
+item.checkInTime
+? new Date(item.checkInTime).toLocaleTimeString()
+: "-"
+}
+</div>
+
+<div>
+<b>Check Out :</b>
+<br />
+{
+item.checkOutTime
+? new Date(item.checkOutTime).toLocaleTimeString()
+: "-"
+}
+</div>
+
+<div>
+<b>Duration :</b>
+<br />
+{item.consultationTime || "-"}
+</div>
+
+<div>
+<b>Payment :</b>
+<br />
+{item.paymentStatus || "Paid"}
+</div>
+
+</div>
+
+<div className="
+flex
+flex-wrap
+gap-2
+mt-4
+pt-4
+border-t
+">
+
+<button
+className="
+flex-1
+bg-yellow-500
+text-white
+py-2
+rounded-xl
+"
+>
+Follow Up
+</button>
+
+<button
+className="
+flex-1
+bg-green-600
+text-white
+py-2
+rounded-xl
+"
+>
+Treated
+</button>
+
+<button
+onClick={()=>printHistory(item)}
+className="
+flex-1
+bg-blue-600
+text-white
+py-2
+rounded-xl
+"
+>
+Print
+</button>
+
+</div>
+
+</div>
+
+))}
+
 </div>
 
 </div>
@@ -2264,32 +2477,65 @@ Number(totalAmount || 0)
 
 </div>
 
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
 <button
-
-onClick={() => {
-
-    openRazorpay(
-        Number(600) + Number(totalAmount || 0)
-    );
-    
-    }}
-
+onClick={() => openRazorpay(600)}
 className="
-w-full
+bg-green-600
+hover:bg-green-700
+text-white
+py-4
+rounded-xl
+font-bold
+text-lg
+"
+>
+Pay Consultation Fee
+₹600
+</button>
+
+<button
+onClick={() => openRazorpay(Number(totalAmount || 0))}
+className="
 bg-blue-600
 hover:bg-blue-700
 text-white
 py-4
 rounded-xl
-text-xl
 font-bold
+text-lg
 "
-
 >
-
-Pay Now
-
+Pay Medicine
+₹{totalAmount}
 </button>
+
+<button
+onClick={() =>
+openRazorpay(
+Number(600) +
+Number(totalAmount || 0)
+)
+}
+className="
+bg-yellow-500
+hover:bg-yellow-600
+text-white
+py-4
+rounded-xl
+font-bold
+text-lg
+"
+>
+Pay Total
+₹{
+Number(600) +
+Number(totalAmount || 0)
+}
+</button>
+
+</div>
 
 </div>
 
@@ -2340,6 +2586,162 @@ Total Consultation Time
 
 </div>
 
+
+<div className="block xl:hidden space-y-4">
+
+{filteredHistory.map((item,index)=>(
+
+<div
+key={index}
+className="
+bg-white
+rounded-2xl
+shadow-md
+border
+p-4
+"
+>
+
+<div className="flex justify-between items-start mb-3">
+
+<div>
+<h2 className="font-bold text-lg">
+{item.patientName}
+</h2>
+
+<p className="text-sm text-gray-500">
+{item.date || "-"}
+</p>
+</div>
+
+<span className="
+bg-green-100
+text-green-700
+px-3
+py-1
+rounded-full
+text-xs
+font-semibold
+">
+{item.status || "Treated"}
+</span>
+
+</div>
+
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+
+<div>
+<b>Doctor :</b> {item.doctorName || "-"}
+</div>
+
+<div>
+<b>Phone :</b> {item.patientPhone || "-"}
+</div>
+
+
+<div className="sm:col-span-2">
+<b>Reason :</b> {item.reason || "-"}
+</div>
+
+<div className="sm:col-span-2">
+<b>Solution :</b> {item.solution || "-"}
+</div>
+
+<div>
+<b>Check In :</b>
+<br />
+{item.checkInTime || "-"}
+</div>
+
+<div>
+<b>Check Out :</b>
+<br />
+{item.checkOutTime || "-"}
+</div>
+
+<div>
+<b>Duration :</b>
+<br />
+{item.consultationTime || "-"}
+</div>
+
+<div>
+<b>Payment :</b>
+<br />
+{item.paymentStatus || "Paid"}
+</div>
+
+</div>
+
+<div className="
+flex
+flex-wrap
+gap-2
+mt-4
+pt-4
+border-t
+">
+
+<button
+onClick={()=>{
+alert(`Follow Up - ${item.patientName}`);
+}}
+className="
+flex-1
+min-w-[90px]
+bg-yellow-500
+text-white
+py-2
+rounded-xl
+font-medium
+"
+>
+Follow Up
+</button>
+
+<button
+onClick={()=>{
+alert(`${item.patientName} Treated`);
+}}
+className="
+flex-1
+min-w-[90px]
+bg-green-600
+text-white
+py-2
+rounded-xl
+font-medium
+"
+>
+Treated
+</button>
+
+<button
+onClick={()=>{
+printHistory(item);
+}}
+className="
+flex-1
+min-w-[90px]
+bg-blue-600
+text-white
+py-2
+rounded-xl
+font-medium
+"
+>
+Print
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+
 <button
 
 onClick={async () => {
@@ -2361,11 +2763,23 @@ const historyData = {
     doctorName:
     selectedAppointment?.doctorName || "",
     
-    address:
-    selectedAppointment?.address || "",
+    appointmentNo:
+    selectedAppointment?.appointmentNo || "",
+    
+    email:
+    selectedAppointment?.email || "",
+    
+    gender:
+    selectedAppointment?.gender || "",
+    
+    bloodGroup:
+    selectedAppointment?.bloodGroup || "",
     
     age:
     selectedAppointment?.age || "",
+    
+    address:
+    selectedAppointment?.address || "",
     
     reason:
     selectedAppointment?.reason ||
@@ -2378,16 +2792,29 @@ const historyData = {
     date:
     selectedAppointment?.date || "",
     
+    checkInTime:
+    checkInTime
+    ? new Date(checkInTime).toLocaleTimeString()
+    : "",
+    
+    checkOutTime:
+    new Date().toLocaleTimeString(),
+    
+    consultationTime:
+    formatConsultationTime(
+    consultationSeconds
+    ),
+    
+    paymentStatus:
+    "Paid",
+    
+    status:
+    "Treated",
+    
     createdAt:
     serverTimestamp()
     
     };
-    
-    await addDoc(
-    collection(db, "appointmentHistory"),
-    historyData
-    );
-
     const appointmentQuery = query(
 
         collection(db, "appointments"),

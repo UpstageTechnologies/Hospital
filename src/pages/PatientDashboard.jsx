@@ -74,7 +74,7 @@ const PatientDashboard = () => {
 
 
 
-    const [activeTab, setActiveTab] = useState("appointments")
+    const [activeTab, setActiveTab] = useState("home")
 
     const savedUser = JSON.parse(
         localStorage.getItem("currentUser")
@@ -347,7 +347,12 @@ String(userEmail).trim().toLowerCase()
             {/* LEFT MENU */}
             <div className="hidden md:block w-1/5 bg-blue-600 text-white p-6">
                 <h2 className="text-xl font-bold mb-6">Patient Panel</h2>
-                <p className="mb-4 cursor-pointer">Home</p>
+                <p
+  className="mb-4 cursor-pointer"
+  onClick={() => setActiveTab("home")}
+>
+  Home
+</p>
                 <p 
   className="mb-4 cursor-pointer"
   onClick={() => setActiveTab("appointments")}
@@ -385,8 +390,14 @@ String(userEmail).trim().toLowerCase()
           </div>
         ))}
 
-</div>    
+</div>      
+  </>
+)}
 
+
+{activeTab === "home" && (
+
+<>
 {/* Health Overview */}
 
 <div className="mt-10">
@@ -526,202 +537,146 @@ String(userEmail).trim().toLowerCase()
   </div>
 
 </div>
+</>
 
-    
-  </>
 )}
 
 
 {activeTab === "history" && (
-  <>
-    <div className="flex items-center justify-between mb-6">
-      <h1 className="text-3xl font-bold">
-        Appointment History
-      </h1>
-    </div>
 
-    {Object.entries(
+<div>
 
-      currentAppointments.reduce((acc, item) => {
+<h1 className="text-3xl font-bold mb-6">
+Appointment History
+</h1>
 
-        if (!acc[item.doctorName]) {
-          acc[item.doctorName] = []
-        }
+<div className="hidden lg:block bg-white rounded-2xl shadow overflow-hidden">
 
-        acc[item.doctorName].push(item)
+<table className="w-full">
 
-        return acc
+<thead className="bg-blue-600 text-white">
 
-      }, {})
+<tr>
+<th className="p-4 text-left">Patient</th>
+<th className="p-4 text-left">Doctor</th>
+<th className="p-4 text-left">Address</th>
+<th className="p-4 text-left">Date</th>
+<th className="p-4 text-left">Time</th>
+<th className="p-4 text-left">Reason</th>
+<th className="p-4 text-left">Contact</th>
+<th className="p-4 text-left">Action</th>
+</tr>
 
-    ).map(([doctorName, doctorAppointments], index) => (
+</thead>
 
-      <div
-        key={index}
-        className="mb-10 bg-white rounded-xl shadow-lg overflow-hidden"
-      >
+<tbody>
 
-        {/* DOCTOR TITLE */}
-        <div className="bg-blue-600 text-white px-6 py-4">
-          <h2 className="text-2xl font-bold">
-            Dr. {doctorName} Appointments
-          </h2>
-        </div>
+{historyAppointments.map((item,index)=>(
 
-        {/* TABLE */}
-        <div className="
-  w-full
-  overflow-x-auto
-  md:overflow-x-auto
-  lg:overflow-visible
-  pb-4
-">
+<tr
+key={index}
+className="border-b"
+>
 
-  <div className="
-    min-w-[950px]
-    md:min-w-[1100px]
-    lg:min-w-full
-  ">
+<td className="p-4">
+{item.patientName}
+</td>
 
-<table className="
-  w-full
-  border
-  border-gray-300
-  bg-white
-  text-xs
-  sm:text-sm
-  md:text-base
-">
+<td className="p-4">
+{item.doctorName}
+</td>
 
-            <thead className="bg-gray-100">
+<td className="p-4">
+{item.address}
+</td>
 
-              <tr>
+<td className="p-4">
+{item.date}
+</td>
 
-                <th className="border p-3">Date</th>
+<td className="p-4">
+{item.time}
+</td>
 
-                <th className="border p-3">Time</th>
+<td className="p-4">
+{item.reason}
+</td>
 
-                <th className="border p-3">Reason</th>
+<td className="p-4">
+{item.phone || item.patientPhone || "-"}
+</td>
 
-                <th className="border p-3">Injection</th>
 
-                <th className="border p-3">Tablet</th>
 
-                <th className="border p-3">Doctor Notes</th>
+<td className="p-4">
 
-                <th className="border p-3">Appointment No</th>
+<button
+onClick={() => handlePrint(item)}
+className="bg-purple-600 text-white px-4 py-2 rounded-xl"
+>
+Print
+</button>
 
-                <th className="border p-3">Actions</th>
+</td>
 
-              </tr>
+</tr>
 
-            </thead>
+))}
 
-            <tbody>
+</tbody>
 
-              {doctorAppointments.map((item, i) => {
+</table>
 
-                const medical = getMedicalData(item.reason)
+</div>
 
-                return (
+{/* MOBILE + TABLET */}
 
-                  <tr key={i} className="text-center">
+<div className="lg:hidden space-y-4">
 
-                    {/* DATE */}
-                    <td className="border p-3">
-                      {item.date}
-                    </td>
+{historyAppointments.map((item,index)=>(
 
-                    {/* TIME */}
-                    <td className="border p-3">
-                      {item.time}
-                    </td>
+<div
+key={index}
+className="bg-white rounded-2xl shadow p-4"
+>
 
-                    {/* REASON */}
-                    <td className="border p-3">
-                      <textarea
-                        defaultValue={item.reason || ""}
-                        className="border p-2 rounded w-full"
-                      />
-                    </td>
+<h2 className="font-bold text-xl mb-2">
+Dr. {item.doctorName}
+</h2>
 
-                    {/* INJECTION */}
-                    <td className="border p-3">
-                      <input
-                        type="text"
-                        value={medical.injection}
-                        readOnly
-                        className="border p-2 rounded w-full"
-                      />
-                    </td>
+<p>
+<b>Date :</b> {item.date}
+</p>
 
-                    {/* TABLET */}
-                    <td className="border p-3">
-                      <input
-                        type="text"
-                        value={medical.tablet}
-                        readOnly
-                        className="border p-2 rounded w-full"
-                      />
-                    </td>
+<p>
+<b>Time :</b> {item.time}
+</p>
 
-                    {/* NOTES */}
-                    <td className="border p-3">
-                      <textarea
-                        value={medical.notes}
-                        readOnly
-                        className="border p-2 rounded w-full"
-                      />
-                    </td>
+<p>
+<b>Reason :</b> {item.reason}
+</p>
 
-                    {/* APPOINTMENT NO */}
-                    <td className="border p-3 font-bold">
-                      {item.appointmentNo}
-                    </td>
+<div className="mt-3 flex items-center justify-between">
 
-                    {/* ACTIONS */}
-                    <td className="border p-3">
 
-                      <div className="flex flex-col gap-3 min-w-[120px]">
 
-                        <button
-                          className="bg-green-600 text-white px-4 py-2 rounded"
-                          onClick={() =>
-                            alert("Updated Successfully ✅")
-                          }
-                        >
-                          Save
-                        </button>
+<button
+onClick={() => handlePrint(item)}
+className="bg-purple-600 text-white px-4 py-2 rounded-xl"
+>
+Print
+</button>
 
-                        <button
-                          onClick={() => handlePrint(item)}
-                          className="bg-blue-600 text-white px-4 py-2 rounded"
-                        >
-                          Print
-                        </button>
+</div>
 
-                      </div>
+</div>
 
-                    </td>
+))}
 
-                  </tr>
+</div>
 
-                )
+</div>
 
-              })}
-
-            </tbody>
-
-          </table>
-          </div>
-
-        </div>
-
-      </div>
-
-    ))}
-
-  </>
 )}
             </div>
 
@@ -931,7 +886,7 @@ String(userEmail).trim().toLowerCase()
 
 {/* HOME */}
 <button
-  onClick={() => navigate("")}
+  onClick={() => setActiveTab("home")}
   className="flex flex-col items-center text-xs"
 >
   <span className="text-xl">🏠</span>

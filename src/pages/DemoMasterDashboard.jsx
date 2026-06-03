@@ -650,9 +650,17 @@ useEffect(() => {
 
         {tab === "account" && subMenu === "" && (
 
-<div className="w-full flex justify-center items-center py-10">
+<div className="w-full px-3 md:px-8 py-6">
 
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-3xl">
+<div
+className="
+grid
+grid-cols-2
+md:grid-cols-2
+xl:grid-cols-3
+gap-4
+"
+>
 
     <div
       onClick={() => setSubMenu("admins")}
@@ -815,58 +823,7 @@ Total Patients : {patients.length}
 
 <div
 key={i}
-onClick={() => {
-
-  console.log("PATIENT =", patient);
-  console.log("PATIENT DATA =", patient.patientData);
-  
-  if (!patient.patientData) {
-
-    console.log(patient);
-    
-    setViewData({
-      basicInfo:{
-        name: patient.patientName,
-        age: patient.age,
-        gender: patient.gender,
-        dob: patient.dob,
-        contact: patient.contact,
-        emrContact: patient.emrContact,
-        email: patient.email,
-        address: patient.address
-      },
-    
-      insuranceInfo:{
-        provider: patient.provider,
-        policyNo: patient.policyNo,
-        agentName: patient.agentName,
-        agentNumber: patient.agentNumber
-      },
-    
-      medicalInfo:{
-        bloodGroup: patient.bloodGroup,
-        condition: patient.condition,
-        visitReason: patient.visitReason,
-        primaryReason: patient.primaryReason,
-        duration: patient.duration,
-        treatedBefore: patient.treatedBefore
-      },
-    
-      accountInfo:{
-        username: patient.username
-      }
-    });
-    
-    setShowPatientPopup(true);
-    
-    return;
-    }
-  
-  setViewData(patient.patientData);
-  
-  setShowPatientPopup(true);
-  
-  }}
+onClick={() => {}}
 className="
 border
 rounded-xl
@@ -1252,6 +1209,50 @@ Doctor
   </span>
 </div>
 
+<div className="flex justify-between">
+  <span className="font-semibold text-gray-500">
+    Contact
+  </span>
+
+  <span className="text-right">
+    {item.phone || item.contact || "-"}
+  </span>
+</div>
+
+<div className="flex justify-between">
+  <span className="font-semibold text-gray-500">
+    Address
+  </span>
+
+  <span className="text-right break-words max-w-[60%]">
+    {item.address || "-"}
+  </span>
+</div>
+
+<div className="flex justify-between">
+  <span className="font-semibold text-gray-500">
+    Solution
+  </span>
+
+  <span className="text-right break-words max-w-[60%]">
+    {item.solution || item.prescription || "-"}
+  </span>
+</div>
+
+<div className="flex flex-wrap justify-center gap-4 mt-6">
+  <button className="bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm">
+    Followup
+  </button>
+
+  <button className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm">
+    Treated
+  </button>
+
+  <button className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm">
+    Print
+  </button>
+</div>
+
           </div>
 
         </div>
@@ -1270,25 +1271,15 @@ Doctor
 
         <tr>
 
-          <th className="p-4 text-left">
-            Patient
-          </th>
-
-          <th className="p-4 text-left">
-            Doctor
-          </th>
-
-          <th className="p-4 text-left">
-            Date
-          </th>
-
-          <th className="p-4 text-left">
-            Time
-          </th>
-
-          <th className="p-4 text-left">
-            Reason
-          </th>
+        <th className="p-4 text-left">Patient</th>
+        <th className="p-4 text-left">Contact</th>
+        <th className="p-4 text-left">Address</th>
+        <th className="p-4 text-left">Doctor</th>
+        <th className="p-4 text-left">Date</th>
+        <th className="p-4 text-left">Time</th>
+        <th className="p-4 text-left">Reason</th>
+        <th className="p-4 text-left">Solution</th>
+        <th className="p-4 text-center">Action</th>
 
         </tr>
 
@@ -1334,25 +1325,59 @@ Doctor
               className="border-b"
             >
 
-              <td className="p-4">
-                {item.patientName}
-              </td>
+<td className="p-4">
+  {item.patientName}
+</td>
 
-              <td className="p-4">
-                {item.doctorName}
-              </td>
+<td className="p-4">
+{item.phone || "-"}
+</td>
 
-              <td className="p-4">
-                {item.date}
-              </td>
+<td className="p-4 max-w-[200px] break-words">
+{item.address ||
+ item.patientData?.basicInfo?.address ||
+ "-"}
+</td>
 
-              <td className="p-4">
-                {item.time}
-              </td>
+<td className="p-4">
+  {item.doctorName}
+</td>
 
-              <td className="p-4 break-words max-w-[250px]">
-                {item.reason}
-              </td>
+<td className="p-4">
+  {item.date}
+</td>
+
+<td className="p-4">
+  {item.time}
+</td>
+
+<td className="p-4">
+  {item.reason}
+</td>
+
+<td className="p-4">
+{item.solution ||
+ item.doctorSolution ||
+ "-"}
+</td>
+
+<td className="p-4">
+<td>
+  <div className="flex items-center justify-center gap-2">
+    <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg whitespace-nowrap">
+      Followup
+    </button>
+
+    <button className="bg-green-600 text-white px-4 py-2 rounded-lg whitespace-nowrap">
+      Treated
+    </button>
+
+    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg whitespace-nowrap">
+      Print
+    </button>
+  </div>
+</td>
+</td>
 
             </tr>
 

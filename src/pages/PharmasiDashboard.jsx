@@ -1662,6 +1662,58 @@ Print
  Pharmacy Dashboard
 </h1>
 
+{/* Low Stock */}
+
+<div className="bg-white rounded-2xl shadow p-6">
+
+<h2 className="text-2xl font-bold mb-4">
+ Low Stock Medicines
+</h2>
+
+<div className="space-y-3">
+
+{
+items
+.filter(item => Number(item.qty) <= 10)
+.slice(0,5)
+.map((item,index)=>(
+<div
+key={index}
+className="
+flex
+justify-between
+border-b
+pb-2
+"
+>
+<span>
+{item.medicine}
+</span>
+
+<span className="text-red-500 font-bold">
+{item.qty} Left
+</span>
+
+</div>
+))
+}
+
+{
+items.filter(item =>
+Number(item.qty) <= 10
+).length === 0 && (
+
+<p className="text-green-600">
+All Medicines Stock Available
+</p>
+
+)
+}
+
+</div>
+
+</div>
+
 {/* Stats */}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
@@ -1760,92 +1812,8 @@ Number(item.salesPrice || 0),
 
 </div>
 
-{/* Quick Actions */}
 
-<div className="bg-white rounded-2xl shadow p-6">
 
-<h2 className="text-2xl font-bold mb-4">
-Quick Actions
-</h2>
-
-<div className="flex flex-wrap gap-4">
-
-<button
-onClick={()=>setMenu("inventory")}
-className="bg-blue-600 text-white px-6 py-3 rounded-xl"
->
-Inventory
-</button>
-
-<button
-onClick={()=>setMenu("purchase")}
-className="bg-green-600 text-white px-6 py-3 rounded-xl"
->
-Purchase
-</button>
-
-<button
-onClick={()=>setMenu("sales")}
-className="bg-purple-600 text-white px-6 py-3 rounded-xl"
->
-Sales
-</button>
-
-</div>
-
-</div>
-
-{/* Low Stock */}
-
-<div className="bg-white rounded-2xl shadow p-6">
-
-<h2 className="text-2xl font-bold mb-4">
- Low Stock Medicines
-</h2>
-
-<div className="space-y-3">
-
-{
-items
-.filter(item => Number(item.qty) <= 10)
-.slice(0,5)
-.map((item,index)=>(
-<div
-key={index}
-className="
-flex
-justify-between
-border-b
-pb-2
-"
->
-<span>
-{item.medicine}
-</span>
-
-<span className="text-red-500 font-bold">
-{item.qty} Left
-</span>
-
-</div>
-))
-}
-
-{
-items.filter(item =>
-Number(item.qty) <= 10
-).length === 0 && (
-
-<p className="text-green-600">
-All Medicines Stock Available
-</p>
-
-)
-}
-
-</div>
-
-</div>
 
 </div>
 
