@@ -132,7 +132,9 @@ String(userEmail).trim().toLowerCase()
           
               if (!item.date || !item.time) return;
           
-              const datePart = new Date(item.date)
+              const datePart = new Date(
+                item.date.replace(/-/g, "/")
+              )
           
               const endTime = item.time.split("-")[1]?.trim()
               if (!endTime) return;
@@ -640,9 +642,25 @@ key={index}
 className="bg-white rounded-2xl shadow p-4"
 >
 
-<h2 className="font-bold text-xl mb-2">
-Dr. {item.doctorName}
-</h2>
+<p>
+<b>Patient :</b> {item.patientName}
+</p>
+
+<p>
+<b>Doctor :</b> {item.doctorName}
+</p>
+
+<p>
+<b>Appointment No :</b> {item.appointmentNo || "-"}
+</p>
+
+<p>
+<b>Contact :</b> {item.phone || item.patientPhone || "-"}
+</p>
+
+<p>
+<b>Address :</b> {item.address || "-"}
+</p>
 
 <p>
 <b>Date :</b> {item.date}
@@ -656,13 +674,17 @@ Dr. {item.doctorName}
 <b>Reason :</b> {item.reason}
 </p>
 
-<div className="mt-3 flex items-center justify-between">
-
-
+<div className="mt-4">
 
 <button
 onClick={() => handlePrint(item)}
-className="bg-purple-600 text-white px-4 py-2 rounded-xl"
+className="
+w-full
+bg-purple-600
+text-white
+py-3
+rounded-xl
+"
 >
 Print
 </button>

@@ -561,6 +561,101 @@ useEffect(() => {
   
   }, [])
 
+  const printAppointment = (item) => {
+
+    const win = window.open("", "", "width=900,height=700");
+  
+    win.document.write(`
+    <html>
+    <head>
+      <title>Appointment Report</title>
+      <style>
+        body{
+          font-family: Arial;
+          padding:20px;
+        }
+  
+        table{
+          width:100%;
+          border-collapse:collapse;
+        }
+  
+        td,th{
+          border:1px solid #000;
+          padding:10px;
+        }
+  
+        h2{
+          text-align:center;
+        }
+      </style>
+    </head>
+  
+    <body>
+  
+      <h2>Appointment Report</h2>
+  
+      <table>
+  
+        <tr>
+          <th>Appointment No</th>
+          <td>${item.appointmentNo || "-"}</td>
+        </tr>
+  
+        <tr>
+          <th>Patient Name</th>
+          <td>${item.patientName || "-"}</td>
+        </tr>
+  
+        <tr>
+          <th>Doctor Name</th>
+          <td>${item.doctorName || "-"}</td>
+        </tr>
+  
+        <tr>
+          <th>Contact</th>
+          <td>${item.phone || "-"}</td>
+        </tr>
+  
+        <tr>
+          <th>Address</th>
+          <td>${item.address || "-"}</td>
+        </tr>
+  
+        <tr>
+          <th>Date</th>
+          <td>${item.date || "-"}</td>
+        </tr>
+  
+        <tr>
+          <th>Time</th>
+          <td>${item.time || "-"}</td>
+        </tr>
+  
+        <tr>
+          <th>Reason</th>
+          <td>${item.reason || "-"}</td>
+        </tr>
+  
+        <tr>
+          <th>Solution</th>
+          <td>${item.solution || "-"}</td>
+        </tr>
+  
+      </table>
+  
+    </body>
+    </html>
+    `);
+  
+    win.document.close();
+  
+    setTimeout(() => {
+      win.print();
+    }, 500);
+  
+  };
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -1264,9 +1359,12 @@ Doctor
   Treated
 </button>
 
-  <button className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm">
-    Print
-  </button>
+<button
+  onClick={() => printAppointment(item)}
+  className="bg-blue-600 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+>
+  Print
+</button>
 </div>
 
           </div>
@@ -1400,9 +1498,12 @@ Doctor
   Treated
 </button>
 
-    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg whitespace-nowrap">
-      Print
-    </button>
+<button
+  onClick={() => printAppointment(item)}
+  className="bg-blue-600 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+>
+  Print
+</button>
   </div>
 </td>
 </td>
