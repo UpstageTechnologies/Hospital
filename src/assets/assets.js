@@ -39,6 +39,8 @@ import Neurologist from './Neurologist.svg'
 import Pediatricians from './Pediatricians.svg'
 
 
+
+
 export const assets = {
     appointment_img,
     header_img,
@@ -48,7 +50,8 @@ export const assets = {
     verified_icon,
     info_icon,
     profile_pic,
-   login1_icon,
+
+    login1_icon,
     arrow_icon,
     contact_image,
     about_image,

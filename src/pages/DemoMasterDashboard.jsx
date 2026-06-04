@@ -258,6 +258,10 @@ appointments.forEach((appt) => {
 
 const [historySearch, setHistorySearch] = useState("")
 
+const [showFollowupPopup, setShowFollowupPopup] = useState(false)
+const [showTreatedPopup, setShowTreatedPopup] = useState(false)
+const [selectedAppointment, setSelectedAppointment] = useState(null)
+
 const [adminSearch, setAdminSearch] = useState("")
 const [doctorSearch, setDoctorSearch] = useState("")
 const [staffSearch, setStaffSearch] = useState("")
@@ -1240,13 +1244,25 @@ Doctor
 </div>
 
 <div className="flex flex-wrap justify-center gap-4 mt-6">
-  <button className="bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm">
-    Followup
-  </button>
+<button
+  onClick={() => {
+    setSelectedAppointment(item)
+    setShowFollowupPopup(true)
+  }}
+  className="bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm"
+>
+  Followup
+</button>
 
-  <button className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm">
-    Treated
-  </button>
+<button
+  onClick={() => {
+    setSelectedAppointment(item)
+    setShowTreatedPopup(true)
+  }}
+  className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm"
+>
+  Treated
+</button>
 
   <button className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm">
     Print
@@ -1364,13 +1380,25 @@ Doctor
 <td className="p-4">
 <td>
   <div className="flex items-center justify-center gap-2">
-    <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg whitespace-nowrap">
-      Followup
-    </button>
+  <button
+  onClick={() => {
+    setSelectedAppointment(item)
+    setShowFollowupPopup(true)
+  }}
+  className="bg-yellow-500 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+>
+  Followup
+</button>
 
-    <button className="bg-green-600 text-white px-4 py-2 rounded-lg whitespace-nowrap">
-      Treated
-    </button>
+<button
+  onClick={() => {
+    setSelectedAppointment(item)
+    setShowTreatedPopup(true)
+  }}
+  className="bg-green-600 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+>
+  Treated
+</button>
 
     <button className="bg-blue-600 text-white px-4 py-2 rounded-lg whitespace-nowrap">
       Print
@@ -1388,6 +1416,221 @@ Doctor
     </table>
 
   </div>
+
+</div>
+
+)}
+
+{showFollowupPopup && (
+
+<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-3">
+
+<div
+className="
+bg-white
+rounded-3xl
+w-full
+max-w-[900px]
+max-h-[90vh]
+overflow-y-auto
+p-5 md:p-8
+relative
+"
+>
+
+<button
+onClick={() => setShowFollowupPopup(false)}
+className="absolute top-4 right-5 text-4xl font-bold"
+>
+×
+</button>
+
+<div className="text-center">
+
+<img
+src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+className="w-24 h-24 md:w-32 md:h-32 mx-auto object-contain"
+/>
+
+<h2 className="text-2xl md:text-5xl font-bold mt-3">
+Follow Up Patient
+</h2>
+
+<div
+className="
+bg-blue-600
+text-white
+font-bold
+text-lg md:text-3xl
+rounded-2xl
+py-4
+px-5
+mt-6
+inline-block
+"
+>
+Appointment No :
+{selectedAppointment?.appointmentNo || "API929"}
+</div>
+
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+
+<input
+readOnly
+value={selectedAppointment?.patientName || ""}
+className="border rounded-xl p-4"
+/>
+
+<input
+readOnly
+value={selectedAppointment?.phone || ""}
+className="border rounded-xl p-4"
+/>
+
+<input
+readOnly
+value={selectedAppointment?.reason || ""}
+className="border rounded-xl p-4"
+/>
+
+<input
+readOnly
+value={selectedAppointment?.doctorName || ""}
+className="border rounded-xl p-4"
+/>
+
+<input
+readOnly
+value={selectedAppointment?.date || ""}
+className="border rounded-xl p-4"
+/>
+
+<input
+readOnly
+value={selectedAppointment?.time || ""}
+className="border rounded-xl p-4"
+/>
+
+</div>
+
+<div className="text-center mt-8">
+
+<div className="text-green-600 text-2xl md:text-4xl font-bold">
+📱 {selectedAppointment?.phone}
+</div>
+
+<button
+className="
+mt-5
+bg-green-600
+text-white
+px-10
+py-4
+rounded-xl
+font-bold
+text-lg
+"
+>
+📞 Contact Number
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{showTreatedPopup && (
+
+<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-3">
+
+<div
+className="
+bg-white
+rounded-3xl
+w-full
+max-w-[900px]
+max-h-[90vh]
+overflow-y-auto
+p-5 md:p-8
+relative
+"
+>
+
+<button
+onClick={() => setShowTreatedPopup(false)}
+className="absolute top-4 right-5 text-4xl font-bold"
+>
+×
+</button>
+
+<div className="text-center">
+
+<img
+src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+className="w-24 h-24 md:w-32 md:h-32 mx-auto object-contain"
+/>
+
+<h2 className="text-2xl md:text-5xl font-bold mt-3">
+Patient Confirmation Panel
+</h2>
+
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+
+<input readOnly value={selectedAppointment?.patientName || ""} className="border rounded-xl p-4"/>
+<input readOnly value={selectedAppointment?.phone || ""} className="border rounded-xl p-4"/>
+<input readOnly value={selectedAppointment?.reason || ""} className="border rounded-xl p-4"/>
+<input readOnly value={selectedAppointment?.doctorName || ""} className="border rounded-xl p-4"/>
+<input readOnly value={selectedAppointment?.date || ""} className="border rounded-xl p-4"/>
+<input readOnly value={selectedAppointment?.time || ""} className="border rounded-xl p-4"/>
+
+</div>
+
+<div className="text-center mt-8">
+
+<p className="text-orange-500 font-bold text-2xl">
+Status : Pending
+</p>
+
+<div className="mt-6 flex flex-col gap-4">
+
+<button
+className="
+bg-orange-500
+text-white
+py-4
+rounded-xl
+font-bold
+text-lg
+"
+>
+🔄 Follow Up Required
+</button>
+
+<button
+className="
+bg-green-600
+text-white
+py-4
+rounded-xl
+font-bold
+text-lg
+"
+>
+✅ Completed
+</button>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
@@ -4925,20 +5168,21 @@ fetchPharmasi()
 
 <div className="
 fixed inset-0 z-50
-bg-black/40
-flex justify-center items-center
-p-4
+bg-black/50
+overflow-y-auto
+py-4 sm:py-6 md:py-10
+px-3
 ">
 
 <div className="
 bg-white
 w-full
 max-w-5xl
-rounded-[40px]
-p-6 md:p-10
+mx-auto
+rounded-[24px] md:rounded-[40px]
+p-4 sm:p-6 md:p-10
 relative
-max-h-[95vh]
-overflow-y-auto
+my-4
 ">
 
 <button
@@ -4952,19 +5196,29 @@ text-4xl font-bold
 </button>
 
 <h1 className="
-text-4xl md:text-6xl
+text-2xl
+sm:text-3xl
+md:text-5xl
+lg:text-6xl
 font-black
 text-center
-mb-10
+mb-6
+md:mb-10
+break-words
 ">
 Appointment Details
 </h1>
 
 <div className="
-flex flex-col md:flex-row
-justify-center items-center
-gap-10
-mb-10
+flex
+flex-col
+md:flex-row
+justify-center
+items-center
+gap-5
+md:gap-10
+mb-6
+md:mb-10
 ">
 
 {/* PATIENT */}
@@ -5038,12 +5292,17 @@ Doctor
 
 </div>
 
-<div className="
-space-y-5
-text-xl
-md:text-2xl
+<div
+className="
+space-y-4
+text-base
+sm:text-lg
+md:text-xl
+lg:text-2xl
 font-semibold
-">
+break-words
+"
+>
 
 <p>
 <b>Patient:</b>
@@ -5058,6 +5317,18 @@ Dr. {selected.doctorName}
 </p>
 
 <p>
+<b>Appointment Number:</b>
+{" "}
+{selected.appointmentNo || "-"}
+</p>
+
+<p>
+<b>Contact Number:</b>
+{" "}
+{selected.phone || selected.patientPhone || "-"}
+</p>
+
+<p>
 <b>Date:</b>
 {" "}
 {selected.date}
@@ -5067,6 +5338,12 @@ Dr. {selected.doctorName}
 <b>Time:</b>
 {" "}
 {selected.time}
+</p>
+
+<p>
+<b>Address:</b>
+{" "}
+{selected.address || "-"}
 </p>
 
 <p>

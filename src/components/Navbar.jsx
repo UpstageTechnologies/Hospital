@@ -65,6 +65,82 @@ const hospitalLogos = {
     const [userName,setUserName] = useState("");
     
 const [userRole,setUserRole] = useState("");
+
+useEffect(() => {
+
+  const adminData =
+  JSON.parse(localStorage.getItem("adminData"));
+  
+  const doctorData =
+  JSON.parse(localStorage.getItem("doctorData"));
+  
+  const patientData =
+  JSON.parse(localStorage.getItem("patientData"));
+  
+  const staffData =
+  JSON.parse(localStorage.getItem("staffData"));
+  
+  const pharmasiData =
+  JSON.parse(localStorage.getItem("pharmasiData"));
+  
+  const masterData =
+  JSON.parse(localStorage.getItem("masterData"));
+
+  console.log("doctorData =", doctorData);
+console.log("patientData =", patientData);
+console.log("adminData =", adminData);
+console.log("masterData =", masterData);
+  
+if(localStorage.getItem("doctorLogin")==="true"){
+  setUserImage(
+    doctorData?.doctorBasicInfo?.image ||
+    doctorData?.image ||
+    assets.profile_pic
+  );
+}
+
+else if(localStorage.getItem("patientLogin")==="true"){
+  setUserImage(
+    patientData?.basicInfo?.image ||
+    patientData?.patientBasicInfo?.image ||
+    patientData?.image ||
+    assets.profile_pic
+  );
+}
+
+else if(localStorage.getItem("adminLogin")==="true"){
+  setUserImage(
+    adminData?.adminBasicInfo?.image ||
+    adminData?.image ||
+    assets.profile_pic
+  );
+}
+
+else if(localStorage.getItem("masterLogin")==="true"){
+  setUserImage(
+    masterData?.masterBasicInfo?.image ||
+    masterData?.image ||
+    assets.profile_pic
+  );
+}
+
+else if(localStorage.getItem("staffLogin")==="true"){
+  setUserImage(
+    staffData?.staffBasicInfo?.image ||
+    staffData?.image ||
+    assets.profile_pic
+  );
+}
+
+else if(localStorage.getItem("pharmasiLogin")==="true"){
+  setUserImage(
+    pharmasiData?.pharmasiBasicInfo?.image ||
+    pharmasiData?.image ||
+    assets.profile_pic
+  );
+}
+  
+  }, []);
     const [showLogoutPopup, setShowLogoutPopup] = useState(false)
 
     useEffect(() => {

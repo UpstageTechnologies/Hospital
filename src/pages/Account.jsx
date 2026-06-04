@@ -25,6 +25,7 @@ const Account = () => {
   const [medicine,setMedicine] = useState("");
   const [inventoryItems,setInventoryItems]=useState([]);
   const [patientsData,setPatientsData] = useState([]);
+  const [treatedData, setTreatedData] = useState(null);
 
   useEffect(() => {
 
@@ -1706,18 +1707,18 @@ historyAppointments.filter((item) =>
     <div className="flex gap-2">
 
       <button
-        onClick={() => setSelectedPatient(p)}
+        onClick={() => setCallData(p)}
         className="bg-yellow-500 text-white px-3 py-2 rounded-lg"
       >
         Follow Up
       </button>
 
       <button
-        onClick={() => setCallData(p)}
-        className="bg-green-600 text-white px-3 py-2 rounded-lg"
-      >
-        Treated
-      </button>
+  onClick={() => setTreatedData(p)}
+  className="bg-green-600 text-white px-3 py-2 rounded-lg"
+>
+  Treated
+</button>
 
       <button
         onClick={() => handlePatientPrint(p)}
@@ -1845,7 +1846,7 @@ historyAppointments.filter((item) =>
   <div className="flex flex-wrap justify-center gap-4 mt-6">
 
     <button
-      onClick={() => setSelectedPatient(p)}
+      onClick={() => setCallData(p)}
       className="
       bg-yellow-500
       text-white
@@ -1859,18 +1860,18 @@ historyAppointments.filter((item) =>
     </button>
 
     <button
-      onClick={() => setCallData(p)}
-      className="
-      bg-green-600
-      text-white
-      px-5
-      py-3
-      rounded-xl
-      min-w-[110px]
-      "
-    >
-      Treated
-    </button>
+  onClick={() => setTreatedData(p)}
+  className="
+  bg-green-600
+  text-white
+  px-5
+  py-3
+  rounded-xl
+  min-w-[110px]
+  "
+>
+  Treated
+</button>
 
     <button
       onClick={() => handlePatientPrint(p)}
@@ -1902,13 +1903,34 @@ historyAppointments.filter((item) =>
 
 )}
 
-{callData && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+{treatedData && (
+  <div
+  className="
+  fixed inset-0
+  bg-black/40
+  flex items-center justify-center
+  p-2 md:p-4
+  z-[9999]
+  "
+>
     
-    <div className="bg-white rounded-2xl p-8 w-[700px] relative">
+<div
+  className="
+  bg-white
+  rounded-2xl
+  p-4 md:p-8
+  w-[95vw]
+  max-w-[850px]
+  h-[85vh]
+  md:h-auto
+  overflow-y-auto
+  pb-32
+  relative
+  "
+>
 
       <button 
-        onClick={() => setCallData(null)}
+        onClick={() => setTreatedData(null)}
         className="absolute top-4 right-4 text-xl"
       >
         ✖
@@ -1923,124 +1945,292 @@ historyAppointments.filter((item) =>
         <h2 className="text-xl font-bold mb-4">
           Patient Confirmation Panel
         </h2>
-
-        <a
-          href={`tel:${callData.patientPhone || ""}`}
-          className="bg-green-500 text-white px-6 py-3 rounded-xl mb-6"
-        >
-          📞 Call Patient
-        </a>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
 
 <input
-  value={callData.patientName || ""}
+  value={treatedData.patientName || ""}
+  disabled
+  className="border p-3 rounded-xl"
+/>
+
+<div>
+  
+
+  <input
+    value={
+      treatedData.patientPhone ||
+      treatedData.phone ||
+      treatedData.contact ||
+      ""
+    }
+    disabled
+    className="border p-3 rounded-xl w-full"
+  />
+</div>
+
+<input
+  value={treatedData.reason || ""}
   disabled
   className="border p-3 rounded-xl"
 />
 
 <input
-  value={callData.patientEmail || ""}
+  value={treatedData.doctorName || ""}
   disabled
   className="border p-3 rounded-xl"
 />
 
 <input
-  value={callData.reason || ""}
+  value={treatedData.date || ""}
   disabled
   className="border p-3 rounded-xl"
 />
 
 <input
-  value={callData.doctorName || ""}
-  disabled
-  className="border p-3 rounded-xl"
-/>
-
-<input
-  value={callData.date || ""}
-  disabled
-  className="border p-3 rounded-xl"
-/>
-
-<input
-  value={callData.time || ""}
+  value={treatedData.time || ""}
   disabled
   className="border p-3 rounded-xl"
 />
 
 </div>
 
-      <p className={`text-center mt-4 font-semibold ${
-        callData.status === "completed"
-          ? "text-green-600"
-          : callData.status === "arrived"
-          ? "text-blue-500"
-          : "text-red-500"
-      }`}>
-        Status: {callData.status || "pending"}
-      </p>
+<p className={`text-center mt-4 font-semibold ${
+  treatedData.status === "completed"
+    ? "text-green-600"
+    : "text-orange-500"
+}`}>
+  Status: {treatedData.status || "pending"}
+</p>
 
       <div className="flex justify-center mt-4">
-  <button
-    onClick={handlePrint}
-    className="bg-purple-600 text-white px-6 py-2 rounded-lg"
-  >
-    🖨 Print Report
-  </button>
+  
 </div>
 
-      <div className="flex justify-center gap-4 mt-6">
+<div className="flex flex-col md:flex-row justify-center gap-4 mt-6">
 
-        <button
-          onClick={() => setCallData({ ...callData, status: "arrived" })}
-          className="bg-blue-500 text-white px-6 py-2 rounded"
-        >
-          ✅ Arrived
-        </button>
+<button
+  onClick={async () => {
 
-        <button
-          onClick={async () => {
+    await updateDoc(
+      doc(db, "appointments", treatedData.id),
+      {
+        status: "followup-required"
+      }
+    );
 
-            const updatedData = {
-              ...callData,
-              status: "completed"
-            };
-          
-            setCallData(updatedData);
-          
-            try {
-          
-              await updateDoc(
-                doc(
-                  db,
-                  "patients",
-                  callData.basicInfo?.email
-                ),
-                {
-                  status: "completed"
-                }
-              );
-          
-              fetchPatients();
-          
-            } catch (error) {
-          
-              console.log(error);
-          
-            }
-          
-          }}
-          className="bg-green-600 text-white px-6 py-2 rounded"
-        >
-          🩺 Completed
-        </button>
+    setTreatedData({
+      ...treatedData,
+      status: "followup-required"
+    });
 
-      </div>
+  }}
+  className="
+  bg-orange-500
+  text-white
+  px-6
+  py-3
+  rounded-xl
+  "
+>
+  🔄 Follow Up Required
+</button>
+
+<button
+  onClick={async () => {
+
+    await updateDoc(
+      doc(db, "appointments", treatedData.id),
+      {
+        status: "completed"
+      }
+    );
+
+    setTreatedData({
+      ...treatedData,
+      status: "completed"
+    });
+
+  }}
+  className="
+  bg-green-600
+  text-white
+  px-6
+  py-3
+  rounded-xl
+  "
+>
+  ✅ Completed
+</button>
+
+</div>
 
     </div>
   </div>
+)}
+
+{callData && (
+
+<div
+  className="
+  fixed inset-0
+  bg-black/40
+  flex items-center justify-center
+  p-2 md:p-4
+  z-[9999]
+  "
+>
+
+<div
+  className="
+  bg-white
+  rounded-2xl
+  p-4 md:p-6
+  w-[95vw]
+  max-w-[850px]
+  h-[85vh]
+  md:h-auto
+  overflow-y-auto
+  pb-32
+  relative
+  "
+>
+
+    <button
+      onClick={() => setCallData(null)}
+      className="absolute top-4 right-4 text-xl"
+    >
+      ✖
+    </button>
+
+    <div className="flex flex-col items-center mb-6">
+
+    <img
+  src="/Doctors/doc1.png"
+  alt="Doctor"
+  className="
+  w-20 h-20
+  md:w-28 md:h-28
+  object-contain
+  mb-3
+  "
+/>
+
+<h2 className="text-2xl font-bold text-center">
+  Follow Up Patient
+</h2>
+
+<div className="flex justify-center mt-4 mb-4">
+
+  <button
+    className="
+    bg-blue-600
+    text-white
+    px-8
+    py-3
+    rounded-xl
+    font-bold
+    text-lg
+    cursor-default
+    "
+  >
+    Appointment No : {
+      callData.appointmentNo ||
+      callData.appointmentId ||
+      callData.id ||
+      "N/A"
+    }
+  </button>
+
+</div>
+
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+
+      <input
+        value={callData.patientName || ""}
+        disabled
+        className="border p-3 rounded-xl"
+      />
+
+<div>
+<input
+  value={
+    callData.phone ||
+    callData.contact ||
+    callData.patientPhone ||
+    ""
+  }
+  disabled
+  className="border p-3 rounded-xl w-full"
+/>
+
+</div>
+
+      <input
+        value={callData.reason || ""}
+        disabled
+        className="border p-3 rounded-xl"
+      />
+
+      <input
+        value={callData.doctorName || ""}
+        disabled
+        className="border p-3 rounded-xl"
+      />
+
+      <input
+        value={callData.date || ""}
+        disabled
+        className="border p-3 rounded-xl"
+      />
+
+      <input
+        value={callData.time || ""}
+        disabled
+        className="border p-3 rounded-xl"
+      />
+
+    </div>
+
+    <p className="
+  text-center
+  text-2xl
+  font-bold
+  text-green-600
+  mt-3
+  mb-5
+">
+  📱 {
+    callData.phone ||
+    callData.contact ||
+    callData.patientPhone ||
+    ""
+  }
+</p>
+
+    <div className="flex justify-center mt-6">
+
+      <a
+        href={`tel:${
+          callData.phone ||
+          callData.contact ||
+          callData.patientPhone ||
+          ""
+        }`}
+        className="bg-green-600 text-white px-8 py-3 rounded-xl"
+      >
+        📞 Contact Number
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
 )}
 
  </div>

@@ -102,12 +102,18 @@ localStorage.setItem(
 user.email
 );
 
-const patientData = {
-patientBasicInfo:{
-name:user.displayName || email.split("@")[0],
-email:user.email
+const patientRef = doc(db, "patients", user.email);
+
+const patientSnap = await getDoc(patientRef);
+
+if (patientSnap.exists()) {
+
+  localStorage.setItem(
+    "patientData",
+    JSON.stringify(patientSnap.data())
+  );
+
 }
-};
 
 localStorage.setItem(
 "patientData",

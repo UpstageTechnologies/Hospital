@@ -171,9 +171,16 @@ localStorage.setItem(
   data.doctorBasicInfo?.name || "Doctor"
 );
 
+console.log("DOCTOR DATA =", data);
+
 localStorage.setItem(
   "doctorData",
   JSON.stringify(data)
+);
+
+localStorage.setItem(
+  "doctorImage",
+  data.image || ""
 );
 
 if(isDemo){

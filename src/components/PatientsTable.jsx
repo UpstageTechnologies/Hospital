@@ -145,6 +145,9 @@ focus:ring-blue-500
 
 <tr>
 
+<th className="p-4 text-left">
+Appointment No
+</th>
 <th className="p-4 text-left">Patient</th>
 <th className="p-4 text-left">Doctor</th>
 <th className="p-4 text-left">Reason</th>
@@ -164,6 +167,15 @@ focus:ring-blue-500
 key={index}
 className="border-b"
 >
+
+<td className="p-4 font-bold text-blue-600">
+{
+item.appointmentNo ||
+item.appointmentId ||
+item.id ||
+ "-"
+}
+</td>
 
 <td className="p-4">
 {item.patientName}
@@ -236,6 +248,26 @@ p-4
 
 <div className="space-y-3">
 
+<div
+className="
+bg-blue-600
+text-white
+font-bold
+text-center
+py-3
+rounded-xl
+mb-3
+"
+>
+Appointment No :
+{
+item.appointmentNo ||
+item.appointmentId ||
+item.id ||
+ "-"
+}
+</div>
+
 <div className="flex">
 <span className="w-24 font-semibold text-gray-600">
 Patient
@@ -283,7 +315,14 @@ Time
 
 </div>
 
-<div className="flex flex-col sm:flex-row gap-2 mt-4">
+<div
+className="
+grid
+grid-cols-2
+gap-3
+mt-4
+"
+>
 
 <button
 onClick={() => setSelectedPatient(item)}

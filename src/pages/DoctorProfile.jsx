@@ -405,6 +405,10 @@ const [purchase,setPurchase] = useState("");
 const [sales,setSales] = useState("");
 const [search,setSearch] = useState("");
 const [historySearch,setHistorySearch] =useState("");
+
+const [showFollowupPopup,setShowFollowupPopup] = useState(false);
+const [showTreatedPopup,setShowTreatedPopup] = useState(false);
+const [historySelected,setHistorySelected] = useState(null);
 const [describeItems,setDescribeItems] = useState([]);
 
 const syncPharmacyItems = async () => {
@@ -603,6 +607,20 @@ const categoryMap={
 
 
     const location = useLocation();
+
+    useEffect(() => {
+
+        const params =
+        new URLSearchParams(location.search);
+      
+        const tab =
+        params.get("tab");
+      
+        if (tab === "settings") {
+          setPage("settings");
+        }
+      
+      }, [location.search]);
 const isDemo = location.state?.demo === true;
 
     const handleDateSelect = (date) => {
@@ -1034,9 +1052,7 @@ selectedAppointment?.doctorEmail || "",
                     Appointments
                 </p>
 
-                <p onClick={() => setPage("settings")} className="mb-3 md:mb-3 cursor-pointer shrink-0">
-                    Settings
-                </p>
+                
 
                 <p onClick={() => setPage("describe")}className="mb-3 cursor-pointer">
                     Prescribe
@@ -1379,8 +1395,9 @@ rounded-lg
 text-sm
 "
 onClick={()=>{
-alert(`Follow Up Scheduled for ${item.patientName}`);
-}}
+    setHistorySelected(item);
+    setShowFollowupPopup(true);
+    }}
 >
 Follow Up
 </button>
@@ -1396,8 +1413,9 @@ rounded-lg
 text-sm
 "
 onClick={()=>{
-alert(`${item.patientName} Treated Successfully`);
-}}
+    setHistorySelected(item);
+    setShowTreatedPopup(true);
+    }}
 >
 Treated
 </button>
@@ -1551,6 +1569,10 @@ border-t
 ">
 
 <button
+onClick={()=>{
+setHistorySelected(item);
+setShowFollowupPopup(true);
+}}
 className="
 flex-1
 bg-yellow-500
@@ -1563,6 +1585,10 @@ Follow Up
 </button>
 
 <button
+onClick={()=>{
+setHistorySelected(item);
+setShowTreatedPopup(true);
+}}
 className="
 flex-1
 bg-green-600
@@ -1600,6 +1626,213 @@ Print
 </div>
 
 ))}
+
+</div>
+
+</div>
+
+)}
+
+{showFollowupPopup && (
+
+<div className="fixed inset-0 bg-black/50 z-[99999] flex items-center justify-center p-3">
+
+<div className="
+bg-white
+w-full
+max-w-4xl
+rounded-3xl
+max-h-[95vh]
+overflow-y-auto
+p-5 md:p-8
+relative
+">
+
+<button
+onClick={()=>setShowFollowupPopup(false)}
+className="absolute top-4 right-5 text-4xl"
+>
+×
+</button>
+
+<div className="text-center">
+
+<img
+src={assets.profile_pic}
+className="
+w-24 h-24
+md:w-32 md:h-32
+mx-auto
+rounded-full
+"
+/>
+
+<h2 className="
+text-2xl
+md:text-5xl
+font-bold
+mt-4
+">
+Follow Up Patient
+</h2>
+
+<div className="
+inline-block
+bg-blue-600
+text-white
+font-bold
+text-lg
+md:text-3xl
+px-6
+py-4
+rounded-2xl
+mt-6
+">
+Appointment No :
+{historySelected?.appointmentNo}
+</div>
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-2
+gap-4
+mt-8
+">
+
+<input readOnly value={historySelected?.patientName || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.patientPhone || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.doctorName || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.reason || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.date || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.address || ""} className="border p-4 rounded-xl"/>
+
+</div>
+
+<div className="text-center mt-8">
+
+<div className="
+text-green-600
+font-bold
+text-2xl
+md:text-4xl
+">
+📞 {historySelected?.patientPhone}
+</div>
+
+<button className="
+mt-5
+bg-green-600
+text-white
+px-10
+py-4
+rounded-xl
+font-bold
+">
+Contact Number
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{showTreatedPopup && (
+
+<div className="fixed inset-0 bg-black/50 z-[99999] flex items-center justify-center p-3">
+
+<div className="
+bg-white
+w-full
+max-w-4xl
+rounded-3xl
+max-h-[95vh]
+overflow-y-auto
+p-5 md:p-8
+relative
+">
+
+<button
+onClick={()=>setShowTreatedPopup(false)}
+className="absolute top-4 right-5 text-4xl"
+>
+×
+</button>
+
+<div className="text-center">
+
+<img
+src={assets.profile_pic}
+className="
+w-24 h-24
+md:w-32 md:h-32
+mx-auto
+rounded-full
+"
+/>
+
+<h2 className="
+text-2xl
+md:text-5xl
+font-bold
+mt-4
+">
+Patient Confirmation
+</h2>
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-2
+gap-4
+mt-8
+">
+
+<input readOnly value={historySelected?.patientName || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.doctorName || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.patientPhone || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.reason || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.date || ""} className="border p-4 rounded-xl"/>
+<input readOnly value={historySelected?.consultationTime || ""} className="border p-4 rounded-xl"/>
+
+</div>
+
+<div className="mt-8 space-y-4">
+
+<button
+className="
+w-full
+bg-orange-500
+text-white
+py-4
+rounded-xl
+font-bold
+"
+>
+Follow Up Required
+</button>
+
+<button
+className="
+w-full
+bg-green-600
+text-white
+py-4
+rounded-xl
+font-bold
+"
+>
+Completed
+</button>
+
+</div>
 
 </div>
 
@@ -2941,10 +3174,7 @@ Previous
   <span>Describe</span>
 </button>
 
-<button onClick={() => setPage("settings")} className="flex flex-col items-center text-sm">
-    ⚙️
-    <span>Settings</span>
-</button>
+
 
 </div>
 

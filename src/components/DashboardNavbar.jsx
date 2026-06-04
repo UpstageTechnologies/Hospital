@@ -34,8 +34,50 @@ const isLogged = (role) => {
   return localStorage.getItem(role + "Login") === "true";
 };
 
+const openSettings = () => {
+
+  if (isLogged("doctor")) {
+    navigate("/demodoctordashboard?tab=settings");
+  }
+
+  else if (isLogged("patient")) {
+    navigate("/demopatientdashboard?tab=settings");
+  }
+
+  else if (isLogged("admin")) {
+    navigate("/demoadmindashboard?tab=settings");
+  }
+
+  else if (isLogged("master")) {
+    navigate("/demomasterdashboard?tab=settings");
+  }
+
+  else if (isLogged("staff")) {
+    navigate("/demostaffdashboard?tab=settings");
+  }
+
+  else if (isLogged("pharmasi")) {
+    navigate("/demopharmasidashboard?tab=settings");
+  }
+
+};
+
 // demo user image (login black iconக்கு பதிலா profile pic)
-const userImage = assets.profile_pic;
+const doctorData = JSON.parse(localStorage.getItem("doctorData") || "{}");
+const patientData = JSON.parse(localStorage.getItem("patientData") || "{}");
+const adminData = JSON.parse(localStorage.getItem("adminData") || "{}");
+const masterData = JSON.parse(localStorage.getItem("masterData") || "{}");
+const staffData = JSON.parse(localStorage.getItem("staffData") || "{}");
+const pharmasiData = JSON.parse(localStorage.getItem("pharmasiData") || "{}");
+
+const userImage =
+  doctorData?.doctorBasicInfo?.image ||
+  patientData?.basicInfo?.image ||
+  adminData?.adminBasicInfo?.image ||
+  masterData?.masterBasicInfo?.image ||
+  staffData?.staffBasicInfo?.image ||
+  pharmasiData?.pharmasiBasicInfo?.image ||
+  assets.profile_pic;
 
 return(
 <>
@@ -152,7 +194,7 @@ My Profile
 </p>
 
 <p
-onClick={()=>navigate("/demodoctordashboard?tab=settings")}
+onClick={openSettings}
 className="cursor-pointer hover:text-blue-600"
 >
 Settings
@@ -216,7 +258,7 @@ My Profile
 </p>
 
 <p
-onClick={()=>navigate("/demodoctordashboard?tab=settings")}
+onClick={openSettings}
 className="cursor-pointer hover:text-blue-600"
 >
 Settings
