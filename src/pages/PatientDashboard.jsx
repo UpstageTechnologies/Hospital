@@ -94,8 +94,9 @@ const PatientDashboard = () => {
               snap.forEach(doc => {
                 const data = doc.data()
           
-                console.log("DATA:", data)
-                console.log("USER:", userEmail)
+                console.log("FIREBASE DATA =", data);
+console.log("PATIENT EMAIL =", data.patientEmail);
+console.log("LOGIN EMAIL =", userEmail);
           
                 if (
                   data?.patientEmail &&
@@ -111,6 +112,8 @@ String(userEmail).trim().toLowerCase()
               })
           
               console.log("FINAL LIST:", list)
+              console.log("USER EMAIL =", userEmail);
+console.log("APPOINTMENTS =", list);
               setAppointments(list);
           
             }
@@ -162,6 +165,8 @@ String(userEmail).trim().toLowerCase()
             })
           
             setCurrentAppointments(current)
+            console.log("CURRENT =", current);
+console.log("HISTORY =", history);
             setHistoryAppointments(history)
           
           }, [appointments])
@@ -552,7 +557,7 @@ String(userEmail).trim().toLowerCase()
 Appointment History
 </h1>
 
-<div className="hidden lg:block bg-white rounded-2xl shadow overflow-hidden">
+<div className="hidden md:block bg-white rounded-2xl shadow overflow-x-auto">
 
 <table className="w-full">
 
@@ -633,7 +638,7 @@ Print
 
 {/* MOBILE + TABLET */}
 
-<div className="lg:hidden space-y-4">
+<div className="md:hidden space-y-4">
 
 {historyAppointments.map((item,index)=>(
 
