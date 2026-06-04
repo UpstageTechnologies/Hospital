@@ -79,9 +79,13 @@ const PatientDashboard = () => {
     const savedUser = JSON.parse(
         localStorage.getItem("currentUser")
         );
+        console.log("CURRENT USER =", savedUser);
         console.log(savedUser)
         
         const userEmail = savedUser?.email;
+        console.log("USER EMAIL =", userEmail);
+        console.log("CURRENT USER =", savedUser);
+console.log("USER EMAIL =", userEmail);
 
         useEffect(() => {
 
@@ -98,22 +102,30 @@ const PatientDashboard = () => {
 console.log("PATIENT EMAIL =", data.patientEmail);
 console.log("LOGIN EMAIL =", userEmail);
           
-                if (
-                  data?.patientEmail &&
-                  userEmail &&
-                  String(data.patientEmail).trim().toLowerCase() ===
-String(userEmail).trim().toLowerCase()
-                ) {
-                  list.push({
-                    id: doc.id,
-                    ...data
-                  })
-                }
+const appointmentEmail =
+data.patientEmail ||
+data.email ||
+data.patientMail;
+
+if (
+appointmentEmail &&
+userEmail &&
+appointmentEmail.trim().toLowerCase() ===
+userEmail.trim().toLowerCase()
+) {
+
+list.push({
+  id: doc.id,
+  ...data
+});
+
+}
               })
           
               console.log("FINAL LIST:", list)
               console.log("USER EMAIL =", userEmail);
 console.log("APPOINTMENTS =", list);
+console.log("MATCHED APPOINTMENTS =", list);
               setAppointments(list);
           
             }
@@ -142,7 +154,12 @@ console.log("APPOINTMENTS =", list);
               const endTime = item.time.split("-")[1]?.trim()
               if (!endTime) return;
           
-              const [time, modifier] = endTime.match(/(\d+:\d+)(am|pm)/i).slice(1)
+              const match =
+endTime.match(/(\d+:\d+)(am|pm)/i);
+
+if (!match) return;
+
+const [, time, modifier] = match;
           
               let [hours, minutes] = time.split(":").map(Number)
           
@@ -557,6 +574,7 @@ console.log("HISTORY =", history);
 Appointment History
 </h1>
 
+
 <div className="hidden md:block bg-white rounded-2xl shadow overflow-x-auto">
 
 <table className="w-full">
@@ -748,7 +766,10 @@ Print
         <div className="flex flex-col items-center">
 
           <img
-            src={selected.doctorImage}
+            src={
+              selected.doctorImage ||
+              "/Doctors/doc1.png"
+            }
             alt=""
             className="
               w-24 h-24 
@@ -798,7 +819,7 @@ Print
             </p>
 
             <h4 className="font-semibold text-lg">
-              {selected.phone}
+            {selected.phone || "-"}
             </h4>
           </div>
 
@@ -808,7 +829,7 @@ Print
             </p>
 
             <h4 className="font-semibold text-lg">
-              {selected.reason}
+            {selected.reason || "-"}
             </h4>
           </div>
 
@@ -818,7 +839,7 @@ Print
             </p>
 
             <h4 className="font-semibold text-lg">
-              {selected.address}
+            {selected.address}
             </h4>
           </div>
 
@@ -828,7 +849,7 @@ Print
             </p>
 
             <h4 className="font-semibold text-lg">
-              {selected.appointmentNo}
+            {selected.appointmentNo || "-"}
             </h4>
           </div>
 
