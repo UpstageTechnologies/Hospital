@@ -206,6 +206,9 @@ const [patientAccounts, setPatientAccounts] = useState([])
 const [pharmasiAccounts, setPharmasiAccounts] = useState([])
 const [appointments, setAppointments] = useState([])
 
+const [journalEntries, setJournalEntries] = useState([])
+const [selectedJournal, setSelectedJournal] = useState(null)
+
 const doctorWisePatients = {};
 
 appointments.forEach((appt) => {
@@ -561,6 +564,26 @@ useEffect(() => {
   
   }, [])
 
+  useEffect(() => {
+
+    const fetchJournalEntries = async () => {
+  
+      const snapshot = await getDocs(
+        collection(db, "appointmentHistory")
+      )
+  
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+  
+      setJournalEntries(data)
+    }
+  
+    fetchJournalEntries()
+  
+  }, [])
+
   const printAppointment = (item) => {
 
     const win = window.open("", "", "width=900,height=700");
@@ -656,6 +679,95 @@ useEffect(() => {
   
   };
 
+  const printJournal = (item) => {
+
+    const win = window.open("", "_blank");
+    
+    win.document.write(`
+    <html>
+    <head>
+    <title>Hospital Journal Entry</title>
+    
+    <style>
+    
+    body{
+    font-family:Arial;
+    padding:30px;
+    }
+    
+    h1{
+    text-align:center;
+    margin-bottom:25px;
+    }
+    
+    p{
+    margin:8px 0;
+    font-size:16px;
+    }
+    
+    </style>
+    
+    </head>
+    
+    <body>
+    
+    <h1>Hospital Journal Entry</h1>
+    
+    <p><b>Appointment No :</b> ${item.appointmentNo || "-"}</p>
+    
+    <p><b>Patient :</b> ${item.patientName || "-"}</p>
+    
+    <p><b>Doctor :</b> ${item.doctorName || "-"}</p>
+    
+    <p><b>Date :</b> ${item.date || "-"}</p>
+    
+    <p><b>Age :</b> ${item.age || "-"}</p>
+    
+    <p><b>Phone :</b> ${item.patientPhone || item.phone || "-"}</p>
+    
+    <p><b>Address :</b> ${item.address || "-"}</p>
+    
+    <p><b>Emergency Contact :</b>
+    ${item.emergencyContact || "-"}
+    </p>
+    
+    <p><b>Reason :</b> ${item.reason || "-"}</p>
+    
+    <p><b>Doctor Notes :</b> ${item.solution || "-"}</p>
+    
+    <p><b>Payment Status :</b>
+    ${item.paymentStatus || "Pending"}
+    </p>
+    
+    <p><b>Status :</b>
+    ${item.status || "Completed"}
+    </p>
+    
+    <p><b>Consultancy Fee :</b>
+    ₹${item.consultancyFee || 0}
+    </p>
+    
+    <p><b>Medicine Fee :</b>
+    ₹${item.medicineFee || 0}
+    </p>
+    
+    <p><b>Total :</b>
+    ₹${item.totalAmount || 0}
+    </p>
+    
+    </body>
+    </html>
+    `);
+    
+    win.document.close();
+    
+    setTimeout(() => {
+    win.focus();
+    win.print();
+    }, 500);
+    
+    };
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -694,6 +806,13 @@ useEffect(() => {
             <p onClick={() => handleMenuChange("history")}className="cursor-pointer">
               Appointment History
             </p>
+
+            <p
+  onClick={() => handleMenuChange("journal")}
+  className="cursor-pointer"
+>
+  Journal Entry
+</p>
 
 
             <p
@@ -1004,6 +1123,53 @@ transition
 
     </div>
   </div>
+)}
+
+{tab === "journal" && (
+
+<div>
+
+<h1 className="text-4xl font-bold mb-8">
+Journal Entry
+</h1>
+
+<div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+{journalEntries.map((item,index)=>(
+
+<div
+key={index}
+onClick={() => setSelectedJournal(item)}
+className="
+bg-white
+border
+rounded-2xl
+shadow
+p-5
+cursor-pointer
+hover:shadow-lg
+"
+>
+
+<p><b>Patient :</b> {item.patientName}</p>
+
+<p><b>Doctor :</b> {item.doctorName}</p>
+
+<p><b>Date :</b> {item.date}</p>
+
+<p>
+  <b>Phone :</b>
+  {item.patientPhone || item.phone || "-"}
+</p>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
 )}
 
 
@@ -1726,6 +1892,319 @@ text-lg
 >
 ✅ Completed
 </button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{selectedJournal && (
+
+<div className="fixed inset-0 bg-black/50 z-[999999] overflow-y-auto pb-24">
+
+<div className="p-6 md:p-10">
+
+<div className="
+bg-white
+rounded-3xl
+shadow-xl
+p-4 md:p-8
+w-full
+max-w-7xl
+mx-auto
+mb-20
+">
+
+<div className="
+flex
+flex-col
+md:flex-row
+justify-between
+md:items-center
+gap-4
+mb-8
+">
+
+<h1 className="
+text-2xl
+md:text-5xl
+font-bold
+">
+Journal Entry
+</h1>
+
+</div>
+
+<div className="
+border
+rounded-3xl
+p-8
+">
+
+<div className="
+flex
+flex-col
+md:flex-row
+justify-between
+md:items-center
+gap-4
+mb-8
+">
+
+<h2 className="
+text-xl
+md:text-4xl
+font-bold
+break-words
+">
+Appointment :
+{selectedJournal.appointmentNo}
+</h2>
+
+<button
+onClick={() => printJournal(selectedJournal)}
+className="
+bg-blue-600
+text-white
+w-full
+md:w-auto
+px-6
+py-3
+rounded-xl
+"
+>
+Print
+</button>
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+lg:grid-cols-2
+gap-6
+md:gap-10
+">
+
+<div>
+
+<p><b>Patient :</b> {selectedJournal.patientName}</p>
+
+<p><b>Doctor :</b> {selectedJournal.doctorName}</p>
+
+<p><b>Date :</b> {selectedJournal.date}</p>
+
+<p><b>Requirement :</b> {selectedJournal.reason}</p>
+
+<p><b>Doctor Notes :</b> {selectedJournal.solution}</p>
+
+<p><b>Lab Tests :</b>
+{
+selectedJournal.labTests?.length
+? selectedJournal.labTests.join(", ")
+: "No Lab Test"
+}
+</p>
+
+</div>
+
+<div>
+
+<p><b>Age :</b> {selectedJournal.age || "-"}</p>
+
+<p><b>Phone :</b>
+{selectedJournal.patientPhone ||
+ selectedJournal.phone ||
+ "-"}
+</p>
+
+<p><b>Address :</b>
+{selectedJournal.address || "-"}
+</p>
+
+<p><b>Time :</b>
+{selectedJournal.time || "-"}
+</p>
+
+<p><b>Emergency Contact :</b>
+{selectedJournal.emergencyContact ||
+ selectedJournal.emrContact ||
+ "-"}
+</p>
+
+<p><b>Payment Status :</b>
+{selectedJournal.paymentStatus || "Pending"}
+</p>
+<p className="mt-2">
+  <b>Appointment Status :</b>
+
+  <span className="
+    ml-2
+    px-3
+    py-1
+    rounded-full
+    bg-green-100
+    text-green-700
+    text-sm
+  ">
+    {selectedJournal.status || "Completed"}
+  </span>
+</p>
+
+
+
+</div>
+
+</div>
+
+<div className="
+grid
+md:grid-cols-3
+gap-5
+mt-10
+">
+
+<div className="
+bg-yellow-50
+rounded-2xl
+p-5
+mb-6
+">
+
+<h3 className="font-bold text-lg mb-2">
+Treatment Summary
+</h3>
+
+<p>
+{selectedJournal.solution ||
+"No treatment notes available"}
+</p>
+
+</div>
+
+<div className="
+bg-gray-100
+rounded-2xl
+p-5
+mb-6
+">
+
+<h3 className="font-bold text-lg mb-2">
+Case Summary
+</h3>
+
+<p>
+Patient visited
+Dr. {selectedJournal.doctorName}
+for
+{selectedJournal.reason || "Consultation"}.
+Treatment completed successfully.
+</p>
+
+</div>
+
+<div className="
+bg-green-100
+rounded-2xl
+p-6
+">
+
+<h3 className="font-bold text-xl">
+Consultancy Fee
+</h3>
+
+₹ {selectedJournal.consultancyFee || 0}
+
+</div>
+
+<div className="
+bg-blue-100
+rounded-2xl
+p-6
+">
+
+<h3 className="font-bold text-xl">
+Medicine Fee
+</h3>
+
+₹ {selectedJournal.medicineFee || 0}
+
+</div>
+
+<div className="
+bg-yellow-100
+rounded-2xl
+p-6
+">
+
+<h3 className="font-bold text-xl">
+Total
+</h3>
+
+₹ {selectedJournal.totalAmount || 0}
+
+</div>
+
+</div>
+
+<div className="
+bg-red-50
+rounded-2xl
+p-5
+mt-8
+mb-6
+">
+
+<h3 className="font-bold text-lg mb-3">
+Audit Information
+</h3>
+
+<p>
+<b>Created By :</b>
+{selectedJournal.createdBy || "Doctor"}
+</p>
+
+<p>
+<b>Last Updated :</b>
+{
+selectedJournal.updatedAt
+? selectedJournal.updatedAt
+: "-"
+}
+</p>
+
+<p>
+<b>Record Status :</b>
+{selectedJournal.status || "Completed"}
+</p>
+
+</div>
+
+<div className="mt-8 pt-6 border-t flex justify-center">
+
+<button
+onClick={() => setSelectedJournal(null)}
+className="
+bg-red-500
+hover:bg-red-600
+text-white
+font-semibold
+w-full
+md:w-56
+h-12
+rounded-xl
+transition-all
+"
+>
+Close
+</button>
+
+</div>
 
 </div>
 
@@ -5534,39 +6013,58 @@ Close
 
 
       {/* MOBILE + TAB BOTTOM MENU */}
-      <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow md:hidden flex justify-around items-center py-3 px-2 gap-2 z-50">
+{/* MOBILE + TAB BOTTOM MENU */}
+<div className="fixed bottom-0 left-0 w-full bg-white border-t shadow md:hidden flex justify-around items-center py-3 px-2 z-50 overflow-x-auto">
 
-      <button onClick={()=>handleMenuChange("home")}>
-          🏠
-          <p>Home</p>
-        </button>
+  <button
+    onClick={() => handleMenuChange("home")}
+    className="flex flex-col items-center text-black min-w-[60px]"
+  >
+    <span className="text-xl">🏠</span>
+    <p className="text-xs">Home</p>
+  </button>
 
-        <button onClick={()=>handleMenuChange("subscription")}>
-          💳
-          <p>Subscription</p>
-        </button>
+  <button
+    onClick={() => handleMenuChange("subscription")}
+    className="flex flex-col items-center text-black min-w-[60px]"
+  >
+    <span className="text-xl">💳</span>
+    <p className="text-xs">Plans</p>
+  </button>
 
-        <button onClick={()=>handleMenuChange("appointments")}>
-          📅
-          <p>Appointments</p>
-        </button>
+  <button
+    onClick={() => handleMenuChange("appointments")}
+    className="flex flex-col items-center text-black min-w-[60px]"
+  >
+    <span className="text-xl">📅</span>
+    <p className="text-xs">Appointments</p>
+  </button>
 
-        <button onClick={()=>handleMenuChange("history")}>
-        📜
-        <p>History</p>
-        </button>
- 
+  <button
+    onClick={() => handleMenuChange("history")}
+    className="flex flex-col items-center text-black min-w-[60px]"
+  >
+    <span className="text-xl">📜</span>
+    <p className="text-xs">History</p>
+  </button>
 
-        <button
-onClick={() => {
-  handleMenuChange("account")
-}}
-className="flex flex-col items-center text-black">
-       <span className="text-2xl">👨‍⚕️</span>
-       <p className="text-sm">Accounts</p>
-        </button>
+  <button
+    onClick={() => handleMenuChange("journal")}
+    className="flex flex-col items-center text-black min-w-[60px]"
+  >
+    <span className="text-xl">📖</span>
+    <p className="text-xs">Journal</p>
+  </button>
 
-      </div>
+  <button
+    onClick={() => handleMenuChange("account")}
+    className="flex flex-col items-center text-black min-w-[60px]"
+  >
+    <span className="text-xl">👨‍⚕️</span>
+    <p className="text-xs">Account</p>
+  </button>
+
+</div>
 
     </div>
   )

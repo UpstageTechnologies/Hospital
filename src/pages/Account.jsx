@@ -26,6 +26,7 @@ const Account = () => {
   const [inventoryItems,setInventoryItems]=useState([]);
   const [patientsData,setPatientsData] = useState([]);
   const [treatedData, setTreatedData] = useState(null);
+  const [selectedJournal, setSelectedJournal] = useState(null);
 
   useEffect(() => {
 
@@ -1429,6 +1430,13 @@ historyAppointments.filter((item) =>
             Appointment History
         </li>
 
+        <li
+className="cursor-pointer hover:text-gray-200"
+onClick={() => setMenu("journal")}
+>
+Journal Entry
+</li>
+
 
 
         </ul>
@@ -1903,6 +1911,125 @@ historyAppointments.filter((item) =>
 
 )}
 
+
+{menu === "journal" && (
+<div>
+  <h1 className="text-4xl font-bold mb-6">
+    Journal Entry
+  </h1>
+
+  <div className="
+grid
+grid-cols-2
+lg:grid-cols-5
+gap-4
+mb-8
+">
+
+<div className="
+bg-blue-100
+rounded-2xl
+p-4
+shadow
+">
+<p className="text-sm text-gray-600">
+Patients Today
+</p>
+
+<h2 className="text-2xl font-bold">
+👨 45
+</h2>
+</div>
+
+<div className="
+bg-green-100
+rounded-2xl
+p-4
+shadow
+">
+<p className="text-sm text-gray-600">
+Revenue
+</p>
+
+<h2 className="text-2xl font-bold">
+💰 ₹25,000
+</h2>
+</div>
+
+<div className="
+bg-yellow-100
+rounded-2xl
+p-4
+shadow
+">
+<p className="text-sm text-gray-600">
+Consultations
+</p>
+
+<h2 className="text-2xl font-bold">
+📋 38
+</h2>
+</div>
+
+<div className="
+bg-purple-100
+rounded-2xl
+p-4
+shadow
+">
+<p className="text-sm text-gray-600">
+Follow-Ups
+</p>
+
+<h2 className="text-2xl font-bold">
+🔄 12
+</h2>
+</div>
+
+<div className="
+bg-emerald-100
+rounded-2xl
+p-4
+shadow
+">
+<p className="text-sm text-gray-600">
+Completed
+</p>
+
+<h2 className="text-2xl font-bold">
+✅ 33
+</h2>
+</div>
+
+</div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+    {historyAppointments.map((item,index)=>(
+
+      <div
+        key={index}
+        onClick={() => setSelectedJournal(item)}
+        className="bg-white rounded-2xl shadow p-5 cursor-pointer"
+      >
+
+        <p><b>Patient :</b> {item.patientName}</p>
+        <p><b>Doctor :</b> {item.doctorName}</p>
+        <p><b>Date :</b> {item.date}</p>
+
+        <p>
+          <b>Phone :</b>
+          {item.patientPhone || item.phone || "-"}
+        </p>
+
+      </div>
+
+    ))}
+
+  </div>
+</div>
+)}
+
 {treatedData && (
   <div
   className="
@@ -2287,9 +2414,292 @@ historyAppointments.filter((item) =>
     <span className="mt-1">History</span>
   </button>
 
+  <button
+onClick={() => setMenu("journal")}
+className={`flex flex-col items-center text-xs ${
+menu === "journal"
+? "text-blue-600"
+: "text-gray-600"
+}`}
+>
+<span className="text-xl">📖</span>
+<span className="mt-1">Journal</span>
+</button>
+
 </div>
 
 </div>
+
+
+{selectedJournal && (
+
+<div className="
+fixed inset-0
+bg-black/50
+z-[999999]
+overflow-y-auto
+p-2 md:p-6
+">
+
+<div className="
+bg-white
+rounded-3xl
+shadow-xl
+w-full
+max-w-7xl
+mx-auto
+p-4 md:p-8
+mb-20
+">
+
+<h1 className="
+text-3xl
+md:text-6xl
+font-bold
+mb-8
+">
+Journal Entry
+</h1>
+
+<div className="
+border
+rounded-3xl
+p-4 md:p-8
+">
+
+<div className="
+flex
+flex-col
+md:flex-row
+justify-between
+gap-4
+mb-8
+">
+
+<h2 className="
+text-xl
+md:text-5xl
+font-bold
+break-words
+">
+Appointment :
+{selectedJournal.appointmentNo || "-"}
+</h2>
+
+<button
+onClick={() => window.print()}
+className="
+bg-blue-600
+text-white
+px-6
+py-3
+rounded-xl
+w-full
+md:w-auto
+"
+>
+Print
+</button>
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+lg:grid-cols-2
+gap-8
+">
+
+<div className="space-y-3">
+
+<p>
+<b>Patient :</b>
+{" "}
+{selectedJournal.patientName || "-"}
+</p>
+
+<p>
+<b>Doctor :</b>
+{" "}
+{selectedJournal.doctorName || "-"}
+</p>
+
+<p>
+<b>Date :</b>
+{" "}
+{selectedJournal.date || "-"}
+</p>
+
+<p>
+<b>Requirement :</b>
+{" "}
+{selectedJournal.reason || "-"}
+</p>
+
+<p>
+<b>Doctor Notes :</b>
+{" "}
+{selectedJournal.solution || "-"}
+</p>
+
+<p>
+<b>Lab Tests :</b>
+{" "}
+{
+selectedJournal.labTests?.length
+? selectedJournal.labTests.join(", ")
+: "No Lab Test"
+}
+</p>
+
+</div>
+
+<div className="space-y-3">
+
+<p>
+<b>Age :</b>
+{" "}
+{selectedJournal.age || "-"}
+</p>
+
+<p>
+<b>Phone :</b>
+{" "}
+{selectedJournal.patientPhone ||
+ selectedJournal.phone ||
+ "-"}
+</p>
+
+<p>
+<b>Address :</b>
+{" "}
+{selectedJournal.address || "-"}
+</p>
+
+<p>
+<b>Time :</b>
+{" "}
+{selectedJournal.time || "-"}
+</p>
+
+<p>
+<b>Emergency Contact :</b>
+{" "}
+{selectedJournal.emergencyContact ||
+ selectedJournal.emrContact ||
+ "-"}
+</p>
+
+<p>
+<b>Payment Status :</b>
+{" "}
+{selectedJournal.paymentStatus || "Paid"}
+</p>
+
+</div>
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+sm:grid-cols-2
+lg:grid-cols-3
+gap-5
+mt-10
+mb-10
+">
+
+<div className="
+bg-green-100
+rounded-2xl
+p-6
+">
+
+<h3 className="
+font-bold
+text-xl
+mb-2
+">
+Consultancy Fee
+</h3>
+
+₹ {selectedJournal.consultancyFee || 0}
+
+</div>
+
+<div className="
+bg-blue-100
+rounded-2xl
+p-6
+">
+
+<h3 className="
+font-bold
+text-xl
+mb-2
+">
+Medicine Fee
+</h3>
+
+₹ {selectedJournal.medicineFee || 0}
+
+</div>
+
+<div className="
+bg-yellow-100
+rounded-2xl
+p-6
+">
+
+<h3 className="
+font-bold
+text-xl
+mb-2
+">
+Total
+</h3>
+
+₹ {selectedJournal.totalAmount || 0}
+
+</div>
+
+</div>
+
+<div className="
+mt-10
+pt-6
+border-t
+flex
+justify-center
+">
+
+<button
+onClick={() => setSelectedJournal(null)}
+className="
+bg-red-500
+hover:bg-red-600
+text-white
+font-semibold
+w-full
+md:w-56
+h-12
+rounded-xl
+transition-all
+"
+>
+Close
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
 
 {selectedPatient && (
 

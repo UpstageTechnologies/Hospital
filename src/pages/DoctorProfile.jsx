@@ -487,6 +487,157 @@ const printHistory = (item) => {
     
     };
 
+    const printJournal = (item) => {
+
+        const win = window.open("", "_blank");
+        
+        win.document.write(`
+        
+        <html>
+        
+        <head>
+        
+        <title>Hospital Journal Entry</title>
+        
+        <style>
+        
+        body{
+        font-family: Arial, sans-serif;
+        padding:30px;
+        line-height:1.8;
+        }
+        
+        h1{
+        text-align:center;
+        margin-bottom:30px;
+        }
+        
+        .section{
+        margin-bottom:20px;
+        padding:15px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        }
+        
+        .fees{
+        display:flex;
+        gap:20px;
+        margin-top:20px;
+        }
+        
+        .card{
+        flex:1;
+        padding:15px;
+        border-radius:10px;
+        background:#f5f5f5;
+        }
+        
+        </style>
+        
+        </head>
+        
+        <body>
+        
+        <h1>Hospital Journal Entry</h1>
+        
+        <div class="section">
+        
+        <p><b>Appointment No :</b> ${item.appointmentNo || "-"}</p>
+        
+        <p><b>Patient :</b> ${item.patientName || "-"}</p>
+        
+        <p><b>Age :</b> ${item.age || "-"}</p>
+        
+        <p><b>Gender :</b> ${item.gender || "-"}</p>
+        
+        <p><b>Blood Group :</b> ${item.bloodGroup || "-"}</p>
+        
+        <p><b>Phone :</b> ${item.patientPhone || item.phone || "-"}</p>
+        
+        <p><b>Address :</b> ${item.address || "-"}</p>
+        
+        <p><b>Emergency Contact :</b> ${item.emergencyContact || "-"}</p>
+        
+        </div>
+        
+        <div class="section">
+        
+        <p><b>Doctor :</b> ${item.doctorName || "-"}</p>
+        
+        <p><b>Date :</b> ${item.date || "-"}</p>
+        
+        <p><b>Time :</b> ${item.time || "-"}</p>
+        
+        <p><b>Reason :</b> ${item.reason || "-"}</p>
+        
+        <p><b>Doctor Notes :</b> ${item.solution || "-"}</p>
+        
+        <p><b>Lab Tests :</b>
+        ${
+        item.labTests?.length
+        ? item.labTests.join(", ")
+        : "No Lab Test"
+        }
+        </p>
+        
+        <p><b>Status :</b> ${item.status || "Completed"}</p>
+        
+        <p><b>Payment Status :</b> ${item.paymentStatus || "Pending"}</p>
+        
+        </div>
+        
+        <div class="section">
+        
+        <p><b>Treatment Summary :</b></p>
+        
+        <p>
+        ${item.solution || "No treatment notes available"}
+        </p>
+        
+        </div>
+        
+        <div class="fees">
+        
+        <div class="card">
+        
+        <h3>Consultancy Fee</h3>
+        
+        ₹${item.consultancyFee || 0}
+        
+        </div>
+        
+        <div class="card">
+        
+        <h3>Medicine Fee</h3>
+        
+        ₹${item.medicineFee || 0}
+        
+        </div>
+        
+        <div class="card">
+        
+        <h3>Total Amount</h3>
+        
+        ₹${item.totalAmount || 0}
+        
+        </div>
+        
+        </div>
+        
+        </body>
+        
+        </html>
+        
+        `);
+        
+        win.document.close();
+        
+        setTimeout(() => {
+        win.print();
+        }, 500);
+        
+        };
+
 const [activeDescribeCategory,setActiveDescribeCategory]=
 useState("All");
 
@@ -1003,6 +1154,17 @@ selectedAppointment?.doctorEmail || "",
             
             date:
             new Date().toLocaleDateString(),
+
+            consultancyFee: 600,
+
+medicineFee: totalAmount,
+
+totalAmount:
+Number(600) +
+Number(totalAmount || 0),
+
+medicines:
+prescriptionList || [],
             
             createdAt:
             serverTimestamp()
@@ -1052,8 +1214,6 @@ selectedAppointment?.doctorEmail || "",
                     Appointments
                 </p>
 
-                
-
                 <p onClick={() => setPage("describe")}className="mb-3 cursor-pointer">
                     Prescribe
                 </p>
@@ -1064,6 +1224,10 @@ selectedAppointment?.doctorEmail || "",
 
                 <p onClick={() => setPage("appointmentHistory")}className="mb-3 cursor-pointer">
                     Appointment History
+                </p>
+
+                <p onClick={() => setPage("journalEntry")}className="mb-3 cursor-pointer">
+                    Journal Entry
                 </p>
 
             </div>
@@ -1619,6 +1783,251 @@ Print
 
 ))}
 
+</div>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+{page === "journalEntry" && (
+
+<div className="flex-1 p-4 md:p-8">
+
+<h1 className="text-3xl font-bold mb-6">
+Journal Entry
+</h1>
+
+<div className="grid gap-5">
+
+{appointmentHistory.map((item,index)=>(
+
+<div
+key={index}
+className="
+bg-white
+rounded-2xl
+shadow-lg
+border
+p-5
+"
+>
+
+<div className="
+flex
+justify-between
+items-center
+flex-wrap
+gap-3
+"
+>
+
+<h2 className="font-bold text-xl">
+Appointment :
+{item.appointmentNo}
+</h2>
+
+<button
+onClick={()=>printJournal(item)}
+className="
+bg-blue-600
+text-white
+px-5
+py-2
+rounded-xl
+"
+>
+Print
+</button>
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-2
+gap-4
+mt-5
+"
+>
+
+<div>
+<b>Patient :</b>
+{item.patientName}
+</div>
+
+<div>
+<b>Age :</b>
+{item.age}
+</div>
+
+<div>
+<b>Doctor :</b>
+{item.doctorName}
+</div>
+
+<div>
+<b>Phone :</b>
+{item.patientPhone}
+</div>
+
+<div>
+<b>Date :</b>
+{item.date}
+</div>
+
+<div>
+<b>Duration :</b>
+{item.consultationTime}
+</div>
+
+<div className="md:col-span-2">
+<b>Requirement :</b>
+{item.reason}
+</div>
+
+<div className="md:col-span-2">
+<b>Doctor Notes :</b>
+{item.solution}
+</div>
+
+<div className="md:col-span-2">
+
+<b>Lab Tests :</b>
+
+{item.labTests?.length > 0
+? item.labTests.join(", ")
+: "No Lab Test"}
+
+</div>
+
+<div>
+<b>Blood Group :</b>
+{item.bloodGroup || "-"}
+</div>
+
+<div>
+<b>Gender :</b>
+{item.gender || "-"}
+</div>
+
+<div>
+<b>Payment Status :</b>
+{item.paymentStatus || "Paid"}
+</div>
+
+<div>
+<b>Status :</b>
+{item.status || "Completed"}
+</div>
+
+<div>
+<b>Prescription Count :</b>
+{item.medicines?.length || 0}
+</div>
+</div>
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-3
+gap-4
+mt-5
+"
+>
+
+<div className="bg-green-100 p-4 rounded-xl">
+
+Consultancy Fee
+
+<br/>
+
+<b>
+₹{item.consultancyFee}
+</b>
+
+</div>
+
+<div className="bg-blue-100 p-4 rounded-xl">
+
+Medicine Fee
+
+<br/>
+
+<b>
+₹{item.medicineFee}
+</b>
+
+</div>
+
+<div className="bg-yellow-100 p-4 rounded-xl">
+
+Total
+
+<br/>
+
+<b>
+₹{item.totalAmount}
+</b>
+
+</div>
+
+</div>
+
+<div className="
+bg-purple-100
+rounded-2xl
+p-5
+mt-5
+">
+
+<h3 className="font-bold text-xl mb-3">
+Treatment Summary
+</h3>
+
+<p>
+{item.solution || "No Treatment Notes"}
+</p>
+
+</div>
+
+<div className="
+grid
+grid-cols-2
+md:grid-cols-4
+gap-4
+mt-5
+">
+
+<div className="bg-blue-100 p-4 rounded-xl">
+👨 Patient Age
+<br />
+<b>{item.age || "-"}</b>
+</div>
+
+<div className="bg-green-100 p-4 rounded-xl">
+💊 Medicines
+<br />
+<b>{item.medicines?.length || 0}</b>
+</div>
+
+<div className="bg-yellow-100 p-4 rounded-xl">
+🧪 Lab Tests
+<br />
+<b>{item.labTests?.length || 0}</b>
+</div>
+
+<div className="bg-red-100 p-4 rounded-xl">
+⏱ Duration
+<br />
+<b>{item.consultationTime || "-"}</b>
 </div>
 
 </div>
@@ -3159,6 +3568,11 @@ Previous
 <button onClick={() => setPage("appointmentHistory")}className="flex flex-col items-center text-sm">
     📜
     <span>History</span>
+</button>
+
+<button onClick={() => setPage("journalEntry")}className="flex flex-col items-center text-sm">
+📒
+<span>Journal</span>
 </button>
 
 <button
