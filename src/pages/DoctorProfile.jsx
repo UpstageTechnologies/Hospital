@@ -405,6 +405,8 @@ const [purchase,setPurchase] = useState("");
 const [sales,setSales] = useState("");
 const [search,setSearch] = useState("");
 const [historySearch,setHistorySearch] =useState("");
+const [journalSearch,setJournalSearch] = useState("");
+const [selectedJournal,setSelectedJournal] = useState(null);
 
 const [showFollowupPopup,setShowFollowupPopup] = useState(false);
 const [showTreatedPopup,setShowTreatedPopup] = useState(false);
@@ -1104,6 +1106,33 @@ useEffect(() => {
             return bTime - aTime;
             
             });
+
+            const filteredJournal = appointmentHistory.filter((item)=>{
+
+                const search = journalSearch.toLowerCase();
+                
+                return (
+                
+                (item.patientName || "")
+                .toLowerCase()
+                .includes(search)
+                
+                ||
+                
+                (item.doctorName || "")
+                .toLowerCase()
+                .includes(search)
+                
+                ||
+                
+                (item.appointmentNo || "")
+                .toString()
+                .toLowerCase()
+                .includes(search)
+                
+                );
+                
+                });
 
     const formatConsultationTime = (seconds) => {
 
@@ -1805,12 +1834,156 @@ Print
 Journal Entry
 </h1>
 
-<div className="grid gap-5">
+<div className="mb-5">
 
-{appointmentHistory.map((item,index)=>(
+<input
+type="text"
+placeholder="Search Appointment No / Patient / Doctor"
+value={journalSearch}
+onChange={(e)=>setJournalSearch(e.target.value)}
+className="
+w-full
+md:w-[450px]
+border
+rounded-xl
+p-3
+"
+/>
+
+</div>
+
+
+{/* Desktop */}
+
+<div className="hidden lg:block bg-white rounded-2xl shadow overflow-x-auto">
+
+<table className="w-full">
+
+<thead className="bg-blue-600 text-white">
+
+<tr>
+<th className="p-4">Appointment No</th>
+<th className="p-4">Patient</th>
+<th className="p-4">Doctor</th>
+<th className="p-4">Date</th>
+<th className="p-4">Contact</th>
+<th className="p-4">Reason</th>
+<th className="p-4">Action</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{filteredJournal.map((item,index)=>(
+
+<tr key={index} className="border-b">
+
+<td className="p-4">{item.appointmentNo || "-"}</td>
+<td className="p-4">{item.patientName || "-"}</td>
+<td className="p-4">{item.doctorName || "-"}</td>
+<td className="p-4">{item.date || "-"}</td>
+<td className="p-4">{item.patientPhone || "-"}</td>
+<td className="p-4">{item.reason || "-"}</td>
+
+<td className="p-4">
+
+<button
+onClick={()=>setSelectedJournal(item)}
+className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+>
+Details
+</button>
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+<div className="block lg:hidden space-y-4">
+
+{filteredJournal.map((item,index)=>(
 
 <div
 key={index}
+onClick={()=>setSelectedJournal(item)}
+className="
+bg-white
+rounded-2xl
+shadow
+p-4
+cursor-pointer
+"
+>
+
+<p><b>Appointment :</b> {item.appointmentNo}</p>
+<p><b>Patient :</b> {item.patientName}</p>
+<p><b>Doctor :</b> {item.doctorName}</p>
+<p><b>Date :</b> {item.date}</p>
+<p><b>Contact :</b> {item.patientPhone}</p>
+<p><b>Reason :</b> {item.reason}</p>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+{selectedJournal && (
+
+<div
+className="
+fixed
+inset-0
+bg-black/50
+z-[99999]
+flex
+items-center
+justify-center
+p-4
+"
+>
+
+<div
+className="
+bg-white
+w-full
+max-w-7xl
+max-h-[95vh]
+overflow-y-auto
+rounded-3xl
+shadow-2xl
+border
+p-5
+relative
+"
+>
+
+<button
+onClick={()=>setSelectedJournal(null)}
+className="
+absolute
+top-4
+right-4
+text-4xl
+font-bold
+"
+>
+×
+</button>
+
+<div
 className="
 bg-white
 rounded-2xl
@@ -1831,11 +2004,11 @@ gap-3
 
 <h2 className="font-bold text-xl">
 Appointment :
-{item.appointmentNo}
+{selectedJournal.appointmentNo}
 </h2>
 
 <button
-onClick={()=>printJournal(item)}
+onClick={()=>printJournal(selectedJournal)}
 className="
 bg-blue-600
 text-white
@@ -1860,78 +2033,77 @@ mt-5
 
 <div>
 <b>Patient :</b>
-{item.patientName}
+{selectedJournal.patientName}
 </div>
 
 <div>
 <b>Age :</b>
-{item.age}
+{selectedJournal.age}
 </div>
 
 <div>
 <b>Doctor :</b>
-{item.doctorName}
+{selectedJournal.doctorName}
 </div>
 
 <div>
 <b>Phone :</b>
-{item.patientPhone}
+{selectedJournal.patientPhone}
 </div>
 
 <div>
 <b>Date :</b>
-{item.date}
+{selectedJournal.date}
 </div>
 
 <div>
 <b>Duration :</b>
-{item.consultationTime}
+{selectedJournal.consultationTime}
 </div>
 
 <div className="md:col-span-2">
 <b>Requirement :</b>
-{item.reason}
+{selectedJournal.reason}
 </div>
 
 <div className="md:col-span-2">
 <b>Doctor Notes :</b>
-{item.solution}
+{selectedJournal.solution}
 </div>
 
 <div className="md:col-span-2">
-
 <b>Lab Tests :</b>
 
-{item.labTests?.length > 0
-? item.labTests.join(", ")
+{selectedJournal.labTests?.length > 0
+? selectedJournal.labTests.join(", ")
 : "No Lab Test"}
-
 </div>
 
 <div>
 <b>Blood Group :</b>
-{item.bloodGroup || "-"}
+{selectedJournal.bloodGroup || "-"}
 </div>
 
 <div>
 <b>Gender :</b>
-{item.gender || "-"}
+{selectedJournal.gender || "-"}
 </div>
 
 <div>
 <b>Payment Status :</b>
-{item.paymentStatus || "Paid"}
+{selectedJournal.paymentStatus || "Paid"}
 </div>
 
 <div>
 <b>Status :</b>
-{item.status || "Completed"}
+{selectedJournal.status || "Completed"}
 </div>
 
 <div>
 <b>Prescription Count :</b>
-{item.medicines?.length || 0}
+{selectedJournal.medicines?.length || 0}
 </div>
+
 </div>
 
 <div className="
@@ -1944,39 +2116,21 @@ mt-5
 >
 
 <div className="bg-green-100 p-4 rounded-xl">
-
 Consultancy Fee
-
 <br/>
-
-<b>
-₹{item.consultancyFee}
-</b>
-
+<b>₹{selectedJournal.consultancyFee}</b>
 </div>
 
 <div className="bg-blue-100 p-4 rounded-xl">
-
 Medicine Fee
-
 <br/>
-
-<b>
-₹{item.medicineFee}
-</b>
-
+<b>₹{selectedJournal.medicineFee}</b>
 </div>
 
 <div className="bg-yellow-100 p-4 rounded-xl">
-
 Total
-
 <br/>
-
-<b>
-₹{item.totalAmount}
-</b>
-
+<b>₹{selectedJournal.totalAmount}</b>
 </div>
 
 </div>
@@ -1986,14 +2140,15 @@ bg-purple-100
 rounded-2xl
 p-5
 mt-5
-">
+"
+>
 
 <h3 className="font-bold text-xl mb-3">
 Treatment Summary
 </h3>
 
 <p>
-{item.solution || "No Treatment Notes"}
+{selectedJournal.solution || "No Treatment Notes"}
 </p>
 
 </div>
@@ -2004,37 +2159,36 @@ grid-cols-2
 md:grid-cols-4
 gap-4
 mt-5
-">
+"
+>
 
 <div className="bg-blue-100 p-4 rounded-xl">
 👨 Patient Age
 <br />
-<b>{item.age || "-"}</b>
+<b>{selectedJournal.age || "-"}</b>
 </div>
 
 <div className="bg-green-100 p-4 rounded-xl">
 💊 Medicines
 <br />
-<b>{item.medicines?.length || 0}</b>
+<b>{selectedJournal.medicines?.length || 0}</b>
 </div>
 
 <div className="bg-yellow-100 p-4 rounded-xl">
 🧪 Lab Tests
 <br />
-<b>{item.labTests?.length || 0}</b>
+<b>{selectedJournal.labTests?.length || 0}</b>
 </div>
 
 <div className="bg-red-100 p-4 rounded-xl">
 ⏱ Duration
 <br />
-<b>{item.consultationTime || "-"}</b>
+<b>{selectedJournal.consultationTime || "-"}</b>
 </div>
 
 </div>
 
 </div>
-
-))}
 
 </div>
 

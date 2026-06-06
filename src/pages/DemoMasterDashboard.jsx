@@ -1133,9 +1133,48 @@ transition
 Journal Entry
 </h1>
 
-<div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+<div className="mb-6">
 
-{journalEntries.map((item,index)=>(
+<input
+type="text"
+placeholder="Search Doctor Name..."
+value={doctorSearch}
+onChange={(e) => setDoctorSearch(e.target.value)}
+className="
+w-full
+md:w-[400px]
+border
+rounded-xl
+px-4
+py-3
+outline-none
+focus:border-blue-600
+"
+/>
+
+</div>
+
+{/* MOBILE + TABLET */}
+
+<div className="block lg:hidden space-y-4">
+
+{journalEntries
+
+.filter((item) => {
+
+if (doctorSearch.trim() === "")
+return true
+
+return (
+(item.doctorName || "")
+.trim()
+.toLowerCase() ===
+doctorSearch.trim().toLowerCase()
+)
+
+})
+
+.map((item,index)=>(
 
 <div
 key={index}
@@ -1144,22 +1183,40 @@ className="
 bg-white
 border
 rounded-2xl
+p-4
 shadow
-p-5
 cursor-pointer
-hover:shadow-lg
 "
 >
 
-<p><b>Patient :</b> {item.patientName}</p>
-
-<p><b>Doctor :</b> {item.doctorName}</p>
-
-<p><b>Date :</b> {item.date}</p>
+<p>
+<b>Appointment No :</b>
+{item.appointmentNo || "-"}
+</p>
 
 <p>
-  <b>Phone :</b>
-  {item.patientPhone || item.phone || "-"}
+<b>Patient :</b>
+{item.patientName || "-"}
+</p>
+
+<p>
+<b>Doctor :</b>
+{item.doctorName || "-"}
+</p>
+
+<p>
+<b>Date :</b>
+{item.date || "-"}
+</p>
+
+<p>
+<b>Contact :</b>
+{item.patientPhone || item.phone || "-"}
+</p>
+
+<p>
+<b>Reason :</b>
+{item.reason || "-"}
 </p>
 
 </div>
@@ -1168,9 +1225,104 @@ hover:shadow-lg
 
 </div>
 
+{/* Desktop */}
+
+<div className="hidden lg:block overflow-x-auto bg-white rounded-2xl shadow border">
+
+<table className="w-full">
+
+<thead className="bg-blue-600 text-white">
+
+<tr>
+<th className="p-4 text-left">Appointment No</th>
+<th className="p-4 text-left">Patient Name</th>
+<th className="p-4 text-left">Doctor Name</th>
+<th className="p-4 text-left">Date</th>
+<th className="p-4 text-left">Contact Number</th>
+<th className="p-4 text-left">Reason</th>
+<th className="p-4 text-center">Action</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{journalEntries
+
+.filter((item) => {
+
+if (doctorSearch.trim() === "")
+return true
+
+return (
+(item.doctorName || "")
+.trim()
+.toLowerCase() ===
+doctorSearch.trim().toLowerCase()
+)
+
+})
+
+.map((item,index)=>(
+
+<tr key={index} className="border-b">
+
+<td className="p-4">
+{item.appointmentNo || "-"}
+</td>
+
+<td className="p-4">
+{item.patientName}
+</td>
+
+<td className="p-4">
+{item.doctorName}
+</td>
+
+<td className="p-4">
+{item.date}
+</td>
+
+<td className="p-4">
+{item.patientPhone || item.phone || "-"}
+</td>
+
+<td className="p-4">
+{item.reason || "-"}
+</td>
+
+<td className="p-4 text-center">
+
+<button
+onClick={() => setSelectedJournal(item)}
+className="
+bg-blue-600
+text-white
+px-4
+py-2
+rounded-lg
+"
+>
+Details
+</button>
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
 </div>
 
 )}
+
+
 
 
           {/* SUBSCRIPTION */}

@@ -58,6 +58,7 @@ const [qty,setQty] = useState("");
 const [purchase,setPurchase] = useState("");
 const [sales,setSales] = useState("");
 const [historySearch, setHistorySearch] = useState("");
+const [journalSearch,setJournalSearch] =useState("")
 
 const [activeDescribeCategory,setActiveDescribeCategory] =
 useState("All");
@@ -348,6 +349,35 @@ historyAppointments.filter((item) =>
 .toLowerCase()
 .includes(historySearch.toLowerCase())
 );
+
+const filteredJournal =
+historyAppointments.filter((item)=>{
+
+const search =
+journalSearch.toLowerCase();
+
+return (
+(item.patientName || "")
+.toLowerCase()
+.includes(search)
+
+||
+
+(item.doctorName || "")
+.toLowerCase()
+.includes(search)
+
+||
+
+(item.appointmentNo || "")
+.toString()
+.toLowerCase()
+.includes(search)
+);
+
+});
+
+
 
 
   const [callData, setCallData] = useState(null)
@@ -1918,6 +1948,29 @@ Journal Entry
     Journal Entry
   </h1>
 
+  <div className="mb-6">
+
+<input
+type="text"
+placeholder="Search Patient / Doctor..."
+value={journalSearch}
+onChange={(e)=>
+setJournalSearch(e.target.value)
+}
+className="
+w-full
+md:w-[400px]
+border
+rounded-xl
+p-3
+outline-none
+focus:ring-2
+focus:ring-blue-500
+"
+/>
+
+</div>
+
   <div className="
 grid
 grid-cols-2
@@ -2003,30 +2056,84 @@ Completed
 
 </div>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+  {/* Desktop Table */}
 
-    {historyAppointments.map((item,index)=>(
+<div className="hidden lg:block overflow-x-auto bg-white rounded-2xl shadow">
 
-      <div
-        key={index}
-        onClick={() => setSelectedJournal(item)}
-        className="bg-white rounded-2xl shadow p-5 cursor-pointer"
-      >
+<table className="w-full">
 
-        <p><b>Patient :</b> {item.patientName}</p>
-        <p><b>Doctor :</b> {item.doctorName}</p>
-        <p><b>Date :</b> {item.date}</p>
+<thead className="bg-blue-600 text-white">
 
-        <p>
-          <b>Phone :</b>
-          {item.patientPhone || item.phone || "-"}
-        </p>
+<tr>
+<th className="p-4">Appointment No</th>
+<th className="p-4">Patient</th>
+<th className="p-4">Doctor</th>
+<th className="p-4">Date</th>
+<th className="p-4">Contact</th>
+<th className="p-4">Reason</th>
+<th className="p-4">Action</th>
+</tr>
 
-      </div>
+</thead>
 
-    ))}
+<tbody>
 
-  </div>
+{filteredJournal.map((item,index)=>(
+
+<tr key={index} className="border-b">
+
+<td className="p-4">{item.appointmentNo || "-"}</td>
+<td className="p-4">{item.patientName || "-"}</td>
+<td className="p-4">{item.doctorName || "-"}</td>
+<td className="p-4">{item.date || "-"}</td>
+<td className="p-4">{item.patientPhone || item.phone || "-"}</td>
+<td className="p-4">{item.reason || "-"}</td>
+
+<td className="p-4">
+
+<button
+onClick={() => setSelectedJournal(item)}
+className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+>
+Details
+</button>
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+{/* Mobile + Tablet */}
+
+<div className="block lg:hidden space-y-4">
+
+{filteredJournal.map((item,index)=>(
+
+<div
+key={index}
+onClick={() => setSelectedJournal(item)}
+className="bg-white rounded-2xl shadow p-4 cursor-pointer"
+>
+
+<p><b>Appointment :</b> {item.appointmentNo || "-"}</p>
+<p><b>Patient :</b> {item.patientName || "-"}</p>
+<p><b>Doctor :</b> {item.doctorName || "-"}</p>
+<p><b>Date :</b> {item.date || "-"}</p>
+<p><b>Contact :</b> {item.patientPhone || item.phone || "-"}</p>
+<p><b>Reason :</b> {item.reason || "-"}</p>
+
+</div>
+
+))}
+
+</div>
 </div>
 )}
 
