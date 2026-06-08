@@ -9,7 +9,6 @@ import {
   doc,
   updateDoc
 } from "firebase/firestore";
-import * as XLSX from "xlsx"
 import { saveAs } from "file-saver"
 import {
   BarChart,
@@ -130,10 +129,7 @@ const [typeOptions,setTypeOptions]=useState([
 
     const [items, setItems] = useState([]);
 
-    const [entryItems,setEntryItems] = useState(()=>{
-        const saved = localStorage.getItem("entryItems");
-        return saved ? JSON.parse(saved) : [];
-        });
+    const [entryItems,setEntryItems] = useState([]);
 
         
         useEffect(() => {
@@ -155,45 +151,6 @@ const [typeOptions,setTypeOptions]=useState([
           fetchItems();
         
         }, []);
-
-        const exportExcel = ()=>{
-
-          const ws =
-          XLSX.utils.json_to_sheet(entryItems);
-          
-          const wb =
-          XLSX.utils.book_new();
-          
-          XLSX.utils.book_append_sheet(
-          wb,
-          ws,
-          "Journal"
-          );
-          
-          const excelBuffer =
-          XLSX.write(
-          wb,
-          {
-          bookType:"xlsx",
-          type:"array"
-          }
-          );
-          
-          const file =
-          new Blob(
-          [excelBuffer],
-          {
-          type:
-          "application/octet-stream"
-          }
-          );
-          
-          saveAs(
-          file,
-          "PharmacyJournal.xlsx"
-          );
-          
-          }
 
         const currentMonth =
 new Date().getMonth()+1;
@@ -261,6 +218,23 @@ totalIncome - totalExpense,
 0
 );
 
+const totalPurchasedQty =
+purchaseItems.reduce(
+(sum,item)=>
+sum + Number(item.qty || 0),
+0
+);
+
+const totalSoldQty =
+entryItems.reduce(
+(sum,item)=>
+sum + Number(item.qty || 0),
+0
+);
+
+const availableStock =
+totalPurchasedQty - totalSoldQty;
+
   const graphData = [
     {
     name:"Income",
@@ -286,12 +260,26 @@ totalIncome - totalExpense,
             
             },[entryItems]);
 
-            useEffect(() => {
-              const stored = localStorage.getItem("entryItems");
-              if (stored) {
-                setEntryItems(JSON.parse(stored));
-              }
-            }, []);
+           useEffect(() => {
+
+  const fetchJournal = async () => {
+
+    const querySnapshot = await getDocs(
+      collection(db,"journal")
+    );
+
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    setEntryItems(data);
+
+  };
+
+  fetchJournal();
+
+}, []);
 
             useEffect(() => {
 
@@ -312,6 +300,28 @@ totalIncome - totalExpense,
               fetchPurchase();
             
             }, []);
+
+            useEffect(() => {
+
+              const fetchJournal = async () => {
+            
+                const querySnapshot = await getDocs(
+                  collection(db,"journal")
+                );
+            
+                const data = querySnapshot.docs.map(doc => ({
+                  id: doc.id,
+                  ...doc.data()
+                }));
+            
+                setEntryItems(data);
+            
+              };
+            
+              fetchJournal();
+            
+            }, []);
+
             const addPurchase = async () => {
 
               if(!type || !medicine || !qty || !purchasePrice){
@@ -605,6 +615,11 @@ const addMedicine = async () => {
       data
     );
   
+    await addDoc(
+      collection(db,"journal"),
+      data
+    );
+
     // TABLE SAVE
     setEntryItems(prev => [
       ...prev,
@@ -2433,39 +2448,6 @@ Print
 Journal Entry
 </h1>
 
-<div className="flex gap-4 mb-6">
-
-<button
-onClick={exportExcel}
-className="
-bg-green-600
-text-white
-px-5
-py-3
-rounded-xl
-font-semibold
-"
->
-Export Excel
-</button>
-
-</div>
-
-<input
-type="text"
-placeholder="Search Medicine..."
-value={journalSearch}
-onChange={(e)=>setJournalSearch(e.target.value)}
-className="
-w-full
-md:w-[400px]
-border
-rounded-xl
-px-4
-py-3
-mb-6
-"
-/>
 
 {/* Summary Cards */}
 
@@ -2542,6 +2524,37 @@ Number(item.qty || 0)
 </div>
 </div>
 
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+<div className="bg-white rounded-3xl shadow p-6">
+<h3 className="text-xl font-bold">
+Purchased Qty
+</h3>
+<p className="text-4xl font-bold text-blue-600">
+{totalPurchasedQty}
+</p>
+</div>
+
+<div className="bg-white rounded-3xl shadow p-6">
+<h3 className="text-xl font-bold">
+Sold Qty
+</h3>
+<p className="text-4xl font-bold text-green-600">
+{totalSoldQty}
+</p>
+</div>
+
+<div className="bg-white rounded-3xl shadow p-6">
+<h3 className="text-xl font-bold">
+Available Stock
+</h3>
+<p className="text-4xl font-bold text-purple-600">
+{availableStock}
+</p>
+</div>
+
+</div>
+
 <div className="bg-white rounded-3xl shadow p-6 mt-6">
 
 <h2 className="text-2xl font-bold mb-4">
@@ -2580,6 +2593,37 @@ Number(item.qty||0)),
 )
 }
 </p>
+</div>
+
+<br />
+
+<div className="bg-white rounded-3xl shadow p-6 mb-6">
+
+<h2 className="text-2xl font-bold mb-4">
+Medicine Wise Sales
+</h2>
+
+{entryItems.map((item,index)=>(
+
+<div
+key={index}
+className="flex justify-between border-b py-3"
+>
+
+<span>{item.medicine}</span>
+
+<span>
+Qty : {item.qty}
+</span>
+
+<span>
+₹{item.salesPrice}
+</span>
+
+</div>
+
+))}
+
 </div>
 
 {/* GRAPH START */}
