@@ -1263,42 +1263,58 @@ onClick={() => setSelectedJournal(item)}
 className="
 bg-white
 border
-rounded-2xl
-p-4
-shadow
+rounded-3xl
+p-6
+shadow-md
 cursor-pointer
 "
 >
 
-<p>
-<b>Appointment No :</b>
-{item.appointmentNo || "-"}
-</p>
+<div className="grid grid-cols-[140px_1fr] gap-y-4">
 
-<p>
-<b>Patient :</b>
-{item.patientName || "-"}
-</p>
-
-<p>
-<b>Doctor :</b>
-{item.doctorName || "-"}
-</p>
-
-<p>
-<b>Date :</b>
+<span className="text-gray-500 font-semibold">
+Date
+</span>
+<span className="text-right font-semibold">
 {item.date || "-"}
-</p>
+</span>
 
-<p>
-<b>Contact :</b>
-{item.patientPhone || item.phone || "-"}
-</p>
+<span className="text-gray-500 font-semibold">
+Appointment No
+</span>
+<span className="text-right font-semibold">
+{item.appointmentNo || "-"}
+</span>
 
-<p>
-<b>Reason :</b>
-{item.reason || "-"}
-</p>
+<span className="text-gray-500 font-semibold">
+Patient
+</span>
+<span className="text-right font-bold">
+{item.patientName || "-"}
+</span>
+
+<span className="text-gray-500 font-semibold">
+Doctor
+</span>
+<span className="text-right">
+{item.doctorName || "-"}
+</span>
+
+<span className="text-gray-500 font-semibold">
+Income
+</span>
+<span className="text-right text-green-600 font-bold">
+₹{item.totalAmount || 0}
+</span>
+
+<span className="text-gray-500 font-semibold">
+Expense
+</span>
+<span className="text-right text-red-600 font-bold">
+₹{item.medicineFee || 0}
+</span>
+
+</div>
 
 </div>
 
@@ -1315,12 +1331,12 @@ cursor-pointer
 <thead className="bg-blue-600 text-white">
 
 <tr>
+<th className="p-4 text-left">Date</th>
 <th className="p-4 text-left">Appointment No</th>
 <th className="p-4 text-left">Patient Name</th>
 <th className="p-4 text-left">Doctor Name</th>
-<th className="p-4 text-left">Date</th>
-<th className="p-4 text-left">Contact Number</th>
-<th className="p-4 text-left">Reason</th>
+<th className="p-4 text-left">Income</th>
+<th className="p-4 text-left">Expense</th>
 <th className="p-4 text-center">Action</th>
 </tr>
 
@@ -1332,23 +1348,27 @@ cursor-pointer
 
 .filter((item) => {
 
-if (doctorSearch.trim() === "")
-return true
-
-return (
-(item.doctorName || "")
-.trim()
-.toLowerCase() ===
-doctorSearch.trim().toLowerCase()
-)
-
-})
+  if (doctorSearch.trim() === "")
+  return true
+  
+  return (
+  (item.doctorName || "")
+  .trim()
+  .toLowerCase() ===
+  doctorSearch.trim().toLowerCase()
+  )
+  
+  })
 
 .map((item,index)=>(
 
 <tr key={index} className="border-b">
 
 <td className="p-4">
+{item.date}
+</td>
+
+<td className="p-4 font-semibold">
 {item.appointmentNo || "-"}
 </td>
 
@@ -1356,21 +1376,18 @@ doctorSearch.trim().toLowerCase()
 {item.patientName}
 </td>
 
-<td className="p-4">
-{item.doctorName}
+<td className="font-semibold p-4">
+  {item.doctorName || "-"}
 </td>
 
-<td className="p-4">
-{item.date}
+<td className="p-4 text-green-600 font-bold">
+₹{item.totalAmount || 0}
 </td>
 
-<td className="p-4">
-{item.patientPhone || item.phone || "-"}
+<td className="p-4 text-red-600 font-bold">
+₹{item.medicineFee || 0}
 </td>
 
-<td className="p-4">
-{item.reason || "-"}
-</td>
 
 <td className="p-4 text-center">
 

@@ -1189,32 +1189,7 @@ useEffect(() => {
             
             });
 
-            const filteredJournal = appointmentHistory.filter((item)=>{
-
-                const search = journalSearch.toLowerCase();
-                
-                return (
-                
-                (item.patientName || "")
-                .toLowerCase()
-                .includes(search)
-                
-                ||
-                
-                (item.doctorName || "")
-                .toLowerCase()
-                .includes(search)
-                
-                ||
-                
-                (item.appointmentNo || "")
-                .toString()
-                .toLowerCase()
-                .includes(search)
-                
-                );
-                
-                });
+            const filteredJournal = appointmentHistory
 
     const formatConsultationTime = (seconds) => {
 
@@ -2013,12 +1988,11 @@ sum + Number(item.totalAmount || 0),
 <thead className="bg-blue-600 text-white">
 
 <tr>
+<th className="p-4">Date</th>
 <th className="p-4">Appointment No</th>
 <th className="p-4">Patient</th>
-<th className="p-4">Doctor</th>
-<th className="p-4">Date</th>
-<th className="p-4">Contact</th>
-<th className="p-4">Reason</th>
+<th className="p-4">Income</th>
+<th className="p-4">Expense</th>
 <th className="p-4">Action</th>
 </tr>
 
@@ -2030,12 +2004,23 @@ sum + Number(item.totalAmount || 0),
 
 <tr key={index} className="border-b">
 
-<td className="p-4">{item.appointmentNo || "-"}</td>
-<td className="p-4">{item.patientName || "-"}</td>
-<td className="p-4">{item.doctorName || "-"}</td>
 <td className="p-4">{item.date || "-"}</td>
-<td className="p-4">{item.patientPhone || "-"}</td>
-<td className="p-4">{item.reason || "-"}</td>
+
+<td className="p-4 font-semibold">
+{item.appointmentNo || "-"}
+</td>
+
+<td className="p-4">
+{item.patientName || "-"}
+</td>
+
+<td className="p-4 text-green-600 font-bold">
+₹{item.totalAmount || 0}
+</td>
+
+<td className="p-4 text-red-600 font-bold">
+₹{item.medicineFee || 0}
+</td>
 
 <td className="p-4">
 
@@ -2074,12 +2059,23 @@ cursor-pointer
 "
 >
 
-<p><b>Appointment :</b> {item.appointmentNo}</p>
-<p><b>Patient :</b> {item.patientName}</p>
-<p><b>Doctor :</b> {item.doctorName}</p>
 <p><b>Date :</b> {item.date}</p>
-<p><b>Contact :</b> {item.patientPhone}</p>
-<p><b>Reason :</b> {item.reason}</p>
+
+<p><b>Appointment No :</b>
+{item.appointmentNo || "-"}
+</p>
+
+<p><b>Patient :</b>
+{item.patientName}
+</p>
+
+<p className="text-green-600 font-bold">
+Income : ₹{item.totalAmount || 0}
+</p>
+
+<p className="text-red-600 font-bold">
+Expense : ₹{item.medicineFee || 0}
+</p>
 
 </div>
 

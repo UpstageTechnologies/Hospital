@@ -2695,20 +2695,35 @@ radius={[10,10,0,0]}
 
 {/* Table */}
 
-<div className="bg-white rounded-2xl shadow overflow-x-auto">
+{/* Expense Details */}
+
+<div className="bg-white rounded-3xl shadow-lg border overflow-hidden mb-8">
+
+<div className="p-5">
+<h2 className="text-3xl font-bold text-red-600">
+💸 Expense Details
+</h2>
+</div>
+
+<div className="overflow-x-auto">
 
 <table className="w-full">
 
 <thead>
 
-<tr className="bg-blue-600 text-white">
+<tr className="bg-red-500 text-white">
 
-<th className="p-4">Medicine</th>
-<th>Qty</th>
-<th>Income</th>
-<th>Expense</th>
-<th>Date</th>
-<th>Print</th>
+<th className="px-6 py-4 text-left">Date</th>
+
+<th className="px-6 py-4 text-left">Medicine</th>
+
+<th className="px-6 py-4 text-center">Qty</th>
+
+<th className="px-6 py-4 text-center">Expense</th>
+
+<th className="px-6 py-4 text-center">Time</th>
+
+<th className="px-6 py-4 text-center">Action</th>
 
 </tr>
 
@@ -2716,53 +2731,48 @@ radius={[10,10,0,0]}
 
 <tbody>
 
-{entryItems
-.filter(item=>
-
-item.medicine
-?.toLowerCase()
-.includes(
-journalSearch.toLowerCase()
-)
-
-)
-.map((item,index)=>(
+{purchaseItems.map((item,index)=>(
 
 <tr
 key={index}
-className="border-b"
+className="border-b hover:bg-gray-50 transition"
 >
 
-<td className="p-4">
-{item.medicine}
-</td>
-
-<td>
-{item.qty}
-</td>
-
-<td>
-₹{item.salesPrice}
-</td>
-
-<td>
-₹{item.purchasePrice}
-</td>
-
-<td>
+<td className="px-6 py-4">
 {item.date}
 </td>
 
-<td>
+<td className="px-6 py-4 font-medium">
+{item.medicine}
+</td>
+
+<td className="px-6 py-4 text-center">
+{item.qty}
+</td>
+
+<td className="px-6 py-4 text-center font-bold text-red-600">
+₹{
+Number(item.purchasePrice || 0) *
+Number(item.qty || 0)
+}
+</td>
+
+<td className="px-6 py-4 text-center text-gray-500">
+{item.time}
+</td>
+
+<td className="px-6 py-4 text-center">
 
 <button
-onClick={()=>printRow(item,"Journal")}
+onClick={()=>printRow(item,"Expense")}
 className="
 bg-blue-600
+hover:bg-blue-700
 text-white
-px-4
+px-5
 py-2
 rounded-xl
+font-semibold
 "
 >
 Print
@@ -2780,6 +2790,102 @@ Print
 
 </div>
 
+</div>
+
+
+{/* Income Details */}
+
+<div className="bg-white rounded-3xl shadow-lg border overflow-hidden">
+
+<div className="p-5">
+<h2 className="text-3xl font-bold text-green-600">
+💰 Income Details
+</h2>
+</div>
+
+<div className="overflow-x-auto">
+
+<table className="w-full">
+
+<thead>
+
+<tr className="bg-green-500 text-white">
+
+<th className="px-6 py-4 text-left">Date</th>
+
+<th className="px-6 py-4 text-left">Customer Name</th>
+
+<th className="px-6 py-4 text-center">Qty</th>
+
+<th className="px-6 py-4 text-center">Income</th>
+
+<th className="px-6 py-4 text-center">Time</th>
+
+<th className="px-6 py-4 text-center">Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{entryItems.map((item,index)=>(
+
+<tr
+key={index}
+className="border-b hover:bg-gray-50 transition"
+>
+
+<td className="px-6 py-4">
+{item.date}
+</td>
+
+<td className="px-6 py-4 font-medium">
+{item.customerName || "Walk In"}
+</td>
+
+<td className="px-6 py-4 text-center">
+{item.qty}
+</td>
+
+<td className="px-6 py-4 text-center font-bold text-green-600">
+₹{item.salesPrice}
+</td>
+
+<td className="px-6 py-4 text-center text-gray-500">
+{item.time}
+</td>
+
+<td className="px-6 py-4 text-center">
+
+<button
+onClick={()=>printRow(item,"Income")}
+className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-5
+py-2
+rounded-xl
+font-semibold
+"
+>
+Print
+</button>
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
 </div>
 
 )}
