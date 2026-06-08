@@ -1154,6 +1154,87 @@ focus:border-blue-600
 
 </div>
 
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+<div
+className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+border-l-[8px]
+border-blue-500
+"
+>
+
+<h3 className="text-gray-500 text-xl font-semibold">
+Today Income
+</h3>
+
+<p className="text-4xl font-bold text-blue-500 mt-3">
+₹{
+journalEntries.reduce(
+(sum,item)=>
+sum +
+Number(item.totalAmount || 0),
+0
+)
+}
+</p>
+
+</div>
+
+<div
+className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+border-l-[8px]
+border-yellow-500
+"
+>
+
+<h3 className="text-gray-500 text-xl font-semibold">
+Today Expense
+</h3>
+
+<p className="text-4xl font-bold text-yellow-500 mt-3">
+₹0
+</p>
+
+</div>
+
+<div
+className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+border-l-[8px]
+border-green-500
+"
+>
+
+<h3 className="text-gray-500 text-xl font-semibold">
+Today Profit
+</h3>
+
+<p className="text-4xl font-bold text-green-500 mt-3">
+₹{
+journalEntries.reduce(
+(sum,item)=>
+sum +
+Number(item.totalAmount || 0),
+0
+)
+}
+</p>
+
+</div>
+
+</div>
+
 {/* MOBILE + TABLET */}
 
 <div className="block lg:hidden space-y-4">
@@ -1693,6 +1774,77 @@ Doctor
 
   </div>
 
+  {/* Income Expense Profit Cards */}
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+<div className="
+  bg-white
+  rounded-3xl
+  shadow-lg
+  p-6
+  border-l-[8px]
+  border-blue-500
+">
+  <h3 className="text-gray-500 text-xl font-semibold">
+    Today Income
+  </h3>
+
+  <p className="text-4xl font-bold text-blue-500 mt-3">
+    ₹{
+      journalEntries.reduce(
+        (sum,item)=>
+          sum +
+          Number(item.totalAmount || 0),
+        0
+      )
+    }
+  </p>
+</div>
+
+<div className="
+  bg-white
+  rounded-3xl
+  shadow-lg
+  p-6
+  border-l-[8px]
+  border-yellow-500
+">
+  <h3 className="text-gray-500 text-xl font-semibold">
+    Today Expense
+  </h3>
+
+  <p className="text-4xl font-bold text-yellow-500 mt-3">
+    ₹0
+  </p>
+</div>
+
+<div className="
+  bg-white
+  rounded-3xl
+  shadow-lg
+  p-6
+  border-l-[8px]
+  border-green-500
+">
+  <h3 className="text-gray-500 text-xl font-semibold">
+    Today Profit
+  </h3>
+
+  <p className="text-4xl font-bold text-green-500 mt-3">
+    ₹{
+      journalEntries.reduce(
+        (sum,item)=>
+          sum +
+          Number(item.totalAmount || 0),
+        0
+      )
+    }
+  </p>
+</div>
+
+</div>
+
   {/* DESKTOP */}
 
   <div className="hidden lg:block overflow-x-auto rounded-2xl shadow border bg-white">
@@ -2214,93 +2366,202 @@ selectedJournal.labTests?.length
 
 </div>
 
-<div className="
-grid
-md:grid-cols-3
-gap-5
-mt-10
-">
+<div className="grid lg:grid-cols-3 gap-6 mt-8">
 
-<div className="
-bg-yellow-50
-rounded-2xl
-p-5
-mb-6
-">
+  {/* Fee Details */}
 
-<h3 className="font-bold text-lg mb-2">
-Treatment Summary
-</h3>
+  <div className="
+  bg-white
+  border
+  rounded-3xl
+  p-6
+  shadow-sm
+  ">
 
-<p>
-{selectedJournal.solution ||
-"No treatment notes available"}
-</p>
+    <h3 className="text-3xl font-bold mb-6">
+      Fee Details
+    </h3>
 
-</div>
+    <div className="mb-6">
 
-<div className="
-bg-gray-100
-rounded-2xl
-p-5
-mb-6
-">
+      <h4 className="
+      text-green-600
+      text-2xl
+      font-bold
+      mb-3
+      ">
+        Consultancy Fee
+      </h4>
 
-<h3 className="font-bold text-lg mb-2">
-Case Summary
-</h3>
+      <div className="flex justify-between">
+        <span>Doctor Consultation</span>
+        <b>₹{selectedJournal.consultancyFee || 0}</b>
+      </div>
 
-<p>
-Patient visited
-Dr. {selectedJournal.doctorName}
-for
-{selectedJournal.reason || "Consultation"}.
-Treatment completed successfully.
-</p>
+    </div>
 
-</div>
+    <div className="bg-yellow-50 rounded-2xl p-5">
 
-<div className="
-bg-green-100
-rounded-2xl
-p-6
-">
+      <div className="flex justify-between mb-3">
+        <span className="font-bold">
+          Consultancy Fee
+        </span>
 
-<h3 className="font-bold text-xl">
-Consultancy Fee
-</h3>
+        <b>
+          ₹{selectedJournal.consultancyFee || 0}
+        </b>
+      </div>
 
-₹ {selectedJournal.consultancyFee || 0}
+      <div className="flex justify-between mb-3">
+        <span className="font-bold">
+          Medicine Fee
+        </span>
 
-</div>
+        <b>
+          ₹{selectedJournal.medicineFee || 0}
+        </b>
+      </div>
 
-<div className="
-bg-blue-100
-rounded-2xl
-p-6
-">
+      <hr className="my-4"/>
 
-<h3 className="font-bold text-xl">
-Medicine Fee
-</h3>
+      <div className="flex justify-between text-2xl font-bold">
+        <span>Total Amount</span>
 
-₹ {selectedJournal.medicineFee || 0}
+        <span>
+          ₹{selectedJournal.totalAmount || 0}
+        </span>
+      </div>
 
-</div>
+    </div>
 
-<div className="
-bg-yellow-100
-rounded-2xl
-p-6
-">
+  </div>
 
-<h3 className="font-bold text-xl">
-Total
-</h3>
 
-₹ {selectedJournal.totalAmount || 0}
+  {/* Patient Summary */}
 
-</div>
+  <div className="
+  bg-blue-50
+  border
+  rounded-3xl
+  p-6
+  shadow-sm
+  ">
+
+    <h3 className="text-3xl font-bold mb-6">
+      Patient Summary
+    </h3>
+
+    <div className="space-y-4">
+
+      <div className="flex justify-between">
+        <span>👤 Patient</span>
+        <b>{selectedJournal.patientName}</b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>👨‍⚕️ Doctor</span>
+        <b>{selectedJournal.doctorName}</b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>📅 Visit Date</span>
+        <b>{selectedJournal.date}</b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>📞 Contact</span>
+        <b>
+          {selectedJournal.patientPhone ||
+          selectedJournal.phone ||
+          "-"}
+        </b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>📍 Address</span>
+        <b>{selectedJournal.address || "-"}</b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>💊 Prescriptions</span>
+        <b>
+          {selectedJournal.prescriptions?.length || 0}
+        </b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>🩸 Blood Group</span>
+        <b>
+          {selectedJournal.bloodGroup || "-"}
+        </b>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* Appointment Info */}
+
+  <div className="
+  bg-green-50
+  border
+  rounded-3xl
+  p-6
+  shadow-sm
+  ">
+
+    <h3 className="text-3xl font-bold mb-6">
+      Appointment Info
+    </h3>
+
+    <div className="space-y-4">
+
+      <div>
+        📋 Appointment No :
+        <b>
+          {selectedJournal.appointmentNo}
+        </b>
+      </div>
+
+      <div>
+        💳 Payment :
+        <b>
+          {selectedJournal.paymentStatus || "Paid"}
+        </b>
+      </div>
+
+      <div>
+        📊 Status :
+        <b>
+          {selectedJournal.status || "Treated"}
+        </b>
+      </div>
+
+      <div>
+        💊 Medicines :
+        <b>
+          {selectedJournal.medicines?.length || 0}
+        </b>
+      </div>
+
+      <div>
+        🧪 Lab Tests :
+        <b>
+          {selectedJournal.labTests?.length || 0}
+        </b>
+      </div>
+
+      <div>
+        ⏰ Time :
+        <b>
+          {selectedJournal.time || "-"}
+        </b>
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
 

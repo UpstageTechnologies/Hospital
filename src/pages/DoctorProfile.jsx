@@ -627,6 +627,88 @@ const printHistory = (item) => {
         </div>
         
         </body>
+
+        <div class="section">
+
+<h2>Appointment Information</h2>
+
+<p>
+<b>Appointment No :</b>
+${item.appointmentNo || "-"}
+</p>
+
+<p>
+<b>Payment Status :</b>
+${item.paymentStatus || "Paid"}
+</p>
+
+<p>
+<b>Status :</b>
+${item.status || "Treated"}
+</p>
+
+<p>
+<b>Medicine Count :</b>
+${item.medicines?.length || 0}
+</p>
+
+<p>
+<b>Consultation Duration :</b>
+${item.consultationTime || "-"}
+</p>
+
+</div>
+
+<div class="section">
+
+<h2>Fee & Appointment Summary</h2>
+
+<table
+style="
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+"
+>
+
+<tr>
+<td><b>Consultancy Fee</b></td>
+<td>₹${item.consultancyFee || 0}</td>
+</tr>
+
+<tr>
+<td><b>Medicine Fee</b></td>
+<td>₹${item.medicineFee || 0}</td>
+</tr>
+
+<tr>
+<td><b>Total Amount</b></td>
+<td>₹${item.totalAmount || 0}</td>
+</tr>
+
+<tr>
+<td><b>Appointment No</b></td>
+<td>${item.appointmentNo || "-"}</td>
+</tr>
+
+<tr>
+<td><b>Payment Status</b></td>
+<td>${item.paymentStatus || "Paid"}</td>
+</tr>
+
+<tr>
+<td><b>Status</b></td>
+<td>${item.status || "Treated"}</td>
+</tr>
+
+<tr>
+<td><b>Medicine Count</b></td>
+<td>${item.medicines?.length || 0}</td>
+</tr>
+
+</table>
+
+</div>
         
         </html>
         
@@ -1852,6 +1934,75 @@ p-3
 
 </div>
 
+{/* Income Expense Profit */}
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+<div className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+border-l-[8px]
+border-blue-500
+">
+<p className="text-gray-500 text-lg font-semibold">
+Today Income
+</p>
+
+<p className="text-4xl font-bold text-blue-500 mt-3">
+₹{
+appointmentHistory.reduce(
+(sum,item)=>
+sum + Number(item.totalAmount || 0),
+0
+)
+}
+</p>
+</div>
+
+<div className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+border-l-[8px]
+border-yellow-500
+">
+<p className="text-gray-500 text-lg font-semibold">
+Today Expense
+</p>
+
+<p className="text-4xl font-bold text-yellow-500 mt-3">
+₹0
+</p>
+</div>
+
+<div className="
+bg-white
+rounded-3xl
+shadow-lg
+p-6
+border-l-[8px]
+border-green-500
+">
+<p className="text-gray-500 text-lg font-semibold">
+Today Profit
+</p>
+
+<p className="text-4xl font-bold text-green-500 mt-3">
+₹{
+appointmentHistory.reduce(
+(sum,item)=>
+sum + Number(item.totalAmount || 0),
+0
+)
+}
+</p>
+</div>
+
+</div>
+
 
 {/* Desktop */}
 
@@ -2118,19 +2269,294 @@ mt-5
 <div className="bg-green-100 p-4 rounded-xl">
 Consultancy Fee
 <br/>
-<b>₹{selectedJournal.consultancyFee}</b>
+<b>₹{selectedJournal.consultancyFee || 0}</b>
 </div>
 
 <div className="bg-blue-100 p-4 rounded-xl">
 Medicine Fee
 <br/>
-<b>₹{selectedJournal.medicineFee}</b>
+<b>₹{selectedJournal.medicineFee || 0}</b>
 </div>
 
 <div className="bg-yellow-100 p-4 rounded-xl">
 Total
 <br/>
-<b>₹{selectedJournal.totalAmount}</b>
+<b>₹{selectedJournal.totalAmount || 0}</b>
+</div>
+
+<div className="mt-6 bg-white border rounded-2xl p-5">
+
+<h2 className="text-xl font-bold mb-4">
+Fee Details
+</h2>
+
+{/* Consultancy */}
+
+<div className="mb-5">
+
+<h3 className="font-bold text-green-700 text-lg">
+Consultancy Fee
+</h3>
+
+<div className="flex justify-between border-b py-2">
+
+<span>Doctor Consultation</span>
+
+<span>
+₹{selectedJournal.consultancyFee || 0}
+</span>
+
+</div>
+
+</div>
+
+{/* Medicine */}
+
+<div className="mb-5">
+
+<h3 className="font-bold text-blue-700 text-lg">
+Medicine Details
+</h3>
+
+<div className="overflow-x-auto">
+
+<table className="w-full min-w-[600px] border">
+
+<thead className="bg-blue-100">
+
+<tr>
+
+<th className="p-3 text-left w-[40%]">
+Medicine
+</th>
+
+<th className="p-3 text-center w-[15%]">
+Qty
+</th>
+
+<th className="p-3 text-center w-[20%]">
+Rate
+</th>
+
+<th className="p-3 text-center w-[25%]">
+Amount
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{selectedJournal.medicines?.map((med,index)=>{
+
+const qty =
+(Number(med.morning||0)+
+Number(med.afternoon||0)+
+Number(med.night||0))
+*
+Number(med.days||0)
+
+return(
+
+<tr
+key={index}
+className="border-b"
+>
+
+<td className="p-3">
+{med.medicine}
+</td>
+
+<td className="p-3 text-center">
+{qty}
+</td>
+
+<td className="p-3 text-center">
+₹{med.price}
+</td>
+
+<td className="p-3 text-center font-semibold text-green-600">
+₹{med.total}
+</td>
+
+</tr>
+
+)
+
+})}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+{/* Total */}
+
+<div className="
+bg-yellow-100
+rounded-xl
+p-4
+mt-4
+">
+
+<div className="flex justify-between">
+
+<span className="font-bold">
+Consultancy Fee
+</span>
+
+<span>
+₹{selectedJournal.consultancyFee || 0}
+</span>
+
+</div>
+
+<div className="flex justify-between mt-2">
+
+<span className="font-bold">
+Medicine Fee
+</span>
+
+<span>
+₹{selectedJournal.medicineFee || 0}
+</span>
+
+</div>
+
+<hr className="my-3"/>
+
+<div className="flex justify-between text-xl font-bold">
+
+<span>Total Amount</span>
+
+<span>
+₹{selectedJournal.totalAmount || 0}
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div className="
+bg-blue-50
+rounded-2xl
+p-6
+border
+shadow-sm
+">
+
+<h3 className="font-bold text-xl mb-5">
+Patient Summary
+</h3>
+
+<div className="space-y-4 text-[15px]">
+
+<div className="flex justify-between">
+<span>👤 Patient</span>
+<b>{selectedJournal.patientName || "-"}</b>
+</div>
+
+<div className="flex justify-between">
+<span>👨‍⚕️ Doctor</span>
+<b>{selectedJournal.doctorName || "-"}</b>
+</div>
+
+<div className="flex justify-between">
+<span>📅 Visit Date</span>
+<b>{selectedJournal.date || "-"}</b>
+</div>
+
+<div className="flex justify-between">
+<span>📞 Contact</span>
+<b>{selectedJournal.patientPhone || "-"}</b>
+</div>
+
+<div className="flex justify-between">
+<span>🎂 Age</span>
+<b>{selectedJournal.age || "-"}</b>
+</div>
+
+<div className="flex justify-between">
+<span>⚧ Gender</span>
+<b>{selectedJournal.gender || "-"}</b>
+</div>
+
+<div className="flex justify-between">
+<span>🩸 Blood Group</span>
+<b>{selectedJournal.bloodGroup || "-"}</b>
+</div>
+
+<div className="flex justify-between">
+<span>📍 Address</span>
+<b>{selectedJournal.address || "-"}</b>
+</div>
+
+<div className="flex justify-between">
+<span>🧪 Lab Tests</span>
+<b>
+{selectedJournal.labTests?.length || 0}
+</b>
+</div>
+
+<div className="flex justify-between">
+<span>💊 Prescriptions</span>
+<b>
+{selectedJournal.medicines?.length || 0}
+</b>
+</div>
+
+<div className="flex justify-between">
+<span>⏱ Duration</span>
+<b>
+{selectedJournal.consultationTime || "-"}
+</b>
+</div>
+
+</div>
+
+</div>
+
+
+<div className="
+bg-green-50
+rounded-2xl
+p-5
+border
+mt-5
+">
+
+<h3 className="font-bold text-xl mb-4">
+Appointment Info
+</h3>
+
+<p>
+📋 Appointment No :
+<b> {selectedJournal.appointmentNo}</b>
+</p>
+
+<p className="mt-2">
+💳 Payment :
+<b> {selectedJournal.paymentStatus || "Paid"}</b>
+</p>
+
+<p className="mt-2">
+📊 Status :
+<b> {selectedJournal.status || "Completed"}</b>
+</p>
+
+<p className="mt-2">
+💊 Medicines :
+<b>
+{selectedJournal.medicines?.length || 0}
+</b>
+</p>
+
 </div>
 
 </div>
@@ -3562,15 +3988,6 @@ const historyData = {
     appointmentNo:
     selectedAppointment?.appointmentNo || "",
     
-    email:
-    selectedAppointment?.email || "",
-    
-    gender:
-    selectedAppointment?.gender || "",
-    
-    bloodGroup:
-    selectedAppointment?.bloodGroup || "",
-    
     age:
     selectedAppointment?.age || "",
     
@@ -3601,16 +4018,32 @@ const historyData = {
     consultationSeconds
     ),
     
-    paymentStatus:
-    "Paid",
+    paymentStatus:"Paid",
     
-    status:
-    "Treated",
+    /* 🔥 ADD THESE */
+    
+    consultancyFee: 600,
+    
+    medicineFee: Number(totalAmount || 0),
+    
+    totalAmount:
+    Number(600) +
+    Number(totalAmount || 0),
+    
+    medicines:
+    prescriptionList || [],
+    
+    status:"Treated",
     
     createdAt:
     serverTimestamp()
-    
-    };
+    }
+
+    await addDoc(
+        collection(db, "appointmentHistory"),
+        historyData
+      );
+
     const appointmentQuery = query(
 
         collection(db, "appointments"),

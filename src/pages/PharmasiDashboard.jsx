@@ -9,7 +9,17 @@ import {
   doc,
   updateDoc
 } from "firebase/firestore";
-
+import * as XLSX from "xlsx"
+import { saveAs } from "file-saver"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+  } from "recharts";
 
 const PharmasiDashboard=()=>{
 
@@ -28,6 +38,7 @@ const [entryType,setEntryType] = useState("")
 const [showEntryDropdown,setShowEntryDropdown] = useState(false)
 const [purchaseItems,setPurchaseItems] = useState([]);
 const [salesItems,setSalesItems] = useState([]);
+const [journalSearch,setJournalSearch] = useState("")
 
 
 const printRow = (item, type) => {
@@ -144,6 +155,126 @@ const [typeOptions,setTypeOptions]=useState([
           fetchItems();
         
         }, []);
+
+        const exportExcel = ()=>{
+
+          const ws =
+          XLSX.utils.json_to_sheet(entryItems);
+          
+          const wb =
+          XLSX.utils.book_new();
+          
+          XLSX.utils.book_append_sheet(
+          wb,
+          ws,
+          "Journal"
+          );
+          
+          const excelBuffer =
+          XLSX.write(
+          wb,
+          {
+          bookType:"xlsx",
+          type:"array"
+          }
+          );
+          
+          const file =
+          new Blob(
+          [excelBuffer],
+          {
+          type:
+          "application/octet-stream"
+          }
+          );
+          
+          saveAs(
+          file,
+          "PharmacyJournal.xlsx"
+          );
+          
+          }
+
+        const currentMonth =
+new Date().getMonth()+1;
+
+const monthlyIncome =
+entryItems
+.filter(item => {
+
+const month =
+new Date(item.date).getMonth()+1;
+
+return month===currentMonth;
+
+})
+.reduce(
+(sum,item)=>
+sum + Number(item.salesPrice||0),
+0
+);
+
+const monthlyExpense =
+purchaseItems
+.filter(item => {
+
+const month =
+new Date(item.date).getMonth()+1;
+
+return month===currentMonth;
+
+})
+.reduce(
+(sum,item)=>
+sum +
+(
+Number(item.purchasePrice||0)
+*
+Number(item.qty||0)
+),
+0
+);
+
+
+const totalIncome =
+entryItems.reduce(
+(sum,item)=>
+sum + Number(item.salesPrice || 0),
+0
+);
+
+const totalExpense =
+purchaseItems.reduce(
+(sum,item)=>
+sum +
+(
+Number(item.purchasePrice || 0)
+*
+Number(item.qty || 0)
+),
+0
+);
+
+const totalProfit =
+Math.max(
+totalIncome - totalExpense,
+0
+);
+
+  const graphData = [
+    {
+    name:"Income",
+    amount: totalIncome
+    },
+    {
+    name:"Expense",
+    amount: totalExpense
+    },
+    {
+    name:"Profit",
+    amount: totalProfit
+    }
+    ];
           
 
         useEffect(()=>{
@@ -644,6 +775,10 @@ Purchase
 <li onClick={()=>setMenu("sales")} className="cursor-pointer">
 Sales
 </li>
+
+<li onClick={()=>setMenu("journal")}className="cursor-pointer">
+Journal Entry
+</li>
 </ul>
 
 </div>
@@ -662,7 +797,7 @@ border-t
 shadow-md
 ">
 
-<div className="grid grid-cols-4 py-3 text-black">
+<div className="grid grid-cols-5 py-3 text-black">
 
 <button
 onClick={()=>setMenu("home")}
@@ -701,6 +836,16 @@ className="flex flex-col items-center gap-2"
 <span className="text-2xl">💰</span>
 <span className="text-base font-medium">
 Sales
+</span>
+</button>
+
+<button
+onClick={()=>setMenu("journal")}
+className="flex flex-col items-center gap-2"
+>
+<span className="text-2xl">📒</span>
+<span className="text-base font-medium">
+Journal
 </span>
 </button>
 
@@ -2273,6 +2418,321 @@ Print
 </div>
 
 ))}
+
+</div>
+
+</div>
+
+)}
+
+{menu==="journal" && (
+
+<div>
+
+<h1 className="text-4xl font-bold mb-8">
+Journal Entry
+</h1>
+
+<div className="flex gap-4 mb-6">
+
+<button
+onClick={exportExcel}
+className="
+bg-green-600
+text-white
+px-5
+py-3
+rounded-xl
+font-semibold
+"
+>
+Export Excel
+</button>
+
+</div>
+
+<input
+type="text"
+placeholder="Search Medicine..."
+value={journalSearch}
+onChange={(e)=>setJournalSearch(e.target.value)}
+className="
+w-full
+md:w-[400px]
+border
+rounded-xl
+px-4
+py-3
+mb-6
+"
+/>
+
+{/* Summary Cards */}
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+<div className="bg-white rounded-3xl shadow p-6 border-l-[8px] border-blue-500">
+<h3 className="text-gray-500 text-xl font-semibold">
+Income
+</h3>
+
+<p className="text-4xl font-bold text-blue-500 mt-3">
+
+₹{
+entryItems.reduce(
+(sum,item)=>
+sum + Number(item.salesPrice || 0),
+0
+)
+}
+
+</p>
+</div>
+
+<div className="bg-white rounded-3xl shadow p-6 border-l-[8px] border-yellow-500">
+<h3 className="text-gray-500 text-xl font-semibold">
+Expense
+</h3>
+
+<p className="text-4xl font-bold text-yellow-500 mt-3">
+
+₹{
+purchaseItems.reduce(
+(sum,item)=>
+sum +
+(
+Number(item.purchasePrice || 0)
+*
+Number(item.qty || 0)
+),
+0
+)
+}
+
+</p>
+</div>
+
+<div className="bg-white rounded-3xl shadow p-6 border-l-[8px] border-green-500">
+<h3 className="text-gray-500 text-xl font-semibold">
+Profit
+</h3>
+
+<p className="text-4xl font-bold text-green-500 mt-3">
+
+₹{
+entryItems.reduce(
+(sum,item)=>
+sum + Number(item.salesPrice || 0),
+0
+)
+-
+purchaseItems.reduce(
+(sum,item)=>
+sum +
+(
+Number(item.purchasePrice || 0)
+*
+Number(item.qty || 0)
+),
+0
+)
+}
+
+</p>
+</div>
+</div>
+
+<div className="bg-white rounded-3xl shadow p-6 mt-6">
+
+<h2 className="text-2xl font-bold mb-4">
+Today's Report
+</h2>
+
+<p>
+Income :
+₹{
+entryItems
+.filter(item =>
+item.date === new Date().toLocaleDateString()
+)
+.reduce(
+(sum,item)=>
+sum + Number(item.salesPrice || 0),
+0
+)
+}
+</p>
+
+<p>
+Expense :
+₹{
+purchaseItems
+.filter(item =>
+item.date === new Date().toLocaleDateString()
+)
+.reduce(
+(sum,item)=>
+sum +
+(Number(item.purchasePrice||0)
+*
+Number(item.qty||0)),
+0
+)
+}
+</p>
+</div>
+
+{/* GRAPH START */}
+
+<div className="
+bg-black
+rounded-3xl
+p-6
+mt-8
+w-full
+">
+
+<h2 className="text-white text-3xl font-bold mb-2">
+Pharmacy Profit Overview
+</h2>
+
+<p className="text-gray-300 mb-6">
+Compare income, expense and profit
+</p>
+
+<div className="h-[450px]">
+
+<ResponsiveContainer
+width="100%"
+height="100%"
+>
+
+<BarChart
+data={graphData}
+margin={{
+top:20,
+right:30,
+left:20,
+bottom:20
+}}
+>
+
+<CartesianGrid
+strokeDasharray="3 3"
+stroke="#444"
+/>
+
+<XAxis
+dataKey="name"
+stroke="#fff"
+/>
+
+<YAxis
+stroke="#fff"
+/>
+
+<Tooltip />
+
+<Bar
+dataKey="amount"
+fill="#3B82F6"
+radius={[10,10,0,0]}
+/>
+
+</BarChart>
+
+</ResponsiveContainer>
+
+</div>
+
+</div>
+
+<br />
+
+{/* Table */}
+
+<div className="bg-white rounded-2xl shadow overflow-x-auto">
+
+<table className="w-full">
+
+<thead>
+
+<tr className="bg-blue-600 text-white">
+
+<th className="p-4">Medicine</th>
+<th>Qty</th>
+<th>Income</th>
+<th>Expense</th>
+<th>Date</th>
+<th>Print</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{entryItems
+.filter(item=>
+
+item.medicine
+?.toLowerCase()
+.includes(
+journalSearch.toLowerCase()
+)
+
+)
+.map((item,index)=>(
+
+<tr
+key={index}
+className="border-b"
+>
+
+<td className="p-4">
+{item.medicine}
+</td>
+
+<td>
+{item.qty}
+</td>
+
+<td>
+₹{item.salesPrice}
+</td>
+
+<td>
+₹{item.purchasePrice}
+</td>
+
+<td>
+{item.date}
+</td>
+
+<td>
+
+<button
+onClick={()=>printRow(item,"Journal")}
+className="
+bg-blue-600
+text-white
+px-4
+py-2
+rounded-xl
+"
+>
+Print
+</button>
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
 
 </div>
 
