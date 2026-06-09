@@ -208,6 +208,10 @@ const [appointments, setAppointments] = useState([])
 
 const [journalEntries, setJournalEntries] = useState([])
 const [selectedJournal, setSelectedJournal] = useState(null)
+const [fromDate, setFromDate] = useState("")
+const [toDate, setToDate] = useState("")
+const [filteredJournalEntries, setFilteredJournalEntries] = useState([])
+
 
 const doctorWisePatients = {};
 
@@ -577,12 +581,22 @@ useEffect(() => {
         ...doc.data()
       }))
   
-      setJournalEntries(data)
+      setJournalEntries(
+        data.sort(
+          (a,b)=>
+            new Date(b.date) -
+            new Date(a.date)
+        )
+      )
     }
   
     fetchJournalEntries()
   
   }, [])
+
+  useEffect(() => {
+    setFilteredJournalEntries(journalEntries)
+  }, [journalEntries])
 
   const printAppointment = (item) => {
 
@@ -679,94 +693,155 @@ useEffect(() => {
   
   };
 
-  const printJournal = (item) => {
+  const printJournalReport = () => {
 
     const win = window.open("", "_blank");
-    
+  
     win.document.write(`
     <html>
     <head>
-    <title>Hospital Journal Entry</title>
-    
-    <style>
-    
-    body{
-    font-family:Arial;
-    padding:30px;
-    }
-    
-    h1{
-    text-align:center;
-    margin-bottom:25px;
-    }
-    
-    p{
-    margin:8px 0;
-    font-size:16px;
-    }
-    
-    </style>
-    
+      <title>Journal Report</title>
+  
+      <style>
+  
+        body{
+          font-family:Arial;
+          padding:20px;
+        }
+  
+        h1{
+          text-align:center;
+          margin-bottom:20px;
+        }
+  
+        table{
+          width:100%;
+          border-collapse:collapse;
+        }
+  
+        th,td{
+          border:1px solid #000;
+          padding:8px;
+          text-align:left;
+          font-size:13px;
+        }
+  
+        th{
+          background:#f2f2f2;
+        }
+  
+      </style>
+  
     </head>
-    
+  
     <body>
-    
-    <h1>Hospital Journal Entry</h1>
-    
-    <p><b>Appointment No :</b> ${item.appointmentNo || "-"}</p>
-    
-    <p><b>Patient :</b> ${item.patientName || "-"}</p>
-    
-    <p><b>Doctor :</b> ${item.doctorName || "-"}</p>
-    
-    <p><b>Date :</b> ${item.date || "-"}</p>
-    
-    <p><b>Age :</b> ${item.age || "-"}</p>
-    
-    <p><b>Phone :</b> ${item.patientPhone || item.phone || "-"}</p>
-    
-    <p><b>Address :</b> ${item.address || "-"}</p>
-    
-    <p><b>Emergency Contact :</b>
-    ${item.emergencyContact || "-"}
-    </p>
-    
-    <p><b>Reason :</b> ${item.reason || "-"}</p>
-    
-    <p><b>Doctor Notes :</b> ${item.solution || "-"}</p>
-    
-    <p><b>Payment Status :</b>
-    ${item.paymentStatus || "Pending"}
-    </p>
-    
-    <p><b>Status :</b>
-    ${item.status || "Completed"}
-    </p>
-    
-    <p><b>Consultancy Fee :</b>
-    ₹${item.consultancyFee || 0}
-    </p>
-    
-    <p><b>Medicine Fee :</b>
-    ₹${item.medicineFee || 0}
-    </p>
-    
-    <p><b>Total :</b>
-    ₹${item.totalAmount || 0}
-    </p>
-    
+
+    <div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+">
+
+  <img
+    src="/logos/upstage.png"
+    style="
+      width:80px;
+      height:80px;
+      object-fit:contain;
+    "
+  />
+
+  <div style="text-align:center;flex:1;">
+    <h1 style="margin:0;">
+      Hospital Journal Report
+    </h1>
+  </div>
+
+</div>
+  
+      <table>
+  
+        <thead>
+  
+          <tr>
+            <th>Appointment No</th>
+            <th>Date</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Reason</th>
+            <th>Notes</th>
+            <th>Consultancy</th>
+            <th>Medicine</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+  
+        </thead>
+  
+        <tbody>
+  
+          ${filteredJournalEntries.map(item => `
+            <tr>
+              <td>${item.appointmentNo || "-"}</td>
+              <td>${item.date || "-"}</td>
+              <td>${item.patientName || "-"}</td>
+              <td>${item.doctorName || "-"}</td>
+              <td>${item.patientPhone || item.phone || "-"}</td>
+              <td>${item.address || "-"}</td>
+              <td>${item.reason || "-"}</td>
+              <td>${item.solution || "-"}</td>
+              <td>₹${item.consultancyFee || 0}</td>
+              <td>₹${item.medicineFee || 0}</td>
+              <td>₹${item.totalAmount || 0}</td>
+              <td>${item.status || "-"}</td>
+            </tr>
+          `).join("")}
+  
+        </tbody>
+  
+      </table>
+  
     </body>
+  
     </html>
     `);
-    
+  
     win.document.close();
-    
+  
     setTimeout(() => {
-    win.focus();
-    win.print();
+      win.print();
     }, 500);
+  
+  };
+
+    const handleGenerateData = () => {
+
+      if (!fromDate || !toDate) {
+        alert("Select From Date & To Date")
+        return
+      }
     
-    };
+      const filtered = journalEntries.filter((item) => {
+    
+        if (!item.date) return false
+    
+        const itemDate = new Date(item.date)
+    
+        const startDate = new Date(fromDate)
+    
+        const endDate = new Date(toDate)
+    
+        return (
+          itemDate >= startDate &&
+          itemDate <= endDate
+        )
+      })
+    
+      setFilteredJournalEntries(filtered)
+    }
 
   return (
     <div className="min-h-screen bg-white">
@@ -1154,6 +1229,66 @@ focus:border-blue-600
 
 </div>
 
+<div className="
+flex
+flex-col
+md:flex-row
+gap-4
+mb-8
+">
+
+<input
+type="date"
+value={fromDate}
+onChange={(e)=>setFromDate(e.target.value)}
+className="
+border
+rounded-xl
+px-4
+py-3
+"
+/>
+
+<input
+type="date"
+value={toDate}
+onChange={(e)=>setToDate(e.target.value)}
+className="
+border
+rounded-xl
+px-4
+py-3
+"
+/>
+
+<button
+onClick={handleGenerateData}
+className="
+bg-blue-600
+text-white
+px-6
+py-3
+rounded-xl
+"
+>
+Generate Data
+</button>
+
+<button
+  onClick={printJournalReport}
+  className="
+  bg-green-600
+  text-white
+  px-6
+  py-3
+  rounded-xl
+  "
+>
+  Print Report
+</button>
+
+</div>
+
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
 <div
@@ -1168,12 +1303,12 @@ border-blue-500
 >
 
 <h3 className="text-gray-500 text-xl font-semibold">
-Today Income
+ Income
 </h3>
 
 <p className="text-4xl font-bold text-blue-500 mt-3">
 ₹{
-journalEntries.reduce(
+filteredJournalEntries.reduce(
 (sum,item)=>
 sum +
 Number(item.totalAmount || 0),
@@ -1196,11 +1331,18 @@ border-yellow-500
 >
 
 <h3 className="text-gray-500 text-xl font-semibold">
-Today Expense
+ Expense
 </h3>
 
 <p className="text-4xl font-bold text-yellow-500 mt-3">
-₹0
+₹{
+filteredJournalEntries.reduce(
+(sum,item)=>
+sum +
+Number(item.medicineFee || 0),
+0
+)
+}
 </p>
 
 </div>
@@ -1217,15 +1359,18 @@ border-green-500
 >
 
 <h3 className="text-gray-500 text-xl font-semibold">
-Today Profit
+ Profit
 </h3>
 
 <p className="text-4xl font-bold text-green-500 mt-3">
 ₹{
-journalEntries.reduce(
+filteredJournalEntries.reduce(
 (sum,item)=>
 sum +
-Number(item.totalAmount || 0),
+(
+Number(item.totalAmount || 0) -
+Number(item.medicineFee || 0)
+),
 0
 )
 }
@@ -1235,11 +1380,13 @@ Number(item.totalAmount || 0),
 
 </div>
 
+
+
 {/* MOBILE + TABLET */}
 
 <div className="block lg:hidden space-y-4">
 
-{journalEntries
+{filteredJournalEntries
 
 .filter((item) => {
 
@@ -1344,7 +1491,7 @@ Expense
 
 <tbody>
 
-{journalEntries
+{filteredJournalEntries
 
 .filter((item) => {
 
@@ -1804,7 +1951,7 @@ Doctor
   border-blue-500
 ">
   <h3 className="text-gray-500 text-xl font-semibold">
-    Today Income
+     Income
   </h3>
 
   <p className="text-4xl font-bold text-blue-500 mt-3">
@@ -1828,7 +1975,7 @@ Doctor
   border-yellow-500
 ">
   <h3 className="text-gray-500 text-xl font-semibold">
-    Today Expense
+     Expense
   </h3>
 
   <p className="text-4xl font-bold text-yellow-500 mt-3">
@@ -1845,7 +1992,7 @@ Doctor
   border-green-500
 ">
   <h3 className="text-gray-500 text-xl font-semibold">
-    Today Profit
+     Profit
   </h3>
 
   <p className="text-4xl font-bold text-green-500 mt-3">
@@ -2287,20 +2434,6 @@ Appointment :
 {selectedJournal.appointmentNo}
 </h2>
 
-<button
-onClick={() => printJournal(selectedJournal)}
-className="
-bg-blue-600
-text-white
-w-full
-md:w-auto
-px-6
-py-3
-rounded-xl
-"
->
-Print
-</button>
 
 </div>
 

@@ -223,12 +223,23 @@ const DemoHome = () => {
                     {doctors.map((doc, index) => (
                         <div
                             key={index}
-                            onClick={() => navigate(`/demodoctordetails/${doc.id}`)}
+                            onClick={() =>
+                                navigate(
+                                  `/demodoctordetails/${
+                                    encodeURIComponent(
+                                      doc.doctorBasicInfo?.email ||
+                                      doc.email ||
+                                      doc.id
+                                    )
+                                  }`
+                                )
+                              }
                             className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer"
                         >
 
 <img
   src={
+    doc.image ||
     doc.doctorDesignation?.doctorImage ||
     "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
   }
@@ -240,16 +251,28 @@ const DemoHome = () => {
                                 <p className="text-green-600 text-sm">● Available</p>
 
                                 <h2 className="font-semibold text-lg">
-                                    {doc.name}
-                                </h2>
+  {doc.name || doc.doctorBasicInfo?.name}
+</h2>
 
-                                <p className="text-gray-600 text-sm">
-                                    {doc.speciality}
-                                </p>
+<p className="text-gray-600 text-sm">
+  {doc.speciality ||
+   doc.doctorDesignation?.designation}
+</p>
 
-                                <a href={doc.map} target="_blank" rel="noreferrer" className="text-blue-500 text-xs underline">
-                                    📍 {doc.hospital}
-                                </a>
+<a
+ href={
+   doc.map ||
+   doc.doctorBasicInfo?.map
+ }
+ target="_blank"
+ rel="noreferrer"
+ className="text-blue-500 text-xs underline"
+>
+ 📍 {
+   doc.hospital ||
+   doc.doctorBasicInfo?.address
+ }
+</a>
 
                             </div>
 

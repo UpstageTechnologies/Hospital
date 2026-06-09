@@ -16,7 +16,12 @@ const DemoDoctorDetails = () => {
   const [showPopup, setShowPopup] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date())
   useEffect(() => {
-    const doctor = doctors.find(doc => doc.email === id)
+    const doctor = doctors.find(
+      doc =>
+        doc.email === id ||
+        doc.doctorBasicInfo?.email === id ||
+        doc.id === id
+    )
     if (doctor) setDocInfo(doctor)
   }, [doctors, id])
 
@@ -72,14 +77,25 @@ const DemoDoctorDetails = () => {
 
         {/* TOP UI (FIRST IMAGE STYLE 🔥) */}
        <div className='flex flex-col md:flex-row gap-6 items-center md:items-stretch w-full'>
-          <img
-           className='w-full max-w-[280px] md:w-72 h-[250px] md:h-[300px] object-cover rounded-xl bg-blue-500'
-            src={docInfo.image}
-          />
+       <img
+ className='w-full max-w-[280px] md:w-72 h-[250px] md:h-[300px] object-cover rounded-xl bg-blue-50'
+ src={
+   docInfo.image ||
+   docInfo.doctorDesignation?.doctorImage ||
+   "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+ }
+ alt="doctor"
+/>
 
           <div className='w-full md:w-[500px] border rounded-xl p-6 shadow-sm flex flex-col justify-center text-center md:text-left'>
-            <h1 className='text-3xl font-bold'>{docInfo.name}</h1>
-            <p className='text-gray-600 mt-2'>{docInfo.speciality}</p>
+          <h1 className='text-3xl font-bold'>
+  {docInfo.name || docInfo.doctorBasicInfo?.name}
+</h1>
+
+<p className='text-gray-600 mt-2'>
+  {docInfo.speciality ||
+   docInfo.doctorDesignation?.designation}
+</p>
             <p className='text-gray-600 mt-2'>
               {docInfo.experience || "5 Years Experience"}
             </p>

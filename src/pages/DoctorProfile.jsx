@@ -406,6 +406,9 @@ const [sales,setSales] = useState("");
 const [search,setSearch] = useState("");
 const [historySearch,setHistorySearch] =useState("");
 const [journalSearch,setJournalSearch] = useState("");
+const [fromDate,setFromDate] = useState("");
+const [toDate,setToDate] = useState("");
+const [filteredJournalEntries,setFilteredJournalEntries] = useState([]);   
 const [selectedJournal,setSelectedJournal] = useState(null);
 
 const [showFollowupPopup,setShowFollowupPopup] = useState(false);
@@ -489,238 +492,219 @@ const printHistory = (item) => {
     
     };
 
-    const printJournal = (item) => {
+    const printHospitalReport = () => {
 
+        const hospitalLogo =
+          localStorage.getItem("hospitalLogo") || "";
+      
+        const hospitalName =
+          localStorage.getItem("hospitalName") || "Hospital";
+      
         const win = window.open("", "_blank");
-        
+      
         win.document.write(`
-        
         <html>
-        
         <head>
-        
-        <title>Hospital Journal Entry</title>
-        
-        <style>
-        
-        body{
-        font-family: Arial, sans-serif;
-        padding:30px;
-        line-height:1.8;
-        }
-        
-        h1{
-        text-align:center;
-        margin-bottom:30px;
-        }
-        
-        .section{
-        margin-bottom:20px;
-        padding:15px;
-        border:1px solid #ddd;
-        border-radius:10px;
-        }
-        
-        .fees{
-        display:flex;
-        gap:20px;
-        margin-top:20px;
-        }
-        
-        .card{
-        flex:1;
-        padding:15px;
-        border-radius:10px;
-        background:#f5f5f5;
-        }
-        
-        </style>
-        
+          <title>Hospital Patient Report</title>
+      
+          <style>
+      
+            body{
+              font-family: Arial, sans-serif;
+              padding:20px;
+            }
+      
+            .header{
+              display:flex;
+              align-items:center;
+              gap:20px;
+              margin-bottom:20px;
+              border-bottom:2px solid #ddd;
+              padding-bottom:15px;
+            }
+      
+            .logo{
+              width:90px;
+              height:90px;
+              object-fit:contain;
+            }
+      
+            .hospital-title{
+              flex:1;
+            }
+      
+            .hospital-title h1{
+              margin:0;
+              font-size:28px;
+            }
+      
+            .hospital-title p{
+              margin-top:5px;
+              color:#555;
+            }
+      
+            table{
+              width:100%;
+              border-collapse:collapse;
+              margin-top:20px;
+            }
+      
+            th,td{
+              border:1px solid #000;
+              padding:8px;
+              text-align:left;
+              font-size:12px;
+            }
+      
+            th{
+              background:#f3f4f6;
+            }
+      
+            .summary{
+              margin-top:25px;
+            }
+      
+            .summary h3{
+              margin:8px 0;
+            }
+      
+          </style>
+      
         </head>
-        
+      
         <body>
-        
-        <h1>Hospital Journal Entry</h1>
-        
-        <div class="section">
-        
-        <p><b>Appointment No :</b> ${item.appointmentNo || "-"}</p>
-        
-        <p><b>Patient :</b> ${item.patientName || "-"}</p>
-        
-        <p><b>Age :</b> ${item.age || "-"}</p>
-        
-        <p><b>Gender :</b> ${item.gender || "-"}</p>
-        
-        <p><b>Blood Group :</b> ${item.bloodGroup || "-"}</p>
-        
-        <p><b>Phone :</b> ${item.patientPhone || item.phone || "-"}</p>
-        
-        <p><b>Address :</b> ${item.address || "-"}</p>
-        
-        <p><b>Emergency Contact :</b> ${item.emergencyContact || "-"}</p>
-        
-        </div>
-        
-        <div class="section">
-        
-        <p><b>Doctor :</b> ${item.doctorName || "-"}</p>
-        
-        <p><b>Date :</b> ${item.date || "-"}</p>
-        
-        <p><b>Time :</b> ${item.time || "-"}</p>
-        
-        <p><b>Reason :</b> ${item.reason || "-"}</p>
-        
-        <p><b>Doctor Notes :</b> ${item.solution || "-"}</p>
-        
-        <p><b>Lab Tests :</b>
-        ${
-        item.labTests?.length
-        ? item.labTests.join(", ")
-        : "No Lab Test"
-        }
-        </p>
-        
-        <p><b>Status :</b> ${item.status || "Completed"}</p>
-        
-        <p><b>Payment Status :</b> ${item.paymentStatus || "Pending"}</p>
-        
-        </div>
-        
-        <div class="section">
-        
-        <p><b>Treatment Summary :</b></p>
-        
-        <p>
-        ${item.solution || "No treatment notes available"}
-        </p>
-        
-        </div>
-        
-        <div class="fees">
-        
-        <div class="card">
-        
-        <h3>Consultancy Fee</h3>
-        
-        ₹${item.consultancyFee || 0}
-        
-        </div>
-        
-        <div class="card">
-        
-        <h3>Medicine Fee</h3>
-        
-        ₹${item.medicineFee || 0}
-        
-        </div>
-        
-        <div class="card">
-        
-        <h3>Total Amount</h3>
-        
-        ₹${item.totalAmount || 0}
-        
-        </div>
-        
-        </div>
-        
+      
+          <div class="header">
+      
+            <img
+              src="${hospitalLogo}"
+              class="logo"
+            />
+      
+            <div class="hospital-title">
+      
+              <h1>${hospitalName}</h1>
+      
+              <p>Patient Journal Report</p>
+      
+              <p>
+                Generated On :
+                ${new Date().toLocaleString()}
+              </p>
+      
+            </div>
+      
+          </div>
+      
+          <table>
+      
+            <thead>
+      
+              <tr>
+      
+                <th>Appointment No</th>
+                <th>Date</th>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Reason</th>
+                <th>Notes</th>
+                <th>Consultancy</th>
+                <th>Medicine</th>
+                <th>Total</th>
+                <th>Status</th>
+      
+              </tr>
+      
+            </thead>
+      
+            <tbody>
+      
+              ${filteredJournalEntries.map(item => `
+      
+                <tr>
+      
+                  <td>${item.appointmentNo || "-"}</td>
+      
+                  <td>${item.date || "-"}</td>
+      
+                  <td>${item.patientName || "-"}</td>
+      
+                  <td>${item.doctorName || "-"}</td>
+      
+                  <td>${item.patientPhone || "-"}</td>
+      
+                  <td>${item.address || "-"}</td>
+      
+                  <td>${item.reason || "-"}</td>
+      
+                  <td>${item.solution || "-"}</td>
+      
+                  <td>₹${item.consultancyFee || 0}</td>
+      
+                  <td>₹${item.medicineFee || 0}</td>
+      
+                  <td>₹${item.totalAmount || 0}</td>
+      
+                  <td>${item.status || "-"}</td>
+      
+                </tr>
+      
+              `).join("")}
+      
+            </tbody>
+      
+          </table>
+      
+          <div class="summary">
+      
+            <h3>
+              Total Income :
+              ₹${filteredJournalEntries.reduce(
+                (sum,item)=>
+                  sum + Number(item.totalAmount || 0),
+                0
+              )}
+            </h3>
+      
+            <h3>
+              Total Expense :
+              ₹${filteredJournalEntries.reduce(
+                (sum,item)=>
+                  sum + Number(item.medicineFee || 0),
+                0
+              )}
+            </h3>
+      
+            <h3>
+              Total Profit :
+              ₹${filteredJournalEntries.reduce(
+                (sum,item)=>
+                  sum +
+                  (
+                    Number(item.totalAmount || 0)
+                    -
+                    Number(item.medicineFee || 0)
+                  ),
+                0
+              )}
+            </h3>
+      
+          </div>
+      
         </body>
-
-        <div class="section">
-
-<h2>Appointment Information</h2>
-
-<p>
-<b>Appointment No :</b>
-${item.appointmentNo || "-"}
-</p>
-
-<p>
-<b>Payment Status :</b>
-${item.paymentStatus || "Paid"}
-</p>
-
-<p>
-<b>Status :</b>
-${item.status || "Treated"}
-</p>
-
-<p>
-<b>Medicine Count :</b>
-${item.medicines?.length || 0}
-</p>
-
-<p>
-<b>Consultation Duration :</b>
-${item.consultationTime || "-"}
-</p>
-
-</div>
-
-<div class="section">
-
-<h2>Fee & Appointment Summary</h2>
-
-<table
-style="
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-"
->
-
-<tr>
-<td><b>Consultancy Fee</b></td>
-<td>₹${item.consultancyFee || 0}</td>
-</tr>
-
-<tr>
-<td><b>Medicine Fee</b></td>
-<td>₹${item.medicineFee || 0}</td>
-</tr>
-
-<tr>
-<td><b>Total Amount</b></td>
-<td>₹${item.totalAmount || 0}</td>
-</tr>
-
-<tr>
-<td><b>Appointment No</b></td>
-<td>${item.appointmentNo || "-"}</td>
-</tr>
-
-<tr>
-<td><b>Payment Status</b></td>
-<td>${item.paymentStatus || "Paid"}</td>
-</tr>
-
-<tr>
-<td><b>Status</b></td>
-<td>${item.status || "Treated"}</td>
-</tr>
-
-<tr>
-<td><b>Medicine Count</b></td>
-<td>${item.medicines?.length || 0}</td>
-</tr>
-
-</table>
-
-</div>
-        
+      
         </html>
-        
         `);
-        
+      
         win.document.close();
-        
+      
         setTimeout(() => {
-        win.print();
+          win.print();
         }, 500);
-        
-        };
+      
+      };
 
 const [activeDescribeCategory,setActiveDescribeCategory]=
 useState("All");
@@ -1188,6 +1172,41 @@ useEffect(() => {
             return bTime - aTime;
             
             });
+
+            useEffect(() => {
+                setFilteredJournalEntries(appointmentHistory);
+              }, [appointmentHistory]);
+
+              const handleGenerateData = () => {
+
+                if(!fromDate || !toDate){
+                  alert("Select From Date & To Date");
+                  return;
+                }
+              
+                const startDate = new Date(fromDate);
+                const endDate = new Date(toDate);
+              
+                endDate.setHours(23,59,59,999);
+              
+                const filtered =
+                appointmentHistory.filter(item => {
+              
+                  if(!item.date) return false;
+              
+                  const itemDate =
+                  new Date(item.date);
+              
+                  return (
+                    itemDate >= startDate &&
+                    itemDate <= endDate
+                  );
+              
+                });
+              
+                setFilteredJournalEntries(filtered);
+              
+              };
 
             const filteredJournal = appointmentHistory
 
@@ -1909,6 +1928,54 @@ p-3
 
 </div>
 
+<div className="
+flex
+flex-col
+md:flex-row
+gap-3
+mb-5
+">
+
+<input
+type="date"
+value={fromDate}
+onChange={(e)=>setFromDate(e.target.value)}
+className="border rounded-xl p-3"
+/>
+
+<input
+type="date"
+value={toDate}
+onChange={(e)=>setToDate(e.target.value)}
+className="border rounded-xl p-3"
+/>
+
+<button
+onClick={handleGenerateData}
+className="
+bg-blue-600
+text-white
+px-6
+rounded-xl
+"
+>
+Generate Data
+</button>
+
+<button
+onClick={printHospitalReport}
+className="
+bg-green-600
+text-white
+px-6
+rounded-xl
+"
+>
+Print Report
+</button>
+
+</div>
+
 {/* Income Expense Profit */}
 
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -1922,12 +1989,12 @@ border-l-[8px]
 border-blue-500
 ">
 <p className="text-gray-500 text-lg font-semibold">
-Today Income
+ Income
 </p>
 
 <p className="text-4xl font-bold text-blue-500 mt-3">
 ₹{
-appointmentHistory.reduce(
+filteredJournalEntries.reduce(
 (sum,item)=>
 sum + Number(item.totalAmount || 0),
 0
@@ -1945,11 +2012,17 @@ border-l-[8px]
 border-yellow-500
 ">
 <p className="text-gray-500 text-lg font-semibold">
-Today Expense
+ Expense
 </p>
 
 <p className="text-4xl font-bold text-yellow-500 mt-3">
-₹0
+₹{
+filteredJournalEntries.reduce(
+(sum,item)=>
+sum + Number(item.medicineFee || 0),
+0
+)
+}
 </p>
 </div>
 
@@ -1962,16 +2035,21 @@ border-l-[8px]
 border-green-500
 ">
 <p className="text-gray-500 text-lg font-semibold">
-Today Profit
+ Profit
 </p>
 
 <p className="text-4xl font-bold text-green-500 mt-3">
 ₹{
-appointmentHistory.reduce(
-(sum,item)=>
-sum + Number(item.totalAmount || 0),
-0
-)
+filteredJournalEntries.reduce(
+    (sum,item)=>
+    sum +
+    (
+    Number(item.totalAmount || 0)
+    -
+    Number(item.medicineFee || 0)
+    ),
+    0
+    )
 }
 </p>
 </div>
@@ -2000,7 +2078,7 @@ sum + Number(item.totalAmount || 0),
 
 <tbody>
 
-{filteredJournal.map((item,index)=>(
+{filteredJournalEntries.map((item,index)=>(
 
 <tr key={index} className="border-b">
 
@@ -2045,7 +2123,7 @@ Details
 
 <div className="block lg:hidden space-y-4">
 
-{filteredJournal.map((item,index)=>(
+{filteredJournalEntries.map((item,index)=>(
 
 <div
 key={index}
@@ -2154,18 +2232,7 @@ Appointment :
 {selectedJournal.appointmentNo}
 </h2>
 
-<button
-onClick={()=>printJournal(selectedJournal)}
-className="
-bg-blue-600
-text-white
-px-5
-py-2
-rounded-xl
-"
->
-Print
-</button>
+
 
 </div>
 

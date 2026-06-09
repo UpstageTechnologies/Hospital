@@ -219,12 +219,28 @@ const Upstage = () => {
                     {doctors.map((doc, index) => (
                         <div
                             key={index}
-                            onClick={() => navigate(`/appointment/${doc.id}`)}
+                            onClick={() =>
+                                navigate(
+                                `/appointment/${
+                                encodeURIComponent(
+                                doc.doctorBasicInfo?.email ||
+                                doc.email ||
+                                doc.id
+                                )}`
+                                )
+                                }
                             className="bg-[#f0f4f8] border border-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer"
                         >
 
-        <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" alt="user"
-className="w-full h-60 object-contain bg-blue-50"/>
+<img
+src={
+  doc.image ||
+  doc.doctorDesignation?.doctorImage ||
+  "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
+}
+alt="doctor"
+className="w-full h-60 object-contain bg-blue-50"
+/>
 
                             <div className="p-4">
 
@@ -232,13 +248,14 @@ className="w-full h-60 object-contain bg-blue-50"/>
   ● {index < 4 ? "Available" : "Not Available"}
 </p>
 
-                                <h2 className="font-semibold text-lg">
-                                    {doc.name}
-                                </h2>
+<h2 className="font-semibold text-lg">
+    {doc.name || doc.doctorBasicInfo?.name}
+</h2>
 
-                                <p className="text-gray-600 text-sm">
-                                    {doc.speciality}
-                                </p>
+<p className="text-gray-600 text-sm">
+    {doc.speciality ||
+     doc.doctorDesignation?.designation}
+</p>
 
 
 

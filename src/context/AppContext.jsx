@@ -18,11 +18,36 @@ const AppContextProvider = (props) => {
       const list = [];
 
       snapshot.forEach((doc) => {
+
+        const data = doc.data();
+      
         list.push({
           id: doc.id,
-          email: doc.id,
-          ...doc.data()
+      
+          email:
+            data.email ||
+            data.doctorBasicInfo?.email ||
+            doc.id,
+      
+          name:
+            data.name ||
+            data.doctorBasicInfo?.name,
+      
+          speciality:
+            data.speciality ||
+            data.doctorDesignation?.designation,
+      
+          hospital:
+            data.hospital ||
+            data.doctorBasicInfo?.hospital,
+      
+          image:
+            data.image ||
+            data.doctorDesignation?.doctorImage,
+      
+          ...data
         });
+      
       });
 
       setDoctors(list);

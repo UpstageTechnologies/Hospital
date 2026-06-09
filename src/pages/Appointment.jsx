@@ -203,10 +203,48 @@ useEffect(() => {
       {showPopup && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
 
-         <div className="bg-white w-[95%] md:w-[800px] max-h-[90vh] overflow-y-auto rounded-xl flex flex-col md:flex-row">
+<div className="relative bg-white w-[95%] md:w-[800px] max-h-[90vh] overflow-y-auto rounded-xl flex flex-col md:flex-row">
+
+<button
+  onClick={() => {
+    setShowPopup(false)
+    setStep(1)
+  }}
+  className="
+    absolute
+    top-3
+    right-3
+    w-9
+    h-9
+    md:w-10
+    md:h-10
+    rounded-full
+    bg-red-500
+    text-white
+    font-bold
+    text-xl
+    flex
+    items-center
+    justify-center
+    z-50
+    hover:bg-red-600
+  "
+>
+  ×
+</button>
 
             {/* LEFT MENU */}
-            <div className="w-full md:w-1/3 bg-blue-600 text-white flex md:flex-col flex-row">
+            <div className="
+w-full
+md:w-1/3
+bg-blue-600
+text-white
+flex
+flex-row
+md:flex-col
+pt-12
+md:pt-16
+">
 
 <button
     onClick={() => setStep(1)}
@@ -235,7 +273,7 @@ useEffect(() => {
 </div>
 
             {/* RIGHT */}
-           <div className="w-full md:w-2/3 p-4 md:p-6">
+            <div className="w-full md:w-2/3 p-4 md:p-6 pt-14 md:pt-6">
 
 
 

@@ -38,6 +38,10 @@ const [showEntryDropdown,setShowEntryDropdown] = useState(false)
 const [purchaseItems,setPurchaseItems] = useState([]);
 const [salesItems,setSalesItems] = useState([]);
 const [journalSearch,setJournalSearch] = useState("")
+const [fromDate,setFromDate] = useState("")
+const [toDate,setToDate] = useState("")
+const [filteredPurchase,setFilteredPurchase] = useState([]);
+const [filteredSales,setFilteredSales] = useState([]);
 
 
 const printRow = (item, type) => {
@@ -765,6 +769,138 @@ const deleteEntryItem = (index) => {
           
           };
 
+          const groupedExpense = Object.values(
+
+            purchaseItems.reduce((acc,item)=>{
+            
+            const date = item.date || "No Date";
+            
+            if(!acc[date]){
+            acc[date] = {
+            date,
+            qty:0,
+            expense:0,
+            time:item.time
+            };
+            }
+            
+            acc[date].qty += Number(item.qty || 0);
+            
+            acc[date].expense +=
+            Number(item.purchasePrice || 0)
+            *
+            Number(item.qty || 0);
+            
+            return acc;
+            
+            },{})
+            );
+
+            const groupedIncome = Object.values(
+
+              entryItems.reduce((acc,item)=>{
+              
+              const date = item.date || "No Date";
+              
+              if(!acc[date]){
+              acc[date] = {
+              date,
+              qty:0,
+              income:0,
+              time:item.time
+              };
+              }
+              
+              acc[date].qty += Number(item.qty || 0);
+              
+              acc[date].income +=
+              Number(item.salesPrice || 0);
+              
+              return acc;
+              
+              },{})
+              );
+
+              const convertDate = (dateStr) => {
+
+                if(!dateStr) return null;
+              
+                const parts = dateStr.split("/");
+              
+                if(parts.length !== 3){
+                  return new Date(dateStr);
+                }
+              
+                return new Date(
+                  parts[2],
+                  parts[1]-1,
+                  parts[0]
+                );
+              };
+
+              const generateJournalReport = () => {
+
+                if(!fromDate || !toDate){
+                  alert("Select From Date & To Date");
+                  return;
+                }
+              
+                const from = new Date(fromDate);
+              
+                const to = new Date(toDate);
+              
+                to.setHours(23,59,59,999);
+              
+                const purchaseData = purchaseItems.filter(item => {
+              
+                  const itemDate = convertDate(item.date);
+              
+                  return itemDate >= from &&
+                         itemDate <= to;
+              
+                });
+              
+                const salesData = entryItems.filter(item => {
+              
+                  const itemDate = convertDate(item.date);
+              
+                  return itemDate >= from &&
+                         itemDate <= to;
+              
+                });
+              
+                setFilteredPurchase(purchaseData);
+                setFilteredSales(salesData);
+              };
+
+              const reportIncome =
+(filteredSales.length
+? filteredSales
+: entryItems)
+.reduce(
+(sum,item)=>
+sum + Number(item.salesPrice || 0),
+0
+);
+
+const reportExpense =
+(filteredPurchase.length
+? filteredPurchase
+: purchaseItems)
+.reduce(
+(sum,item)=>
+sum +
+(
+Number(item.purchasePrice || 0)
+*
+Number(item.qty || 0)
+),
+0
+);
+
+const reportProfit =
+reportIncome - reportExpense;
+
 
 return(
 <div className="min-h-screen bg-gray-100">
@@ -1218,6 +1354,80 @@ Delete
 </table>
 
 </div>
+
+<div className="md:hidden space-y-4">
+
+{groupedExpense.map((item,index)=>(
+
+<div
+key={index}
+className="bg-white rounded-2xl shadow border p-4"
+>
+
+<p><b>Date :</b> {item.date}</p>
+
+<p><b>Total Qty :</b> {item.qty}</p>
+
+<p className="text-red-600 font-bold">
+Expense : ₹{item.expense}
+</p>
+
+<p>{item.time}</p>
+
+<button
+onClick={()=>printRow(item,"Expense")}
+className="
+mt-3
+bg-blue-600
+text-white
+px-4
+py-2
+rounded-xl
+"
+>
+Print
+</button>
+
+</div>
+
+))}
+
+</div>
+
+{groupedIncome.map((item,index)=>(
+
+<div
+key={index}
+className="bg-white rounded-2xl shadow border p-4"
+>
+
+<p><b>Date :</b> {item.date}</p>
+
+<p><b>Total Qty :</b> {item.qty}</p>
+
+<p className="text-green-600 font-bold">
+Income : ₹{item.income}
+</p>
+
+<p>{item.time}</p>
+
+<button
+onClick={()=>printRow(item,"Income")}
+className="
+mt-3
+bg-blue-600
+text-white
+px-4
+py-2
+rounded-xl
+"
+>
+Print
+</button>
+
+</div>
+
+))}
 
 {/* Mobile + Tablet Card View */}
 
@@ -2448,6 +2658,63 @@ Print
 Journal Entry
 </h1>
 
+<div className="
+bg-white
+rounded-3xl
+shadow-lg
+p-5
+mb-8
+">
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-4
+gap-4
+">
+
+<input
+type="date"
+value={fromDate}
+onChange={(e)=>setFromDate(e.target.value)}
+className="
+border
+p-3
+rounded-xl
+w-full
+"
+/>
+
+<input
+type="date"
+value={toDate}
+onChange={(e)=>setToDate(e.target.value)}
+className="
+border
+p-3
+rounded-xl
+w-full
+"
+/>
+
+<button
+onClick={generateJournalReport}
+className="
+bg-blue-600
+text-white
+rounded-xl
+px-5
+py-3
+font-bold
+"
+>
+Generate Report
+</button>
+
+</div>
+
+</div>
+
 
 {/* Summary Cards */}
 
@@ -2460,13 +2727,7 @@ Income
 
 <p className="text-4xl font-bold text-blue-500 mt-3">
 
-₹{
-entryItems.reduce(
-(sum,item)=>
-sum + Number(item.salesPrice || 0),
-0
-)
-}
+₹{reportIncome}
 
 </p>
 </div>
@@ -2478,18 +2739,7 @@ Expense
 
 <p className="text-4xl font-bold text-yellow-500 mt-3">
 
-₹{
-purchaseItems.reduce(
-(sum,item)=>
-sum +
-(
-Number(item.purchasePrice || 0)
-*
-Number(item.qty || 0)
-),
-0
-)
-}
+₹{reportExpense}
 
 </p>
 </div>
@@ -2501,24 +2751,7 @@ Profit
 
 <p className="text-4xl font-bold text-green-500 mt-3">
 
-₹{
-entryItems.reduce(
-(sum,item)=>
-sum + Number(item.salesPrice || 0),
-0
-)
--
-purchaseItems.reduce(
-(sum,item)=>
-sum +
-(
-Number(item.purchasePrice || 0)
-*
-Number(item.qty || 0)
-),
-0
-)
-}
+₹{reportProfit}
 
 </p>
 </div>
@@ -2553,46 +2786,6 @@ Available Stock
 </p>
 </div>
 
-</div>
-
-<div className="bg-white rounded-3xl shadow p-6 mt-6">
-
-<h2 className="text-2xl font-bold mb-4">
-Today's Report
-</h2>
-
-<p>
-Income :
-₹{
-entryItems
-.filter(item =>
-item.date === new Date().toLocaleDateString()
-)
-.reduce(
-(sum,item)=>
-sum + Number(item.salesPrice || 0),
-0
-)
-}
-</p>
-
-<p>
-Expense :
-₹{
-purchaseItems
-.filter(item =>
-item.date === new Date().toLocaleDateString()
-)
-.reduce(
-(sum,item)=>
-sum +
-(Number(item.purchasePrice||0)
-*
-Number(item.qty||0)),
-0
-)
-}
-</p>
 </div>
 
 <br />
@@ -2731,7 +2924,33 @@ radius={[10,10,0,0]}
 
 <tbody>
 
-{purchaseItems.map((item,index)=>(
+{(filteredPurchase.length
+? Object.values(
+filteredPurchase.reduce((acc,item)=>{
+
+const date = item.date;
+
+if(!acc[date]){
+acc[date]={
+date,
+qty:0,
+expense:0,
+time:item.time
+};
+}
+
+acc[date].qty += Number(item.qty);
+
+acc[date].expense +=
+Number(item.purchasePrice) *
+Number(item.qty);
+
+return acc;
+
+},{})
+)
+: groupedExpense
+).map((item,index)=>(
 
 <tr
 key={index}
@@ -2743,7 +2962,7 @@ className="border-b hover:bg-gray-50 transition"
 </td>
 
 <td className="px-6 py-4 font-medium">
-{item.medicine}
+All Medicines
 </td>
 
 <td className="px-6 py-4 text-center">
@@ -2751,10 +2970,7 @@ className="border-b hover:bg-gray-50 transition"
 </td>
 
 <td className="px-6 py-4 text-center font-bold text-red-600">
-₹{
-Number(item.purchasePrice || 0) *
-Number(item.qty || 0)
-}
+₹{item.expense}
 </td>
 
 <td className="px-6 py-4 text-center text-gray-500">
@@ -2829,7 +3045,32 @@ Print
 
 <tbody>
 
-{entryItems.map((item,index)=>(
+{(filteredSales.length
+? Object.values(
+filteredSales.reduce((acc,item)=>{
+
+const date = item.date;
+
+if(!acc[date]){
+acc[date]={
+date,
+qty:0,
+income:0,
+time:item.time
+};
+}
+
+acc[date].qty += Number(item.qty);
+
+acc[date].income +=
+Number(item.salesPrice);
+
+return acc;
+
+},{})
+)
+: groupedIncome
+).map((item,index)=>(
 
 <tr
 key={index}
@@ -2841,7 +3082,7 @@ className="border-b hover:bg-gray-50 transition"
 </td>
 
 <td className="px-6 py-4 font-medium">
-{item.customerName || "Walk In"}
+Sales Summary
 </td>
 
 <td className="px-6 py-4 text-center">
@@ -2849,7 +3090,7 @@ className="border-b hover:bg-gray-50 transition"
 </td>
 
 <td className="px-6 py-4 text-center font-bold text-green-600">
-₹{item.salesPrice}
+₹{item.income}
 </td>
 
 <td className="px-6 py-4 text-center text-gray-500">
