@@ -91,9 +91,6 @@ doc.hospital || ""
                     <p>Available</p>
                   </div>
 
-                  <pre className="text-xs">
-{JSON.stringify(item,null,2)}
-</pre>
 
                   <p className='font-medium'>{item.name || item.doctorBasicInfo?.name}</p>
                   <p className='text-sm text-gray-600'>{item.speciality || item.doctorBasicInfo?.speciality}</p>

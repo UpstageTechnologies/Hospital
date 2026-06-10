@@ -2,7 +2,12 @@ import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import UpstageNavbar from "../components/UpstageNavbar";
-import { doc } from "firebase/firestore";
+import {
+    collection,
+    getDocs
+  } from "firebase/firestore";
+  
+  import { db } from "../firebase";
 
 const UpstageDoctors = () => {
 
@@ -10,6 +15,7 @@ const UpstageDoctors = () => {
     const navigate = useNavigate();
     const { city } = useParams();
     const [filterDoc, setFilterDoc] = useState([]);
+    const [doctorStatus, setDoctorStatus] = useState({});
     const [showFilter, setShowFilter] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -45,6 +51,69 @@ const UpstageDoctors = () => {
 
         groupedDoctors[hospital].push(doc);
     });
+
+    useEffect(() => {
+
+        const loadDoctorStatus = async () => {
+        
+         const appointmentSnap =
+         await getDocs(
+         collection(db,"appointments")
+         )
+        
+         const counts = {}
+        
+         appointmentSnap.forEach((doc)=>{
+        
+           const data = doc.data()
+        
+           if(!counts[data.doctorEmail]){
+             counts[data.doctorEmail] = {}
+           }
+        
+           counts[data.doctorEmail][data.time] =
+           (counts[data.doctorEmail][data.time] || 0) + 1
+        
+         })
+        
+         const result = {}
+        
+         doctors.forEach((doctor)=>{
+        
+            const doctorEmail =
+            doctor.email ||
+            doctor.doctorBasicInfo?.email
+            
+            const bookings =
+            counts[doctorEmail] || {}
+        
+            const slots =
+            doctor.slots?.length > 0
+            ? doctor.slots
+            : [
+              "10:00am-11:00am",
+              "1:00pm-2:00pm",
+              "5:00pm-7:00pm"
+            ]
+        
+           const allClosed =
+           slots.length > 0 &&
+           slots.every(
+             slot =>
+             (bookings[slot] || 0) >= 2
+           )
+        
+           result[doctorEmail] =
+allClosed
+         })
+        
+         setDoctorStatus(result)
+        
+        }
+        
+        loadDoctorStatus()
+        
+        }, [doctors])
 
     return (
         <>
@@ -97,8 +166,24 @@ const UpstageDoctors = () => {
             <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
                 className="bg-blue-50 w-full h-60 object-contain"/>
                                     <div className='p-4'>
-                                    <p className={`text-sm ${index < 4 ? "text-green-500" : "text-red-500"}`}>
-  ● {index < 4 ? "Available" : "Not Available"}
+                                    <p
+className={`text-sm ${
+doctorStatus[
+item.email ||
+item.doctorBasicInfo?.email
+]
+? "text-red-500"
+: "text-green-500"
+}`}
+>
+● {
+doctorStatus[
+item.email ||
+item.doctorBasicInfo?.email
+]
+? "Not Available"
+: "Available"
+}
 </p>
                                         <p className='font-medium'>{item.name}</p>
                                         <p className='text-sm text-gray-600'>{item.speciality}</p>
@@ -135,8 +220,24 @@ const UpstageDoctors = () => {
 />
 
                                             <div className='p-4'>
-                                            <p className={`text-sm ${index < 4 ? "text-green-500" : "text-red-500"}`}>
-  ● {index < 4 ? "Available" : "Not Available"}
+                                            <p
+className={`text-sm ${
+doctorStatus[
+item.email ||
+item.doctorBasicInfo?.email
+]
+? "text-red-500"
+: "text-green-500"
+}`}
+>
+● {
+doctorStatus[
+item.email ||
+item.doctorBasicInfo?.email
+]
+? "UnAvailable"
+: "Available"
+}
 </p>
                                                 <p className='font-medium'>{item.name}</p>
                                                 <p className='text-sm text-gray-600'>{item.speciality}</p>

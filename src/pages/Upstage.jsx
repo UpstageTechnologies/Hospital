@@ -20,6 +20,7 @@ const Upstage = () => {
     ];
 
     const [doctors, setDoctors] = useState([]);
+    const [doctorStatus, setDoctorStatus] = useState({});
 
     const [doctorImages, setDoctorImages] = useState({});
 
@@ -60,11 +61,69 @@ const Upstage = () => {
                 });
             });
 
+            const appointmentSnap =
+await getDocs(collection(db,"appointments"))
+
+const counts = {}
+
+appointmentSnap.forEach((doc)=>{
+
+ const data = doc.data()
+
+ const key = data.doctorEmail
+
+ if(!counts[key]){
+   counts[key] = {}
+ }
+
+ counts[key][data.time] =
+ (counts[key][data.time] || 0) + 1
+
+})
+
+const statusObj = {}
+
+list.forEach((doctor)=>{
+
+    const email =
+    doctor.email ||
+    doctor.doctorBasicInfo?.email
+
+ const doctorBookings =
+ counts[email] || {}
+
+ const slots =
+doctor.slots?.length > 0
+? doctor.slots
+: [
+   "10:00am-11:00am",
+   "1:00pm-2:00pm",
+   "5:00pm-7:00pm"
+ ]
+
+ const allClosed =
+ slots.every(
+   slot =>
+   (doctorBookings[slot] || 0) >= 2
+ )
+
+ statusObj[email] =
+ allClosed
+ ? "Unavailable"
+ : "Available"
+
+})
+
+setDoctorStatus(statusObj)
+
             setDoctors(list);
         };
 
         fetchDoctors();
+
     }, []);
+
+    
 
     return (
         <div className="w-full min-h-screen bg-white">
@@ -244,8 +303,24 @@ className="w-full h-60 object-contain bg-blue-50"
 
                             <div className="p-4">
 
-                            <p className={`text-sm ${index < 4 ? "text-green-600" : "text-red-500"}`}>
-  ● {index < 4 ? "Available" : "Not Available"}
+                            <p
+className={`text-sm ${
+    doctorStatus[
+        doc.email ||
+        doc.doctorBasicInfo?.email
+        ] === "Unavailable"
+? "text-red-500"
+: "text-green-600"
+}`}
+>
+● {
+doctorStatus[
+    doc.email ||
+    doc.doctorBasicInfo?.email
+    ] === "Unavailable"
+? "Unavailable"
+: "Available"
+}
 </p>
 
 <h2 className="font-semibold text-lg">

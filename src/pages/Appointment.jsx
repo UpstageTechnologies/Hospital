@@ -4,7 +4,12 @@ import { AppContext } from '../context/AppContext'
 import { db } from '../firebase'
 import { doc, getDoc } from "firebase/firestore"
 import { useNavigate } from 'react-router-dom'
-import { collection, addDoc, serverTimestamp } from "firebase/firestore"
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs
+} from "firebase/firestore"
 import { auth } from "../firebase"
 import { onAuthStateChanged } from "firebase/auth"
 import { setDoc } from "firebase/firestore";
@@ -40,6 +45,7 @@ const Appointment = () => {
   // 🔥 NEW STATES
   const [userData, setUserData] = useState(null)
   const [appointmentNo, setAppointmentNo] = useState("")
+  const [slotBookings, setSlotBookings] = useState({})
   const selectedDate =
 new Date().toISOString().split("T")[0]
 
@@ -53,6 +59,38 @@ useEffect(() => {
 
   if (doctor) setDocInfo(doctor)
 }, [doctors, decodedId])
+
+useEffect(() => {
+
+  const loadBookings = async () => {
+
+    if (!docInfo) return
+
+    const snap = await getDocs(
+      collection(db, "appointments")
+    )
+
+    const counts = {}
+
+    snap.forEach((doc) => {
+
+      const data = doc.data()
+
+      if (data.doctorEmail === docInfo.email) {
+
+        counts[data.time] =
+          (counts[data.time] || 0) + 1
+
+      }
+
+    })
+
+    setSlotBookings(counts)
+  }
+
+  loadBookings()
+
+}, [docInfo])
 
 
 
@@ -187,6 +225,12 @@ useEffect(() => {
     fetchSlots()
    
    },[])
+
+   const allSlotsClosed =
+docSlots.length > 0 &&
+docSlots[0].times.every(
+t => (slotBookings[t] || 0) >= 3
+)
 
    if (!docInfo) {
     return (
@@ -647,20 +691,69 @@ Go to Dashboard
 
 <div className="flex gap-3 flex-wrap justify-center">
 
-{(slot.times || []).map((t,j)=>(
+{(slot.times || []).map((t,j)=>{
+
+const bookedCount = slotBookings[t] || 0
+const isClosed = bookedCount >= 3
+
+return (
+
+<div key={j} className="relative">
+
+{isClosed && (
+<div className="
+absolute
+-top-2
+left-1/2
+-transform
+-translate-x-1/2
+bg-red-600
+text-white
+text-xs
+px-2
+py-1
+rounded-full
+z-10
+">
+CLOSED
+</div>
+)}
+
 <button
- key={j}
- onClick={()=>{
-   setSlotTime(t)
-   setSlotIndex(j)
- }}
- className={`px-4 py-2 border rounded
- ${slotIndex===j ? "bg-blue-600 text-white" : ""}
- `}
+disabled={isClosed}
+onClick={()=>{
+setSlotTime(t)
+setSlotIndex(j)
+}}
+className={`
+px-4
+py-2
+border
+rounded
+min-w-[170px]
+
+${isClosed
+? "bg-gray-300 text-gray-500 cursor-not-allowed"
+: slotIndex===j
+? "bg-blue-600 text-white"
+: ""
+}
+`}
 >
- {t}
+
+<div>{t}</div>
+
+<div className="text-xs mt-1">
+{3 - bookedCount} Slots Left
+</div>
+
 </button>
-))}
+
+</div>
+
+)
+
+})}
 
 </div>
 
@@ -669,15 +762,44 @@ Go to Dashboard
 ))}
         </div>
 
-        <button
-          onClick={() => {
-            if (!slotTime) return alert("Select time first")
-            setShowPopup(true)
-          }}
-         className='mt-6 bg-blue-600 text-white px-5 md:px-6 py-2 md:py-3 rounded text-sm md:text-base'
-        >
-          Book Appointment
-        </button>
+        {allSlotsClosed ? (
+
+<div
+className="
+mt-6
+bg-red-600
+text-white
+px-8
+py-3
+rounded-lg
+font-bold
+"
+>
+Doctor Unavailable
+</div>
+
+) : (
+
+<button
+onClick={() => {
+if (!slotTime)
+return alert("Select time first")
+
+setShowPopup(true)
+}}
+className="
+mt-6
+bg-blue-600
+text-white
+px-6
+py-3
+rounded
+"
+>
+Book Appointment
+</button>
+
+)}
       </div>
 
     </div>

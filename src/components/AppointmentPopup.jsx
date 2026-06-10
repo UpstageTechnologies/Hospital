@@ -10,8 +10,8 @@ const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
     const navigate = useNavigate()
     const [step, setStep] = useState(1)
     const [users, setUsers] = useState([])
-    const [loginEmail, setLoginEmail] = useState("sundar@gmail.com")
-    const [loginPassword, setLoginPassword] = useState("sundar11")
+    const [loginEmail, setLoginEmail] = useState("")
+const [loginPassword, setLoginPassword] = useState("")
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -21,40 +21,70 @@ const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [reason, setReason] = useState("")
     const [currentUser, setCurrentUser] = useState(null)
+    const [age, setAge] = useState("")
+    const [appointmentNo, setAppointmentNo] = useState("")
 
     // 🔥 REGISTER
     const handleRegister = async () => {
-        if (!name || !email || !password || !address || !phone || !gender) {
-            return alert("Fill all fields")
+
+      if (
+        !name ||
+        !age ||
+        !email ||
+        !password ||
+        !address ||
+        !phone ||
+        !gender
+      ) {
+        return alert("Fill all fields")
+      }
+    
+      try {
+    
+        const querySnapshot = await getDocs(
+          collection(db, "users")
+        )
+    
+        const exists = querySnapshot.docs.find(
+          doc => doc.data().email === email
+        )
+    
+        if (exists) {
+          return alert("User already exists")
         }
-
-        try {
-            // check duplicate email
-            const querySnapshot = await getDocs(collection(db, "users"))
-            const exists = querySnapshot.docs.find(
-                doc => doc.data().email === email
-            )
-
-            if (exists) {
-                return alert("User already exists")
-            }
-
-            await addDoc(collection(db, "users"), {
-                name,
-                email,
-                password,
-                address,
-                phone,
-                gender
-            })
-
-            alert("Account Created")
-            setShowRegister(false)
-
-        } catch (err) {
-            console.log(err)
-            alert("Error")
-        }
+    
+        await addDoc(collection(db, "users"), {
+          name,
+          age,
+          email,
+          password,
+          address,
+          phone,
+          gender
+        })
+    
+        alert("Account Created Successfully ✅")
+    
+        // auto fill login
+        setLoginEmail(email)
+        setLoginPassword(password)
+    
+        // clear register form
+        setName("")
+        setAge("")
+        setEmail("")
+        setPassword("")
+        setAddress("")
+        setPhone("")
+        setGender("")
+    
+        // go login page
+        setStep(1)
+    
+      } catch (err) {
+        console.log(err)
+        alert("Error")
+      }
     }
 
     // 🔥 LOGIN
@@ -151,7 +181,7 @@ const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
           date: (date || new Date()).toISOString().split("T")[0],
       
           reason: reason,
-          appointmentNo: "API" + Math.floor(Math.random()*900+100),
+          appointmentNo: appointmentNo,
       
           isDemo: doctor.demo === true,
       };
@@ -161,6 +191,10 @@ const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
             collection(db,"appointments"),
             appointmentData
         );
+
+        setTimeout(() => {
+          navigate("/demopatientdashboard")
+        }, 1500)
     
         setStep(4)
     }
@@ -248,6 +282,16 @@ Details
     >
       Login
     </button>
+
+    <p className="text-center mt-4 text-sm">
+  Don't have an account?{" "}
+  <span
+    onClick={() => setStep(5)}
+    className="text-blue-600 font-semibold cursor-pointer underline"
+  >
+    Register
+  </span>
+</p>
   </>
 )}
                     {/* STEP 2 */}
@@ -282,14 +326,25 @@ Details
                         <>
                             <h2 className="text-xl font-bold mb-4">Details</h2>
 
-                            <p><b>Doctor:</b> {doctor.name}</p>
-                            <p><b>Patient:</b> {currentUser?.name}</p>
-                            <p><b>Email:</b> {currentUser?.email}</p>
-                            <p><b>Address:</b> {currentUser?.address}</p>
-                            <p><b>Phone:</b> {currentUser?.phone}</p>
-                            <p><b>Gender:</b> {currentUser?.gender}</p>
-                            <p><b>Time:</b> {slotTime}</p>
-                            <p><b>Reason:</b> {reason}</p>
+                            <p><b>Appointment No:</b> API{Math.floor(Math.random() * 900 + 100)}</p>
+
+<p><b>Doctor Name:</b> {doctor.name}</p>
+
+<p><b>Patient Name:</b> {currentUser?.name}</p>
+
+<p><b>Age:</b> {currentUser?.age}</p>
+
+<p><b>Email:</b> {currentUser?.email}</p>
+
+<p><b>Address:</b> {currentUser?.address}</p>
+
+<p><b>Contact Number:</b> {currentUser?.phone}</p>
+
+<p><b>Gender:</b> {currentUser?.gender}</p>
+
+<p><b>Appointment Time:</b> {slotTime}</p>
+
+<p><b>Reason:</b> {reason}</p>
 
                             <div className="flex justify-end gap-3 mt-4">
                                 <button onClick={() => setStep(2)}>Previous</button>
@@ -312,8 +367,8 @@ Details
                             </h2>
 
                             <p className="mb-4">
-                                Appointment No: API882
-                            </p>
+  Appointment No: {appointmentNo}
+</p>
 
                             <p
                                 onClick={() => navigate("/demopatientdashboard")}
@@ -324,6 +379,85 @@ Details
 
                         </div>
                     )}
+
+                    {/* STEP 5 REGISTER */}
+
+{step === 5 && (
+
+<>
+<h2 className="text-xl font-bold mb-4">
+Patient Registration
+</h2>
+
+<input
+type="text"
+placeholder="Patient Name"
+value={name}
+onChange={(e)=>setName(e.target.value)}
+className="border p-2 w-full mb-2"
+/>
+
+<input
+type="number"
+placeholder="Age"
+value={age}
+onChange={(e)=>setAge(e.target.value)}
+className="border p-2 w-full mb-2"
+/>
+
+<input
+type="email"
+placeholder="Email"
+value={email}
+onChange={(e)=>setEmail(e.target.value)}
+className="border p-2 w-full mb-2"
+/>
+
+<input
+type="password"
+placeholder="Password"
+value={password}
+onChange={(e)=>setPassword(e.target.value)}
+className="border p-2 w-full mb-2"
+/>
+
+<input
+type="text"
+placeholder="Address"
+value={address}
+onChange={(e)=>setAddress(e.target.value)}
+className="border p-2 w-full mb-2"
+/>
+
+<input
+type="text"
+placeholder="Contact Number"
+value={phone}
+onChange={(e)=>setPhone(e.target.value)}
+className="border p-2 w-full mb-2"
+/>
+
+<select
+value={gender}
+onChange={(e)=>setGender(e.target.value)}
+className="border p-2 w-full mb-2"
+>
+<option value="">Select Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+</select>
+
+<button
+onClick={handleRegister}
+className="bg-green-600 text-white px-6 py-2 rounded w-full"
+>
+Create Account
+</button>
+
+</>
+
+)}
 
                 </div>
             </div>

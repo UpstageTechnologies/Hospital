@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { AppContext } from "../context/AppContext"
 import AppointmentPopup from "../components/AppointmentPopup"
+import { collection, getDocs } from "firebase/firestore"
+import { db } from "../firebase"
 
 
 const UpstageAppointmentPage = () => {
@@ -14,6 +16,22 @@ const UpstageAppointmentPage = () => {
   const [slotIndex, setSlotIndex] = useState(null)
   const [showPopup, setShowPopup] = useState(false)
 
+  const [slotBookings, setSlotBookings] = useState({
+    "10:00am-11:00am": 0,
+    "1:00pm-2:00pm": 0,
+    "5:00pm-7:00pm": 0,
+  })
+  
+  const slots = [
+    "10:00am-11:00am",
+    "1:00pm-2:00pm",
+    "5:00pm-7:00pm",
+  ]
+  
+  const allSlotsClosed = slots.every(
+    slot => slotBookings[slot] >= 2
+  )
+
   // ✅ GET DOCTOR
   useEffect(() => {
     if (!doctors || doctors.length === 0) return
@@ -24,6 +42,44 @@ const UpstageAppointmentPage = () => {
 
     if (doctor) setDocInfo(doctor)
   }, [doctors, docId])
+
+  useEffect(() => {
+
+    const loadSlotBookings = async () => {
+  
+      if (!docInfo) return
+  
+      const snapshot = await getDocs(
+        collection(db, "appointments")
+      )
+  
+      const counts = {
+        "10:00am-11:00am": 0,
+        "1:00pm-2:00pm": 0,
+        "5:00pm-7:00pm": 0,
+      }
+  
+      snapshot.forEach((doc) => {
+  
+        const data = doc.data()
+  
+        // Pavithra doctor bookings mattum count
+        if (data.doctorEmail === docInfo.email) {
+  
+          if (counts[data.time] !== undefined) {
+            counts[data.time] += 1
+          }
+  
+        }
+  
+      })
+  
+      setSlotBookings(counts)
+    }
+  
+    loadSlotBookings()
+  
+  }, [docInfo])
 
   // ⛔ SAFE CHECK
   if (!docInfo) {
@@ -69,35 +125,114 @@ const UpstageAppointmentPage = () => {
           </div>
 
           {/* TIME SLOTS */}
-          <div className="flex gap-3 flex-wrap justify-center mt-4">
+          <div className="flex flex-wrap justify-center gap-3 mt-4 w-full">
 
-            {["10:00am-11:00am", "1:00pm-2:00pm", "5:00pm-7:00pm"].map((t, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setSlotTime(t)
-                  setSlotIndex(i)
-                }}
-                className={`px-4 py-2 border rounded ${
-                  slotIndex === i ? "bg-blue-600 text-white" : ""
-                }`}
-              >
-                {t}
-              </button>
-            ))}
+{slots.map((t, i) => {
 
-          </div>
+const isClosed = slotBookings[t] >= 2
+
+  return (
+    <div key={i} className="relative">
+
+      {isClosed && (
+        <div
+          className="
+          absolute
+          -top-2
+          left-1/2
+          -translate-x-1/2
+          bg-red-600
+          text-white
+          text-[10px]
+          px-2
+          py-1
+          rounded-full
+          z-10
+        "
+        >
+          CLOSED
+        </div>
+      )}
+
+      <button
+        disabled={isClosed}
+        onClick={() => {
+          setSlotTime(t)
+          setSlotIndex(i)
+        }}
+        className={`
+          min-w-[150px]
+          px-4
+          py-3
+          border
+          rounded-lg
+          transition
+
+          ${
+            isClosed
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : slotIndex === i
+              ? "bg-blue-600 text-white"
+              : "bg-white"
+          }
+        `}
+      >
+        <div>{t}</div>
+
+        <div className="text-xs mt-1">
+        {2 - slotBookings[t]} Slots Left
+        </div>
+      </button>
+
+    </div>
+  )
+})}
+
+</div>
 
           {/* BUTTON */}
-          <button
-            onClick={() => {
-                if (!slotTime) return alert("Select time first ❌")
-                setShowPopup(true)
-              }}
-            className="mt-6 bg-blue-600 text-white px-6 py-3 rounded"
-          >
-            Book Appointment
-          </button>
+          {allSlotsClosed ? (
+
+<div
+  className="
+  mt-6
+  bg-red-600
+  text-white
+  px-8
+  py-3
+  rounded-lg
+  font-bold
+"
+>
+  Doctor Unavailable
+</div>
+
+) : (
+
+<button
+  onClick={() => {
+    if (!slotTime) {
+      alert("Select time first ❌")
+      return
+    }
+
+    setShowPopup(true)
+  }}
+  className="
+    mt-6
+    bg-blue-600
+    text-white
+    px-8
+    py-3
+    rounded-lg
+    w-full
+    max-w-[250px]
+  "
+>
+  Book Appointment
+</button>
+
+)}
 
           {showPopup && (
   <AppointmentPopup
