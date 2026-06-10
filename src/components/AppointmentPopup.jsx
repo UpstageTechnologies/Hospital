@@ -5,13 +5,25 @@ import { db } from "../firebase"
 import { collection, addDoc, getDocs } from "firebase/firestore"
 
 
-const AppointmentPopup = ({ close, doctor, slotTime, date }) => {
+const AppointmentPopup = ({
+  close,
+  doctor,
+  slotTime,
+  date,
+  isDemo = false
+}) => {
 
     const navigate = useNavigate()
     const [step, setStep] = useState(1)
     const [users, setUsers] = useState([])
-    const [loginEmail, setLoginEmail] = useState("")
-const [loginPassword, setLoginPassword] = useState("")
+    const [loginEmail, setLoginEmail] = useState(
+      isDemo ? "sithu@gmail.com" : ""
+    )
+    
+    const [loginPassword, setLoginPassword] = useState(
+      isDemo ? "123456" : ""
+    )
+
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -22,7 +34,9 @@ const [loginPassword, setLoginPassword] = useState("")
     const [reason, setReason] = useState("")
     const [currentUser, setCurrentUser] = useState(null)
     const [age, setAge] = useState("")
-    const [appointmentNo, setAppointmentNo] = useState("")
+    const [appointmentNo, setAppointmentNo] = useState(
+      "API" + Math.floor(1000 + Math.random() * 9000)
+    )
 
     // 🔥 REGISTER
     const handleRegister = async () => {
@@ -92,14 +106,16 @@ const [loginPassword, setLoginPassword] = useState("")
 
         // Demo patient auto login
         if (
-          loginEmail === "sundar@gmail.com" &&
-          loginPassword === "sundar11"
-        ) {
+          isDemo &&
+          loginEmail === "sithu@gmail.com" &&
+          loginPassword === "123456"
+        ){
       
           const demoUser = {
-            name: "Sundar",
-            email: "sundar@gmail.com",
-            address: "Madurai",
+            name: "Sithu",
+            age: "25",
+            email: "sithu@gmail.com",
+            address: "Chennai",
             phone: "9876543210",
             gender: "Male"
           }
@@ -159,6 +175,8 @@ const [loginPassword, setLoginPassword] = useState("")
         if (!reason) {
             return alert("Enter reason ")
         }
+
+        const generatedAppointmentNo = appointmentNo
     
         const appointmentData = {
           patientName: currentUser.name,
@@ -181,7 +199,7 @@ const [loginPassword, setLoginPassword] = useState("")
           date: (date || new Date()).toISOString().split("T")[0],
       
           reason: reason,
-          appointmentNo: appointmentNo,
+          appointmentNo: generatedAppointmentNo,
       
           isDemo: doctor.demo === true,
       };
@@ -283,15 +301,17 @@ Details
       Login
     </button>
 
-    <p className="text-center mt-4 text-sm">
-  Don't have an account?{" "}
-  <span
-    onClick={() => setStep(5)}
-    className="text-blue-600 font-semibold cursor-pointer underline"
-  >
-    Register
-  </span>
-</p>
+    {!isDemo && (
+  <p className="text-center mt-4 text-sm">
+    Don't have an account?{" "}
+    <span
+      onClick={() => setStep(5)}
+      className="text-blue-600 font-semibold cursor-pointer underline"
+    >
+      Register
+    </span>
+  </p>
+)}
   </>
 )}
                     {/* STEP 2 */}
@@ -326,7 +346,7 @@ Details
                         <>
                             <h2 className="text-xl font-bold mb-4">Details</h2>
 
-                            <p><b>Appointment No:</b> API{Math.floor(Math.random() * 900 + 100)}</p>
+                            <p><b>Appointment No:</b> {appointmentNo}</p>
 
 <p><b>Doctor Name:</b> {doctor.name}</p>
 

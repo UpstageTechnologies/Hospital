@@ -164,13 +164,14 @@ const DemoDoctorDetails = () => {
   </button>
 
   {showPopup && (
-    <AppointmentPopup
-      close={() => setShowPopup(false)}
-      doctor={docInfo}
-      slotTime={slotTime}
-      date={selectedDate}
-    />
-  )}
+  <AppointmentPopup
+    close={() => setShowPopup(false)}
+    doctor={docInfo}
+    slotTime={slotTime}
+    date={selectedDate}
+    isDemo={true}
+  />
+)}
 </div>
 
       </div>
