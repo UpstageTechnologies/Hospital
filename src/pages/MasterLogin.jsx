@@ -21,6 +21,13 @@ const MasterLogin = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [showSetupPopup,setShowSetupPopup] = useState(false);
+const [setupStep,setSetupStep] = useState(1);
+
+const [ownerName,setOwnerName] = useState("");
+const [hospitalAddress,setHospitalAddress] = useState("");
+const [hospitalAge,setHospitalAge] = useState("");
+
   const navigate = useNavigate();
   const location = useLocation();
   const isDemo = location.state?.demo === true;
@@ -66,6 +73,12 @@ const MasterLogin = () => {
         phone,
         email,
         role: "master",
+      
+        ownerName,
+        hospitalAddress,
+        hospitalAge,
+      
+        profileCompleted:true
       });
   
       alert("Registration Success");
@@ -424,9 +437,19 @@ PharmacyLogin
             className="input-style" />
         )}
 
-        <button className="btn-style">
-          {state === "Login" ? "Login" : "Register"}
-        </button>
+<button
+type="button"
+className="btn-style"
+onClick={()=>{
+  if(state==="Login"){
+    handleLogin();
+  }else{
+    setShowSetupPopup(true);
+  }
+}}
+>
+{state === "Login" ? "Login" : "Register"}
+</button>
 
         <div className="flex items-center gap-3 my-6">
   <div className="flex-1 h-[1px] bg-gray-300"></div>
@@ -475,6 +498,192 @@ PharmacyLogin
 )}
 
       </form>
+
+      {showSetupPopup && (
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+
+    <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
+
+      {/* STEP 1 */}
+      {setupStep === 1 && (
+        <>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Owner Name
+          </h2>
+
+          <input
+            type="text"
+            placeholder="Enter Owner Name"
+            value={ownerName}
+            onChange={(e) => setOwnerName(e.target.value)}
+            className="input-style"
+          />
+
+          <button
+            className="btn-style mt-4"
+            onClick={() => setSetupStep(2)}
+          >
+            Next
+          </button>
+        </>
+      )}
+
+      {/* STEP 2 */}
+      {setupStep === 2 && (
+        <>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Hospital Name
+          </h2>
+
+          <input
+            type="text"
+            placeholder="Enter Hospital Name"
+            value={hospital}
+            onChange={(e) => setHospital(e.target.value)}
+            className="input-style"
+          />
+
+          <div className="flex gap-2 mt-4">
+
+            <button
+              className="border rounded-xl px-4 py-3 flex-1"
+              onClick={() => setSetupStep(1)}
+            >
+              Back
+            </button>
+
+            <button
+              className="btn-style flex-1"
+              onClick={() => setSetupStep(3)}
+            >
+              Next
+            </button>
+
+          </div>
+        </>
+      )}
+
+      {/* STEP 3 */}
+      {setupStep === 3 && (
+        <>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Hospital Address
+          </h2>
+
+          <textarea
+            rows={4}
+            placeholder="Enter Hospital Address"
+            value={hospitalAddress}
+            onChange={(e) => setHospitalAddress(e.target.value)}
+            className="w-full border rounded-xl p-3"
+          />
+
+          <div className="flex gap-2 mt-4">
+
+            <button
+              className="border rounded-xl px-4 py-3 flex-1"
+              onClick={() => setSetupStep(2)}
+            >
+              Back
+            </button>
+
+            <button
+              className="btn-style flex-1"
+              onClick={() => setSetupStep(4)}
+            >
+              Next
+            </button>
+
+          </div>
+        </>
+      )}
+
+      {/* STEP 4 */}
+      {setupStep === 4 && (
+        <>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Hospital Age
+          </h2>
+
+          <input
+            type="text"
+            placeholder="Enter Hospital Age"
+            value={hospitalAge}
+            onChange={(e) => setHospitalAge(e.target.value)}
+            className="input-style"
+          />
+
+          <div className="flex gap-2 mt-4">
+
+            <button
+              className="border rounded-xl px-4 py-3 flex-1"
+              onClick={() => setSetupStep(3)}
+            >
+              Back
+            </button>
+
+            <button
+              className="btn-style flex-1"
+              onClick={() => setSetupStep(5)}
+            >
+              Next
+            </button>
+
+          </div>
+        </>
+      )}
+
+      {/* STEP 5 */}
+      {setupStep === 5 && (
+        <>
+          <h2 className="text-2xl font-bold mb-2 text-center">
+            Create Account?
+          </h2>
+
+          <p className="text-center text-gray-500 mb-6">
+            Do you want to create account now?
+          </p>
+
+          <div className="flex flex-col gap-3">
+
+            <button
+              className="btn-style"
+              onClick={() => {
+                setName(ownerName);
+                handleRegister();
+              }}
+            >
+              Create Account
+            </button>
+
+            <button
+              className="border border-gray-300 rounded-xl py-3"
+              onClick={() => {
+                navigate("/master-dashboard");
+              }}
+            >
+              Save & Continue Later
+            </button>
+
+            <button
+              className="text-red-500"
+              onClick={() => {
+                setShowSetupPopup(false);
+                setSetupStep(1);
+              }}
+            >
+              Cancel
+            </button>
+
+          </div>
+        </>
+      )}
+
+    </div>
+
+  </div>
+)}
+
       </div>
     </div>
   )
