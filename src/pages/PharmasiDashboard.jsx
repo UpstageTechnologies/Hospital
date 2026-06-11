@@ -1355,79 +1355,7 @@ Delete
 
 </div>
 
-<div className="md:hidden space-y-4">
 
-{groupedExpense.map((item,index)=>(
-
-<div
-key={index}
-className="bg-white rounded-2xl shadow border p-4"
->
-
-<p><b>Date :</b> {item.date}</p>
-
-<p><b>Total Qty :</b> {item.qty}</p>
-
-<p className="text-red-600 font-bold">
-Expense : ₹{item.expense}
-</p>
-
-<p>{item.time}</p>
-
-<button
-onClick={()=>printRow(item,"Expense")}
-className="
-mt-3
-bg-blue-600
-text-white
-px-4
-py-2
-rounded-xl
-"
->
-Print
-</button>
-
-</div>
-
-))}
-
-</div>
-
-{groupedIncome.map((item,index)=>(
-
-<div
-key={index}
-className="bg-white rounded-2xl shadow border p-4"
->
-
-<p><b>Date :</b> {item.date}</p>
-
-<p><b>Total Qty :</b> {item.qty}</p>
-
-<p className="text-green-600 font-bold">
-Income : ₹{item.income}
-</p>
-
-<p>{item.time}</p>
-
-<button
-onClick={()=>printRow(item,"Income")}
-className="
-mt-3
-bg-blue-600
-text-white
-px-4
-py-2
-rounded-xl
-"
->
-Print
-</button>
-
-</div>
-
-))}
 
 {/* Mobile + Tablet Card View */}
 
