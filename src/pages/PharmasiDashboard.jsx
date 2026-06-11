@@ -2816,13 +2816,13 @@ radius={[10,10,0,0]}
 
 {/* Table */}
 
-{/* Expense Details */}
+{/* Combined Journal Table - Desktop */}
 
-<div className="bg-white rounded-3xl shadow-lg border overflow-hidden mb-8">
+<div className="hidden lg:block bg-white rounded-3xl shadow-lg border overflow-hidden mb-8">
 
 <div className="p-5">
-<h2 className="text-3xl font-bold text-red-600">
-💸 Expense Details
+<h2 className="text-3xl font-bold text-blue-600">
+📒 Journal Report
 </h2>
 </div>
 
@@ -2832,19 +2832,22 @@ radius={[10,10,0,0]}
 
 <thead>
 
-<tr className="bg-red-500 text-white">
+<tr className="bg-blue-600 text-white">
 
-<th className="px-6 py-4 text-left">Date</th>
+<th className="px-4 py-4 text-left">Date & Time</th>
 
-<th className="px-6 py-4 text-left">Medicine</th>
 
-<th className="px-6 py-4 text-center">Qty</th>
+<th className="px-4 py-4 text-left">Customer Name</th>
 
-<th className="px-6 py-4 text-center">Expense</th>
+<th className="px-4 py-4 text-left">Medicine</th>
 
-<th className="px-6 py-4 text-center">Time</th>
+<th className="px-4 py-4 text-center">Qty</th>
 
-<th className="px-6 py-4 text-center">Action</th>
+<th className="px-4 py-4 text-center">Expense</th>
+
+<th className="px-4 py-4 text-center">Income</th>
+
+<th className="px-4 py-4 text-center">Action</th>
 
 </tr>
 
@@ -2852,71 +2855,87 @@ radius={[10,10,0,0]}
 
 <tbody>
 
-{(filteredPurchase.length
-? Object.values(
-filteredPurchase.reduce((acc,item)=>{
+{[
+...(filteredPurchase.length
+? filteredPurchase
+: purchaseItems),
 
-const date = item.date;
+...(filteredSales.length
+? filteredSales
+: entryItems)
 
-if(!acc[date]){
-acc[date]={
-date,
-qty:0,
-expense:0,
-time:item.time
-};
-}
+]
 
-acc[date].qty += Number(item.qty);
-
-acc[date].expense +=
-Number(item.purchasePrice) *
-Number(item.qty);
-
-return acc;
-
-},{})
+.sort(
+(a,b)=>
+new Date(b.date) -
+new Date(a.date)
 )
-: groupedExpense
-).map((item,index)=>(
+
+.map((item,index)=>(
 
 <tr
 key={index}
-className="border-b hover:bg-gray-50 transition"
+className="border-b hover:bg-gray-50"
 >
 
-<td className="px-6 py-4">
+<td className="px-4 py-4">
+
+<div className="font-medium">
 {item.date}
+</div>
+
+<div className="text-sm text-gray-500">
+{item.time}
+</div>
+
 </td>
 
-<td className="px-6 py-4 font-medium">
-All Medicines
+<td className="px-4 py-4">
+
+{
+item.customerName ||
+item.customer ||
+item.patientName ||
+"Walk In Customer"
+}
+
 </td>
 
-<td className="px-6 py-4 text-center">
+<td className="px-4 py-4 font-medium">
+{item.medicine}
+</td>
+
+<td className="px-4 py-4 text-center">
 {item.qty}
 </td>
 
-<td className="px-6 py-4 text-center font-bold text-red-600">
-₹{item.expense}
+<td className="px-4 py-4 text-center text-red-600 font-bold">
+{
+item.purchasePrice
+? `₹${Number(item.purchasePrice) * Number(item.qty)}`
+: "-"
+}
 </td>
 
-<td className="px-6 py-4 text-center text-gray-500">
-{item.time}
+<td className="px-4 py-4 text-center text-green-600 font-bold">
+{
+item.salesPrice
+? `₹${item.salesPrice}`
+: "-"
+}
 </td>
 
-<td className="px-6 py-4 text-center">
+<td className="px-4 py-4 text-center">
 
 <button
-onClick={()=>printRow(item,"Expense")}
+onClick={()=>printRow(item,"Journal")}
 className="
 bg-blue-600
-hover:bg-blue-700
 text-white
-px-5
+px-4
 py-2
 rounded-xl
-font-semibold
 "
 >
 Print
@@ -2936,125 +2955,102 @@ Print
 
 </div>
 
+{/* Mobile + Tablet Journal Cards */}
 
-{/* Income Details */}
+<div className="block lg:hidden space-y-4">
 
-<div className="bg-white rounded-3xl shadow-lg border overflow-hidden">
+{[
+...(filteredPurchase.length
+? filteredPurchase
+: purchaseItems),
 
-<div className="p-5">
-<h2 className="text-3xl font-bold text-green-600">
-💰 Income Details
-</h2>
-</div>
+...(filteredSales.length
+? filteredSales
+: entryItems)
 
-<div className="overflow-x-auto">
+]
 
-<table className="w-full">
+.map((item,index)=>(
 
-<thead>
-
-<tr className="bg-green-500 text-white">
-
-<th className="px-6 py-4 text-left">Date</th>
-
-<th className="px-6 py-4 text-left">Customer Name</th>
-
-<th className="px-6 py-4 text-center">Qty</th>
-
-<th className="px-6 py-4 text-center">Income</th>
-
-<th className="px-6 py-4 text-center">Time</th>
-
-<th className="px-6 py-4 text-center">Action</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{(filteredSales.length
-? Object.values(
-filteredSales.reduce((acc,item)=>{
-
-const date = item.date;
-
-if(!acc[date]){
-acc[date]={
-date,
-qty:0,
-income:0,
-time:item.time
-};
-}
-
-acc[date].qty += Number(item.qty);
-
-acc[date].income +=
-Number(item.salesPrice);
-
-return acc;
-
-},{})
-)
-: groupedIncome
-).map((item,index)=>(
-
-<tr
+<div
 key={index}
-className="border-b hover:bg-gray-50 transition"
+className="
+bg-white
+rounded-2xl
+shadow
+border
+p-4
+"
 >
 
-<td className="px-6 py-4">
-{item.date}
-</td>
+<div className="space-y-2">
 
-<td className="px-6 py-4 font-medium">
-Sales Summary
-</td>
-
-<td className="px-6 py-4 text-center">
-{item.qty}
-</td>
-
-<td className="px-6 py-4 text-center font-bold text-green-600">
-₹{item.income}
-</td>
-
-<td className="px-6 py-4 text-center text-gray-500">
+<p>
+<b>Date :</b> {item.date}
+<br/>
+<span className="text-gray-500">
 {item.time}
-</td>
+</span>
+</p>
 
-<td className="px-6 py-4 text-center">
+<p>
+<b>Customer :</b>{" "}
+{
+  item.customerName ||
+  item.customer ||
+  item.patientName ||
+  "Walk In Customer"
+}
+</p>
+
+<p>
+<b>Medicine :</b> {item.medicine}
+</p>
+
+<p>
+<b>Qty :</b> {item.qty}
+</p>
+
+<p className="text-red-600 font-bold">
+Expense :
+{
+item.purchasePrice
+? ` ₹${Number(item.purchasePrice) * Number(item.qty)}`
+: " -"
+}
+</p>
+
+<p className="text-green-600 font-bold">
+Income :
+{
+item.salesPrice
+? ` ₹${item.salesPrice}`
+: " -"
+}
+</p>
 
 <button
-onClick={()=>printRow(item,"Income")}
+onClick={()=>printRow(item,"Journal")}
 className="
+mt-3
 bg-blue-600
-hover:bg-blue-700
 text-white
 px-5
 py-2
 rounded-xl
-font-semibold
 "
 >
 Print
 </button>
 
-</td>
+</div>
 
-</tr>
+</div>
 
 ))}
 
-</tbody>
-
-</table>
-
 </div>
 
-</div>
 </div>
 
 )}

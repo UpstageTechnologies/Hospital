@@ -18,6 +18,15 @@ import {
 } from "firebase/firestore";
 const MasterAppointmentsDashboard = () => {
 
+
+  const [showSetupPopup, setShowSetupPopup] = useState(false)
+const [setupStep, setSetupStep] = useState(1)
+const [ownerName, setOwnerName] = useState("")
+const [hospitalName, setHospitalName] = useState("")
+const [hospitalAddress, setHospitalAddress] = useState("")
+const [doctorCount, setDoctorCount] = useState("");
+const [showDoctorPopup, setShowDoctorPopup] = useState(false);
+
     const [appointments, setAppointments] = useState([])
     const [selected, setSelected] = useState(null)
     const [activePage, setActivePage] = useState("appointments")
@@ -359,7 +368,7 @@ if(blocked) return
       })
     
       fetchDoctors()
-      alert("Doctor created")
+      setShowDoctorPopup(true)
     }
     
     const handleUpdateDoctor = async () => {
@@ -535,6 +544,25 @@ if(blocked) return
 
     useEffect(() => {
 
+      const popup =
+        localStorage.getItem(
+          "showMasterSetupPopup"
+        );
+    
+      if (popup === "true") {
+    
+        setShowSetupPopup(true);
+    
+        localStorage.removeItem(
+          "showMasterSetupPopup"
+        );
+    
+      }
+    
+    }, []);
+
+    useEffect(() => {
+
       const fetchPlan = async () => {
       
       const snap = await getDoc(
@@ -673,6 +701,7 @@ if(blocked) return
     }, [checkInTime, checkedOut])
 
     return (
+      
         <div className="flex flex-col md:flex-row min-h-screen">
 
             {/* ✅ SIDEBAR (ONLY 3 OPTIONS) */}
@@ -1235,6 +1264,60 @@ Pharmasi
 
 )}
 
+{showDoctorPopup && (
+<div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+
+<div className="bg-white rounded-3xl p-8 w-[500px]">
+
+<h2 className="text-3xl font-bold text-center mb-3">
+Doctor Created
+</h2>
+
+<p className="text-center text-gray-500 mb-6">
+Do you want to create another doctor?
+</p>
+
+<div className="flex gap-3">
+
+<button
+className="flex-1 bg-blue-600 text-white py-3 rounded-xl"
+onClick={() => {
+
+  setShowDoctorPopup(false)
+  
+  setDoctorStep(1)
+  
+  setActivePage("account")
+  
+  setSubMenu("doctors")
+  
+  }}
+>
+Create Another Doctor
+</button>
+
+<button
+className="flex-1 border py-3 rounded-xl"
+onClick={() => {
+
+  setShowDoctorPopup(false)
+  
+  setShowSetupPopup(true)
+  
+  setSetupStep(7)
+  
+  }}
+>
+Continue
+</button>
+
+</div>
+
+</div>
+
+</div>
+)}
+
 
 
 {activePage === "account" && subMenu === "doctors" && (
@@ -1593,7 +1676,8 @@ flex-wrap
 
         )}
 
-        {subMenu === "doctors" && (
+{activePage === "account" &&
+ subMenu === "doctors" && (
 
           <div className="mt-10">
 
@@ -3299,6 +3383,278 @@ fetchPharmasi()
 
 </div>
 
+)}
+
+{showSetupPopup && (
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+
+    <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
+
+      {/* STEP 1 */}
+      {setupStep === 1 && (
+        <>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Owner Name
+          </h2>
+
+          <input
+            type="text"
+            placeholder="Enter Owner Name"
+            value={ownerName}
+            onChange={(e) => setOwnerName(e.target.value)}
+            className="input-style"
+          />
+
+          <button
+            className="btn-style mt-4"
+            onClick={() => setSetupStep(2)}
+          >
+            Next
+          </button>
+        </>
+      )}
+
+      {/* STEP 2 */}
+      {setupStep === 2 && (
+        <>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Hospital Name
+          </h2>
+
+          <input
+  type="text"
+  placeholder="Enter Hospital Name"
+  value={hospitalName}
+  onChange={(e) => setHospitalName(e.target.value)}
+  className="input-style"
+/>
+
+          <div className="flex gap-2 mt-4">
+
+            <button
+              className="border rounded-xl px-4 py-3 flex-1"
+              onClick={() => setSetupStep(1)}
+            >
+              Back
+            </button>
+
+            <button
+              className="btn-style flex-1"
+              onClick={() => setSetupStep(3)}
+            >
+              Next
+            </button>
+
+          </div>
+        </>
+      )}
+
+      {/* STEP 3 */}
+      {setupStep === 3 && (
+        <>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Hospital Address
+          </h2>
+
+          <textarea
+            rows={4}
+            placeholder="Enter Hospital Address"
+            value={hospitalAddress}
+            onChange={(e) => setHospitalAddress(e.target.value)}
+            className="w-full border rounded-xl p-3"
+          />
+
+          <div className="flex gap-2 mt-4">
+
+            <button
+              className="border rounded-xl px-4 py-3 flex-1"
+              onClick={() => setSetupStep(2)}
+            >
+              Back
+            </button>
+
+            <button
+              className="btn-style flex-1"
+              onClick={() => setSetupStep(4)}
+            >
+              Next
+            </button>
+
+          </div>
+        </>
+      )}
+
+     {/* STEP 4 */}
+{setupStep === 4 && (
+  <>
+    <h2 className="text-2xl font-bold mb-4 text-center">
+      Number Of Doctors
+    </h2>
+
+    <input
+      type="number"
+      placeholder="Enter Number Of Doctors"
+      value={doctorCount}
+      onChange={(e) => setDoctorCount(e.target.value)}
+      className="input-style"
+    />
+
+    <div className="flex gap-2 mt-4">
+
+      <button
+        className="border rounded-xl px-4 py-3 flex-1"
+        onClick={() => setSetupStep(3)}
+      >
+        Back
+      </button>
+
+      <button
+        className="btn-style flex-1"
+        onClick={() => setSetupStep(5)}
+      >
+        Next
+      </button>
+
+    </div>
+  </>
+)}
+
+     {/* STEP 5 */}
+{setupStep === 5 && (
+  <>
+    <h2 className="text-2xl font-bold mb-2 text-center">
+      Create Doctors?
+    </h2>
+
+    <p className="text-center text-gray-500 mb-6">
+      Do you want to create doctors now?
+    </p>
+
+    <div className="flex flex-col gap-3">
+
+      <button
+        className="btn-style"
+        onClick={() => setSetupStep(6)}
+      >
+        Create Doctor
+      </button>
+
+      <button
+        className="border border-gray-300 rounded-xl py-3"
+        onClick={() => setSetupStep(7)}
+      >
+        Skip
+      </button>
+
+    </div>
+  </>
+)}
+
+{/* STEP 6 */}
+{setupStep === 6 && (
+  <>
+    <h2 className="text-2xl font-bold mb-4 text-center">
+      Create Doctors
+    </h2>
+
+    <p className="text-center text-gray-500 mb-6">
+      Click below to open Doctor Account Creation Form
+    </p>
+
+    <button
+      className="btn-style"
+      onClick={() => {
+
+        setShowSetupPopup(false)
+
+        setActivePage("account")
+
+        setSubMenu("doctors")
+
+      }}
+    >
+      Open Doctor Form
+    </button>
+  </>
+)}
+
+{/* STEP 7 */}
+{setupStep === 7 && (
+  <>
+    <div className="text-center">
+
+      <div className="text-6xl mb-4">
+        🎉
+      </div>
+
+      <h2 className="text-3xl font-bold mb-3">
+        Setup Completed
+      </h2>
+
+      <p className="text-gray-500 mb-6">
+        Your hospital setup has been completed successfully.
+      </p>
+
+      <div className="bg-blue-50 rounded-2xl p-4 mb-6 text-left">
+
+        <p>
+          <b>Owner :</b> {ownerName}
+        </p>
+
+        <p>
+          <b>Hospital :</b> {hospitalName}
+        </p>
+
+        <p>
+          <b>Doctors :</b> {doctorCount}
+        </p>
+
+      </div>
+
+      <button
+        className="
+        w-full
+        py-4
+        rounded-2xl
+        text-white
+        font-bold
+        text-lg
+        bg-blue-600
+        hover:bg-blue-700
+        transition
+        "
+        onClick={() => {
+
+          localStorage.setItem(
+            "hospitalSetup",
+            JSON.stringify({
+              ownerName,
+              hospitalName,
+              hospitalAddress,
+              doctorCount
+            })
+          )
+        
+          localStorage.removeItem("showMasterSetupPopup")
+        
+          setShowSetupPopup(false)
+        
+          setActivePage("home")
+        
+          setSubMenu("")
+        
+        }}
+      >
+        🚀 Get Started
+      </button>
+
+    </div>
+  </>
+)}
+
+    </div>
+
+  </div>
 )}
         </div>
     )
