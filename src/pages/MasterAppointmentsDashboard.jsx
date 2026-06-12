@@ -56,7 +56,7 @@ const [showDoctorsListPopup, setShowDoctorsListPopup] = useState(false);
 
     const [appointments, setAppointments] = useState([])
     const [selected, setSelected] = useState(null)
-    const [activePage, setActivePage] = useState("appointments")
+    const [activePage, setActivePage] = useState("home")
     const [showUpgradePopup, setShowUpgradePopup] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
     const [checkInTime, setCheckInTime] = useState(null)
