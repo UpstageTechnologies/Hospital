@@ -927,6 +927,16 @@ if(blocked) return
   Journal Entry
 </p>
 
+<p
+  onClick={() => {
+    setActivePage("pharmacyJournal")
+    setSubMenu("")
+  }}
+  className="mb-4 cursor-pointer"
+>
+  Pharmacy Journal Entry
+</p>
+
 
 <div className="mb-8">
 
@@ -1426,9 +1436,9 @@ py-3
 <div className="
 grid
 grid-cols-1
-md:grid-cols-2
-xl:grid-cols-4
-gap-4
+sm:grid-cols-2
+xl:grid-cols-5
+gap-6
 mb-8
 ">
 
@@ -1739,6 +1749,144 @@ Details
 </div>
 
 )}
+
+
+{activePage === "pharmacyJournal" && (
+
+<div>
+
+<h1 className="text-4xl font-bold mb-8">
+Pharmacy Journal Entry
+</h1>
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-2
+xl:grid-cols-4
+gap-4
+mb-8
+">
+
+<div className="bg-green-500 text-white rounded-3xl p-6">
+<h3>Today's Sales</h3>
+<p className="text-5xl font-bold mt-4">₹25000</p>
+</div>
+
+<div className="bg-orange-500 text-white rounded-3xl p-6">
+<h3>Purchase Cost</h3>
+<p className="text-5xl font-bold mt-4">₹13000</p>
+</div>
+
+<div className="bg-purple-500 text-white rounded-3xl p-6">
+<h3>Profit</h3>
+<p className="text-5xl font-bold mt-4">₹12000</p>
+</div>
+
+<div className="bg-blue-500 text-white rounded-3xl p-6">
+<h3>Medicines Sold</h3>
+<p className="text-5xl font-bold mt-4">120</p>
+</div>
+
+<div className="bg-red-500 text-white rounded-3xl p-6">
+<h3>Low Stock</h3>
+<p className="text-5xl font-bold mt-4">8</p>
+</div>
+
+</div>
+
+
+
+<div className="hidden lg:block bg-white rounded-3xl shadow border p-6">
+
+<h2 className="text-2xl font-bold mb-4">
+Medicine Sales
+</h2>
+
+<div className="overflow-x-auto">
+
+<table className="w-full">
+
+<thead className="bg-blue-600 text-white">
+
+<tr>
+<th className="p-3">Date</th>
+<th className="p-3">Bill No</th>
+<th className="p-3">Patient</th>
+<th className="p-3">Medicine</th>
+<th className="p-3">Qty</th>
+<th className="p-3">Amount</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr className="border-b">
+
+<td className="p-3">
+2026-06-12
+</td>
+
+<td className="p-3">
+B001
+</td>
+
+<td className="p-3">
+Sithu
+</td>
+
+<td className="p-3">
+Paracetamol
+</td>
+
+<td className="p-3">
+5
+</td>
+
+<td className="p-3">
+₹250
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+<div className="block lg:hidden space-y-4">
+
+<div className="
+bg-white
+rounded-2xl
+shadow
+border
+p-4
+">
+
+<p><b>Date :</b> 2026-06-12</p>
+
+<p><b>Bill No :</b> B001</p>
+
+<p><b>Patient :</b> Sithu</p>
+
+<p><b>Medicine :</b> Paracetamol</p>
+
+<p><b>Qty :</b> 5</p>
+
+<p><b>Amount :</b> ₹250</p>
+
+</div>
+
+</div>
 
 {selectedJournal && (
 
@@ -4752,7 +4900,7 @@ fetchPharmasi()
 
 <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t shadow-md z-50">
 
-  <div className="flex items-center justify-between px-2 sm:px-4 py-2">
+<div className="flex items-center justify-around px-3 py-3 gap-2">
 
     {/* HOME */}
     <button
@@ -4779,6 +4927,19 @@ className="flex flex-col items-center"
 <span className="text-xs">
 Journal
 </span>
+</button>
+
+<button
+  onClick={() => {
+    setActivePage("pharmacyJournal")
+    setSubMenu("")
+  }}
+  className="flex flex-col items-center"
+>
+  💊
+  <p className="text-xs">
+    Pharmacy
+  </p>
 </button>
 
 

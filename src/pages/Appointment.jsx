@@ -694,14 +694,41 @@ Go to Dashboard
 {(slot.times || []).map((t,j)=>{
 
 const bookedCount = slotBookings[t] || 0
-const isClosed = bookedCount >= 3
+
+const now = new Date()
+
+const isToday =
+slot.date ===
+new Date().toISOString().split("T")[0]
+
+let slotStartHour = 0
+
+if (t === "10:00am-11:00am")
+slotStartHour = 10
+
+if (t === "1:00pm-2:00pm")
+slotStartHour = 13
+
+if (t === "5:00pm-7:00pm")
+slotStartHour = 17
+
+const currentHour =
+now.getHours()
+
+const timeExpired =
+isToday &&
+currentHour >= slotStartHour
+
+const isClosed =
+bookedCount >= 3 ||
+timeExpired
 
 return (
 
 <div key={j} className="relative">
 
 {isClosed && (
-<div className="
+  <div className="
 absolute
 -top-2
 left-1/2
@@ -715,7 +742,11 @@ py-1
 rounded-full
 z-10
 ">
-CLOSED
+
+{timeExpired
+? "TIME OVER"
+: "CLOSED"}
+
 </div>
 )}
 
@@ -744,7 +775,11 @@ ${isClosed
 <div>{t}</div>
 
 <div className="text-xs mt-1">
-{3 - bookedCount} Slots Left
+
+{timeExpired
+? "Time Over"
+: `${3 - bookedCount} Slots Left`}
+
 </div>
 
 </button>

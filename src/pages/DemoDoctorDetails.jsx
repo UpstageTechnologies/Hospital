@@ -206,14 +206,40 @@ const DemoDoctorDetails = () => {
 
 {slots.map((t, i) => {
 
+const today = new Date()
+
+const isToday =
+selectedDate.toDateString() ===
+today.toDateString()
+
+let slotStartHour = 0
+
+if (t === "10:00am-11:00am")
+slotStartHour = 10
+
+if (t === "1:00pm-2:00pm")
+slotStartHour = 13
+
+if (t === "5:00pm-7:00pm")
+slotStartHour = 17
+
+const currentHour =
+today.getHours()
+
+const timeExpired =
+isToday &&
+currentHour >= slotStartHour
+
 const isClosed =
-slotBookings[t] >= 3
+slotBookings[t] >= 3 ||
+timeExpired
 
 return (
 
 <div key={i} className="relative">
 
 {isClosed && (
+
 <div
 className="
 absolute
@@ -230,8 +256,13 @@ rounded-full
 z-10
 "
 >
-CLOSED
+
+{timeExpired
+? "TIME OVER"
+: "CLOSED"}
+
 </div>
+
 )}
 
 <button
@@ -259,9 +290,13 @@ isClosed
 >
 
 <div>{t}</div>
-
 <div className="text-xs mt-1">
-{3 - slotBookings[t]} Slots Left
+
+{timeExpired
+? "Time Over"
+: `${3 - slotBookings[t]} Slots Left`
+}
+
 </div>
 
 </button>

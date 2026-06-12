@@ -186,23 +186,34 @@ eventData?.slots?.filter(s => !s.leave) || [];
                             text-sm sm:text-base
                             overflow-hidden
 
-${type === "doctor"
-                                    ? (
-                                        events?.[date]?.type?.toLowerCase() === "holiday"
-                                            ? "bg-green-500 text-white"
-                                            : events?.[date]?.type?.toLowerCase() === "gov" || isSunday
-                                                ? "bg-red-500 text-white"
-                                                : "bg-gray-100"
-                                    )
-                                    : (
-                                      isSunday
-                                            ? "bg-blue-500 text-white"
+                            ${isToday
+                                ? "bg-pink-500 text-white ring-4 ring-pink-200"
+                                : type === "doctor"
+                                ? (
+                                    events?.[date]?.type?.toLowerCase() === "holiday"
+                                        ? "bg-green-500 text-white"
+                                        : events?.[date]?.type?.toLowerCase() === "gov" || isSunday
+                                            ? "bg-red-500 text-white"
                                             : "bg-gray-100"
-                                    )
-                                }
+                                  )
+                                : (
+                                    isSunday
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-100"
+                                  )
+                            }
 `}
                         >
-                            <p className="text-sm sm:text-lg font-semibold">{day}</p>
+                            <p
+className={`
+text-sm sm:text-lg
+${isToday ? "font-bold text-white text-2xl" : "font-semibold"}
+`}
+>
+{day}
+</p>
+
+
                             {isSunday && !events[date] && (
     <p className="text-[10px] absolute bottom-1 opacity-0">
         Sunday
@@ -357,7 +368,9 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [patientsData,setPatientsData] = useState([]);
     const [page, setPage] = useState("appointments")
     const [selected, setSelected] = useState(null)
-    const [selectedDate, setSelectedDate] = useState(null)
+    const [selectedDate, setSelectedDate] = useState(
+        new Date().toISOString().split("T")[0]
+        )
     const [selectedAppointment, setSelectedAppointment] = useState(null)
     const [visitPopup, setVisitPopup] = useState(null);
 
@@ -368,6 +381,12 @@ const [visitForm, setVisitForm] = useState({
     
 const [showTabletDropdown,setShowTabletDropdown] =
 useState(false);
+
+const [summaryPopup,setSummaryPopup] =
+useState(false);
+
+const [summaryType,setSummaryType] =
+useState("");
 
 const [tabletSearch,setTabletSearch] =
 useState("");
@@ -414,6 +433,17 @@ const [selectedJournal,setSelectedJournal] = useState(null);
 const [showFollowupPopup,setShowFollowupPopup] = useState(false);
 const [showTreatedPopup,setShowTreatedPopup] = useState(false);
 const [historySelected,setHistorySelected] = useState(null);
+
+const pendingPatients =
+appointmentHistory.filter(
+item => item.status === "Pending"
+);
+
+const completedPatients =
+appointmentHistory.filter(
+item => item.status === "Completed"
+);
+
 const [describeItems,setDescribeItems] = useState([]);
 
 const syncPharmacyItems = async () => {
@@ -1351,20 +1381,46 @@ prescriptionList || [],
                     Set Appointments
                     </h2>
 
-                    <Calendar
+                    <div className="
+flex
+flex-col
+xl:flex-row
+gap-6
+items-start
+">
+
+<div className="
+w-full
+xl:w-[650px]
+shrink-0
+">
+<Calendar
     onSelect={handleDateSelect}
     selectedDate={selectedDate}
     events={appointmentEvents}
     type="appointment"
     appointments={appointments}
 />
+</div>
 
-                    {selectedDate && (
-                        <div className="mt-6 bg-white p-6 rounded-xl shadow">
+<div className="
+w-full
+flex-1
+">
 
-                            <h2 className="text-lg font-semibold mb-4">
-                                Schedule - {selectedDate}
-                            </h2>
+{selectedDate && (
+<div className="
+bg-white
+p-6
+rounded-xl
+shadow
+">
+
+<h2 className="text-lg font-semibold mb-4">
+Schedule - {selectedDate}
+</h2>
+
+{/* UN SCHEDULE CODE FULLY SAME */}
 
                             <div className="space-y-4">
 
@@ -1507,9 +1563,12 @@ w-fit
                                 })}
 
                             </div>
-                        </div>
-                    )}
+                            </div>
+)}
 
+</div>
+
+</div>
 
                 </div>
             )}
@@ -1528,6 +1587,134 @@ patientsData={patientsData}
 
 )}
 
+{summaryPopup && (
+
+<div className="
+fixed
+inset-0
+bg-black/50
+z-[99999]
+flex
+items-center
+justify-center
+p-4
+">
+
+<div className="
+bg-white
+w-full
+max-w-5xl
+rounded-3xl
+p-6
+max-h-[90vh]
+overflow-y-auto
+relative
+">
+
+<button
+onClick={()=>
+setSummaryPopup(false)
+}
+className="
+absolute
+top-4
+right-5
+text-4xl
+font-bold
+"
+>
+×
+</button>
+
+<h2 className="
+text-3xl
+font-bold
+mb-6
+">
+
+{summaryType === "Completed"
+? "Treated Patients"
+: "Pending Patients"}
+
+</h2>
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-2
+gap-4
+">
+
+{appointmentHistory
+
+.filter(item =>
+
+summaryType === "Completed"
+
+? item.status === "Completed"
+
+: item.status === "Pending"
+
+)
+
+.map((item,index)=>(
+
+<div
+key={index}
+className="
+border
+rounded-2xl
+p-4
+shadow-sm
+bg-gray-50
+"
+>
+
+<h3 className="
+font-bold
+text-xl
+mb-3
+">
+{item.patientName}
+</h3>
+
+<p>
+<b>Doctor :</b>
+{item.doctorName}
+</p>
+
+<p>
+<b>Phone :</b>
+{item.patientPhone}
+</p>
+
+<p>
+<b>Date :</b>
+{item.date}
+</p>
+
+<p>
+<b>Reason :</b>
+{item.reason}
+</p>
+
+<p>
+<b>Status :</b>
+{item.status}
+</p>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
 {page === "appointmentHistory" && (
 
 <div className="flex-1 p-3 sm:p-5 md:p-6 pb-28">
@@ -1535,6 +1722,69 @@ patientsData={patientsData}
 <h1 className="text-2xl font-bold mb-6 text-center md:text-left">
 Appointment History
 </h1>
+
+<div className="
+grid
+grid-cols-2
+gap-4
+mb-6
+">
+
+<div
+onClick={()=>{
+setSummaryType("Pending");
+setSummaryPopup(true);
+}}
+className="
+bg-orange-500
+text-white
+rounded-2xl
+p-5
+shadow
+cursor-pointer
+hover:scale-[1.02]
+transition
+"
+>
+
+<p className="text-sm">
+Pending Patients
+</p>
+
+<p className="text-4xl font-bold mt-2">
+{pendingPatients.length}
+</p>
+
+</div>
+
+<div
+onClick={()=>{
+setSummaryType("Completed");
+setSummaryPopup(true);
+}}
+className="
+bg-green-600
+text-white
+rounded-2xl
+p-5
+shadow
+cursor-pointer
+hover:scale-[1.02]
+transition
+"
+>
+
+<p className="text-sm">
+Treated Patients
+</p>
+
+<p className="text-4xl font-bold mt-2">
+{completedPatients.length}
+</p>
+
+</div>
+
+</div>
 
 {/* SEARCH */}
 
@@ -2859,6 +3109,34 @@ mt-8
 <div className="mt-8 space-y-4">
 
 <button
+onClick={async()=>{
+
+await updateDoc(
+doc(
+db,
+"appointmentHistory",
+historySelected.id
+),
+{
+status:"Pending"
+}
+);
+
+setAppointmentHistory(prev =>
+prev.map(item =>
+item.id === historySelected.id
+? {
+...item,
+status:"Pending"
+}
+: item
+)
+);
+
+setShowTreatedPopup(false);
+
+}}
+
 className="
 w-full
 bg-orange-500
@@ -2872,6 +3150,34 @@ Follow Up Required
 </button>
 
 <button
+onClick={async()=>{
+
+await updateDoc(
+doc(
+db,
+"appointmentHistory",
+historySelected.id
+),
+{
+status:"Completed"
+}
+);
+
+setAppointmentHistory(prev =>
+prev.map(item =>
+item.id === historySelected.id
+? {
+...item,
+status:"Completed"
+}
+: item
+)
+);
+
+setShowTreatedPopup(false);
+
+}}
+
 className="
 w-full
 bg-green-600
@@ -2881,7 +3187,7 @@ rounded-xl
 font-bold
 "
 >
-Completed
+Treated
 </button>
 
 </div>

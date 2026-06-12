@@ -28,9 +28,28 @@ const UpstageAppointmentPage = () => {
     "5:00pm-7:00pm",
   ]
   
-  const allSlotsClosed = slots.every(
-    slot => slotBookings[slot] >= 2
-  )
+  const allSlotsClosed = slots.every((slot) => {
+
+    let slotStartHour = 0
+    
+    if (slot === "10:00am-11:00am")
+    slotStartHour = 10
+    
+    if (slot === "1:00pm-2:00pm")
+    slotStartHour = 13
+    
+    if (slot === "5:00pm-7:00pm")
+    slotStartHour = 17
+    
+    const timeExpired =
+    new Date().getHours() >= slotStartHour
+    
+    return (
+    (slotBookings[slot] || 0) >= 2 ||
+    timeExpired
+    )
+    
+    })
 
   // ✅ GET DOCTOR
   useEffect(() => {
@@ -129,30 +148,63 @@ const UpstageAppointmentPage = () => {
 
 {slots.map((t, i) => {
 
-const isClosed = slotBookings[t] >= 2
+const bookedCount = slotBookings[t] || 0
+
+const now = new Date()
+
+const currentDate =
+new Date().toISOString().split("T")[0]
+
+const selectedDate =
+new Date().toISOString().split("T")[0]
+
+const isToday =
+selectedDate === currentDate
+
+let slotStartHour = 0
+
+if (t === "10:00am-11:00am")
+slotStartHour = 10
+
+if (t === "1:00pm-2:00pm")
+slotStartHour = 13
+
+if (t === "5:00pm-7:00pm")
+slotStartHour = 17
+
+const currentHour =
+now.getHours()
+
+const timeExpired =
+isToday &&
+currentHour >= slotStartHour
+
+const isClosed =
+bookedCount >= 2 ||
+timeExpired
 
   return (
     <div key={i} className="relative">
 
-      {isClosed && (
-        <div
-          className="
-          absolute
-          -top-2
-          left-1/2
-          -translate-x-1/2
-          bg-red-600
-          text-white
-          text-[10px]
-          px-2
-          py-1
-          rounded-full
-          z-10
-        "
-        >
-          CLOSED
-        </div>
-      )}
+{isClosed && (
+  <div
+    className="
+    absolute
+    -top-2
+    left-1/2
+    -translate-x-1/2
+    bg-red-600
+    text-white
+    text-[10px]
+    px-2
+    py-1
+    rounded-full
+    z-10
+  "
+  >
+    {timeExpired ? "TIME OVER" : "CLOSED"}
+  </div>
+)}
 
       <button
         disabled={isClosed}
@@ -180,8 +232,10 @@ const isClosed = slotBookings[t] >= 2
         <div>{t}</div>
 
         <div className="text-xs mt-1">
-        {2 - slotBookings[t]} Slots Left
-        </div>
+  {timeExpired
+    ? "Time Over"
+    : `${2 - bookedCount} Slots Left`}
+</div>
       </button>
 
     </div>
