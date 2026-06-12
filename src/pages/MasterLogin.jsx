@@ -83,12 +83,29 @@ const [hospitalAge,setHospitalAge] = useState("");
   
       alert("Registration Success");
 
-localStorage.setItem("masterLogin", "true");
-localStorage.setItem("showMasterSetupPopup", "true");
-
-
-
-navigate("/master-dashboard");
+      localStorage.setItem("masterLogin", "true");
+      
+      localStorage.setItem(
+        "setupOwnerName",
+        name
+      );
+      
+      localStorage.setItem(
+        "setupHospitalName",
+        hospital
+      );
+      
+      localStorage.setItem(
+        "setupHospitalAddress",
+        hospitalAddress || ""
+      );
+      
+      localStorage.setItem(
+        "showMasterSetupPopup",
+        "true"
+      );
+      
+      navigate("/master-dashboard");
   
     } catch (error) {
       alert(error.message);

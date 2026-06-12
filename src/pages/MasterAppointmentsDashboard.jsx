@@ -24,8 +24,35 @@ const [setupStep, setSetupStep] = useState(1)
 const [ownerName, setOwnerName] = useState("")
 const [hospitalName, setHospitalName] = useState("")
 const [hospitalAddress, setHospitalAddress] = useState("")
+
+useEffect(() => {
+
+  const savedOwner =
+    localStorage.getItem("setupOwnerName");
+
+  const savedHospital =
+    localStorage.getItem("setupHospitalName");
+
+  const savedAddress =
+    localStorage.getItem("setupHospitalAddress");
+
+  if (savedOwner) {
+    setOwnerName(savedOwner);
+  }
+
+  if (savedHospital) {
+    setHospitalName(savedHospital);
+  }
+
+  if (savedAddress) {
+    setHospitalAddress(savedAddress);
+  }
+
+}, []);
+
 const [doctorCount, setDoctorCount] = useState("");
 const [showDoctorPopup, setShowDoctorPopup] = useState(false);
+const [showDoctorsListPopup, setShowDoctorsListPopup] = useState(false);
 
     const [appointments, setAppointments] = useState([])
     const [selected, setSelected] = useState(null)
@@ -37,6 +64,14 @@ const [showDoctorPopup, setShowDoctorPopup] = useState(false);
     const [checkedOut, setCheckedOut] = useState(false)
     const [subMenu, setSubMenu] = useState("")
     const [adminStep, setAdminStep] = useState(1)
+
+    const [journalEntries, setJournalEntries] = useState([])
+const [filteredJournalEntries, setFilteredJournalEntries] = useState([])
+const [selectedJournal, setSelectedJournal] = useState(null)
+
+const [doctorSearch, setDoctorSearch] = useState("")
+const [fromDate, setFromDate] = useState("")
+const [toDate, setToDate] = useState("")
 
     const [adminBasicInfo, setAdminBasicInfo] = useState({
       name: "",
@@ -219,6 +254,20 @@ const [showDoctorPopup, setShowDoctorPopup] = useState(false);
     const [patientAccounts, setPatientAccounts] = useState([])
     const [pharmasiAccounts, setPharmasiAccounts] = useState([])
     const [adminAccounts, setAdminAccounts] = useState([])
+
+    const doctorWisePatients = {}
+
+appointments.forEach((appt) => {
+
+  if (!appt.doctorName) return
+
+  if (!doctorWisePatients[appt.doctorName]) {
+    doctorWisePatients[appt.doctorName] = []
+  }
+
+  doctorWisePatients[appt.doctorName].push(appt)
+
+})
 
     const [currentPlan, setCurrentPlan] = useState("basic")
 
@@ -474,13 +523,22 @@ if(blocked) return
     }
     
     const fetchDoctors = async () => {
-      const q = query(
-        collection(db, "doctors"),
-        where("createdBy", "==", auth.currentUser.uid)
+
+      const snapshot = await getDocs(
+        collection(db, "doctors")
       )
-      
-      const snapshot = await getDocs(q)
-      setDoctorAccounts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+    
+      console.log(
+        "TOTAL DOCTORS =",
+        snapshot.docs.length
+      )
+    
+      setDoctorAccounts(
+        snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+      )
     }
     
     const fetchStaffs = async () => {
@@ -490,17 +548,32 @@ if(blocked) return
       )
       
       const snapshot = await getDocs(q)
-      setStaffAccounts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+
+      setStaffAccounts(
+        snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+      )
     }
     
     const fetchPatients = async () => {
-      const q = query(
-        collection(db, "patients"),
-        where("createdBy", "==", auth.currentUser.uid)
+
+      const snapshot = await getDocs(
+        collection(db, "patients")
       )
-      
-      const snapshot = await getDocs(q)
-      setPatientAccounts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+    
+      console.log(
+        "TOTAL PATIENTS =",
+        snapshot.docs.length
+      )
+    
+      setPatientAccounts(
+        snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+      )
     }
     
     const fetchPharmasi = async () => {
@@ -689,6 +762,130 @@ if(blocked) return
         fetchAppointments()
     }, [])
 
+    useEffect(() => {
+
+      const fetchJournalEntries = async () => {
+    
+        const snap = await getDocs(
+          collection(db, "appointmentHistory")
+        )
+    
+        const data = snap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+    
+        setJournalEntries(data)
+        setFilteredJournalEntries(data)
+    
+      }
+    
+      fetchJournalEntries()
+    
+    }, [])
+
+    const handleGenerateData = () => {
+
+      if (!fromDate || !toDate) {
+        alert("Select From Date & To Date")
+        return
+      }
+    
+      const filtered = journalEntries.filter((item) => {
+    
+        if (!item.date) return false
+    
+        const itemDate = new Date(item.date)
+    
+        return (
+          itemDate >= new Date(fromDate) &&
+          itemDate <= new Date(toDate)
+        )
+    
+      })
+    
+      setFilteredJournalEntries(filtered)
+    
+    }
+
+    const printJournalReport = () => {
+
+      const win = window.open("", "_blank");
+      
+      win.document.write(`
+      <html>
+      <head>
+      <title>Journal Report</title>
+      
+      <style>
+      
+      body{
+      font-family:Arial;
+      padding:20px;
+      }
+      
+      table{
+      width:100%;
+      border-collapse:collapse;
+      }
+      
+      th,td{
+      border:1px solid #000;
+      padding:8px;
+      }
+      
+      </style>
+      
+      </head>
+      
+      <body>
+      
+      <h1>Hospital Journal Report</h1>
+      
+      <table>
+      
+      <thead>
+      
+      <tr>
+      <th>Date</th>
+      <th>Appointment No</th>
+      <th>Patient</th>
+      <th>Doctor</th>
+      <th>Income</th>
+      <th>Expense</th>
+      </tr>
+      
+      </thead>
+      
+      <tbody>
+      
+      ${filteredJournalEntries.map(item => `
+      <tr>
+      <td>${item.date || "-"}</td>
+      <td>${item.appointmentNo || "-"}</td>
+      <td>${item.patientName || "-"}</td>
+      <td>${item.doctorName || "-"}</td>
+      <td>₹${item.totalAmount || 0}</td>
+      <td>₹${item.medicineFee || 0}</td>
+      </tr>
+      `).join("")}
+      
+      </tbody>
+      
+      </table>
+      
+      </body>
+      </html>
+      `);
+      
+      win.document.close();
+      
+      setTimeout(() => {
+      win.print();
+      },500);
+      
+      };
+
     // ⏱ timer logic (same as patient)
     useEffect(() => {
         let interval
@@ -705,8 +902,11 @@ if(blocked) return
         <div className="flex flex-col md:flex-row min-h-screen">
 
             {/* ✅ SIDEBAR (ONLY 3 OPTIONS) */}
-            <div className="hidden md:block w-1/5 bg-blue-600 text-white p-6">
-                <h2 className="text-xl font-bold mb-6">Master Panel</h2>
+            <div className="hidden md:block w-[280px] min-h-screen bg-blue-600 text-white p-6">
+
+<h2 className="text-4xl font-extrabold mb-10">
+  Master Panel
+</h2>
                 <p 
   onClick={() => {
     setActivePage("home")
@@ -715,6 +915,16 @@ if(blocked) return
   className="mb-4 cursor-pointer"
 >
   Home
+</p>
+
+<p
+  onClick={() => {
+    setActivePage("journal")
+    setSubMenu("")
+  }}
+  className="mb-4 cursor-pointer"
+>
+  Journal Entry
 </p>
 
 
@@ -757,6 +967,8 @@ Upgrade
   </div>
 
 </div>
+
+
 
 <p 
   onClick={() => {
@@ -831,7 +1043,7 @@ Pharmasi
             <div className="w-full md:w-4/5 p-4 md:p-6 pb-28">
 
             <h1 className="text-2xl font-bold mb-6">
-  {activePage === "home" && "Home"}
+ 
   {activePage === "subscription" && "Subscription"}
   {activePage === "appointments" && "All Appointments"}
   
@@ -840,13 +1052,1162 @@ Pharmasi
 {/* 🔥 STEP-5 — இதை இங்க add பண்ணு */}
 
 {activePage === "home" && (
-  <div className="text-xl font-semibold mb-4">
-    Welcome Home
+
+<div>
+
+<h1 className="text-3xl md:text-5xl font-bold">
+  Welcome to Master Home
+</h1>
+
+<p className="mt-5 text-gray-600 text-sm md:text-lg">
+  Manage doctors, patients and appointments easily from master panel.
+</p>
+
+<div className="
+grid
+grid-cols-1
+sm:grid-cols-2
+xl:grid-cols-3
+gap-6
+mt-10
+">
+
+<div
+onClick={() => setActivePage("doctorsList")}
+className="
+border
+rounded-xl
+p-6
+shadow
+bg-white
+cursor-pointer
+hover:scale-105
+transition
+"
+>
+
+<h2 className="text-xl font-bold">
+Total Doctors
+</h2>
+
+<p className="text-3xl mt-4 text-blue-600">
+{doctorAccounts.length}
+</p>
+
+</div>
+
+
+
+<div
+onClick={() => setActivePage("appointmentsList")}
+className="
+border
+rounded-xl
+p-6
+shadow
+bg-white
+cursor-pointer
+hover:scale-105
+transition
+"
+>
+
+<h2 className="text-xl font-bold">
+Appointments
+</h2>
+
+<p className="text-3xl mt-4 text-blue-600">
+{appointments.length}
+</p>
+
+</div>
+
+<div
+onClick={() => setActivePage("patientsList")}
+className="
+border
+rounded-xl
+p-6
+shadow
+bg-white
+cursor-pointer
+hover:scale-105
+transition
+"
+>
+    <h2 className="text-xl font-bold">
+      Total Patients
+    </h2>
+
+    <p className="text-3xl mt-4 text-blue-600">
+      {patientAccounts.length}
+    </p>
+  </div>
+
+
+
+</div>
+
+</div>
+
+)}
+
+{activePage === "doctorsList" && (
+
+<div>
+
+<h1 className="text-3xl font-bold mb-6">
+Doctors
+</h1>
+
+<div className="grid md:grid-cols-3 gap-4">
+
+{doctorAccounts
+.filter(doc =>
+doc?.doctorBasicInfo?.name?.trim()
+)
+.map((doc, i) => (
+
+<div
+key={i}
+onClick={() => {
+setViewData(doc)
+setShowDoctorPopup(true)
+}}
+className="
+border
+p-4
+rounded-xl
+shadow
+cursor-pointer
+hover:scale-105
+"
+>
+
+<p className="font-bold">
+{doc.doctorBasicInfo?.name}
+</p>
+
+<p>
+{doc.doctorDesignation?.designation}
+</p>
+
+<p className="text-gray-500">
+{doc.doctorBasicInfo?.email}
+</p>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+
+{activePage === "patientsList" && (
+
+<div>
+
+<h1 className="text-3xl font-bold mb-6">
+Doctor Wise Patients
+</h1>
+
+<div className="space-y-6">
+
+{Object.entries(doctorWisePatients).map(
+([doctorName, patients], index) => (
+
+<div
+key={index}
+className="
+bg-white
+border
+rounded-2xl
+shadow
+p-5
+"
+>
+
+<h2 className="text-2xl font-bold text-blue-600 mb-2">
+Dr. {doctorName}
+</h2>
+
+<p className="text-gray-500 mb-5">
+Total Patients : {patients.length}
+</p>
+
+<div className="grid md:grid-cols-3 gap-4">
+
+{patients.map((patient,i)=>(
+
+<div
+key={i}
+className="
+border
+rounded-xl
+p-4
+"
+>
+
+<p className="font-bold">
+{patient.patientName}
+</p>
+
+<p className="text-gray-500">
+{patient.date}
+</p>
+
+<p className="text-gray-500">
+{patient.time}
+</p>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)
+
+)}
+
+</div>
+
+</div>
+
+)}
+
+{activePage === "appointmentsList" && (
+
+<div>
+
+<h1 className="text-3xl font-bold mb-6">
+Doctor Wise Appointments
+</h1>
+
+<div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+{Object.entries(doctorWisePatients).map(
+([doctorName, patients], index) => (
+
+<div
+key={index}
+className="
+bg-white
+border
+rounded-2xl
+shadow
+p-6
+"
+>
+
+<h2 className="text-2xl font-bold text-blue-600">
+Dr. {doctorName}
+</h2>
+
+<p className="mt-4 text-xl">
+Total Appointments :
+<span className="font-bold ml-2">
+{patients.length}
+</span>
+</p>
+
+</div>
+
+)
+
+)}
+
+</div>
+
+</div>
+
+)}
+
+{showDoctorsListPopup && (
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+
+    <div className="bg-white w-[95%] md:w-[800px] max-h-[80vh] overflow-y-auto rounded-2xl p-6">
+
+      <div className="flex justify-between items-center mb-5">
+
+        <h2 className="text-2xl font-bold">
+          Total Doctors ({doctorAccounts.length})
+        </h2>
+
+        <button
+          onClick={() => setShowDoctorsListPopup(false)}
+          className="text-red-500 font-bold text-xl"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <table className="w-full border">
+
+        <thead className="bg-gray-200">
+
+          <tr>
+            <th className="border p-2">Name</th>
+            <th className="border p-2">Designation</th>
+            <th className="border p-2">Contact</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          {doctorAccounts.map((doctor, index) => (
+
+            <tr key={index}>
+
+              <td className="border p-2">
+                {doctor.doctorBasicInfo?.name}
+              </td>
+
+              <td className="border p-2">
+                {doctor.doctorDesignation?.designation}
+              </td>
+
+              <td className="border p-2">
+                {doctor.doctorBasicInfo?.contact}
+              </td>
+
+            </tr>
+
+          ))}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
   </div>
 )}
 
 {activePage === "payment" && (
  <HospitalPaymentSection />
+)}
+
+{activePage === "journal" && (
+
+<div>
+
+<h1 className="text-4xl font-bold mb-8">
+Journal Entry
+</h1>
+
+<div className="mb-6">
+
+<input
+type="text"
+placeholder="Search Doctor Name..."
+value={doctorSearch}
+onChange={(e)=>setDoctorSearch(e.target.value)}
+className="
+w-full
+md:w-[400px]
+border
+rounded-xl
+px-4
+py-3
+"
+/>
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+md:grid-cols-2
+xl:grid-cols-4
+gap-4
+mb-8
+">
+
+<input
+type="date"
+value={fromDate}
+onChange={(e)=>setFromDate(e.target.value)}
+className="border rounded-xl px-4 py-3"
+/>
+
+<input
+type="date"
+value={toDate}
+onChange={(e)=>setToDate(e.target.value)}
+className="border rounded-xl px-4 py-3"
+/>
+
+<button
+onClick={handleGenerateData}
+className="
+bg-blue-600
+text-white
+px-6
+py-3
+rounded-xl
+"
+>
+Generate Data
+</button>
+
+<button
+onClick={printJournalReport}
+className="
+bg-green-600
+text-white
+px-6
+py-3
+rounded-xl
+"
+>
+Print Report
+</button>
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+sm:grid-cols-2
+xl:grid-cols-3
+gap-6
+mb-8
+">
+
+<div className="bg-white rounded-3xl shadow-lg p-6 border-l-[8px] border-blue-500">
+
+<h3 className="text-gray-500 text-xl font-semibold">
+Income
+</h3>
+
+<p className="text-4xl font-bold text-blue-500 mt-3">
+
+₹{
+filteredJournalEntries.reduce(
+(sum,item)=>
+sum + Number(item.totalAmount || 0),
+0
+)
+}
+
+</p>
+
+</div>
+
+<div className="bg-white rounded-3xl shadow-lg p-6 border-l-[8px] border-yellow-500">
+
+<h3 className="text-gray-500 text-xl font-semibold">
+Expense
+</h3>
+
+<p className="text-4xl font-bold text-yellow-500 mt-3">
+
+₹{
+filteredJournalEntries.reduce(
+(sum,item)=>
+sum + Number(item.medicineFee || 0),
+0
+)
+}
+
+</p>
+
+</div>
+
+<div className="bg-white rounded-3xl shadow-lg p-6 border-l-[8px] border-green-500">
+
+<h3 className="text-gray-500 text-xl font-semibold">
+Profit
+</h3>
+
+<p className="text-4xl font-bold text-green-500 mt-3">
+
+₹{
+filteredJournalEntries.reduce(
+(sum,item)=>
+sum +
+(
+Number(item.totalAmount || 0)
+-
+Number(item.medicineFee || 0)
+),
+0
+)
+}
+
+</p>
+
+</div>
+
+</div>
+
+<div className="hidden lg:block overflow-x-auto bg-white rounded-2xl shadow border">
+
+<table className="w-full">
+
+<thead className="bg-blue-600 text-white">
+
+<tr>
+<th className="p-4">Date</th>
+<th className="p-4">Appointment No</th>
+<th className="p-4">Patient Name</th>
+<th className="p-4">Doctor Name</th>
+<th className="p-4">Income</th>
+<th className="p-4">Expense</th>
+<th className="p-4">Action</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{filteredJournalEntries
+
+.filter((item) => {
+
+if (doctorSearch.trim() === "")
+return true
+
+return (
+(item.doctorName || "")
+.trim()
+.toLowerCase() ===
+doctorSearch.trim().toLowerCase()
+)
+
+})
+
+.map((item,index)=>(
+
+<tr key={index} className="border-b">
+
+<td className="p-4">{item.date}</td>
+
+<td className="p-4">
+{item.appointmentNo}
+</td>
+
+<td className="p-4">
+{item.patientName}
+</td>
+
+<td className="p-4 font-bold">
+{item.doctorName}
+</td>
+
+<td className="p-4 text-green-600 font-bold">
+₹{item.totalAmount || 0}
+</td>
+
+<td className="p-4 text-red-600 font-bold">
+₹{item.medicineFee || 0}
+</td>
+
+<td className="p-4">
+
+<button
+onClick={() => setSelectedJournal(item)}
+className="
+bg-blue-600
+text-white
+px-4
+py-2
+rounded-lg
+"
+>
+Details
+</button>
+
+</td>
+
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+{/* MOBILE + TAB CARD VIEW */}
+
+<div className="block lg:hidden space-y-4">
+
+{filteredJournalEntries.map((item,index)=>(
+
+<div
+key={index}
+className="
+bg-white
+rounded-2xl
+shadow
+border
+p-4
+"
+>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Date
+</span>
+
+<span>
+{item.date}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Appointment No
+</span>
+
+<span>
+{item.appointmentNo || "-"}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Patient
+</span>
+
+<span>
+{item.patientName}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-gray-500">
+Doctor
+</span>
+
+<span className="font-bold">
+{item.doctorName}
+</span>
+</div>
+
+<div className="flex justify-between mb-3">
+<span className="font-semibold text-green-600">
+Income
+</span>
+
+<span className="font-bold text-green-600">
+₹{item.totalAmount || 0}
+</span>
+</div>
+
+<div className="flex justify-between mb-4">
+<span className="font-semibold text-red-600">
+Expense
+</span>
+
+<span className="font-bold text-red-600">
+₹{item.medicineFee || 0}
+</span>
+</div>
+
+<button
+onClick={() => setSelectedJournal(item)}
+className="
+w-full
+bg-blue-600
+text-white
+py-3
+rounded-xl
+font-semibold
+"
+>
+Details
+</button>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+{selectedJournal && (
+
+<div className="fixed inset-0 bg-black/50 z-[999999] overflow-y-auto pb-24">
+
+<div className="p-6 md:p-10">
+
+<div className="
+bg-white
+rounded-3xl
+shadow-xl
+p-4 md:p-8
+w-full
+max-w-7xl
+mx-auto
+mb-20
+">
+
+<div className="
+flex
+flex-col
+md:flex-row
+justify-between
+md:items-center
+gap-4
+mb-8
+">
+
+<h1 className="
+text-2xl
+md:text-5xl
+font-bold
+">
+Journal Entry
+</h1>
+
+</div>
+
+<div className="
+border
+rounded-3xl
+p-8
+">
+
+<div className="
+flex
+flex-col
+md:flex-row
+justify-between
+md:items-center
+gap-4
+mb-8
+">
+
+<h2 className="
+text-xl
+md:text-4xl
+font-bold
+break-words
+">
+Appointment :
+{selectedJournal.appointmentNo}
+</h2>
+
+
+</div>
+
+<div className="
+grid
+grid-cols-1
+lg:grid-cols-2
+gap-6
+md:gap-10
+">
+
+<div>
+
+<p><b>Patient :</b> {selectedJournal.patientName}</p>
+
+<p><b>Doctor :</b> {selectedJournal.doctorName}</p>
+
+<p><b>Date :</b> {selectedJournal.date}</p>
+
+<p><b>Requirement :</b> {selectedJournal.reason}</p>
+
+<p><b>Doctor Notes :</b> {selectedJournal.solution}</p>
+
+<p><b>Lab Tests :</b>
+{
+selectedJournal.labTests?.length
+? selectedJournal.labTests.join(", ")
+: "No Lab Test"
+}
+</p>
+
+</div>
+
+<div>
+
+<p><b>Age :</b> {selectedJournal.age || "-"}</p>
+
+<p><b>Phone :</b>
+{selectedJournal.patientPhone ||
+ selectedJournal.phone ||
+ "-"}
+</p>
+
+<p><b>Address :</b>
+{selectedJournal.address || "-"}
+</p>
+
+<p><b>Time :</b>
+{selectedJournal.time || "-"}
+</p>
+
+<p><b>Emergency Contact :</b>
+{selectedJournal.emergencyContact ||
+ selectedJournal.emrContact ||
+ "-"}
+</p>
+
+<p><b>Payment Status :</b>
+{selectedJournal.paymentStatus || "Pending"}
+</p>
+<p className="mt-2">
+  <b>Appointment Status :</b>
+
+  <span className="
+    ml-2
+    px-3
+    py-1
+    rounded-full
+    bg-green-100
+    text-green-700
+    text-sm
+  ">
+    {selectedJournal.status || "Completed"}
+  </span>
+</p>
+
+
+
+</div>
+
+</div>
+
+<div className="grid lg:grid-cols-3 gap-6 mt-8">
+
+  {/* Fee Details */}
+
+  <div className="
+  bg-white
+  border
+  rounded-3xl
+  p-6
+  shadow-sm
+  ">
+
+    <h3 className="text-3xl font-bold mb-6">
+      Fee Details
+    </h3>
+
+    <div className="mb-6">
+
+      <h4 className="
+      text-green-600
+      text-2xl
+      font-bold
+      mb-3
+      ">
+        Consultancy Fee
+      </h4>
+
+      <div className="flex justify-between">
+        <span>Doctor Consultation</span>
+        <b>₹{selectedJournal.consultancyFee || 0}</b>
+      </div>
+
+    </div>
+
+    <div className="bg-yellow-50 rounded-2xl p-5">
+
+      <div className="flex justify-between mb-3">
+        <span className="font-bold">
+          Consultancy Fee
+        </span>
+
+        <b>
+          ₹{selectedJournal.consultancyFee || 0}
+        </b>
+      </div>
+
+      <div className="flex justify-between mb-3">
+        <span className="font-bold">
+          Medicine Fee
+        </span>
+
+        <b>
+          ₹{selectedJournal.medicineFee || 0}
+        </b>
+      </div>
+
+      <hr className="my-4"/>
+
+      <div className="flex justify-between text-2xl font-bold">
+        <span>Total Amount</span>
+
+        <span>
+          ₹{selectedJournal.totalAmount || 0}
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* Patient Summary */}
+
+  <div className="
+  bg-blue-50
+  border
+  rounded-3xl
+  p-6
+  shadow-sm
+  ">
+
+    <h3 className="text-3xl font-bold mb-6">
+      Patient Summary
+    </h3>
+
+    <div className="space-y-4">
+
+      <div className="flex justify-between">
+        <span>👤 Patient</span>
+        <b>{selectedJournal.patientName}</b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>👨‍⚕️ Doctor</span>
+        <b>{selectedJournal.doctorName}</b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>📅 Visit Date</span>
+        <b>{selectedJournal.date}</b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>📞 Contact</span>
+        <b>
+          {selectedJournal.patientPhone ||
+          selectedJournal.phone ||
+          "-"}
+        </b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>📍 Address</span>
+        <b>{selectedJournal.address || "-"}</b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>💊 Prescriptions</span>
+        <b>
+          {selectedJournal.prescriptions?.length || 0}
+        </b>
+      </div>
+
+      <div className="flex justify-between">
+        <span>🩸 Blood Group</span>
+        <b>
+          {selectedJournal.bloodGroup || "-"}
+        </b>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* Appointment Info */}
+
+  <div className="
+  bg-green-50
+  border
+  rounded-3xl
+  p-6
+  shadow-sm
+  ">
+
+    <h3 className="text-3xl font-bold mb-6">
+      Appointment Info
+    </h3>
+
+    <div className="space-y-4">
+
+      <div>
+        📋 Appointment No :
+        <b>
+          {selectedJournal.appointmentNo}
+        </b>
+      </div>
+
+      <div>
+        💳 Payment :
+        <b>
+          {selectedJournal.paymentStatus || "Paid"}
+        </b>
+      </div>
+
+      <div>
+        📊 Status :
+        <b>
+          {selectedJournal.status || "Treated"}
+        </b>
+      </div>
+
+      <div>
+        💊 Medicines :
+        <b>
+          {selectedJournal.medicines?.length || 0}
+        </b>
+      </div>
+
+      <div>
+        🧪 Lab Tests :
+        <b>
+          {selectedJournal.labTests?.length || 0}
+        </b>
+      </div>
+
+      <div>
+        ⏰ Time :
+        <b>
+          {selectedJournal.time || "-"}
+        </b>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div className="
+bg-red-50
+rounded-2xl
+p-5
+mt-8
+mb-6
+">
+
+<h3 className="font-bold text-lg mb-3">
+Audit Information
+</h3>
+
+<p>
+<b>Created By :</b>
+{selectedJournal.createdBy || "Doctor"}
+</p>
+
+<p>
+<b>Last Updated :</b>
+{
+selectedJournal.updatedAt
+? selectedJournal.updatedAt
+: "-"
+}
+</p>
+
+<p>
+<b>Record Status :</b>
+{selectedJournal.status || "Completed"}
+</p>
+
+</div>
+
+<div className="mt-8 pt-6 border-t flex justify-center">
+
+<button
+onClick={() => setSelectedJournal(null)}
+className="
+bg-red-500
+hover:bg-red-600
+text-white
+font-semibold
+w-full
+md:w-56
+h-12
+rounded-xl
+transition-all
+"
+>
+Close
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+
+{showDoctorPopup && viewData && (
+
+<div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+
+  <div className="bg-white rounded-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
+
+    <div className="flex justify-between items-center mb-6">
+
+      <h2 className="text-2xl font-bold">
+        Doctor Details
+      </h2>
+
+      <button
+        onClick={() => setShowDoctorPopup(false)}
+        className="text-red-500 text-2xl"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div className="space-y-4">
+
+      <p>
+        <b>Name :</b>{" "}
+        {viewData?.doctorBasicInfo?.name}
+      </p>
+
+      <p>
+        <b>Designation :</b>{" "}
+        {viewData?.doctorDesignation?.designation}
+      </p>
+
+      <p>
+        <b>Email :</b>{" "}
+        {viewData?.doctorBasicInfo?.email}
+      </p>
+
+      <p>
+        <b>Contact :</b>{" "}
+        {viewData?.doctorBasicInfo?.contact}
+      </p>
+
+      <p>
+        <b>Address :</b>{" "}
+        {viewData?.doctorBasicInfo?.address}
+      </p>
+
+      <p>
+        <b>Doctor ID :</b>{" "}
+        {viewData?.doctorOfficial?.doctorId}
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
 )}
 
 {activePage === "account" && subMenu === "admins" && (
@@ -1311,6 +2672,21 @@ onClick={() => {
 Continue
 </button>
 
+<button
+className="flex-1 border py-3 rounded-xl"
+onClick={() => {
+
+  setShowDoctorPopup(false)
+
+  setShowSetupPopup(true)
+
+  setSetupStep(7)
+
+}}
+>
+Skip
+</button>
+
 </div>
 
 </div>
@@ -1328,7 +2704,9 @@ Continue
 
     <div className=" w-full md:w-1/4  p-4 flex md:block gap-2 overflow-x-auto md:space-y-3">
 
-              <h2 className="text-xl font-bold mb-4">Create Doctor Account</h2>
+    <h2 className="hidden md:block text-xl font-bold mb-4">
+  Create Doctor Account
+</h2>
 
               <button onClick={() => setDoctorStep(1)}
                 className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${doctorStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
@@ -1371,7 +2749,7 @@ bg-white
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
 
                     <FloatingInput label="Name" required value={doctorBasicInfo.name} disabled={isViewMode}
@@ -1414,7 +2792,9 @@ bg-white
                     />
 
 
-                    <FloatingInput label="Address" className="col-span-2" inputClassName="h-[120px] pt-6"
+<FloatingInput
+label="Address"
+className="col-span-1 sm:col-span-2" inputClassName="h-[120px] pt-6"
                       value={doctorBasicInfo.address || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setDoctorBasicInfo({ ...doctorBasicInfo, address: e.target.value })
@@ -1422,7 +2802,7 @@ bg-white
                     />
 
 
-                    <div className="col-span-2 flex flex-col gap-4">
+<div className="col-span-1 sm:col-span-2 flex flex-col gap-4">
 
                       <FloatingInput label="Contact Number" required value={doctorBasicInfo.contact} disabled={isViewMode}
                         onChange={(e) =>
@@ -1439,14 +2819,18 @@ bg-white
                     </div>
 
 
-                    <FloatingInput label="Email" className="col-span-2" value={doctorBasicInfo.email} disabled={isViewMode}
+                    <FloatingInput
+label="Email"
+className="col-span-1 sm:col-span-2" value={doctorBasicInfo.email} disabled={isViewMode}
                       onChange={(e) =>
                         setDoctorBasicInfo({ ...doctorBasicInfo, email: e.target.value })
                       }
                     />
 
 
-                    <FloatingInput label="Occupation" className="col-span-2" value={doctorBasicInfo.occupation || ""} disabled={isViewMode}
+<FloatingInput
+label="Occupation"
+className="col-span-1 sm:col-span-2" value={doctorBasicInfo.occupation || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setDoctorBasicInfo({ ...doctorBasicInfo, occupation: e.target.value })
                       }
@@ -1806,11 +3190,25 @@ flex-wrap
 
 {activePage === "account" && subMenu === "staff" && (
 
-          <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[450px]">
+<div className="
+flex flex-col md:flex-row
+w-full max-w-7xl
+border rounded-lg overflow-hidden
+h-auto md:h-[450px]
+">
 
-            <div className="w-1/4 p-4 space-y-3">
+<div className="
+w-full md:w-1/4
+p-4
+flex md:block
+gap-2
+overflow-x-auto
+md:space-y-3
+">
 
-              <h2 className="text-xl font-bold mb-4">Create Staff Account</h2>
+<h2 className="hidden md:block text-xl font-bold mb-4">
+  Create Staff Account
+</h2>
 
               <button onClick={() => setStaffStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${staffStep === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Basic Info
@@ -1831,7 +3229,14 @@ flex-wrap
             </div>
 
 
-            <div className="w-3/4 p-6 relative overflow-hidden h-[450px]">
+            <div className="
+w-full md:w-3/4
+p-3 md:p-6
+relative
+overflow-y-auto
+min-h-[600px]
+bg-white
+">
 
 
               {staffStep === 1 && (
@@ -1842,7 +3247,7 @@ flex-wrap
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
 
                     <FloatingInput label="Name" required value={staffBasicInfo.name} disabled={isViewMode}
@@ -1885,7 +3290,7 @@ flex-wrap
                     />
 
 
-                    <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[120px] pt-6"
+                    <FloatingInput label="Address" required className="col-span-1 sm:col-span-2" inputClassName="h-[120px] pt-6"
                       value={staffBasicInfo.address || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setStaffBasicInfo({ ...staffBasicInfo, address: e.target.value })
@@ -1893,7 +3298,7 @@ flex-wrap
                     />
 
 
-                    <div className="col-span-2 flex flex-col gap-4">
+<div className="col-span-1 sm:col-span-2 flex flex-col gap-4">
 
                       <FloatingInput label="Contact Number" required value={staffBasicInfo.contact} disabled={isViewMode}
                         onChange={(e) =>
@@ -1910,14 +3315,18 @@ flex-wrap
                     </div>
 
 
-                    <FloatingInput label="Email" className="col-span-2" value={staffBasicInfo.email} disabled={isViewMode}
+                    <FloatingInput
+label="Email"
+className="col-span-1 sm:col-span-2" value={staffBasicInfo.email} disabled={isViewMode}
                       onChange={(e) =>
                         setStaffBasicInfo({ ...staffBasicInfo, email: e.target.value })
                       }
                     />
 
 
-                    <FloatingInput label="Occupation" className="col-span-2" value={staffBasicInfo.occupation || ""} disabled={isViewMode}
+<FloatingInput
+label="Occupation"
+className="col-span-1 sm:col-span-2" value={staffBasicInfo.occupation || ""} disabled={isViewMode}
                       onChange={(e) =>
                         setStaffBasicInfo({ ...staffBasicInfo, occupation: e.target.value })
                       }
@@ -2225,13 +3634,25 @@ flex-wrap
 
 {activePage === "account" && subMenu === "patients" && (
 
-          <div className="flex w-full max-w-7xl border rounded-lg overflow-hidden h-[500px]">
+<div className="
+flex flex-col md:flex-row
+w-full max-w-7xl
+border rounded-lg overflow-hidden
+h-auto md:h-[500px]
+">
 
-            <div className="w-1/4 p-4 space-y-3">
+<div className="
+w-full md:w-1/4
+p-4
+flex md:block
+gap-2
+overflow-x-auto
+md:space-y-3
+">
 
-              <h2 className="text-xl font-bold mb-3">
-                Create Patient Account
-              </h2>
+              <h2 className="hidden md:block text-xl font-bold mb-3">
+  Create Patient Account
+</h2>
 
               <button onClick={() => setStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
                 Basic Info
@@ -2258,7 +3679,14 @@ flex-wrap
 
 
 
-            <div className="w-3/4 p-6 relative overflow-hidden">
+            <div className="
+w-full md:w-3/4
+p-3 md:p-6
+relative
+overflow-y-auto
+min-h-[650px]
+bg-white
+">
 
               {step === 1 && (
 
@@ -2268,7 +3696,7 @@ flex-wrap
                     Basic Information
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
 
                     <FloatingInput label="Name" required value={basicInfo.name} disabled={isViewMode}
@@ -2302,11 +3730,11 @@ flex-wrap
                     />
 
 
-                    <FloatingInput label="Address" required className="col-span-2" inputClassName="h-[120px] pt-6" value={basicInfo.address}
+                    <FloatingInput label="Address" required className="col-span-1 sm:col-span-2"inputClassName="h-[120px] pt-6" value={basicInfo.address}
                       disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, address: e.target.value })}
                     />
 
-                    <div className="col-span-2 flex flex-col gap-4">
+<div className="col-span-1 sm:col-span-2 flex flex-col gap-4">
 
                       <FloatingInput label="Contact Number" required value={basicInfo.contact}
                         disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, contact: e.target.value })}
@@ -2319,11 +3747,15 @@ flex-wrap
                     </div>
 
 
-                    <FloatingInput label="Email" className="col-span-2" value={basicInfo.email} disabled={isViewMode}
+                    <FloatingInput
+label="Email"
+className="col-span-1 sm:col-span-2" value={basicInfo.email} disabled={isViewMode}
                       onChange={(e) => setBasicInfo({ ...basicInfo, email: e.target.value })}
                     />
 
-                    <FloatingInput label="Occupation" className="col-span-2" value={basicInfo.occupation}
+<FloatingInput
+label="Occupation"
+className="col-span-1 sm:col-span-2" value={basicInfo.occupation}
                       disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, occupation: e.target.value })}
                     />
 
@@ -2704,7 +4136,16 @@ flex-wrap
 flex flex-col md:flex-row
 min-h-[760px] md:min-h-[620px]">
 
-<div className="w-full md:w-1/4 p-4 flex md:block gap-2 md:space-y-4">
+<div className="
+w-full md:w-1/4
+p-4
+flex md:block
+gap-2
+overflow-x-auto
+md:overflow-visible
+md:space-y-4
+scrollbar-hide
+">
 
 <h2 className="hidden md:block text-2xl font-bold">
 Create Pharmasi Account
@@ -2713,7 +4154,7 @@ Create Pharmasi Account
 <button onClick={()=>{setIsViewMode(false);
   setPharmasiStep(1);
   }}
-className={`w-full p-3 rounded text-white ${
+  className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${
 pharmasiStep===1?"bg-blue-500":"bg-gray-400"
 }`}>
 Basic Info
@@ -2722,7 +4163,7 @@ Basic Info
 <button onClick={()=>{ setIsViewMode(false);
   setPharmasiStep(2);
   }}
-className={`w-full p-3 rounded text-white ${
+  className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${
 pharmasiStep===2?"bg-blue-500":"bg-gray-400"
 }`}>
 Designation
@@ -2731,7 +4172,7 @@ Designation
 <button onClick={()=>{ setIsViewMode(false);
   setPharmasiStep(3);
   }}
-className={`w-full p-3 rounded text-white ${
+  className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${
 pharmasiStep===3?"bg-blue-500":"bg-gray-400"
 }`}>
 Official Info
@@ -2740,7 +4181,7 @@ Official Info
 <button onClick={()=>{ setIsViewMode(false);
   setPharmasiStep(4);
   }}
-className={`w-full p-3 rounded text-white ${
+  className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${
 pharmasiStep===4?"bg-blue-500":"bg-gray-400"
 }`}>
 Account
@@ -2757,7 +4198,7 @@ Account
 Basic Information
 </h3>
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
 <FloatingInput label="Name" type="name" value={pharmasiBasicInfo.name}
 onChange={(e)=> 
@@ -2774,18 +4215,27 @@ setPharmasiBasicInfo({
   age:e.target.value
 })}/>
 
-<select value={pharmasiBasicInfo.gender}
-onChange={(e)=>
-setPharmasiBasicInfo({
-...pharmasiBasicInfo,
-gender:e.target.value
-})
-}
->
-<option value="">Select Gender</option>
-<option value="Male">Male</option>
-<option value="Female">Female</option>
-</select>
+<div className="relative">
+  <select
+    value={pharmasiBasicInfo.gender}
+    onChange={(e)=>
+      setPharmasiBasicInfo({
+        ...pharmasiBasicInfo,
+        gender:e.target.value
+      })
+    }
+    className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
+  >
+    <option value="">Select Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Others">Others</option>
+  </select>
+
+  <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
+    Gender <span className="text-red-500">*</span>
+  </label>
+</div>
 
 <FloatingInput label="DOB" type="date" value={pharmasiBasicInfo.dob}
 onChange={(e)=>
@@ -2796,7 +4246,7 @@ dob:e.target.value
 }
 />
 
-<FloatingInput label="Address" className="col-span-2" inputClassName="h-[120px] pt-6" value={pharmasiBasicInfo.address}
+<FloatingInput label="Address" className="col-span-1 sm:col-span-2" inputClassName="h-[120px] pt-6" value={pharmasiBasicInfo.address}
 onChange={(e)=>
 setPharmasiBasicInfo({
 ...pharmasiBasicInfo,
@@ -2805,7 +4255,7 @@ address:e.target.value
 }
 />
 
-<div className="md:col-span-2 flex flex-col gap-4">
+<div className="col-span-1 sm:col-span-2 flex flex-col gap-4">
 <FloatingInput label="Contact Number" value={pharmasiBasicInfo.contact}
 onChange={(e)=>
 setPharmasiBasicInfo({
@@ -2831,7 +4281,7 @@ setPharmasiBasicInfo({
   ...pharmasiBasicInfo,
   email:e.target.value
 })}
-className="md:col-span-2"
+className="col-span-1 sm:col-span-2"
 />
 
 <FloatingInput label="Occupation" type="number" value={pharmasiBasicInfo.occupation}
@@ -2840,7 +4290,7 @@ setPharmasiBasicInfo({
   ...pharmasiBasicInfo,
   occupation:e.target.value
 })}
-className="md:col-span-2"
+className="col-span-1 sm:col-span-2"
 />
 
 </div>
@@ -2948,7 +4398,21 @@ confirmPassword:e.target.value
 
 
 {/* FIXED BUTTONS */}
-<div className="absolute bottom-6 right-6 flex gap-4">
+<div
+  className="
+    sticky
+    bottom-20
+    left-0
+    w-full
+    flex
+    justify-center
+    md:justify-end
+    gap-3
+    px-4
+    py-3
+    bg-white
+  "
+>
 
 {pharmasiStep>1 && (
 <button onClick={()=>setPharmasiStep(pharmasiStep-1)} className="bg-gray-500 text-white px-8 py-3 rounded">
@@ -3305,6 +4769,18 @@ fetchPharmasi()
       </span>
     </button>
 
+    <button
+onClick={()=>{
+setActivePage("journal")
+}}
+className="flex flex-col items-center"
+>
+📒
+<span className="text-xs">
+Journal
+</span>
+</button>
+
 
     {/* UPGRADE */}
     <button
@@ -3405,12 +4881,23 @@ fetchPharmasi()
             className="input-style"
           />
 
-          <button
-            className="btn-style mt-4"
-            onClick={() => setSetupStep(2)}
-          >
-            Next
-          </button>
+<div className="flex gap-2 mt-4">
+
+<button
+  className="btn-style flex-1"
+  onClick={() => setSetupStep(2)}
+>
+  Next
+</button>
+
+<button
+  className="border rounded-xl px-4 py-3 flex-1"
+  onClick={() => setSetupStep(2)}
+>
+  Skip
+</button>
+
+</div>
         </>
       )}
 
@@ -3444,6 +4931,12 @@ fetchPharmasi()
             >
               Next
             </button>
+            <button
+  className="border rounded-xl px-4 py-3 flex-1"
+  onClick={() => setSetupStep(3)}
+>
+  Skip
+</button>
 
           </div>
         </>
@@ -3480,6 +4973,13 @@ fetchPharmasi()
               Next
             </button>
 
+            <button
+  className="border rounded-xl px-4 py-3 flex-1"
+  onClick={() => setSetupStep(4)}
+>
+  Skip
+</button>
+
           </div>
         </>
       )}
@@ -3514,6 +5014,13 @@ fetchPharmasi()
       >
         Next
       </button>
+
+      <button
+  className="border rounded-xl px-4 py-3 flex-1"
+  onClick={() => setSetupStep(5)}
+>
+  Skip
+</button>
 
     </div>
   </>
@@ -3565,7 +5072,7 @@ fetchPharmasi()
       className="btn-style"
       onClick={() => {
 
-        setShowSetupPopup(false)
+        
 
         setActivePage("account")
 
