@@ -20,7 +20,7 @@ import PatientsTable from "../components/PatientsTable";
 
 const Account = () => {
 
-  const [menu, setMenu] = useState("appointments")
+  const [menu, setMenu] = useState("home")
   const [type,setType] = useState("");
   const [medicine,setMedicine] = useState("");
   const [inventoryItems,setInventoryItems]=useState([]);
@@ -89,6 +89,12 @@ const categoryMap={
 
   const hospital = location.state?.hospital || "";
   const [selectedPatient, setSelectedPatient] = useState(null)
+  const [patientSearch, setPatientSearch] = useState("");
+const [showPatientDropdown, setShowPatientDropdown] = useState(false);
+const [showPatientPopup, setShowPatientPopup] = useState(false);
+
+
+const [patientsList, setPatientsList] = useState([]);
   const [doctorStep, setDoctorStep] = useState(1)
   const [doctorImage, setDoctorImage] = useState("")
   const [doctorBasicInfo, setDoctorBasicInfo] = useState({
@@ -1136,6 +1142,7 @@ return (
     }
 
   const handleCreatePatient = async () => {
+    
     try {
 
       const patientId = basicInfo.email
@@ -1150,6 +1157,41 @@ return (
         isDisabled: false,
         createdAt: new Date()
       })
+
+      const appointmentId = Date.now().toString();
+
+await setDoc(
+  doc(db, "appointments", appointmentId),
+  {
+    appointmentNo: appointmentId,
+
+    patientName: basicInfo.name,
+    patientEmail: basicInfo.email,
+    patientPhone: basicInfo.contact,
+
+    address: basicInfo.address,
+
+    reason:
+      reasonInfo.visitReason,
+
+    doctorName:
+      "Not Assigned",
+
+    date:
+      new Date()
+        .toISOString()
+        .split("T")[0],
+
+    time:
+      "09:00am-09:30am",
+
+    status:
+      "pending",
+
+    createdAt:
+      new Date()
+  }
+);
 
       alert("Patient saved ")
 
@@ -1592,6 +1634,193 @@ Journal Entry
 {menu === "appointments" && (
 
   <div>
+
+<div className="flex gap-2">
+
+<div className="relative flex-1">
+
+<input
+type="text"
+placeholder="Search Patient Name / Mobile"
+value={patientSearch}
+onChange={(e) => {
+
+setPatientSearch(e.target.value);
+
+setShowPatientDropdown(true);
+
+}}
+className="
+w-full
+border
+rounded-xl
+p-3
+outline-none
+focus:ring-2
+focus:ring-blue-500
+"
+/>
+
+{showPatientDropdown && (
+
+<div
+className="
+absolute
+top-full
+left-0
+right-0
+bg-white
+border
+rounded-xl
+shadow-xl
+z-50
+max-h-[250px]
+overflow-y-auto
+mt-1
+"
+>
+
+{
+patientsList
+.filter((patient) => {
+
+const name =
+patient.basicInfo?.name || "";
+
+const phone =
+patient.basicInfo?.contact || "";
+
+return (
+
+name
+.toLowerCase()
+.includes(
+patientSearch.toLowerCase()
+)
+
+||
+
+phone.includes(patientSearch)
+
+);
+
+})
+.map((patient) => (
+
+<div
+key={patient.id}
+onClick={() => {
+
+setSelectedPatient(patient);
+
+setPatientSearch(
+patient.basicInfo?.name
+);
+
+setShowPatientDropdown(false);
+
+}}
+className="
+p-3
+cursor-pointer
+hover:bg-gray-100
+border-b
+"
+>
+
+<div className="font-semibold">
+{patient.basicInfo?.name}
+</div>
+
+<div className="text-sm text-gray-500">
+{patient.basicInfo?.contact}
+</div>
+
+</div>
+
+))
+}
+
+{
+patientsList.filter((patient)=>{
+
+const name =
+patient.basicInfo?.name || "";
+
+const phone =
+patient.basicInfo?.contact || "";
+
+return (
+
+name
+.toLowerCase()
+.includes(
+patientSearch.toLowerCase()
+)
+
+||
+
+phone.includes(patientSearch)
+
+);
+
+}).length === 0
+
+&&
+
+patientSearch.trim() !== ""
+
+&& (
+
+<button
+type="button"
+onClick={() => {
+
+setShowPatientPopup(true);
+
+setShowPatientDropdown(false);
+
+}}
+className="
+w-full
+p-3
+text-left
+bg-green-50
+text-green-700
+font-semibold
+"
+>
+➕ Add New Patient
+</button>
+
+)
+
+}
+
+</div>
+
+)}
+
+</div>
+
+<button
+type="button"
+onClick={() => {
+
+setShowPatientPopup(true);
+
+}}
+className="
+px-4
+bg-green-600
+text-white
+rounded-xl
+"
+>
++ Add
+</button>
+
+</div>
 
     
     <h1 className="text-2xl font-bold mb-6">Current Appointments</h1>
@@ -2807,6 +3036,441 @@ Close
 </div>
 
 )}
+
+
+
+{showPatientPopup && (
+
+<div
+className="
+fixed inset-0
+bg-black/50
+z-[9999999]
+flex items-center justify-center
+p-2 md:p-4
+"
+>
+
+<div
+className="
+bg-white
+w-[95vw]
+max-w-[1400px]
+h-auto
+max-h-[90vh]
+overflow-y-auto
+rounded-3xl
+relative
+p-4 md:p-6
+"
+>
+
+<button
+onClick={() => setShowPatientPopup(false)}
+className="
+absolute
+top-6
+right-6
+w-10
+h-10
+flex
+items-center
+justify-center
+rounded-full
+bg-red-500
+text-white
+font-bold
+shadow-lg
+hover:bg-red-600
+z-[999999]
+"
+>
+✕
+</button>
+
+
+<div className="
+flex flex-col md:flex-row
+w-full
+border rounded-lg
+overflow-hidden
+min-h-[500px]
+">
+
+<div className="
+w-full md:w-1/4
+p-4
+flex md:block
+gap-2
+overflow-x-auto
+md:space-y-3
+">
+
+              <h2 className="hidden md:block text-xl font-bold mb-3">
+  Create Patient Account
+</h2>
+
+              <button onClick={() => setStep(1)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 1 ? "bg-blue-500" : "bg-gray-400"}`}>
+                Basic Info
+              </button>
+
+              <button onClick={() => setStep(2)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 2 ? "bg-blue-500" : "bg-gray-400"}`}>
+                Insurance
+              </button>
+
+              <button onClick={() => setStep(3)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 3 ? "bg-blue-500" : "bg-gray-400"}`}>
+                Medical History
+              </button>
+
+              <button onClick={() => setStep(4)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 4 ? "bg-blue-500" : "bg-gray-400"}`}>
+                Reason
+              </button>
+
+              <button onClick={() => setStep(5)} className={`min-w-[140px] md:w-full p-3 rounded-xl text-white text-sm md:text-base ${step === 5 ? "bg-blue-500" : "bg-gray-400"}`}>
+                Create Account
+              </button>
+
+            </div>
+
+
+
+
+            <div className="
+w-full md:w-3/4
+p-3 md:p-6
+relative
+overflow-y-auto
+min-h-[650px]
+bg-white
+">
+
+              {step === 1 && (
+
+                <div>
+
+                  <h3 className="text-lg font-bold mb-6">
+                    Basic Information
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+
+                    <FloatingInput label="Name" required value={basicInfo.name} disabled={isViewMode}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
+                    />
+
+                    <FloatingInput label="Age" required type="number" value={basicInfo.age} disabled={isViewMode}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, age: e.target.value })}
+                    />
+
+
+                    <div className="relative">
+                      <select value={basicInfo.gender} disabled={isViewMode}
+                        onChange={(e) => setBasicInfo({ ...basicInfo, gender: e.target.value })}
+                        className="w-full border rounded-xl px-4 py-3 outline-none bg-white"
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Others">Others</option>
+                      </select>
+
+                      <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
+                        Gender <span className="text-red-500">*</span>
+                      </label>
+                    </div>
+
+
+                    <FloatingInput label="DOB" type="date" className="w-full" inputClassName="h-[52px]" value={basicInfo.dob}
+                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, dob: e.target.value })}
+                    />
+
+
+                    <FloatingInput label="Address" required className="col-span-1 sm:col-span-2"inputClassName="h-[120px] pt-6" value={basicInfo.address}
+                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, address: e.target.value })}
+                    />
+
+<div className="col-span-1 sm:col-span-2 flex flex-col gap-4">
+
+                      <FloatingInput label="Contact Number" required value={basicInfo.contact}
+                        disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, contact: e.target.value })}
+                      />
+
+                      <FloatingInput label="EMR Contact" value={basicInfo.emrContact} disabled={isViewMode}
+                        onChange={(e) => setBasicInfo({ ...basicInfo, emrContact: e.target.value })}
+                      />
+
+                    </div>
+
+
+                    <FloatingInput
+label="Email"
+className="col-span-1 sm:col-span-2" value={basicInfo.email} disabled={isViewMode}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, email: e.target.value })}
+                    />
+
+<FloatingInput
+label="Occupation"
+className="col-span-1 sm:col-span-2" value={basicInfo.occupation}
+                      disabled={isViewMode} onChange={(e) => setBasicInfo({ ...basicInfo, occupation: e.target.value })}
+                    />
+
+                  </div>
+
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+                    <button onClick={() => setStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
+                      Next
+                    </button>
+                  </div>
+
+                </div>
+
+              )}
+
+
+
+
+              {step === 2 && (
+
+                <div>
+
+                  <h3 className="text-lg font-bold mb-6">
+                    Insurance
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-6 max-w-4xl">
+
+                    <FloatingInput label="Insurance Provider" value={insuranceInfo.provider} disabled={isViewMode}
+                      onChange={(e) => setInsuranceInfo({ ...insuranceInfo, provider: e.target.value })}
+                    />
+
+                    <FloatingInput label="Policy Number" value={insuranceInfo.policy} disabled={isViewMode}
+                      onChange={(e) => setInsuranceInfo({ ...insuranceInfo, policy: e.target.value })}
+                    />
+
+                    <FloatingInput label="Agent Name" value={insuranceInfo.agentName} disabled={isViewMode}
+                      onChange={(e) => setInsuranceInfo({ ...insuranceInfo, agentName: e.target.value })}
+                    />
+
+                    <FloatingInput label="Agent Number" value={insuranceInfo.agentNumber} disabled={isViewMode}
+                      onChange={(e) => setInsuranceInfo({ ...insuranceInfo, agentNumber: e.target.value })}
+                    />
+
+                  </div>
+
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+                    <button onClick={() => setStep(1)} className="bg-gray-500 text-white px-6 py-2 rounded">
+                      Previous
+                    </button>
+
+                    <button onClick={() => setStep(3)} className="bg-blue-500 text-white px-6 py-2 rounded">
+                      Next
+                    </button>
+
+                  </div>
+
+                </div>
+
+              )}
+
+
+
+              {step === 3 && (
+
+                <div>
+
+                  <h3 className="text-lg font-bold mb-6 ">
+                    Medical History
+                  </h3>
+
+
+
+                  <div className="grid grid-cols-3 gap-6 max-w-4xl">
+
+                    <FloatingInput label="Blood Group" value={medicalHistory.bloodGroup} disabled={isViewMode}
+                      onChange={(e) => setMedicalHistory({ ...medicalHistory, bloodGroup: e.target.value })}
+                    />
+
+                  </div>
+
+                  <p className="mt-6 mb-2 font-medium">
+                    Do you have any of the following condition?
+                  </p>
+
+                  <div className="flex flex-wrap gap-6">
+
+                    <label><input type="checkbox" /> Diabetes</label>
+                    <label><input type="checkbox" /> Hypertension</label>
+                    <label><input type="checkbox" /> Heart Disease</label>
+                    <label><input type="checkbox" /> Stroke</label>
+                    <label><input type="checkbox" /> Other</label>
+
+                  </div>
+
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+                    <button onClick={() => setStep(2)} className="bg-gray-500 text-white px-6 py-2 rounded">
+                      Previous
+                    </button>
+
+                    <button onClick={() => setStep(4)} className="bg-blue-500 text-white px-6 py-2 rounded">
+                      Next
+                    </button>
+
+                  </div>
+
+                </div>
+
+              )}
+
+              {step === 4 && (
+
+                <div>
+
+                  <h3 className="text-lg font-bold mb-6">
+                    Reason
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-6 max-w-4xl">
+
+                    <FloatingInput label="Current Condition" value={reasonInfo.condition} disabled={isViewMode}
+                      onChange={(e) => setReasonInfo({ ...reasonInfo, condition: e.target.value })}
+                    />
+
+                    <FloatingInput label="Reason For Visit" value={reasonInfo.visitReason} disabled={isViewMode}
+                      onChange={(e) => setReasonInfo({ ...reasonInfo, visitReason: e.target.value })}
+                    />
+
+                    <FloatingInput label="Primary Reason" value={reasonInfo.primaryReason} disabled={isViewMode}
+                      onChange={(e) => setReasonInfo({ ...reasonInfo, primaryReason: e.target.value })}
+                    />
+
+                    <FloatingInput label="Duration" value={reasonInfo.duration} disabled={isViewMode}
+                      onChange={(e) => setReasonInfo({ ...reasonInfo, duration: e.target.value })}
+                    />
+
+                    <div className="flex items-center gap-4 col-span-2">
+
+                      <p>Have you been treated for this before?</p>
+
+                      <label className="flex items-center gap-1">
+                        <input type="radio" name="treatedBefore"
+                          checked={reasonInfo.treatedBefore === "Yes"}
+                          onChange={() => setReasonInfo({ ...reasonInfo, treatedBefore: "Yes" })}
+                        />
+                        Yes
+                      </label>
+
+                      <label className="flex items-center gap-1">
+                        <input type="radio" name="treatedBefore"
+                          checked={reasonInfo.treatedBefore === "No"}
+                          onChange={() => setReasonInfo({ ...reasonInfo, treatedBefore: "No" })}
+                        />
+                        No
+                      </label>
+
+                    </div>
+
+                  </div>
+
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+                    <button onClick={() => setStep(3)} className="bg-gray-500 text-white px-6 py-2 rounded">
+                      Previous
+                    </button>
+
+                    <button onClick={() => setStep(5)} className="bg-blue-500 text-white px-6 py-2 rounded">
+                      Next
+                    </button>
+
+
+                  </div>
+
+                </div>
+
+              )}
+
+              {step === 5 && (
+
+                <div>
+
+                  <h3 className="text-lg font-bold mb-6">
+                    Create Account
+                  </h3>
+
+                  <div className="flex flex-col gap-6 max-w-md">
+
+                    <FloatingInput label="Username" value={accountInfo.username}
+                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, username: e.target.value })}
+                    />
+
+                    <FloatingInput label="Password" type="password" value={accountInfo.password}
+                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, password: e.target.value })}
+                    />
+
+                    <FloatingInput label="Confirm Password" type="password" value={accountInfo.confirmPassword}
+                      disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, confirmPassword: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="
+mt-6
+flex
+justify-center md:justify-end
+gap-4
+flex-wrap
+">
+
+                    <button onClick={() => setStep(4)} className="bg-gray-500 text-white px-8 py-2 rounded">
+                      Previous
+                    </button>
+
+                    <button onClick={handleCreatePatient} className="bg-green-500 text-white px-8 py-2 rounded">
+                      Create Patient
+                    </button>
+
+                  </div>
+
+                </div>
+
+              )}
+
+            </div>
+
+          </div>
+
+</div>
+
+</div>
+
+)}
+
+
 
 {selectedPatient && (
 

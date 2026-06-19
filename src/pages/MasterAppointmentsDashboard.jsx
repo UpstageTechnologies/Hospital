@@ -1856,37 +1856,33 @@ Paracetamol
 
 </div>
 
+<div className="block lg:hidden space-y-4">
+
+  <div className="
+  bg-white
+  rounded-2xl
+  shadow
+  border
+  p-4
+  ">
+
+    <p><b>Date :</b> 2026-06-12</p>
+    <p><b>Bill No :</b> B001</p>
+    <p><b>Patient :</b> Sithu</p>
+    <p><b>Medicine :</b> Paracetamol</p>
+    <p><b>Qty :</b> 5</p>
+    <p><b>Amount :</b> ₹250</p>
+
+  </div>
+
+</div>
+
 </div>
 
 </div>
 
 )}
 
-<div className="block lg:hidden space-y-4">
-
-<div className="
-bg-white
-rounded-2xl
-shadow
-border
-p-4
-">
-
-<p><b>Date :</b> 2026-06-12</p>
-
-<p><b>Bill No :</b> B001</p>
-
-<p><b>Patient :</b> Sithu</p>
-
-<p><b>Medicine :</b> Paracetamol</p>
-
-<p><b>Qty :</b> 5</p>
-
-<p><b>Amount :</b> ₹250</p>
-
-</div>
-
-</div>
 
 {selectedJournal && (
 

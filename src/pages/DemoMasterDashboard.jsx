@@ -4,14 +4,16 @@ import { useNavigate } from "react-router-dom"
 import DashboardNavbar from "../components/DashboardNavbar";
 import FloatingInput from "../components/FloatingInput"
 import { db } from "../firebase"
-import { 
-  doc, 
-  setDoc, 
-  deleteDoc, 
-  updateDoc, 
-  getDocs, 
-  collection 
+import {
+  doc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+  getDocs,
+  collection,
+  onSnapshot
 } from "firebase/firestore"
+
 
 const DemoMasterDashboard = () => {
 
@@ -471,37 +473,64 @@ const handleCreatePharmasiFull = async () => {
   alert("Pharmasi created")
 }
 
-const fetchDoctors = async () => {
-  const snapshot = await getDocs(collection(db, "doctors"))
-  setDoctorAccounts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-}
+
 
 const fetchStaffs = async () => {
   const snapshot = await getDocs(collection(db, "staffs"))
   setStaffAccounts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
 }
-
-const fetchPatients = async () => {
-  const snapshot = await getDocs(collection(db, "patients"))
-  setPatientAccounts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-}
-
 const fetchPharmasi = async () => {
   const snapshot = await getDocs(collection(db, "pharmasi"))
   setPharmasiAccounts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
 }
 
+const fetchDoctors = async () => {
+  const snapshot = await getDocs(
+    collection(db, "doctors")
+  )
+
+  setDoctorAccounts(
+    snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  )
+}
+
+const fetchPatients = async () => {
+  const snapshot = await getDocs(
+    collection(db, "patients")
+  )
+
+  setPatientAccounts(
+    snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  )
+}
+
+const fetchAppointments = async () => {
+  const snapshot = await getDocs(
+    collection(db, "appointments")
+  )
+
+  setAppointments(
+    snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  )
+}
+
 useEffect(() => {
 
   fetchAdmins()
-
   fetchDoctors()
-
   fetchStaffs()
-
   fetchPatients()
-
   fetchPharmasi()
+  fetchAppointments()
 
 }, [])
 
@@ -545,28 +574,7 @@ const handleUpdateAdmin = async () => {
   }
 }
 
-useEffect(() => {
 
-  const fetchAppointments = async () => {
-  
-  const snapshot =
-  await getDocs(
-  collection(db, "appointments")
-  )
-  
-  const list =
-  snapshot.docs.map(doc => ({
-  id: doc.id,
-  ...doc.data()
-  }))
-  
-  setAppointments(list)
-  
-  }
-  
-  fetchAppointments()
-  
-  }, [])
 
   useEffect(() => {
 
@@ -1010,27 +1018,27 @@ gap-4
 
               <div className="grid md:grid-cols-3 gap-6 mt-10">
 
-              <div 
+              <div
   onClick={() => setTab("doctorsList")}
   className="border rounded-xl p-6 shadow cursor-pointer hover:scale-105"
 >
   <h2 className="text-xl font-bold">Total Doctors</h2>
   <p className="text-3xl mt-4 text-blue-600">
-    {doctorAccounts.slice(0,10).length}
+    {doctorAccounts.length}
   </p>
 </div>
 
-<div 
+<div
   onClick={() => setTab("patientsList")}
   className="border rounded-xl p-6 shadow cursor-pointer hover:scale-105"
 >
   <h2 className="text-xl font-bold">Total Patients</h2>
   <p className="text-3xl mt-4 text-blue-600">
-    {patientAccounts.slice(0,20).length}
+    {patientAccounts.length}
   </p>
 </div>
 
-<div 
+<div
   onClick={() => setTab("appointmentsList")}
   className="border rounded-xl p-6 shadow cursor-pointer hover:scale-105"
 >
@@ -1053,7 +1061,6 @@ gap-4
 .filter(doc =>
 doc?.doctorBasicInfo?.name?.trim()
 )
-.slice(0,10)
 .map((doc, i) => (
         <div 
   key={i} 

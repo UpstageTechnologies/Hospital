@@ -89,7 +89,7 @@ const StaffLogin = () => {
           JSON.stringify(data)
         );
     
-        alert("Staff Login Success");
+        
     
         if(isDemo){
           navigate("/demostaffdashboard");

@@ -115,10 +115,6 @@ if (patientSnap.exists()) {
 
 }
 
-localStorage.setItem(
-"patientData",
-JSON.stringify(patientData)
-);
     
       if (isDemo) {
         navigate("/demopatientdashboard");

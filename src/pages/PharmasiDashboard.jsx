@@ -22,7 +22,7 @@ import {
 
 const PharmasiDashboard=()=>{
 
-const [menu,setMenu]=useState("inventory");
+const [menu,setMenu]=useState("home");
 const [activeCategory,setActiveCategory]=useState("All");
 const [editIndex,setEditIndex]=useState(null);
 const [type,setType]=useState("");
