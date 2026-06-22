@@ -89,6 +89,67 @@ const categoryMap={
 
   const hospital = location.state?.hospital || "";
   const [selectedPatient, setSelectedPatient] = useState(null)
+
+  const [selectedPatientData,setSelectedPatientData] =
+useState(null);
+
+  const [showPatientHistoryPopup,setShowPatientHistoryPopup] =
+useState(false);
+
+const [patientHistory,setPatientHistory] =
+useState([]);
+
+  const [showDoctorPopup,setShowDoctorPopup] =
+useState(false);
+
+const [selectedDoctor,setSelectedDoctor] =
+useState(null);
+
+const [selectedSlot,setSelectedSlot] =
+useState("");
+
+const [doctorSlots,setDoctorSlots] =
+useState([]);
+
+const [appointmentNo,setAppointmentNo] =
+useState("");
+
+const [appointmentDate,setAppointmentDate] =
+useState(
+new Date()
+.toISOString()
+.split("T")[0]
+);
+
+const generateAppointmentNo = (
+  doctorName,
+  date,
+  slot
+  ) => {
+  
+  const bookedAppointments =
+  patientAccounts.filter(
+  (item) =>
+  
+  item.doctorName === doctorName &&
+  
+  item.date === date &&
+  
+  item.time === slot
+  );
+  
+  return `API${String(
+  bookedAppointments.length + 1
+  ).padStart(3,"0")}`;
+  
+  };
+
+const [showDoctorDropdown,setShowDoctorDropdown] =
+useState(false);
+
+const [doctorSearch,setDoctorSearch] =
+useState("");
+
   const [patientSearch, setPatientSearch] = useState("");
 const [showPatientDropdown, setShowPatientDropdown] = useState(false);
 const [showPatientPopup, setShowPatientPopup] = useState(false);
@@ -570,12 +631,6 @@ return (
 
     const list = []
 
-    querySnapshot.forEach((doc) => {
-      list.push({
-        id: doc.id,
-        ...doc.data()
-      })
-    })
 
     setStaffAccounts(list)
   }
@@ -584,25 +639,55 @@ return (
   const fetchDoctors = async () => {
 
     try {
-
-      const querySnapshot = await getDocs(collection(db, "doctors"))
-
+  
+      const querySnapshot =
+        await getDocs(
+          collection(db, "doctors")
+        )
+  
       const doctorList = []
-
-      querySnapshot.forEach((doc) => {
+  
+      // 👇 THIS BLOCK REPLACE
+      querySnapshot.forEach((docSnap) => {
+  
+        const data = docSnap.data();
+  
         doctorList.push({
-          id: doc.id,
-          ...doc.data()
-        })
-      })
-
+  
+          id: docSnap.id,
+  
+          ...data,
+  
+          name:
+            data.name ||
+            data.doctorBasicInfo?.name ||
+            "",
+  
+          speciality:
+            data.speciality ||
+            data.doctorDesignation?.designation ||
+            "",
+  
+          hospital:
+            data.hospital ||
+            data.doctorBasicInfo?.address ||
+            "",
+  
+          image:
+            data.image ||
+            "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+  
+        });
+  
+      });
+  
       setDoctorAccounts(doctorList)
-
+  
     }
-    catch (error) {
+    catch(error){
       console.log(error)
     }
-
+  
   }
   useEffect(() => {
 
@@ -1145,7 +1230,7 @@ return (
     
     try {
 
-      const patientId = basicInfo.email
+      const patientId = Date.now().toString()
 
       await setDoc(doc(db, "patients", patientId), {
         basicInfo,
@@ -1158,42 +1243,9 @@ return (
         createdAt: new Date()
       })
 
-      const appointmentId = Date.now().toString();
-
-await setDoc(
-  doc(db, "appointments", appointmentId),
-  {
-    appointmentNo: appointmentId,
-
-    patientName: basicInfo.name,
-    patientEmail: basicInfo.email,
-    patientPhone: basicInfo.contact,
-
-    address: basicInfo.address,
-
-    reason:
-      reasonInfo.visitReason,
-
-    doctorName:
-      "Not Assigned",
-
-    date:
-      new Date()
-        .toISOString()
-        .split("T")[0],
-
-    time:
-      "09:00am-09:30am",
-
-    status:
-      "pending",
-
-    createdAt:
-      new Date()
-  }
-);
-
-      alert("Patient saved ")
+      alert(
+        "Patient Created Successfully"
+        );
 
       fetchPatients()
 
@@ -1681,14 +1733,16 @@ mt-1
 >
 
 {
-patientsList
+patientAccounts
 .filter((patient) => {
 
-const name =
-patient.basicInfo?.name || "";
-
-const phone =
-patient.basicInfo?.contact || "";
+  const name =
+  patient.patientName || "";
+  
+  const phone =
+  patient.phone ||
+  patient.patientPhone ||
+  "";
 
 return (
 
@@ -1711,15 +1765,23 @@ phone.includes(patientSearch)
 key={patient.id}
 onClick={() => {
 
-setSelectedPatient(patient);
-
-setPatientSearch(
-patient.basicInfo?.name
-);
-
-setShowPatientDropdown(false);
-
-}}
+  const historyData =
+  patientAccounts.find(
+  (item) =>
+  item.patientEmail === patient.patientEmail
+  );
+  
+  setPatientHistory([historyData]);
+  
+  setShowPatientHistoryPopup(true);
+  
+  setPatientSearch(
+  patient.patientName
+  );
+  
+  setShowPatientDropdown(false);
+  
+  }}
 className="
 p-3
 cursor-pointer
@@ -1729,11 +1791,14 @@ border-b
 >
 
 <div className="font-semibold">
-{patient.basicInfo?.name}
+{patient.patientName}
 </div>
 
 <div className="text-sm text-gray-500">
-{patient.basicInfo?.contact}
+{
+patient.phone ||
+patient.patientPhone
+}
 </div>
 
 </div>
@@ -1742,13 +1807,15 @@ border-b
 }
 
 {
-patientsList.filter((patient)=>{
+patientAccounts.filter((patient)=>{
 
-const name =
-patient.basicInfo?.name || "";
-
-const phone =
-patient.basicInfo?.contact || "";
+  const name =
+  patient.patientName || "";
+  
+  const phone =
+  patient.phone ||
+  patient.patientPhone ||
+  "";
 
 return (
 
@@ -1777,7 +1844,6 @@ type="button"
 onClick={() => {
 
 setShowPatientPopup(true);
-
 setShowPatientDropdown(false);
 
 }}
@@ -1823,7 +1889,279 @@ rounded-xl
 </div>
 
     
-    <h1 className="text-2xl font-bold mb-6">Current Appointments</h1>
+    {/* Doctor Selection */}
+
+<div className="mt-4 relative">
+
+<label className="block mb-2 font-semibold">
+Select Doctor
+</label>
+
+<input
+type="text"
+placeholder="Search Doctor"
+value={
+selectedDoctor
+? selectedDoctor.name
+: doctorSearch
+}
+onChange={(e)=>{
+
+setDoctorSearch(e.target.value);
+setShowDoctorDropdown(true);
+
+}}
+onFocus={() =>
+setShowDoctorDropdown(true)
+}
+className="
+w-full
+border
+rounded-xl
+p-3
+outline-none
+focus:ring-2
+focus:ring-blue-500
+"
+/>
+
+{showDoctorDropdown && (
+
+<div
+className="
+absolute
+top-full
+left-0
+right-0
+bg-white
+border
+rounded-xl
+shadow-xl
+z-50
+max-h-[300px]
+overflow-y-auto
+mt-1
+"
+>
+
+{doctorAccounts
+.filter((doctor)=>
+
+(doctor.name || "")
+.toLowerCase()
+.includes(
+doctorSearch.toLowerCase()
+)
+
+)
+
+.map((doctor)=>(
+
+<div
+key={doctor.id}
+onClick={() => {
+
+  console.log("Doctor Clicked");
+
+  const slots = [
+    "10:00 AM - 11:00 AM",
+    "01:00 PM - 02:00 PM",
+    "05:00 PM - 07:00 PM"
+  ];
+
+  setSelectedDoctor(doctor);
+  setDoctorSearch(doctor.name);
+  setShowDoctorDropdown(false);
+
+  setDoctorSlots(slots);
+
+  console.log("Slots:", slots);
+}}
+className="
+p-4
+cursor-pointer
+hover:bg-blue-50
+border-b
+flex
+items-center
+gap-4
+"
+>
+
+<img
+src={
+doctor.image ||
+"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+}
+alt=""
+className="
+w-16
+h-16
+rounded-full
+object-cover
+border
+"
+/>
+
+<div>
+
+<h3 className="font-bold text-lg">
+{doctor.name}
+</h3>
+
+<p className="text-gray-500">
+{doctor.speciality}
+</p>
+
+<p className="text-sm text-gray-400">
+{doctor.hospital}
+</p>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+)}
+
+</div>
+
+
+{/* Slot Selection */}
+
+<div className="mt-4">
+
+<label className="block mb-2 font-semibold">
+Select Slot
+</label>
+<select
+value={selectedSlot}
+onChange={(e)=>{
+
+const slot =
+e.target.value;
+
+setSelectedSlot(slot);
+
+const nextNo =
+generateAppointmentNo(
+selectedDoctor?.name,
+appointmentDate,
+slot
+);
+
+setAppointmentNo(nextNo);
+
+}}
+className="
+w-full
+border
+rounded-xl
+p-3
+"
+>
+
+<option value="">
+Select Slot
+</option>
+
+{doctorSlots.map((slot,index)=>(
+
+<option
+key={index}
+value={slot}
+>
+{slot}
+</option>
+
+))}
+
+</select>
+
+</div>
+
+
+<div className="grid md:grid-cols-2 gap-4 mt-4">
+
+<div>
+
+<label className="block mb-2 font-semibold">
+Appointment Date
+</label>
+
+<input
+type="date"
+value={appointmentDate}
+min={new Date().toISOString().split("T")[0]}
+onChange={(e)=>{
+
+setAppointmentDate(e.target.value);
+
+setSelectedSlot("");
+setAppointmentNo("");
+
+}}
+className="
+w-full
+border
+rounded-xl
+p-3
+"
+/>
+
+</div>
+
+<div>
+
+<label className="block mb-2 font-semibold">
+Appointment No
+</label>
+
+<input
+type="text"
+value={appointmentNo}
+readOnly
+className="
+w-full
+border
+rounded-xl
+p-3
+bg-gray-100
+"
+/>
+
+</div>
+
+</div>
+
+<div className="mt-6 flex justify-end">
+
+<button
+onClick={() => alert("Working")}
+className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+font-semibold
+px-8
+py-3
+rounded-xl
+"
+>
+Book Appointment
+</button>
+
+</div>
+
+    
+<div className="mt-8 md:mt-10 pt-6 border-t border-gray-200">
+  <h1 className="text-2xl font-bold">
+    Current Appointments
+  </h1>
+</div>
 
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {currentAppointments.length === 0 ? (
@@ -2696,6 +3034,259 @@ className="bg-white rounded-2xl shadow p-4 cursor-pointer"
 
 )}
 
+{showPatientHistoryPopup && (
+
+<div
+className="
+fixed inset-0
+bg-black/50
+flex items-center justify-center
+z-[999999]
+p-4
+"
+>
+
+<div
+className="
+bg-white
+rounded-3xl
+w-full
+max-w-5xl
+max-h-[85vh]
+overflow-y-auto
+p-6
+relative
+"
+>
+
+<button
+onClick={() =>
+setShowPatientHistoryPopup(false)
+}
+className="
+absolute
+top-4
+right-4
+text-2xl
+font-bold
+"
+>
+✕
+</button>
+
+<h2 className="text-3xl font-bold mb-6">
+Patient Full History
+</h2>
+
+{patientHistory.length > 0 && (
+
+<div
+className="
+border
+rounded-2xl
+p-4
+"
+>
+
+<div className="grid md:grid-cols-2 gap-4">
+
+<div>
+<b>Patient :</b>
+{patientHistory[0].patientName}
+</div>
+
+<div>
+<b>Phone :</b>
+{patientHistory[0].phone}
+</div>
+
+<div>
+<b>Doctor :</b>
+{patientHistory[0].doctorName}
+</div>
+
+<div>
+<b>Reason :</b>
+{patientHistory[0].reason}
+</div>
+
+<div>
+<b>Date :</b>
+{patientHistory[0].date}
+</div>
+
+<div>
+<b>Time :</b>
+{patientHistory[0].time}
+</div>
+
+<div>
+<b>Address :</b>
+{patientHistory[0].address}
+</div>
+
+<div>
+<b>Appointment No :</b>
+{patientHistory[0].appointmentNo}
+</div>
+
+</div>
+
+</div>
+
+)}
+
+</div>
+
+</div>
+
+)}
+
+
+{showDoctorPopup && selectedDoctor && (
+
+<div
+className="
+fixed inset-0
+bg-black/50
+flex items-center justify-center
+z-[999999]
+p-4
+"
+>
+
+<div
+className="
+bg-white
+rounded-3xl
+w-full
+max-w-4xl
+overflow-hidden
+relative
+"
+>
+
+<button
+onClick={() =>
+setShowDoctorPopup(false)
+}
+className="
+absolute
+top-4
+right-4
+text-2xl
+font-bold
+"
+>
+✕
+</button>
+
+<div
+className="
+flex
+flex-col
+md:flex-row
+"
+>
+
+{/* LEFT */}
+
+<div
+className="
+w-full
+md:w-2/3
+p-6
+"
+>
+
+<h2 className="text-3xl font-bold">
+{selectedDoctor.name}
+</h2>
+
+<p className="mt-4 text-lg">
+🏥 Hospital :
+{" "}
+{selectedDoctor.hospital ||
+"City Hospital"}
+</p>
+
+<p className="mt-3 text-lg">
+📍 Address :
+{" "}
+{selectedDoctor.doctorBasicInfo?.address ||
+selectedDoctor.hospital ||
+"N/A"}
+</p>
+
+<p className="mt-3 text-lg text-blue-600 font-semibold">
+🩺
+{" "}
+{selectedDoctor.speciality}
+</p>
+
+<button
+onClick={() => {
+
+alert(
+`${selectedDoctor.name} Selected Successfully ✅`
+);
+
+setShowDoctorPopup(false);
+
+}}
+className="
+mt-8
+bg-green-600
+text-white
+px-8
+py-3
+rounded-xl
+"
+>
+Choose Doctor
+</button>
+
+</div>
+
+{/* RIGHT */}
+
+<div
+className="
+w-full
+md:w-1/3
+bg-gray-100
+flex
+items-center
+justify-center
+p-6
+"
+>
+
+<img
+src={
+selectedDoctor.image ||
+"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+}
+alt=""
+className="
+w-48
+h-48
+object-cover
+rounded-2xl
+shadow-lg
+"
+/>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
  </div>
 
 
@@ -3159,7 +3750,7 @@ bg-white
                       onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
                     />
 
-                    <FloatingInput label="Age" required type="number" value={basicInfo.age} disabled={isViewMode}
+                    <FloatingInput label="Age" type="number" value={basicInfo.age} disabled={isViewMode}
                       onChange={(e) => setBasicInfo({ ...basicInfo, age: e.target.value })}
                     />
 
@@ -3176,7 +3767,7 @@ bg-white
                       </select>
 
                       <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500">
-                        Gender <span className="text-red-500">*</span>
+                        Gender <span className="text-red-500"></span>
                       </label>
                     </div>
 
@@ -3224,9 +3815,35 @@ justify-center md:justify-end
 gap-4
 flex-wrap
 ">
-                    <button onClick={() => setStep(2)} className="bg-blue-500 text-white px-10 py-2 rounded">
-                      Next
-                    </button>
+                    <button
+onClick={() => {
+
+if(
+!basicInfo.name.trim() ||
+!basicInfo.address.trim() ||
+!basicInfo.contact.trim()
+){
+alert(
+"Name, Address, Contact Number required"
+);
+return;
+}
+
+setStep(2);
+
+}}
+className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-10
+py-3
+rounded-xl
+font-semibold
+"
+>
+Next
+</button>
                   </div>
 
                 </div>
@@ -3246,7 +3863,7 @@ flex-wrap
 
                   <div className="grid grid-cols-2 gap-6 max-w-4xl">
 
-                    <FloatingInput label="Insurance Provider" value={insuranceInfo.provider} disabled={isViewMode}
+                    <FloatingInput label="Insurance Provider *" value={insuranceInfo.provider} disabled={isViewMode}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, provider: e.target.value })}
                     />
 
@@ -3276,9 +3893,33 @@ flex-wrap
                       Previous
                     </button>
 
-                    <button onClick={() => setStep(3)} className="bg-blue-500 text-white px-6 py-2 rounded">
-                      Next
-                    </button>
+                    <button
+onClick={() => {
+
+if(
+!insuranceInfo.provider.trim()
+){
+alert(
+"Insurance Provider required"
+);
+return;
+}
+
+setStep(3);
+
+}}
+className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-8
+py-3
+rounded-xl
+font-semibold
+"
+>
+Next
+</button>
 
                   </div>
 
@@ -3300,14 +3941,14 @@ flex-wrap
 
                   <div className="grid grid-cols-3 gap-6 max-w-4xl">
 
-                    <FloatingInput label="Blood Group" value={medicalHistory.bloodGroup} disabled={isViewMode}
+                    <FloatingInput label="Blood Group *" value={medicalHistory.bloodGroup} disabled={isViewMode}
                       onChange={(e) => setMedicalHistory({ ...medicalHistory, bloodGroup: e.target.value })}
                     />
 
                   </div>
 
                   <p className="mt-6 mb-2 font-medium">
-                    Do you have any of the following condition?
+                  Medical Condition *
                   </p>
 
                   <div className="flex flex-wrap gap-6">
@@ -3332,9 +3973,33 @@ flex-wrap
                       Previous
                     </button>
 
-                    <button onClick={() => setStep(4)} className="bg-blue-500 text-white px-6 py-2 rounded">
-                      Next
-                    </button>
+                    <button
+onClick={() => {
+
+if(
+!medicalHistory.bloodGroup.trim()
+){
+alert(
+"Blood Group required"
+);
+return;
+}
+
+setStep(4);
+
+}}
+className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-8
+py-3
+rounded-xl
+font-semibold
+"
+>
+Next
+</button>
 
                   </div>
 
@@ -3352,11 +4017,11 @@ flex-wrap
 
                   <div className="grid grid-cols-2 gap-6 max-w-4xl">
 
-                    <FloatingInput label="Current Condition" value={reasonInfo.condition} disabled={isViewMode}
+                    <FloatingInput label="Current Condition *" value={reasonInfo.condition} disabled={isViewMode}
                       onChange={(e) => setReasonInfo({ ...reasonInfo, condition: e.target.value })}
                     />
 
-                    <FloatingInput label="Reason For Visit" value={reasonInfo.visitReason} disabled={isViewMode}
+                    <FloatingInput label="Reason For Visit *" value={reasonInfo.visitReason} disabled={isViewMode}
                       onChange={(e) => setReasonInfo({ ...reasonInfo, visitReason: e.target.value })}
                     />
 
@@ -3404,9 +4069,34 @@ flex-wrap
                       Previous
                     </button>
 
-                    <button onClick={() => setStep(5)} className="bg-blue-500 text-white px-6 py-2 rounded">
-                      Next
-                    </button>
+                    <button
+onClick={() => {
+
+if(
+!reasonInfo.condition.trim() ||
+!reasonInfo.visitReason.trim()
+){
+alert(
+"Current Condition and Reason For Visit required"
+);
+return;
+}
+
+setStep(5);
+
+}}
+className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-8
+py-3
+rounded-xl
+font-semibold
+"
+>
+Next
+</button>
 
 
                   </div>
@@ -3425,15 +4115,15 @@ flex-wrap
 
                   <div className="flex flex-col gap-6 max-w-md">
 
-                    <FloatingInput label="Username" value={accountInfo.username}
+                    <FloatingInput label="Username *" value={accountInfo.username}
                       disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, username: e.target.value })}
                     />
 
-                    <FloatingInput label="Password" type="password" value={accountInfo.password}
+                    <FloatingInput label="Password *" type="password" value={accountInfo.password}
                       disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, password: e.target.value })}
                     />
 
-                    <FloatingInput label="Confirm Password" type="password" value={accountInfo.confirmPassword}
+                    <FloatingInput label="Confirm Password *" type="password" value={accountInfo.confirmPassword}
                       disabled={isViewMode} onChange={(e) => setAccountInfo({ ...accountInfo, confirmPassword: e.target.value })}
                     />
                   </div>
@@ -3450,9 +4140,104 @@ flex-wrap
                       Previous
                     </button>
 
-                    <button onClick={handleCreatePatient} className="bg-green-500 text-white px-8 py-2 rounded">
-                      Create Patient
-                    </button>
+                    <button
+onClick={() => {
+
+if(
+!accountInfo.username.trim() ||
+!accountInfo.password.trim() ||
+!accountInfo.confirmPassword.trim()
+){
+alert(
+"Username, Password, Confirm Password required"
+);
+return;
+}
+
+if(
+accountInfo.password !==
+accountInfo.confirmPassword
+){
+alert(
+"Password mismatch"
+);
+return;
+}
+
+const handleBookAppointment = async () => {
+
+  try{
+  
+  if(!selectedPatientData){
+  alert("Select Patient");
+  return;
+  }
+  
+  if(!selectedDoctor){
+  alert("Select Doctor");
+  return;
+  }
+  
+  if(!selectedSlot){
+  alert("Select Slot");
+  return;
+  }
+  
+  const appointmentId =
+  Date.now().toString();
+  
+  await setDoc(
+    doc(db,"appointments",appointmentId),
+    {
+      appointmentNo,
+      patientName:selectedPatientData.patientName,
+      patientEmail:selectedPatientData.patientEmail,
+      patientPhone:selectedPatientData.patientPhone,
+      address:selectedPatientData.address,
+      reason:selectedPatientData.reason,
+      doctorName:selectedDoctor.name,
+      date:appointmentDate,
+      time:selectedSlot,
+      status:"pending",
+      createdAt:new Date()
+    }
+  );
+  
+  await fetchPatients();
+  
+  alert("Appointment Booked Successfully");
+    
+    await fetchPatients();
+    
+    setSelectedDoctor(null);
+    setSelectedSlot("");
+    setAppointmentNo("");
+  
+  }
+  catch(error){
+  
+  console.log(error);
+  alert("Booking Failed");
+  
+  }
+  
+  };
+
+handleCreatePatient();
+
+}}
+className="
+bg-green-600
+hover:bg-green-700
+text-white
+px-8
+py-3
+rounded-xl
+font-semibold
+"
+>
+Create Patient
+</button>
 
                   </div>
 
