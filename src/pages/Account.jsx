@@ -1207,24 +1207,33 @@ return (
 
       const patientId = Date.now().toString()
       console.log("REASON INFO =", reasonInfo);
+const newPatient = {
+  basicInfo,
+  insuranceInfo,
+  medicalHistory,
+  reasonInfo,
+  accountInfo,
+  status: "pending",
+  isDisabled: false,
+  createdAt: new Date()
+};
 
-      await setDoc(doc(db, "patients", patientId), {
-        basicInfo,
-        insuranceInfo,
-        medicalHistory,
-        reasonInfo,
-        accountInfo,
-        status: "pending",
-        isDisabled: false,
-        createdAt: new Date()
-      })
+await setDoc(
+  doc(db, "patients", patientId),
+  newPatient
+);
 
-      alert(
-        "Patient Created Successfully"
-        );
-        setShowPatientPopup(false);
 
-        await fetchPatientsList();
+setSelectedPatientData(newPatient);
+
+setPatientSearch(
+  basicInfo.name
+);
+
+alert("Patient Created Successfully");
+setShowPatientPopup(false);
+
+await fetchPatientsList();
 
       fetchPatients()
 
@@ -2120,13 +2129,14 @@ bg-gray-100
 onClick={async () => {
 
   console.log("SELECTED PATIENT DATA =", selectedPatientData);
-  const patientReason =
-  selectedPatientData?.reasonInfo?.visitReason ||
-  selectedPatientData?.reasonInfo?.primaryReason ||
-  selectedPatientData?.reasonInfo?.condition ||
-  selectedPatientData?.visitReason ||
-  selectedPatientData?.reason ||
-  "";
+const patientReason =
+selectedPatientData?.reasonInfo?.visitReason ||
+reasonInfo?.visitReason ||
+selectedPatientData?.reasonInfo?.primaryReason ||
+selectedPatientData?.reasonInfo?.condition ||
+selectedPatientData?.visitReason ||
+selectedPatientData?.reason ||
+"";
   const appointmentData = {
     appointmentNo,
   
