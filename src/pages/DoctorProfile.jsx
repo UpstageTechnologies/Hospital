@@ -942,27 +942,37 @@ const isDemo = location.state?.demo === true;
         );
 
         let list = [];
+        const doctorEmail =
+(localStorage.getItem("doctorEmail") || "")
+.trim()
+.toLowerCase();
+const today =
+new Date().toISOString().split("T")[0];
 
-        snap.forEach(docItem => {
+snap.forEach(docItem => {
 
-            const data = docItem.data();
-            
-            console.log("Firestore Data", data);
-            
-            console.log("doctorEmail DB:", data.doctorEmail);
-            console.log("doctorId DB:", data.doctorId);
-            console.log("doctorName DB:", data.doctorName);
-            
-            console.log("LOGIN EMAIL:", email);
-            console.log("DOCTOR DATA:", doctorData);
-            
-            if(data.status !== "Completed"){
+  const data = docItem.data();
 
-                list.push(data);
-                
-                }
-            
-            });
+  const appointmentDate =
+  data.date
+    ? new Date(data.date)
+        .toISOString()
+        .split("T")[0]
+    : "";
+
+  if (
+    data.status !== "Completed" &&
+    appointmentDate === today
+  ) {
+
+    list.push({
+      id: docItem.id,
+      ...data
+    });
+
+  }
+
+});
 
         console.log("Appointments:", list);
 
@@ -3218,89 +3228,32 @@ gap-4
 mt-10
 w-full
 ">
+{appointments
+.filter(item => {
 
-                    {appointments
-.filter((item) => {
+  const appointmentDate =
+  item.date
+    ? new Date(item.date)
+        .toISOString()
+        .split("T")[0]
+    : "";
 
-  if (!item.date || !item.time)
-    return false
-
-  const now = new Date()
-
-  const endTime =
-    item.time.split("-")[1]?.trim()
-
-  if (!endTime)
-    return false
-
-  const match =
-    endTime.match(
-      /(\d+):(\d+)(am|pm)/i
-    )
-
-  if (!match)
-    return false
-
-  let hours =
-    parseInt(match[1])
-
-  const minutes =
-    parseInt(match[2])
-
-  const modifier =
-    match[3].toLowerCase()
-
-  if (
-    modifier === "pm" &&
-    hours !== 12
-  ) {
-    hours += 12
-  }
-
-  if (
-    modifier === "am" &&
-    hours === 12
-  ) {
-    hours = 0
-  }
-
-  const appointmentEnd =
-    new Date(item.date)
-
-  appointmentEnd.setHours(
-    hours,
-    minutes,
-    0,
-    0
-  )
-
-  return appointmentEnd >= now
+  return (
+    item.status !== "Completed" &&
+    appointmentDate ===
+    new Date().toISOString().split("T")[0]
+  );
 
 })
 .map((item, index) => (
 
-                            <div
-                                key={index}
-                                onClick={() => {
-                                    setSelectedAppointment(item)
-                                    setStep(1)
-                                }}
-                                className="
-bg-white
-shadow-sm
-rounded-2xl
-p-3
-flex
-items-center
-gap-3
-cursor-pointer
-hover:shadow-md
-transition
-w-full
-min-w-0
-h-[90px]
-"
-                            >
+  <div
+    key={index}
+    onClick={() => {
+      setSelectedAppointment(item)
+      setStep(1)
+    }}
+  >
 
                                 {/* PATIENT IMAGE */}
                                 <img

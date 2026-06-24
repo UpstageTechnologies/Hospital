@@ -321,63 +321,10 @@ confirmPassword:""
   const [patientAccounts, setPatientAccounts] = useState([])
 
   const today = new Date().toISOString().split("T")[0];
-
   const currentAppointments =
-  patientAccounts.filter((p) => {
-  
-    if (!p.date || !p.time)
-      return false;
-  
-    const now = new Date();
-  
-    const endTime =
-      p.time.split("-")[1]?.trim();
-  
-    if (!endTime) return false;
-  
-    const match =
-    endTime
-      .replace(/\s/g, "")
-      .match(/(\d+):(\d+)(am|pm)/i);
-  
-    if (!match) return false;
-  
-    let hours =
-      parseInt(match[1]);
-  
-    const minutes =
-      parseInt(match[2]);
-  
-    const modifier =
-      match[3].toLowerCase();
-  
-    if (
-      modifier === "pm" &&
-      hours !== 12
-    ) {
-      hours += 12;
-    }
-  
-    if (
-      modifier === "am" &&
-      hours === 12
-    ) {
-      hours = 0;
-    }
-  
-    const appointmentEnd =
-      new Date(p.date);
-  
-    appointmentEnd.setHours(
-      hours,
-      minutes,
-      0,
-      0
-    );
-  
-    return appointmentEnd >= now;
-  
-  });
+  patientAccounts.filter(
+    (p) => p.date === today
+  );
   
   
   
@@ -1259,6 +1206,7 @@ return (
     try {
 
       const patientId = Date.now().toString()
+      console.log("REASON INFO =", reasonInfo);
 
       await setDoc(doc(db, "patients", patientId), {
         basicInfo,
@@ -1275,6 +1223,8 @@ return (
         "Patient Created Successfully"
         );
         setShowPatientPopup(false);
+
+        await fetchPatientsList();
 
       fetchPatients()
 
@@ -1818,10 +1768,16 @@ setSelectedPatientData({
   patient.name ||
   ""
   );
+  console.log(
+    "SELECTED AFTER SET",
+    patient?.reasonInfo?.visitReason
+    );
   
   setShowPatientDropdown(false);
   
   }}
+
+  
 className="
 p-3
 cursor-pointer
@@ -1846,6 +1802,7 @@ patient.patientPhone
 
 ))
 }
+
 
 {
 patientAccounts
@@ -2163,13 +2120,13 @@ bg-gray-100
 onClick={async () => {
 
   console.log("SELECTED PATIENT DATA =", selectedPatientData);
-
   const patientReason =
   selectedPatientData?.reasonInfo?.visitReason ||
+  selectedPatientData?.reasonInfo?.primaryReason ||
+  selectedPatientData?.reasonInfo?.condition ||
   selectedPatientData?.visitReason ||
   selectedPatientData?.reason ||
   "";
-  
   const appointmentData = {
     appointmentNo,
   
@@ -2240,9 +2197,10 @@ Book Appointment
       className="cursor-pointer bg-white p-4 rounded-xl shadow"
     >
 <p><b>Patient:</b> {p.patientName}</p>
-
-<p><b>Reason:</b> {p.reason}</p>
-
+<p>
+<b>Reason:</b>
+{String(p.reason || "NO REASON")}
+</p>
 <p><b>Doctor:</b> {p.doctorName}</p>
 
 <p><b>Date:</b> {p.date}</p>
@@ -3943,7 +3901,7 @@ Next
                     Reason
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-6 max-w-4xl">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
 
                     <FloatingInput label="Reason For Visit *" value={reasonInfo.visitReason} disabled={isViewMode}
                       onChange={(e) => setReasonInfo({ ...reasonInfo, visitReason: e.target.value })}
