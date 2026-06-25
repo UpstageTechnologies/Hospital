@@ -1556,7 +1556,7 @@ Schedule - {selectedDate}
                                             
                                             const match =
                                             startTime.match(
-                                            /(\d+):(\d+)(am|pm)/i
+                                            /(\d+):(\d+)\s*(AM|PM)/i
                                             );
                                             
                                             if (!match)
