@@ -361,6 +361,9 @@ const DoctorProfile = ({ hideDemoNav }) => {
     const [newSlot, setNewSlot] = useState("")
     const [doctorImage, setDoctorImage] = useState("")
     const [appointments, setAppointments] = useState([])
+    const [currentAppointment, setCurrentAppointment] = useState(null);
+    const [nextAppointment, setNextAppointment] = useState(null);
+    const [todayAppointments, setTodayAppointments] = useState([]);
     const [
         appointmentHistory,
         setAppointmentHistory
@@ -985,6 +988,90 @@ snap.forEach(docItem => {
 useEffect(() => {
     console.log("UPDATED APPOINTMENTS", appointments);
     }, [appointments]);
+
+    useEffect(() => {
+
+        if (!appointments.length) {
+            setCurrentAppointment(null);
+            setNextAppointment(null);
+            return;
+        }
+    
+        const today = new Date().toISOString().split("T")[0];
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+        const convert = (value) => {
+    
+            const match = value.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+    
+            if (!match) return 0;
+    
+            let h = parseInt(match[1]);
+            const m = parseInt(match[2]);
+            const ap = match[3].toLowerCase();
+    
+            if (ap === "pm" && h !== 12) h += 12;
+            if (ap === "am" && h === 12) h = 0;
+    
+            return h * 60 + m;
+        };
+    
+        const list = appointments
+            .filter(item => {
+    
+                if (!item.date || !item.time) return false;
+    
+                const date =
+                    new Date(item.date)
+                        .toISOString()
+                        .split("T")[0];
+    
+                return (
+                    date === today &&
+                    item.status !== "Completed"
+                );
+    
+            })
+            .sort((a, b) => {
+    
+                const aStart = convert(a.time.split("-")[0]);
+                const bStart = convert(b.time.split("-")[0]);
+    
+                return aStart - bStart;
+    
+            });
+    
+        let active = null;
+        let next = null;
+    
+        for (let i = 0; i < list.length; i++) {
+    
+            const item = list[i];
+    
+            const start = convert(item.time.split("-")[0]);
+            const end = convert(item.time.split("-")[1]);
+    
+            if (currentMinutes >= start && currentMinutes < end) {
+    
+                active = item;
+                next = list[i + 1] || null;
+                break;
+    
+            }
+    
+            if (currentMinutes < start && !next) {
+                next = item;
+            }
+    
+        }
+        setTodayAppointments(list);
+        setCurrentAppointment(active);
+        setNextAppointment(next);
+    
+    }, [appointments]);
+
+
 
     useEffect(() => {
 
@@ -3212,75 +3299,234 @@ Treated
             {page === "home" && (
                <div className="flex-1 p-6 overflow-x-hidden">
 
-<h1 className="text-2xl font-bold mb-6 text-center md:text-left">
-  Current Appointments
-</h1>
+<h2 className="text-2xl font-bold mb-5">
+Current Appointment
+</h2>
+
+{currentAppointment ? (
+
+<div
+onClick={()=>{
+setSelectedAppointment(currentAppointment);
+setStep(1);
+}}
+className="
+bg-white
+rounded-3xl
+shadow-lg
+border
+p-5
+cursor-pointer
+hover:shadow-xl
+transition
+max-w-xl
+"
+>
+
+<div className="flex items-center gap-5">
+
+<img
+src={
+currentAppointment.patientImage ||
+assets.profile_pic
+}
+className="
+w-20
+h-20
+rounded-full
+object-cover
+"
+/>
+
+<div>
+
+<h2 className="text-2xl font-bold">
+{currentAppointment.patientName}
+</h2>
+
+<p className="text-gray-500 mt-2">
+{currentAppointment.reason}
+</p>
+
+<p className="font-semibold mt-2">
+🕒 {currentAppointment.time}
+</p>
+
+<p className="text-gray-400">
+📅 {currentAppointment.date}
+</p>
+
+<p className="mt-2 text-blue-600 font-semibold">
+Appointment No :
+{currentAppointment.appointmentNo}
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+) : (
+
+<div
+className="
+bg-white
+rounded-2xl
+shadow
+border
+p-8
+text-center
+text-gray-500
+"
+>
+
+No Current Appointment
+
+</div>
+
+)}
+
+
+<h2 className="text-2xl font-bold mt-8 mb-5">
+Next Appointment
+</h2>
+
+{nextAppointment ? (
+
+<div className="bg-white rounded-3xl shadow-lg border p-5 max-w-xl">
+
+    <div className="flex items-center gap-5">
+
+        <img
+            src={nextAppointment.patientImage || assets.profile_pic}
+            className="w-20 h-20 rounded-full object-cover"
+        />
+
+        <div>
+
+            <h2 className="text-xl font-bold">
+                {nextAppointment.patientName}
+            </h2>
+
+            <p className="text-gray-500">
+                {nextAppointment.reason}
+            </p>
+
+            <p className="font-semibold mt-2">
+                🕒 {nextAppointment.time}
+            </p>
+
+            <p className="text-blue-600 font-semibold">
+                Appointment No :
+                {nextAppointment.appointmentNo}
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+) : (
+
+<div className="bg-white rounded-2xl shadow border p-8 text-center text-gray-500">
+No Next Appointment
+</div>
+
+)}
+
+<h2 className="text-2xl font-bold mt-10 mb-5">
+Today's Appointments
+</h2>
+
+{todayAppointments.length > 0 ? (
 
 <div className="
 grid
 grid-cols-1
-sm:grid-cols-2
-md:grid-cols-3
-lg:grid-cols-4
-xl:grid-cols-5
-2xl:grid-cols-6
-gap-4
-mt-10
-w-full
+md:grid-cols-2
+xl:grid-cols-3
+gap-5
 ">
-{appointments
-.filter(item => {
 
-  const appointmentDate =
-  item.date
-    ? new Date(item.date)
-        .toISOString()
-        .split("T")[0]
-    : "";
+{todayAppointments.map((item)=>(
+    
+<div
+onClick={()=>{
+    setSelectedAppointment(nextAppointment);
+    setStep(1);
+}}
+className="
+bg-white
+rounded-3xl
+shadow-lg
+border
+p-5
+max-w-xl
+cursor-pointer
+hover:shadow-xl
+transition
+"
+>
 
-  return (
-    item.status !== "Completed" &&
-    appointmentDate ===
-    new Date().toISOString().split("T")[0]
-  );
+<div className="flex items-center gap-4">
 
-})
-.map((item, index) => (
+<img
+src={item.patientImage || assets.profile_pic}
+className="
+w-16
+h-16
+rounded-full
+object-cover
+"
+/>
 
-  <div
-    key={index}
-    onClick={() => {
-      setSelectedAppointment(item)
-      setStep(1)
-    }}
-  >
+<div className="flex-1">
 
-                                {/* PATIENT IMAGE */}
-                                <img
-                                    src={item.patientImage || assets.profile_pic}
-                                    className="w-12 h-12 rounded-full object-cover"
-                                />
+<h3 className="font-bold text-lg">
+{item.patientName}
+</h3>
 
-                                {/* DETAILS */}
-                                <div>
-                                    <h2 className="text-lg font-bold">
-                                        {item.patientName}
-                                    </h2>
+<p className="text-gray-500 text-sm">
+{item.reason || "No Reason"}
+</p>
 
-                                    <p className="text-gray-600">
-                                        {item.time}
-                                    </p>
+<p className="mt-2 font-semibold">
+🕒 {item.time}
+</p>
 
-                                    <p className="text-gray-400 text-sm">
-                                        {item.date}
-                                    </p>
-                                </div>
+<p className="text-blue-600 text-sm">
+#{item.appointmentNo}
+</p>
 
-                            </div>
+</div>
 
-                        ))}
+</div>
 
-                    </div>
+</div>
+
+))}
+
+</div>
+
+) : (
+
+<div className="
+bg-white
+rounded-2xl
+border
+shadow
+p-8
+text-center
+text-gray-500
+">
+
+No Appointments Today
+
+</div>
+
+)}
 
                     {/* Hospital Dashboard */}
 

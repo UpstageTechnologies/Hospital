@@ -321,10 +321,77 @@ confirmPassword:""
   const [patientAccounts, setPatientAccounts] = useState([])
 
   const today = new Date().toISOString().split("T")[0];
-  const currentAppointments =
-  patientAccounts.filter(
-    (p) => p.date === today
-  );
+
+const todayAppointments = patientAccounts
+.filter((p) => p.date === today)
+.sort((a, b) => {
+  const getStart = (time) => {
+    const start = time.split("-")[0].trim();
+
+    let [t, ap] = start.split(" ");
+    let [h, m] = t.split(":").map(Number);
+
+    if (ap === "PM" && h !== 12) h += 12;
+    if (ap === "AM" && h === 12) h = 0;
+
+    const d = new Date(today);
+    d.setHours(h, m, 0, 0);
+
+    return d.getTime();
+  };
+
+  return getStart(a.time) - getStart(b.time);
+});
+
+
+  const now = new Date();
+
+  const currentAppointment =
+  todayAppointments
+  .filter((item) => {
+
+  if (!item.time) return false;
+
+  const [start, end] = item.time.split("-").map((t) => t.trim());
+
+  const convertTime = (time) => {
+
+    const match = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+
+    if (!match) return null;
+
+    let hour = parseInt(match[1], 10);
+    const minute = parseInt(match[2], 10);
+    const period = match[3].toUpperCase();
+
+    if (period === "PM" && hour !== 12) hour += 12;
+    if (period === "AM" && hour === 12) hour = 0;
+
+    const d = new Date(item.date);
+    d.setHours(hour, minute, 0, 0);
+
+    return d;
+  };
+
+  const startTime = convertTime(start);
+  const endTime = convertTime(end);
+
+  return now >= startTime && now <= endTime;
+
+})
+.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0))[0];
+
+
+const currentIndex = todayAppointments.findIndex(
+  (item) => item.id === currentAppointment?.id
+);
+
+const nextAppointment =
+  currentIndex !== -1
+    ? todayAppointments[currentIndex + 1] || null
+    : todayAppointments[0] || null;
+
+    
   
   
   
@@ -1575,7 +1642,7 @@ Journal Entry
         Today's Appointments
       </h3>
       <p className="text-4xl font-bold text-green-600">
-        {currentAppointments.length}
+      {todayAppointments.length}
       </p>
     </div>
 
@@ -2189,18 +2256,117 @@ Book Appointment
 
 </div>
 
+{/* ================= CURRENT APPOINTMENT ================= */}
+
+<div className="mt-10">
+
+<h2 className="text-3xl font-bold mb-5">
+Current Appointment
+</h2>
+
+{currentAppointment ? (
+
+<div
+onClick={() => setCallData(currentAppointment)}
+className="bg-white rounded-3xl border shadow-md p-6 cursor-pointer"
+>
+
+<div className="grid md:grid-cols-2 gap-6">
+
+<div>
+
+<p><b>Patient :</b> {currentAppointment.patientName}</p>
+<p><b>Reason :</b> {currentAppointment.reason}</p>
+<p><b>Doctor :</b> {currentAppointment.doctorName}</p>
+
+</div>
+
+<div>
+
+<p><b>Date :</b> {currentAppointment.date}</p>
+<p><b>Time :</b> {currentAppointment.time}</p>
+<p><b>Appointment :</b> {currentAppointment.appointmentNo}</p>
+
+</div>
+
+</div>
+
+</div>
+
+) : (
+
+<div className="bg-white rounded-3xl border shadow p-10 text-center">
+
+No Current Appointment
+
+</div>
+
+)}
+
+</div>
+
+
+{/* ================= NEXT APPOINTMENT ================= */}
+
+<div className="mt-10">
+
+<h2 className="text-3xl font-bold mb-5">
+Next Appointment
+</h2>
+
+{nextAppointment ? (
+
+<div
+onClick={() => setCallData(nextAppointment)}
+className="bg-white rounded-3xl border shadow-md p-6 cursor-pointer"
+>
+
+<div className="grid md:grid-cols-2 gap-6">
+
+<div>
+
+<p><b>Patient :</b> {nextAppointment.patientName}</p>
+<p><b>Reason :</b> {nextAppointment.reason}</p>
+<p><b>Doctor :</b> {nextAppointment.doctorName}</p>
+
+</div>
+
+<div>
+
+<p><b>Date :</b> {nextAppointment.date}</p>
+<p><b>Time :</b> {nextAppointment.time}</p>
+<p><b>Appointment :</b> {nextAppointment.appointmentNo}</p>
+
+</div>
+
+</div>
+
+</div>
+
+) : (
+
+<div className="bg-white rounded-3xl border shadow p-10 text-center">
+
+No Next Appointment
+
+</div>
+
+)}
+
+</div>
+
     
 <div className="mt-8 md:mt-10 pt-6 border-t border-gray-200">
   <h1 className="text-2xl font-bold">
-    Current Appointments
+  Today's Appointments
   </h1>
 </div>
 
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {currentAppointments.length === 0 ? (
-  <p>No Current Appointments</p>
+    {todayAppointments.length === 0 ? (
+  <p>No Today's Appointments</p>
 ) : (
-  currentAppointments.map((p, index) => (
+  todayAppointments.map((p, index) => (
     <div
       key={index}
       onClick={() => setCallData(p)}
